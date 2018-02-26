@@ -1,12 +1,9 @@
 defmodule SmoodleWeb.ErrorView do
   use SmoodleWeb, :view
 
-  def render("404.html", _assigns) do
-    "Page not found"
-  end
-
-  def render("500.html", _assigns) do
-    "Internal server error"
+  def render(<<code::binary-size(3), rest::binary>>, %{reason: %{message: message, plug_status: status}}) 
+  when code not in ["404", "500"] do 
+    render("generic.html", %{message: message, status: status})
   end
 
   # In case no render clause matches or no

@@ -2,6 +2,6 @@ defmodule SmoodleWeb.PageController do
   use SmoodleWeb, :controller
 
   def index(conn, _params) do
-    render conn, "index.html"
+    raise %Plug.BadRequestError{message: "Oh no, we did baaad!!!"}
   end
 end
