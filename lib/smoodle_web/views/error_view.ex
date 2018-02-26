@@ -1,8 +1,10 @@
 defmodule SmoodleWeb.ErrorView do
   use SmoodleWeb, :view
 
-  def render(<<code::binary-size(3), rest::binary>>, %{reason: %{message: message, plug_status: status}}) 
-  when code not in ["404", "500"] do 
+  @codes_with_own_pages ["404", "500"]
+
+  def render(<<code::binary-size(3), _rest::binary>>, %{reason: %{message: message, plug_status: status}}) 
+  when code not in @codes_with_own_pages do 
     render("generic.html", %{message: message, status: status})
   end
 
