@@ -19,6 +19,12 @@ defmodule SmoodleWeb.Router do
     get "/", PageController, :index
   end
 
+  scope "/v1", SmoodleWeb do
+    pipe_through :api
+
+    resources "/events", EventController, except: [:new, :delete]
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", SmoodleWeb do
   #   pipe_through :api
