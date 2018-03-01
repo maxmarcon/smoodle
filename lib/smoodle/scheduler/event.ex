@@ -21,5 +21,7 @@ defmodule Smoodle.Scheduler.Event do
     event
     |> cast(attrs, [:name, :time_window_from, :time_window_to, :desc])
     |> validate_required([:name, :desc])
+    |> validate_length(:name, max: 255, count: :codepoints)
+    |> validate_length(:desc, max: 2500, count: :codepoints)
   end
 end
