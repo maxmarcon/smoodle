@@ -19,37 +19,37 @@ defmodule Smoodle.Scheduler.EventTest do
 
 	test "changeset without name" do 
 		changeset = Event.changeset_create(%Event{}, Map.delete(@valid_attrs, :name))
-		assert %{name: ["can't be blank"]} = errors_on(changeset)
+		assert [name: {_, [validation: :required]}] = changeset.errors
 	end
 
 	test "changeset with name too long" do 
 		changeset = Event.changeset_create(%Event{}, Map.replace!(@valid_attrs, :name, String.pad_trailing("Party", 256, "123")))
-		assert %{name: ["should be at most 255 character(s)"]} = errors_on(changeset)
+		assert [name: {_,  [count: 255, validation: :length, max: 255]}] = changeset.errors
 	end
 
 	test "changeset with description too long" do 
 		changeset = Event.changeset_create(%Event{}, Map.replace!(@valid_attrs, :desc, String.pad_trailing("Yeah!", 2501, "123")))
-		assert %{desc: ["should be at most 2500 character(s)"]} = errors_on(changeset)
+		assert [desc: {_,  [count: 2500, validation: :length, max: 2500]}] = changeset.errors
 	end
 
 	test "validate both time window ends must be defined" do
 		changeset = Event.changeset_create(%Event{}, Map.delete(@valid_attrs, :time_window_from))
-		assert %{time_window: ["both ends must be defined or none"]} = errors_on(changeset)
+		assert [time_window: {_, [validation: :only_one_end_defined]}] = changeset.errors
 	end
 
 	test "validate both scheduled ends must be defined" do
 		changeset = Event.changeset_create(%Event{}, Map.delete(@valid_attrs, :scheduled_to))
-		assert %{scheduled: ["both ends must be defined or none"]} = errors_on(changeset)
+		assert [scheduled: {_, [validation: :only_one_end_defined]}] = changeset.errors
 	end
 
 	test "validate both time window ends must be consistent" do
 		changeset = Event.changeset_create(%Event{}, Map.replace!(@valid_attrs, :time_window_from, "2018-03-25 00:00:00+00"))
-		assert %{time_window: ["the right side of the window must happen later than the left one"]} = errors_on(changeset)
+		assert [time_window: {_, [validation: :inconsistent_interval]}] = changeset.errors
 	end
 
 	test "validate both scheduled ends must be consistent" do
 		changeset = Event.changeset_create(%Event{}, Map.replace!(@valid_attrs, :scheduled_to, "2018-02-05 18:00:01+00"))
-		assert %{scheduled: ["the right side of the window must happen later than the left one"]} = errors_on(changeset)
+		assert [scheduled: {_, [validation: :inconsistent_interval]}] = changeset.errors
 	end
 
 end

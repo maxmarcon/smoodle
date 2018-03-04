@@ -22,8 +22,8 @@ defmodule Smoodle.Scheduler.Event do
     event
     |> cast(attrs, [:name, :time_window_from, :time_window_to, :scheduled_from, :scheduled_to, :desc])
     |> validate_required([:name, :desc])
-    |> validate_length(:name, max: 255, count: :codepoints)
-    |> validate_length(:desc, max: 2500, count: :codepoints)
+    |> validate_length(:name, max: 255)
+    |> validate_length(:desc, max: 2500)
     |> validate_time_window_defined([:time_window_from, :time_window_to], :time_window)
     |> validate_time_window_defined([:scheduled_from, :scheduled_to], :scheduled)
     |> validate_time_window_consistent([:time_window_from, :time_window_to], :time_window)
@@ -38,7 +38,7 @@ defmodule Smoodle.Scheduler.Event do
       |> Enum.count(&(is_nil(&1)))
       |> Integer.is_odd
     do
-      add_error(changeset, error_key, "both ends must be defined or none")
+      add_error(changeset, error_key, "both ends must be defined or none", [validation: :only_one_end_defined])
     else
       changeset
     end
@@ -48,7 +48,7 @@ defmodule Smoodle.Scheduler.Event do
     if Enum.all?(applied = (apply_changes(changeset) |> Map.take(keys) |> Map.values), &(!is_nil(&1)))
       && Enum.reduce(applied, &(DateTime.diff(&1, &2))) <= 0
     do
-      add_error(changeset, error_key, "the right side of the window must happen later than the left one")
+      add_error(changeset, error_key, "the right side of the window must happen later than the left one", [validation: :inconsistent_interval])
     else
       changeset
     end
