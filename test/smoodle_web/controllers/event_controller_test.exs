@@ -4,7 +4,23 @@ defmodule SmoodleWeb.EventControllerTest do
   alias Smoodle.Scheduler
   alias Smoodle.Scheduler.Event
 
-  @create_attrs %{}
+  @create_attrs_1 %{
+    name: "Party",
+    desc: "Yeah!",
+    time_window_from: "2017-03-01",
+    time_window_to: "2017-06-01",
+    scheduled_from: "2017-03-20 20:10:00",
+    scheduled_to: "2017-03-20 23:10:00"
+  }
+  @create_attrs_2 %{
+    name: "Dinner",
+    desc: "Yummy!",
+    time_window_from: "2017-04-01",
+    time_window_to: "2017-08-20",
+    scheduled_from: "2017-07-21 21:10:00",
+    scheduled_to: "2017-07-22 22:10:00"
+  }
+
   @update_attrs %{}
   @invalid_attrs %{}
 
@@ -13,14 +29,29 @@ defmodule SmoodleWeb.EventControllerTest do
     event
   end
 
+  def fixture(:events) do
+    {:ok, event1} = Scheduler.create_event(@create_attrs_1)
+    {:ok, event2} = Scheduler.create_event(@create_attrs_2)
+    {:ok, events: [event1, event2]}
+  end
+
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+   {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
   describe "index" do
-    test "lists all events", %{conn: conn} do
+    setup do
+      fixture(:events)
+    end
+
+    test "lists all events", %{conn: conn, events: events} do
       conn = get conn, event_path(conn, :index)
-      assert json_response(conn, 200)["data"] == []
+      assert length(json_response(conn, 200)["data"]) == 2
+      data = json_response(conn, 200)["data"]
+      Enum.each(events, fn event ->
+        assert event.name in Enum.map(data, &(&1["name"]))
+        assert event.desc in Enum.map(data, &(&1["desc"]))
+      end)
     end
   end
 

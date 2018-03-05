@@ -8,30 +8,29 @@ defmodule Smoodle.Scheduler.Event do
 
   schema "events" do
     field :name, :string
-    field :time_window_from, :utc_datetime
-    field :time_window_to, :utc_datetime
-    field :scheduled_from, :utc_datetime
-    field :scheduled_to, :utc_datetime
+    field :time_window_from, :date
+    field :time_window_to, :date
+    field :scheduled_from, :naive_datetime
+    field :scheduled_to, :naive_datetime
     field :desc, :string
 
     timestamps()
   end
 
   @doc false
-  def changeset_create(%Event{} = event, attrs) do
+  def changeset(%Event{} = event, attrs) do
     event
     |> cast(attrs, [:name, :time_window_from, :time_window_to, :scheduled_from, :scheduled_to, :desc])
     |> validate_required([:name, :desc])
     |> validate_length(:name, max: 255)
     |> validate_length(:desc, max: 2500)
-    |> validate_time_window_defined([:time_window_from, :time_window_to], :time_window)
-    |> validate_time_window_defined([:scheduled_from, :scheduled_to], :scheduled)
+    |> validate_window_defined([:time_window_from, :time_window_to], :time_window)
+    |> validate_window_defined([:scheduled_from, :scheduled_to], :scheduled)
     |> validate_time_window_consistent([:time_window_from, :time_window_to], :time_window)
-    |> validate_time_window_consistent([:scheduled_from, :scheduled_to], :scheduled)
+    |> validate_scheduled_window_consistent([:scheduled_from, :scheduled_to], :scheduled)
   end
 
-
-  defp validate_time_window_defined(changeset, keys, error_key) do
+  defp validate_window_defined(changeset, keys, error_key) do
     if apply_changes(changeset)
       |> Map.take(keys)
       |> Map.values
@@ -45,12 +44,26 @@ defmodule Smoodle.Scheduler.Event do
   end
 
   defp validate_time_window_consistent(changeset, keys, error_key) do
-    if Enum.all?(applied = (apply_changes(changeset) |> Map.take(keys) |> Map.values), &(!is_nil(&1)))
-      && Enum.reduce(applied, &(DateTime.diff(&1, &2))) <= 0
+    with applied <- apply_changes(changeset) |> Map.take(keys) |> Map.values,
+      true <- Enum.all?(applied, &(!is_nil(&1))),
+      [t1, t2] <- applied,
+      :gt <- Date.compare(t1, t2)
     do
       add_error(changeset, error_key, "the right side of the window must happen later than the left one", [validation: :inconsistent_interval])
     else
-      changeset
+      _ -> changeset
+    end
+  end
+
+  defp validate_scheduled_window_consistent(changeset, keys, error_key) do
+    with applied <- apply_changes(changeset) |> Map.take(keys) |> Map.values,
+      true <- Enum.all?(applied, &(!is_nil(&1))),
+      [t1, t2] <- applied,
+      :gt <- NaiveDateTime.compare(t1, t2)
+    do
+      add_error(changeset, error_key, "the right side of the window must happen later than the left one", [validation: :inconsistent_interval])
+    else
+      _ -> changeset
     end
   end
 end

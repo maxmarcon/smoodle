@@ -49,7 +49,9 @@ defmodule Smoodle.Scheduler do
 
   """
   def create_event(attrs \\ %{}) do
-    raise "TODO"
+    %Event{}
+    |> Event.changeset(attrs)
+    |> Repo.insert
   end
 
   @doc """
