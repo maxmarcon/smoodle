@@ -51,6 +51,8 @@ defmodule SmoodleWeb.EventControllerTest do
       Enum.each(events, fn event ->
         assert event.name in Enum.map(data, &(&1["name"]))
         assert event.desc in Enum.map(data, &(&1["desc"]))
+        assert Date.to_string(event.time_window_from) in Enum.map(data, &(&1["time_window_from"]))
+        assert Date.to_string(event.time_window_to) in Enum.map(data, &(&1["time_window_to"]))
       end)
     end
   end
