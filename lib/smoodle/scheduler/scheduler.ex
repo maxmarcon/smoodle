@@ -67,7 +67,9 @@ defmodule Smoodle.Scheduler do
 
   """
   def update_event(%Event{} = event, attrs) do
-    raise "TODO"
+    event
+    |> Event.changeset(attrs)
+    |> Repo.update
   end
 
   @doc """

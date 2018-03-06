@@ -15,6 +15,6 @@ defmodule SmoodleWeb.FallbackController do
   def call(conn, {:error, :not_found}) do
     conn
     |> put_status(:not_found)
-    |> render(SmoodleWeb.ErrorView, :"404")
+    |> render(SmoodleWeb.ErrorView, "404.json", %{reason: %{message: "Not found"}})
   end
 end

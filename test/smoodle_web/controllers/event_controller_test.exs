@@ -21,12 +21,20 @@ defmodule SmoodleWeb.EventControllerTest do
     scheduled_to: "2017-07-22 22:10:00"
   }
 
+  defp rest_repr(attr) do
+    %{
+      "name" => attr[:name],
+      "desc" => attr[:desc],
+      "time_window_from" => attr[:time_window_from],
+      "time_window_to" => attr[:time_window_to]
+    }
+  end
+
   @update_attrs %{}
   @invalid_attrs %{}
 
   def fixture(:event) do
     {:ok, event} = Scheduler.create_event(@create_attrs)
-    event
   end
 
   def fixture(:events) do
@@ -49,22 +57,28 @@ defmodule SmoodleWeb.EventControllerTest do
       assert length(json_response(conn, 200)["data"]) == 2
       data = json_response(conn, 200)["data"]
       Enum.each(events, fn event ->
-        assert event.name in Enum.map(data, &(&1["name"]))
-        assert event.desc in Enum.map(data, &(&1["desc"]))
-        assert Date.to_string(event.time_window_from) in Enum.map(data, &(&1["time_window_from"]))
-        assert Date.to_string(event.time_window_to) in Enum.map(data, &(&1["time_window_to"]))
+        from_data = Enum.find(data, &(&1["id"] == event.id))
+        refute from_data == nil
+        assert event.name == from_data["name"]
+        assert event.desc == from_data["desc"]
+        assert Date.to_string(event.time_window_from) == from_data["time_window_from"]
+        assert Date.to_string(event.time_window_to) == from_data["time_window_to"]
       end)
     end
   end
 
   describe "create event" do
     test "renders event when data is valid", %{conn: conn} do
-      conn = post conn, event_path(conn, :create), event: @create_attrs
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+      conn = post conn, event_path(conn, :create), event: @create_attrs_1
+      data_response = json_response(conn, 201)["data"]
+      assert %{"id" => id} = data_response
+
+      expected_data_response = Map.merge(%{"id" => id}, rest_repr(@create_attrs_1))
+      assert MapSet.subset?(MapSet.new(expected_data_response), MapSet.new(data_response))
 
       conn = get conn, event_path(conn, :show, id)
-      assert json_response(conn, 200)["data"] == %{
-        "id" => id}
+      data_response = json_response(conn, 200)["data"] 
+      assert MapSet.subset?(MapSet.new(expected_data_response), MapSet.new(data_response))
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
@@ -74,7 +88,9 @@ defmodule SmoodleWeb.EventControllerTest do
   end
 
   describe "update event" do
-    setup [:create_event]
+    setup do
+      fixture(:event)
+    end
 
     test "renders event when data is valid", %{conn: conn, event: %Event{id: id} = event} do
       conn = put conn, event_path(conn, :update, event), event: @update_attrs
@@ -92,7 +108,9 @@ defmodule SmoodleWeb.EventControllerTest do
   end
 
   describe "delete event" do
-    setup [:create_event]
+    setup do
+      fixture(:event)
+    end
 
     test "deletes chosen event", %{conn: conn, event: event} do
       conn = delete conn, event_path(conn, :delete, event)
@@ -103,8 +121,4 @@ defmodule SmoodleWeb.EventControllerTest do
     end
   end
 
-  defp create_event(_) do
-    event = fixture(:event)
-    {:ok, event: event}
-  end
 end
