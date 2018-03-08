@@ -8,18 +8,23 @@ defmodule SmoodleWeb.EventControllerTest do
     name: "Party",
     desc: "Yeah!",
     time_window_from: "2017-03-01",
-    time_window_to: "2017-06-01",
-    scheduled_from: "2017-03-20 20:10:00",
-    scheduled_to: "2017-03-20 23:10:00"
+    time_window_to: "2017-06-01"
   }
   @create_attrs_2 %{
     name: "Dinner",
     desc: "Yummy!",
     time_window_from: "2017-04-01",
-    time_window_to: "2017-08-20",
-    scheduled_from: "2017-07-21 21:10:00",
-    scheduled_to: "2017-07-22 22:10:00"
+    time_window_to: "2017-08-20"
   }
+
+  defp rest_repr(%{ scheduled_from: scheduled_from, scheduled_to: scheduled_to }) do
+    {:ok, s_from} = NaiveDateTime.from_iso8601(scheduled_from)
+    {:ok, s_to} = NaiveDateTime.from_iso8601(scheduled_to)
+    %{
+      "scheduled_from" => NaiveDateTime.to_iso8601(s_from),
+      "scheduled_to" => NaiveDateTime.to_iso8601(s_to)
+    }    
+  end
 
   defp rest_repr(attr) do
     %{
@@ -30,11 +35,18 @@ defmodule SmoodleWeb.EventControllerTest do
     }
   end
 
-  @update_attrs %{}
-  @invalid_attrs %{}
+  @update_attrs %{
+    scheduled_from: "2017-04-05 21:10:00",
+    scheduled_to: "2017-04-05 22:10:00"
+  }
+  @invalid_attrs %{
+    scheduled_to: "2017-04-05 21:10:00",
+    scheduled_from: "2017-04-05 22:10:00"    
+  }
 
   def fixture(:event) do
-    {:ok, event} = Scheduler.create_event(@create_attrs)
+    {:ok, event} = Scheduler.create_event(@create_attrs_1)
+    {:ok, event: event}
   end
 
   def fixture(:events) do
@@ -94,11 +106,15 @@ defmodule SmoodleWeb.EventControllerTest do
 
     test "renders event when data is valid", %{conn: conn, event: %Event{id: id} = event} do
       conn = put conn, event_path(conn, :update, event), event: @update_attrs
-      assert %{"id" => ^id} = json_response(conn, 200)["data"]
+      data_response = json_response(conn, 200)["data"]
+      assert %{"id" => ^id} = data_response
 
-      conn = get conn, event_path(conn, :show, id)
-      assert json_response(conn, 200)["data"] == %{
-        "id" => id}
+      expected_data_response = Map.merge(%{"id" => id}, rest_repr(@create_attrs_1)) |> Map.merge(rest_repr(@update_attrs))
+      assert MapSet.subset?(MapSet.new(expected_data_response), MapSet.new(data_response))
+
+      conn = get conn, event_path(conn, :show, event.id)
+      data_response = json_response(conn, 200)["data"]
+      assert MapSet.subset?(MapSet.new(Map.merge(%{"id" => id}, rest_repr(@create_attrs_1))), MapSet.new(data_response))
     end
 
     test "renders errors when data is invalid", %{conn: conn, event: event} do
@@ -120,5 +136,4 @@ defmodule SmoodleWeb.EventControllerTest do
       end
     end
   end
-
 end

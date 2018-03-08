@@ -22,7 +22,7 @@ defmodule SmoodleWeb.Router do
   scope "/v1", SmoodleWeb do
     pipe_through :api
 
-    resources "/events", EventController, except: [:new, :delete]
+    resources "/events", EventController, except: [:new, :edit]
   end
 
   # Other scopes may use custom stacks.

@@ -85,19 +85,6 @@ defmodule Smoodle.Scheduler do
 
   """
   def delete_event(%Event{} = event) do
-    raise "TODO"
-  end
-
-  @doc """
-  Returns a datastructure for tracking event changes.
-
-  ## Examples
-
-      iex> change_event(event)
-      %Todo{...}
-
-  """
-  def change_event(%Event{} = event) do
-    raise "TODO"
+    Repo.delete(event)
   end
 end

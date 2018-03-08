@@ -6,31 +6,56 @@ defmodule Smoodle.SchedulerTest do
   describe "events" do
     alias Smoodle.Scheduler.Event
 
-    @valid_attrs %{}
-    @update_attrs %{}
-    @invalid_attrs %{}
+    @valid_attrs_1 %{
+      name: "Party",
+      desc: "Yeah!",
+      time_window_from: "2017-03-01",
+      time_window_to: "2017-06-01"
+    }
+    @valid_attrs_2 %{
+      name: "Breakfast",
+      desc: "Mmmhhh!",
+      time_window_from: "2018-01-01",
+      time_window_to: "2018-06-01"
+    }
+    
+    @update_attrs %{
+      name: "New name",
+      scheduled_from: "2017-03-20 20:10:00",
+      scheduled_to: "2017-03-20 23:10:00"
+    }
+    @invalid_attrs %{
+      scheduled_to: "2017-03-20 20:10:00",
+      scheduled_from: "2017-03-20 23:10:00"
+    }
 
-    def event_fixture(attrs \\ %{}) do
-      {:ok, event} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> Scheduler.create_event()
+    def event_fixture([_ | _] = attr_list) do
+      Enum.map(attr_list, fn attrs ->
+        {:ok, event} = Scheduler.create_event(attrs)
+
+        event
+      end)
+    end
+
+    def event_fixture(attrs) do
+      {:ok, event} = Scheduler.create_event(attrs)
 
       event
     end
 
     test "list_events/0 returns all events" do
-      event = event_fixture()
-      assert Scheduler.list_events() == [event]
+      events = event_fixture([@valid_attrs_1, @valid_attrs_2])
+      assert MapSet.new(Scheduler.list_events()) == MapSet.new(events)
     end
 
     test "get_event!/1 returns the event with given id" do
-      event = event_fixture()
+      event = event_fixture(@valid_attrs_1)
       assert Scheduler.get_event!(event.id) == event
     end
 
-    test "create_event/1 with valid data creates a event" do
-      assert {:ok, %Event{} = event} = Scheduler.create_event(@valid_attrs)
+    test "create_event/1 with valid data creates an event" do
+      assert {:ok, %Event{} = event} = Scheduler.create_event(@valid_attrs_1)
+      assert Map.take(event, [:name, :desc]) == Map.take(@valid_attrs_1, [:name, :desc])
     end
 
     test "create_event/1 with invalid data returns error changeset" do
@@ -38,26 +63,21 @@ defmodule Smoodle.SchedulerTest do
     end
 
     test "update_event/2 with valid data updates the event" do
-      event = event_fixture()
+      event = event_fixture(@valid_attrs_1)
       assert {:ok, event} = Scheduler.update_event(event, @update_attrs)
-      assert %Event{} = event
+      assert event.name == @update_attrs.name
     end
 
     test "update_event/2 with invalid data returns error changeset" do
-      event = event_fixture()
+      event = event_fixture(@valid_attrs_1)
       assert {:error, %Ecto.Changeset{}} = Scheduler.update_event(event, @invalid_attrs)
       assert event == Scheduler.get_event!(event.id)
     end
 
     test "delete_event/1 deletes the event" do
-      event = event_fixture()
+      event = event_fixture(@valid_attrs_1)
       assert {:ok, %Event{}} = Scheduler.delete_event(event)
       assert_raise Ecto.NoResultsError, fn -> Scheduler.get_event!(event.id) end
-    end
-
-    test "change_event/1 returns a event changeset" do
-      event = event_fixture()
-      assert %Ecto.Changeset{} = Scheduler.change_event(event)
     end
   end
 end

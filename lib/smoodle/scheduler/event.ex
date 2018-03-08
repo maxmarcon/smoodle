@@ -14,7 +14,7 @@ defmodule Smoodle.Scheduler.Event do
     field :scheduled_to, :naive_datetime
     field :desc, :string
 
-    timestamps()
+    timestamps(usec: false)
   end
 
   @doc false
@@ -28,6 +28,8 @@ defmodule Smoodle.Scheduler.Event do
     |> validate_window_defined([:scheduled_from, :scheduled_to], :scheduled)
     |> validate_time_window_consistent([:time_window_from, :time_window_to], :time_window)
     |> validate_scheduled_window_consistent([:scheduled_from, :scheduled_to], :scheduled)
+
+    # TODO: validate scheduled window lies inside time windoe
   end
 
   defp validate_window_defined(changeset, keys, error_key) do

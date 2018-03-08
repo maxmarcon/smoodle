@@ -22,7 +22,6 @@ defmodule SmoodleWeb.ErrorViewTest do
   end
 
   test "render any other without message" do
-    error_msg = "An error occurred"
     assert render_to_string(SmoodleWeb.ErrorView, "505.html", %{}) =~
            "The server experienced an internal error"
   end
