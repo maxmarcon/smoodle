@@ -71,6 +71,7 @@ defmodule SmoodleWeb.EventControllerTest do
       Enum.each(events, fn event ->
         from_data = Enum.find(data, &(&1["id"] == event.id))
         refute from_data == nil
+        refute Map.has_key?(from_data, "update_token")
         assert event.name == from_data["name"]
         assert event.desc == from_data["desc"]
         assert Date.to_string(event.time_window_from) == from_data["time_window_from"]
@@ -84,6 +85,7 @@ defmodule SmoodleWeb.EventControllerTest do
       conn = post conn, event_path(conn, :create), event: @create_attrs_1
       data_response = json_response(conn, 201)["data"]
       assert %{"id" => id} = data_response
+      assert Map.has_key?(data_response, "update_token")
 
       expected_data_response = Map.merge(%{"id" => id}, rest_repr(@create_attrs_1))
       assert MapSet.subset?(MapSet.new(expected_data_response), MapSet.new(data_response))
@@ -91,6 +93,7 @@ defmodule SmoodleWeb.EventControllerTest do
       conn = get conn, event_path(conn, :show, id)
       data_response = json_response(conn, 200)["data"] 
       assert MapSet.subset?(MapSet.new(expected_data_response), MapSet.new(data_response))
+      refute Map.has_key?(data_response, "update_token")
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
@@ -105,9 +108,10 @@ defmodule SmoodleWeb.EventControllerTest do
     end
 
     test "renders event when data is valid", %{conn: conn, event: %Event{id: id} = event} do
-      conn = put conn, event_path(conn, :update, event), event: @update_attrs
+      conn = put conn, event_path(conn, :update, event), event: Map.merge(@update_attrs, %{update_token: event.update_token})
       data_response = json_response(conn, 200)["data"]
       assert %{"id" => ^id} = data_response
+      refute Map.has_key?(data_response, "update_token")
 
       expected_data_response = Map.merge(%{"id" => id}, rest_repr(@create_attrs_1)) |> Map.merge(rest_repr(@update_attrs))
       assert MapSet.subset?(MapSet.new(expected_data_response), MapSet.new(data_response))
@@ -115,12 +119,20 @@ defmodule SmoodleWeb.EventControllerTest do
       conn = get conn, event_path(conn, :show, event.id)
       data_response = json_response(conn, 200)["data"]
       assert MapSet.subset?(MapSet.new(Map.merge(%{"id" => id}, rest_repr(@create_attrs_1))), MapSet.new(data_response))
+      refute Map.has_key?(data_response, "update_token")
     end
 
     test "renders errors when data is invalid", %{conn: conn, event: event} do
-      conn = put conn, event_path(conn, :update, event), event: @invalid_attrs
+      conn = put conn, event_path(conn, :update, event), event: Map.merge(@invalid_attrs, %{update_token: event.update_token})
       assert json_response(conn, 422)["errors"] != %{}
     end
+
+    test "renders errors when token is wrong", %{conn: conn, event: event} do
+      assert_error_sent 404, fn ->
+        put conn, event_path(conn, :update, event), event: Map.merge(@update_attrs, %{update_token: "wrong_token"})
+      end
+    end
+
   end
 
   describe "delete event" do
@@ -129,11 +141,19 @@ defmodule SmoodleWeb.EventControllerTest do
     end
 
     test "deletes chosen event", %{conn: conn, event: event} do
-      conn = delete conn, event_path(conn, :delete, event)
+      conn = delete conn, event_path(conn, :delete, event), update_token: event.update_token
       assert response(conn, 204)
       assert_error_sent 404, fn ->
         get conn, event_path(conn, :show, event)
       end
+    end
+
+    test "does not delete and render error if token is wrong", %{conn: conn, event: event} do
+      assert_error_sent 404, fn ->
+        delete conn, event_path(conn, :delete, event), update_token: "wrong token"
+      end
+      conn = get conn, event_path(conn, :show, event)
+      assert response(conn, 200)
     end
   end
 end

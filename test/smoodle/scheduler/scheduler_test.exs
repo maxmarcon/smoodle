@@ -56,6 +56,7 @@ defmodule Smoodle.SchedulerTest do
     test "create_event/1 with valid data creates an event" do
       assert {:ok, %Event{} = event} = Scheduler.create_event(@valid_attrs_1)
       assert Map.take(event, [:name, :desc]) == Map.take(@valid_attrs_1, [:name, :desc])
+      assert String.length(event.update_token) == 32
     end
 
     test "create_event/1 with invalid data returns error changeset" do
@@ -66,6 +67,22 @@ defmodule Smoodle.SchedulerTest do
       event = event_fixture(@valid_attrs_1)
       assert {:ok, event} = Scheduler.update_event(event, @update_attrs)
       assert event.name == @update_attrs.name
+    end
+
+    test "update_event/2 with valid data cannot update the token" do
+      event = event_fixture(@valid_attrs_1)
+      old_token = event.update_token
+      assert {:ok, event} = Scheduler.update_event(event, Map.merge(@update_attrs, %{update_token: "sneaky_token"}))
+      assert event.name == @update_attrs.name
+      assert event.update_token == old_token
+    end
+
+    test "update_event/2 with valid data cannot update the id" do
+      event = event_fixture(@valid_attrs_1)
+      old_id = event.id
+      assert {:ok, event} = Scheduler.update_event(event, Map.merge(@update_attrs, %{id: "sneaky_id"}))
+      assert event.name == @update_attrs.name
+      assert event.id == old_id
     end
 
     test "update_event/2 with invalid data returns error changeset" do

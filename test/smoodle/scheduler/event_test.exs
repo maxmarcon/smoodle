@@ -22,6 +22,18 @@ defmodule Smoodle.Scheduler.EventTest do
 		assert [name: {_, [validation: :required]}] = changeset.errors
 	end
 
+	test "changeset ignores id" do
+		changeset = Event.changeset(%Event{}, Map.merge(@valid_attrs, %{id: "sneaky_id"}))
+		assert changeset.valid?
+		refute Map.has_key?(changeset.changes, :id)
+	end
+
+	test "changeset ignores update_token" do
+		changeset = Event.changeset(%Event{}, Map.merge(@valid_attrs, %{update_token: "sneaky_token"}))
+		assert changeset.valid?
+		refute Map.has_key?(changeset.changes, :update_token)
+	end
+
 	test "changeset with name too long" do 
 		changeset = Event.changeset(%Event{}, Map.replace!(@valid_attrs, :name, String.pad_trailing("Party", 256, "123")))
 		assert [name: {_,  [count: 255, validation: :length, max: 255]}] = changeset.errors
@@ -51,5 +63,4 @@ defmodule Smoodle.Scheduler.EventTest do
 		changeset = Event.changeset(%Event{}, Map.replace!(@valid_attrs, :scheduled_to, "2018-02-05 18:00:01"))
 		assert [scheduled: {_, [validation: :inconsistent_interval]}] = changeset.errors
 	end
-
 end

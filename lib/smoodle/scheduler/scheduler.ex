@@ -36,6 +36,17 @@ defmodule Smoodle.Scheduler do
     Repo.get!(Event, id)
   end
 
+
+  @doc """
+  Gets a single event for an update, requires knowing the update token
+
+  Raises if the Event does not exist or the token is wwrong
+  """
+  def get_event_for_update!(id, update_token) do
+    Repo.get_by!(Event, id: id, update_token: update_token)
+  end
+
+
   @doc """
   Creates a event.
 
@@ -49,8 +60,7 @@ defmodule Smoodle.Scheduler do
 
   """
   def create_event(attrs \\ %{}) do
-    %Event{}
-    |> Event.changeset(attrs)
+    Event.changeset_insert(attrs)
     |> Repo.insert
   end
 

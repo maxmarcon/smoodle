@@ -41,7 +41,8 @@ defmodule Smoodle.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
-      {:phoenix_slime, git: "https://github.com/slime-lang/phoenix_slime.git"}
+      {:phoenix_slime, git: "https://github.com/slime-lang/phoenix_slime.git"},
+      {:secure_random, "~> 0.5"}
       # Until this: https://github.com/slime-lang/phoenix_slime/pull/51 gets packaged
       # {:phoenix_slime, "~> 0.9.0"}
     ]

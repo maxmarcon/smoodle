@@ -5,14 +5,16 @@ defmodule Smoodle.Scheduler.Event do
   import Ecto.Changeset
 
   @primary_key {:id, :binary_id, autogenerate: true}
+  @update_token_len 16
 
   schema "events" do
     field :name, :string
+    field :update_token, :string
     field :time_window_from, :date
     field :time_window_to, :date
     field :scheduled_from, :naive_datetime
     field :scheduled_to, :naive_datetime
-    field :desc, :string
+    field :desc, :string    
 
     timestamps(usec: false)
   end
@@ -29,7 +31,12 @@ defmodule Smoodle.Scheduler.Event do
     |> validate_time_window_consistent([:time_window_from, :time_window_to], :time_window)
     |> validate_scheduled_window_consistent([:scheduled_from, :scheduled_to], :scheduled)
 
-    # TODO: validate scheduled window lies inside time windoe
+    # TODO: validate scheduled window lies inside time window
+  end
+
+  def changeset_insert(attrs) do
+    changeset(%Event{}, attrs) |>
+    change(%{update_token: SecureRandom.urlsafe_base64(@update_token_len)})
   end
 
   defp validate_window_defined(changeset, keys, error_key) do
