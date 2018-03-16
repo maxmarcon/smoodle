@@ -40,7 +40,7 @@ defmodule Smoodle.Scheduler do
   @doc """
   Gets a single event for an update, requires knowing the update token
 
-  Raises if the Event does not exist or the token is wwrong
+  Raises if the Event does not exist or the token is wrong
   """
   def get_event_for_update!(id, update_token) do
     Repo.get_by!(Event, id: id, update_token: update_token)

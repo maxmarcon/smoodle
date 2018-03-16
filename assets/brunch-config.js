@@ -2,8 +2,12 @@ exports.config = {
   // See http://brunch.io/#documentation for docs.
   files: {
     javascripts: {
-      joinTo: "js/app.js"
-
+      //joinTo: {
+      //  'js/bundle.js': '**/*.js'
+      //},
+      entryPoints: {
+        'js/app.js': 'js/bundle.js'
+      }
       // To use a separate vendor.js bundle, specify two files path
       // http://brunch.io/docs/config#-files-
       // joinTo: {
@@ -20,10 +24,10 @@ exports.config = {
       // }
     },
     stylesheets: {
-      joinTo: "css/app.css"
+      joinTo: "css/bundle.css"
     },
     templates: {
-      joinTo: "js/app.js"
+      joinTo: "js/templates.js"
     }
   },
 
@@ -31,13 +35,14 @@ exports.config = {
     // This option sets where we should place non-css and non-js assets in.
     // By default, we set this to "/assets/static". Files in this directory
     // will be copied to `paths.public`, which is "priv/static" by default.
-    assets: /^(static)/
+    assets: /^(static)/,
+    ignored: ["js/socket.js", "css/phoenix.css"]
   },
 
   // Phoenix paths configuration
   paths: {
     // Dependencies and current project directories to watch
-    watched: ["static", "css", "js", "vendor"],
+    watched: ["static", "js", "vendor", "sass"],
     // Where to compile files to
     public: "../priv/static"
   },
@@ -47,12 +52,21 @@ exports.config = {
     babel: {
       // Do not use ES6 compiler in vendor code
       ignore: [/vendor/]
+    },
+    sass: {
+      options: {
+        includePaths: ["node_modules/bootstrap-sass/assets/stylesheets"], // tell sass-brunch where to look for files to @import
+        precision: 8 // minimum precision required by bootstrap-sass 
+      }
+    },
+    copycat: {
+      "fonts": ["node_modules/bootstrap-sass/assets/fonts/bootstrap"] // copy node_modules/bootstrap-sass/assets/fonts/bootstrap/* to priv/static/fonts/
     }
   },
 
   modules: {
     autoRequire: {
-      "js/app.js": ["js/app"]
+      "js/bundle.js": ["js/app"]
     }
   },
 
