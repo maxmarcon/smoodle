@@ -1,3 +1,5 @@
-div#app.should-be-red
-  | 
-    {{ message }}
+.content.container-fluid
+  h1 
+    = gettext "Welcome to Smoodle!"
+  #app
+    | {{ message }}

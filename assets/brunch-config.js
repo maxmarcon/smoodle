@@ -42,7 +42,7 @@ exports.config = {
   // Phoenix paths configuration
   paths: {
     // Dependencies and current project directories to watch
-    watched: ["static", "js", "vendor", "sass"],
+    watched: ["static", "js", "vendor", "scss"],
     // Where to compile files to
     public: "../priv/static"
   },

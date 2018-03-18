@@ -8,9 +8,9 @@ html lang="en"
     meta content="" name="author"
     title Phoenix
     link rel="stylesheet" href="#{static_path(@conn, "/css/bundle.css")}"
+    script src="#{static_path(@conn, "/js/bundle.js")}" defer=true
 
   body
     main role="main"
       = render @view_module, @view_template, assigns
 
-    script src="#{static_path(@conn, "/js/bundle.js")}"
