@@ -1,5 +1,4 @@
-$icon-font-path: fonts;
-@import 'bootstrap';
+@import "node_modules/bootstrap/scss/bootstrap";
 
 div.should-be-red {
 	font-size: 20px;
