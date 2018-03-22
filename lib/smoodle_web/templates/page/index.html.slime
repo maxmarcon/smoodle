@@ -20,5 +20,4 @@
 .container
   .row.justify-content-center
     .col-4
-      button.btn.btn-lg.btn-primary type="button"
-        = gettext "Schedule an event now"
+      welcome schedule-button-text="#{gettext "Schedule an event now"}"

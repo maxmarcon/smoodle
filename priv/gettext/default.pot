@@ -14,3 +14,43 @@ msgstr ""
 #: lib/smoodle_web/templates/page/index.html.slime:1
 msgid "Welcome to Smoodle!"
 msgstr ""
+
+#, elixir-format
+#: lib/smoodle_web/templates/page/index.html.slime:1
+msgid "Just tell Smoodle what you would like to schedule and (roughly) when, and let it do the rest"
+msgstr ""
+
+#, elixir-format
+#: lib/smoodle_web/templates/page/index.html.slime:1
+msgid "No need to choose dates or time slots"
+msgstr ""
+
+#, elixir-format
+#: lib/smoodle_web/templates/page/index.html.slime:1
+msgid "No need to pick one date yourself"
+msgstr ""
+
+#, elixir-format
+#: lib/smoodle_web/templates/page/index.html.slime:1
+msgid "No need to run around asking people"
+msgstr ""
+
+#, elixir-format
+#: lib/smoodle_web/templates/page/index.html.slime:1
+msgid "Schedule an event now"
+msgstr ""
+
+#, elixir-format
+#: lib/smoodle_web/templates/page/index.html.slime:1
+msgid "Smoodle is a smart scheduling app that allows you to schedule your events super easily"
+msgstr ""
+
+#, elixir-format
+#: lib/smoodle_web/templates/page/index.html.slime:1
+msgid "Smoodle will ask them for you (even multiple times) and collect the answer"
+msgstr ""
+
+#, elixir-format
+#: lib/smoodle_web/templates/page/index.html.slime:1
+msgid "Smoodle will automatically compute the date that works best for everyone"
+msgstr ""

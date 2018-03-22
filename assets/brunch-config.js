@@ -27,7 +27,7 @@ exports.config = {
       joinTo: "css/bundle.css"
     },
     templates: {
-      joinTo: "js/templates.js"
+      joinTo: "js/bundle.js"
     }
   },
 
@@ -62,6 +62,9 @@ exports.config = {
   },
 
   npm: {
-    enabled: true
+    enabled: true,
+    globals: {
+      Vue: 'vue/dist/vue.common'
+    }
   }
 };
