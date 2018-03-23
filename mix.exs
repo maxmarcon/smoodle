@@ -43,8 +43,6 @@ defmodule Smoodle.Mixfile do
       {:cowboy, "~> 1.0"},
       {:secure_random, "~> 0.5"},
       {:phoenix_expug, "~> 0.1.1"}
-      # Until this: https://github.com/slime-lang/phoenix_slime/pull/51 gets packaged
-      # {:phoenix_slime, "~> 0.9.0"}
     ]
   end
 
