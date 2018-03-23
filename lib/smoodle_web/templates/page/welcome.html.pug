@@ -1,7 +1,8 @@
 .container
   .jumbotron
-    h1.display-4 = gettext "Welcome to Smoodle!"
-    p.lead 
+    h1.display-4
+      = gettext "Welcome to Smoodle!"
+    p.lead
       = gettext "Smoodle is a smart scheduling app that allows you to schedule your events super easily"
     hr
     h3
@@ -20,4 +21,6 @@
 .container
   .row.justify-content-center
     .col-4
-      welcome schedule-button-text="#{gettext "Schedule an event now"}"
+      a.btn.btn-lg.btn-primary(role="button" href="event")
+        = gettext "Schedule an event now"
+

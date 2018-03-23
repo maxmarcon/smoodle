@@ -1,7 +1,11 @@
 defmodule SmoodleWeb.PageController do
   use SmoodleWeb, :controller
 
-  def index(conn, _params) do
-  	render conn, "index.html"
+  def welcome(conn, _params) do
+  	render conn, "welcome.html"
+  end
+
+  def app(conn, _params) do
+  	render conn, "app.html"
   end
 end

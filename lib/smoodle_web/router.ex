@@ -17,7 +17,9 @@ defmodule SmoodleWeb.Router do
   scope "/", SmoodleWeb do
     pipe_through :browser # Use the default browser stack
 
-    get "/", PageController, :index
+    get "/", PageController, :welcome
+    get "/event", PageController, :app
+    get "/availability", PageController, :app
   end
 
   scope "/v1", SmoodleWeb do

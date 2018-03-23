@@ -1,0 +1,18 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="utf-8")
+    meta(content="IE=edge" http-equiv="X-UA-Compatible")
+    meta(content="width=device-width, initial-scale=1" name="viewport")
+    meta(content="" name="description")
+    meta(content="" name="author")
+    title Phoenix
+    link(rel="stylesheet" href=static_path(@conn, "/css/app.css"))
+
+  body
+    .container
+      header.header
+        span.logo
+
+      main(role="main")
+        = render @view_module, @view_template, assigns

@@ -1,0 +1,12 @@
+div#app
+	nav.navbar.navbar-expand-lg.navbar-light.bg-light
+  		a.navbar-brand(href="#") Navbar
+		div#navbarNavAltMarkup.collapse.navbar-collapse
+    		div.navbar-nav
+    			router-link.nav-item.nav-link(to="/event" active-class="active") Event
+    			router-link.nav-item.nav-link(to="/availability" active-class="active") Availability
+
+
+	.container
+	 	router-view
+

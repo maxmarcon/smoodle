@@ -37,7 +37,7 @@ config :smoodle, SmoodleWeb.Endpoint,
       ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
       ~r{priv/gettext/.*(po)$},
       ~r{lib/smoodle_web/views/.*(ex)$},
-      ~r{lib/smoodle_web/templates/.*(eex|slim|slime)$}
+      ~r{lib/smoodle_web/templates/.*(eex|slim|slime|pug)$}
     ]
   ]
 
