@@ -19,6 +19,7 @@ defmodule SmoodleWeb.Router do
 
     get "/", PageController, :welcome
     get "/event", PageController, :app
+    get "/event/:id", PageController, :app
     get "/availability", PageController, :app
   end
 
