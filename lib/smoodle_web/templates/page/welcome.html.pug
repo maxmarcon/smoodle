@@ -21,6 +21,6 @@
 .container
   .row.justify-content-center
     .col-4
-      a.btn.btn-lg.btn-primary(role="button" href="event")
+      a.btn.btn-lg.btn-primary(role="button" href="#{page_path @conn, :new_event, step: 1}")
         = gettext "Schedule an event now"
 

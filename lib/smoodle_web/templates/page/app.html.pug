@@ -3,8 +3,8 @@ div#app
   		a.navbar-brand(href="#") Navbar
 		div#navbarNavAltMarkup.collapse.navbar-collapse
     		div.navbar-nav
-    			router-link.nav-item.nav-link(to="/event" active-class="active") Event
-    			router-link.nav-item.nav-link(to="/availability" active-class="active") Availability
+    			router-link.nav-item.nav-link(to="#{page_path @conn, :new_event, step: 1}" active-class="active") Event
+    			router-link.nav-item.nav-link(to="/" active-class="active") Poll
 
 
 	.container-fluid

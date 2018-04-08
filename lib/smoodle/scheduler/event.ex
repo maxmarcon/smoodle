@@ -14,7 +14,7 @@ defmodule Smoodle.Scheduler.Event do
     field :time_window_to, :date
     field :scheduled_from, :naive_datetime
     field :scheduled_to, :naive_datetime
-    field :desc, :string    
+    field :desc, :string
 
     timestamps(usec: false)
   end
@@ -23,10 +23,9 @@ defmodule Smoodle.Scheduler.Event do
   def changeset(%Event{} = event, attrs) do
     event
     |> cast(attrs, [:name, :time_window_from, :time_window_to, :scheduled_from, :scheduled_to, :desc])
-    |> validate_required([:name, :desc])
+    |> validate_required([:name, :desc, :time_window_from, :time_window_to])
     |> validate_length(:name, max: 255)
     |> validate_length(:desc, max: 2500)
-    |> validate_window_defined([:time_window_from, :time_window_to], :time_window)
     |> validate_window_defined([:scheduled_from, :scheduled_to], :scheduled)
     |> validate_time_window_consistent([:time_window_from, :time_window_to], :time_window)
     |> validate_scheduled_window_consistent([:scheduled_from, :scheduled_to], :scheduled)

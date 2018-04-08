@@ -8,4 +8,8 @@ defmodule SmoodleWeb.PageController do
   def app(conn, _params) do
   	render conn, "app.html"
   end
+
+  def new_event(conn, params) do
+  	app(conn, params)
+  end
 end
