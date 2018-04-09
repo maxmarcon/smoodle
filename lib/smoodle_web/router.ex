@@ -19,6 +19,7 @@ defmodule SmoodleWeb.Router do
 
     get "/", PageController, :welcome
     get "/new_event", PageController, :new_event
+    get "/poll", PageController, :poll
   end
 
   scope "/v1", SmoodleWeb do

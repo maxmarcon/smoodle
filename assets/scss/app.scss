@@ -1,6 +1,14 @@
 @import "node_modules/bootstrap/scss/bootstrap";
 
-div.should-be-red {
-	font-size: 20px;
-	color: red;
+.slide-enter-active, .slide-leave-active {
+  transition: opacity 0.5s, transform 0.3s;
+}
+
+.slide-leave-to {
+  opacity: 0;
+  transform: translateX(-90%);
+}
+
+.slide-enter {
+  opacity: 0;
 }
