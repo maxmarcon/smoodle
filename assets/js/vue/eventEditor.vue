@@ -25,8 +25,8 @@
 			.col-1
 				router-link.btn.btn-sm.btn-primary(
 					role="button"
-					:to="{ name: 'new_event', query: {step: ($route.query.step < 2 ? $route.query.step : parseInt($route.query.step) - 1) }}"
-					v-bind:class="{disabled: $route.query.step < 2}"
+					:to="{ name: 'new_event', query: {step: ($route.query.step == minStep ? $route.query.step : parseInt($route.query.step) - 1) }}"
+					v-bind:class="{disabled: $route.query.step == minStep}"
 				)
 					| Prev
 			.col-1
@@ -41,10 +41,13 @@
 <script>
 import Event from '../event.js'
 
-const checkStep = (to, from, next) => {
+const minStep = 1;
+const maxStep = 3;
+
+const sanitizeParameters = (to, from, next) => {
 	let step = parseInt(to.query.step);
-	if (isNaN(step) || step < 1 || step > 3) {
-		next({ path: to.path, query: {step: 1}});
+	if (isNaN(step) || step < minStep || step > maxStep) {
+		next({ path: to.path, query: {step: minStep}});
 	} else {
 		next();
 	}
@@ -52,9 +55,11 @@ const checkStep = (to, from, next) => {
 
 export default {
 	data: () => ({
-		event: new Event("new event", "big party!")
+		event: new Event("new event", "big party!"),
+		minStep,
+		maxStep
 	}),
-	beforeRouteEnter: checkStep,
-	beforeRouteUpdate: checkStep
+	beforeRouteEnter: sanitizeParameters,
+	beforeRouteUpdate: sanitizeParameters
 }
 </script>
