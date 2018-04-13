@@ -1,7 +1,7 @@
 @import "node_modules/bootstrap/scss/bootstrap";
 
 .slide-enter-active, .slide-leave-active {
-  transition: opacity 0.5s, transform 0.3s;
+  transition: opacity 0.5s, transform 0.5s;
 }
 
 .slide-leave-to {

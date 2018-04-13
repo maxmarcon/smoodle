@@ -3,10 +3,13 @@ div#app
   		a.navbar-brand(href="#") Navbar
 		div#navbarNavAltMarkup.collapse.navbar-collapse
     		div.navbar-nav
-    			router-link.nav-item.nav-link(to="#{page_path @conn, :new_event, step: 1}" active-class="active") Event
-    			router-link.nav-item.nav-link(to="#{page_path @conn, :poll}" active-class="active") Poll
+    			router-link.nav-item.nav-link(to="#{page_path @conn, :new_event, step: 1}" active-class="active")
+    				= gettext("Event")
+    			router-link.nav-item.nav-link(to="#{page_path @conn, :poll}" active-class="active")
+    				= gettext("Poll")
 
 
 	.container-fluid
  		router-view
 
+script = raw("var smoodle_locale = '#{Plug.Conn.get_session(@conn, :locale)}'")

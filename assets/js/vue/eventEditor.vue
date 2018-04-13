@@ -7,14 +7,13 @@
 			div(v-if="$route.query.step == 1")
 				.form-row
 					.form-group.col-md-12
-						label(for="eventName") Event name
+						label(for="eventName") {{ $t('event_name') }}
 						input(id="eventName" v-model="event.name" type="text" class="form-control")
-						small(id="eventNameHelp" class="form-text text-muted") Enter a name for the event
-				.form-row
+						small(id="eventNameHelp" class="form-text text-muted") {{ $t('event_name_help') }}
 					.form-group.col-md-6
-						label(for="eventDesc") Event description
+						label(for="eventDesc") {{ $t('event_desc') }}
 						textarea(id="eventDesc" v-model="event.desc" class="form-control")
-						small(id="eventDescHelp" class="form-text text-muted") Describe the event
+						small(id="eventDescHelp" class="form-text text-muted") {{ $t('event_desc_help') }}
 
 			div(v-else-if="$route.query.step == 2")
 				.form-row
@@ -28,14 +27,12 @@
 						role="button"
 						:to="{ name: 'new_event', query: {step: ($route.query.step == minStep ? $route.query.step : parseInt($route.query.step) - 1) }}"
 						v-bind:class="{disabled: $route.query.step == minStep}"
-					)
-						| Prev
+					) {{ $t('prev') }}
 				.col-1
 					router-link.btn.btn-sm.btn-primary(
 						role="button"
 						:to="{ name: 'new_event', query: {step: parseInt($route.query.step) + 1 }}"
-					)
-						| Next
+					) {{ $t('next') }}
 
 </template>
 
@@ -59,8 +56,9 @@ export default {
 		event: new Event(),
 		minStep,
 		maxStep
-	}),
+ 	}),
 	beforeRouteEnter: sanitizeParameters,
-	beforeRouteUpdate: sanitizeParameters
+	beforeRouteUpdate: sanitizeParameters,
 }
 </script>
+
