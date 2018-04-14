@@ -9,6 +9,7 @@ html(lang="en")
     title Phoenix
     link(rel="stylesheet" href=static_path(@conn, "/css/bundle.css"))
     = if @view_template == "app.html" do
+      script =raw("var smoodle_locale = '#{Plug.Conn.get_session(@conn, :locale)}'")
       script(src=static_path(@conn, "/js/bundle.js") defer=true)
 
   body

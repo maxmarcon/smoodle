@@ -5,7 +5,8 @@ export default {
 		event_desc: "What is going to happen?",
 		event_desc_help: "Describe the event",
 		next: "Next",
-		prev: "Previous"
+		prev: "Previous",
+		dates: "Dates"
 	},
 
 	de: {
@@ -14,6 +15,17 @@ export default {
 		event_desc: "Was ist der Anlass?",
 		event_desc_help: "Beschreibe dein Event",
 		next: "Weiter",
-		prev: "Zurück"
+		prev: "Zurück",
+		dates: "Daten"
+	},
+
+	it: {
+		event_name: "Titolo dell'evento",
+		event_name_help: "Dai un nome al tuo evento",
+		event_desc: "Qual'è l'occasione?",
+		event_desc_help: "Descrivi l'evento",
+		next: "Avanti",
+		prev: "Indietro",
+		dates: "Date"
 	}
 }

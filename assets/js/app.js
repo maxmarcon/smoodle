@@ -3,6 +3,8 @@ import EventEditor from './vue/eventEditor.vue'
 import AvailabiltyVue from './vue/availability.vue'
 import VueRouter from 'vue-router'
 import VueI18n from 'vue-i18n'
+import AirbnbStyleDatepicker from 'vue-airbnb-style-datepicker'
+
 
 const router = new VueRouter({
 	mode: 'history',
@@ -23,6 +25,8 @@ const i18n = new VueI18n({
   locale: smoodle_locale,
   messages
 })
+
+Vue.use(AirbnbStyleDatepicker);
 
 const app = new Vue({
 	i18n,
