@@ -1,31 +1,68 @@
 export default {
 	en: {
-		event_name: "Event title",
-		event_name_help: "Enter a name for your event",
-		event_desc: "What is going to happen?",
-		event_desc_help: "Describe the event",
-		next: "Next",
-		prev: "Previous",
-		dates: "Dates"
+		event_editor: {
+			event: {
+				name: "Event title",
+				name_help: "Enter a name for your event",
+				desc: "What is going to happen?",
+				desc_help: "Describe the event",
+				dates: "Dates"
+			},
+			this_week: "This week",
+			next_week: "Next week",
+			within_months: "In 1 month | In {count} months",
+			next: "Next",
+			prev: "Previous",
+			dates_quick_selection: "Quick selection"
+		},
+		date_picker: {
+			days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+			daysShort: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+			months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+			apply: 'Apply',
+			cancel: 'Cancel'
+		}
 	},
 
 	de: {
-		event_name: "Titel des Events",
-		event_name_help: "Gib deinem Event einen Namen",
-		event_desc: "Was ist der Anlass?",
-		event_desc_help: "Beschreibe dein Event",
-		next: "Weiter",
-		prev: "Zurück",
-		dates: "Daten"
+		event_editor: {
+			event: {
+				name: "Titel des Events",
+				name_help: "Gib deinem Event einen Namen",
+				desc: "Was ist der Anlass?",
+				desc_help: "Beschreibe dein Event",
+				dates: "Daten"
+			},
+			next: "Weiter",
+			prev: "Zurück",
+		},
+		date_picker: {
+			days: ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'],
+			daysShort: ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'],
+			months: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+			apply: 'Übernehmen',
+			cancel: 'Abbrechen'
+		}
 	},
 
 	it: {
-		event_name: "Titolo dell'evento",
-		event_name_help: "Dai un nome al tuo evento",
-		event_desc: "Qual'è l'occasione?",
-		event_desc_help: "Descrivi l'evento",
-		next: "Avanti",
-		prev: "Indietro",
-		dates: "Date"
+		event_editor: {
+			event: {
+				name: "Titolo dell'evento",
+				name_help: "Dai un nome al tuo evento",
+				desc: "Qual'è l'occasione?",
+				desc_help: "Descrivi l'evento",
+				dates: "Date"
+			},
+			next: "Avanti",
+			prev: "Indietro"
+		},
+		date_picker: {
+			days: ['Lunedí', 'Martedí', 'Mercoledí', 'Giovedí', 'Venerdí', 'Sabato', 'Domenica'],
+			daysShort: ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'],
+			months: ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'],
+			apply: 'Accetta',
+			cancel: 'Annulla'
+		}
 	}
 }
