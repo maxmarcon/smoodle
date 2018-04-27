@@ -20,25 +20,13 @@ const router = new VueRouter({
 });
 
 import messages from './messages.js'
-
-const dateTimeFormats = {
-	en: {
-		short: {
-			year: 'numeric', month: 'short', day: 'numeric'
-		}
-	},
-	de: {
-		short: {
-			year: 'numeric', month: 'short', day: 'numeric'
-		}
-	}
-
-}
+// importing these here because otherwise single file components (e.g. eventEditor)
+// won't be able to "see" them and import. Probably an issue with vue-brunch, babel, or both
+import dateFns from 'date-fns'
 
 const i18n = new VueI18n({
   locale: smoodle_locale,
-  messages,
-  dateTimeFormats
+  messages
 });
 
 Vue.use(BootstrapVue);

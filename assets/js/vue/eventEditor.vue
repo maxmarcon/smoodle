@@ -43,7 +43,7 @@
 					router-link.btn.btn-primary(
 						role="button"
 						:to="{ name: 'new_event', query: {step: ($route.query.step == minStep ? $route.query.step : parseInt($route.query.step) - 1) }}"
-						v-bind:class="{disabled: $route.query.step == minStep}"
+						:class="{disabled: $route.query.step == minStep}"
 					) {{ $t('event_editor.prev') }}
 				.col
 					router-link.btn.btn-primary(
@@ -54,7 +54,8 @@
 </template>
 
 <script>
-import formatDate from 'date-fns/format'
+
+import dateFns from 'date-fns'
 
 const minStep = 1;
 const maxStep = 3;
@@ -78,14 +79,14 @@ export default {
 		dateTo: '',
 		minStep,
 		maxStep,
-		showThisWeekButton: (today.getDay() > 0 && today.getDay() < 4) // betewn Mon and Wed
+		showThisWeekButton: (dateFns.getDay(today) > 0 && dateFns.getDay(today) < 4) // betewn Mon and Wed
  	}),
 	beforeRouteEnter: sanitizeParameters,
 	beforeRouteUpdate: sanitizeParameters,
 	computed: {
 		dateRange() {
-			let fromDate_s = formatDate(this.dateFrom, 'DD/MM/YYYY');
-			let toDate_s = formatDate(this.dateTo, 'DD/MM/YYYY');
+			let fromDate_s = dateFns.format(this.dateFrom, 'DD/MM/YYYY (ddd)', {locale: this.$i18n.t('date_fns_locale')});
+			let toDate_s = dateFns.format(this.dateTo, 'DD/MM/YYYY (ddd)', {locale: this.$i18n.t('date_fns_locale')});
 
 			if (fromDate_s == InvalidDate || toDate_s == InvalidDate) {
 				return '';
@@ -96,27 +97,26 @@ export default {
 	},
 	methods: {
 		applyDates(from, to) {
-			this.dateFrom = formatDate(from, 'YYYY-MM-DD');
-			this.dateTo = formatDate(to, 'YYYY-MM-DD');
+			this.dateFrom = from;//DateFns.format(from, 'YYYY-MM-DD');
+			this.dateTo = to;//DateFns.format(to, 'YYYY-MM-DD');
 		},
 		pickThisWeek() {
-			let from = new Date();
-			let to = new Date();
-			to.setDate(to.getDate()+((7-to.getDay()) % 7)); // this coming Sunday
-			this.applyDates(from, to);
+			let today = new Date();
+			this.applyDates(
+				dateFns.startOfWeek(today, {weekStartsOn: 1}),
+				dateFns.endOfWeek(today, {weekStartsOn: 1})
+			);
 		},
 		pickNextWeek() {
-			let from = new Date();
-			let to = new Date();
-			from.setDate(from.getDate()+((7-from.getDay()) % 7)+1); // next Monday
-			to.setDate(from.getDate()+6); // next Sunday
-			this.applyDates(from, to);
+			let today_next_week = dateFns.addWeeks(new Date(), 1);
+			this.applyDates(
+				dateFns.startOfWeek(today_next_week, {weekStartsOn: 1}),
+				dateFns.endOfWeek(today_next_week, {weekStartsOn: 1})
+			);
 		},
-		pickNextMonths(montths) {
-			let from = new Date();
-			let to = new Date();
-			to.setMonth(to.getMonth()+1);
-			this.applyDates(from, to);
+		pickNextMonths(months) {
+			let today = new Date();
+			this.applyDates(today, dateFns.addMonths(today,1));
 		}
 	}
 }

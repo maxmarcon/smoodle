@@ -1,3 +1,7 @@
+import date_fns_de from 'date-fns/locale/de'
+import date_fns_en from 'date-fns/locale/en'
+import date_fns_it from 'date-fns/locale/it'
+
 export default {
 	en: {
 		event_editor: {
@@ -21,7 +25,8 @@ export default {
 			months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
 			apply: 'Apply',
 			cancel: 'Cancel'
-		}
+		},
+		date_fns_locale: date_fns_en
 	},
 
 	de: {
@@ -42,7 +47,8 @@ export default {
 			months: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
 			apply: 'Übernehmen',
 			cancel: 'Abbrechen'
-		}
+		},
+		date_fns_locale: date_fns_de
 	},
 
 	it: {
@@ -63,6 +69,7 @@ export default {
 			months: ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'],
 			apply: 'Accetta',
 			cancel: 'Annulla'
-		}
+		},
+		date_fns_locale: date_fns_it
 	}
 }
