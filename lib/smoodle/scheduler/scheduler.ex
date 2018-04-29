@@ -59,10 +59,20 @@ defmodule Smoodle.Scheduler do
       {:error, ...}
 
   """
-  def create_event(attrs \\ %{}) do
+  def create_event(attrs, opts \\ [])
+
+  def create_event(attrs, validate: true) do
+    case Event.changeset_insert(attrs) do
+      %{:valid? => true} -> :ok
+      changeset -> {:error, changeset}
+    end
+  end
+
+  def create_event(attrs, _) do
     Event.changeset_insert(attrs)
     |> Repo.insert
   end
+
 
   @doc """
   Updates a event.

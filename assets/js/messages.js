@@ -14,10 +14,10 @@ export default {
 			},
 			this_week: "This week",
 			next_week: "Next week",
-			within_months: "In 1 month | In {count} months",
+			within_months: "Within one month | Within {count} months",
 			next: "Next",
 			prev: "Previous",
-			dates_quick_selection: "Quick selection"
+			dates_quick_selection: "Quick pre-selection"
 		},
 		date_picker: {
 			days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
@@ -40,6 +40,10 @@ export default {
 			},
 			next: "Weiter",
 			prev: "Zurück",
+			this_week: "Diese Woche",
+			next_week: "Nächste Woche",
+			within_months: "Innerhalb eines Monats | Innerhalb der nächsten {count} Monate",
+			dates_quick_selection: "Schnelle Vorauswahl"
 		},
 		date_picker: {
 			days: ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'],
@@ -61,7 +65,11 @@ export default {
 				dates: "Date"
 			},
 			next: "Avanti",
-			prev: "Indietro"
+			prev: "Indietro",
+			this_week: "Questa settimana",
+			next_week: "La prossima settimana",
+			within_months: "Entro un mese | Entro {count} mesi",
+			dates_quick_selection: "Preselezione veloce"
 		},
 		date_picker: {
 			days: ['Lunedí', 'Martedí', 'Mercoledí', 'Giovedí', 'Venerdí', 'Sabato', 'Domenica'],

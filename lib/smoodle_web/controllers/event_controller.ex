@@ -11,6 +11,10 @@ defmodule SmoodleWeb.EventController do
     render(conn, "index.json", events: events)
   end
 
+  def create(_, %{"event" => event_params, "validate" => true}) do
+    Scheduler.create_event(event_params, validate: true)
+  end
+
   def create(conn, %{"event" => event_params}) do
     with {:ok, %Event{} = event} <- Scheduler.create_event(event_params) do
      conn
@@ -35,7 +39,7 @@ defmodule SmoodleWeb.EventController do
 
   def delete(conn, %{"id" => id, "update_token" => update_token}) do
     event = Scheduler.get_event_for_update!(id, update_token)
-    
+
     with {:ok, %Event{}} <- Scheduler.delete_event(event) do
       send_resp(conn, :no_content, "")
     end

@@ -12,6 +12,10 @@ defmodule SmoodleWeb.FallbackController do
     |> render(SmoodleWeb.ChangesetView, "error.json", changeset: changeset)
   end
 
+  def call(conn, :ok) do
+    send_resp(conn, :ok, "")
+  end
+
   def call(conn, {:error, :not_found}) do
     conn
     |> put_status(:not_found)
