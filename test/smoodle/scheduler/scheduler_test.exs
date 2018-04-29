@@ -53,24 +53,24 @@ defmodule Smoodle.SchedulerTest do
       assert Scheduler.get_event!(event.id) == event
     end
 
-    test "create_event/1 with valid data creates an event" do
+    test "create_event/2 with valid data creates an event" do
       assert {:ok, %Event{} = event} = Scheduler.create_event(@valid_attrs_1)
       assert Map.take(event, [:name, :desc]) == Map.take(@valid_attrs_1, [:name, :desc])
       assert String.length(event.update_token) == 32
       assert Scheduler.get_event!(event.id) == event
     end
 
-    test "create_event/1 with valid data for validation does not create an event" do
-      assert :ok = Scheduler.create_event(@valid_attrs_1, validate: true)
+    test "create_event/2 with valid data for validation does not create an event and returns valid changeset" do
+      assert %{valid?: true} = Scheduler.create_event(@valid_attrs_1, validate: true)
       assert Scheduler.list_events() == []
     end
 
-    test "create_event/1 with invalid data returns error changeset" do
+    test "create_event/2 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Scheduler.create_event(@invalid_attrs)
     end
 
-    test "create_event/1 with invalid data for validation returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Scheduler.create_event(@invalid_attrs, vlidate: true)
+    test "create_event/2 with invalid data for validation returns invalid changeset" do
+      assert %Ecto.Changeset{valid?: false} = Scheduler.create_event(@invalid_attrs, validate: true)
     end
 
     test "update_event/2 with valid data updates the event" do

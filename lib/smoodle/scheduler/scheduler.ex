@@ -62,10 +62,7 @@ defmodule Smoodle.Scheduler do
   def create_event(attrs, opts \\ [])
 
   def create_event(attrs, validate: true) do
-    case Event.changeset_insert(attrs) do
-      %{:valid? => true} -> :ok
-      changeset -> {:error, changeset}
-    end
+    Event.changeset_insert(attrs)
   end
 
   def create_event(attrs, _) do

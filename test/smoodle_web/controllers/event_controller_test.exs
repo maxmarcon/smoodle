@@ -23,7 +23,7 @@ defmodule SmoodleWeb.EventControllerTest do
     %{
       "scheduled_from" => NaiveDateTime.to_iso8601(s_from),
       "scheduled_to" => NaiveDateTime.to_iso8601(s_to)
-    }    
+    }
   end
 
   defp rest_repr(attr) do
@@ -41,7 +41,7 @@ defmodule SmoodleWeb.EventControllerTest do
   }
   @invalid_attrs %{
     scheduled_to: "2017-04-05 21:10:00",
-    scheduled_from: "2017-04-05 22:10:00"    
+    scheduled_from: "2017-04-05 22:10:00"
   }
 
   def fixture(:event) do
@@ -91,13 +91,23 @@ defmodule SmoodleWeb.EventControllerTest do
       assert MapSet.subset?(MapSet.new(expected_data_response), MapSet.new(data_response))
 
       conn = get conn, event_path(conn, :show, id)
-      data_response = json_response(conn, 200)["data"] 
+      data_response = json_response(conn, 200)["data"]
       assert MapSet.subset?(MapSet.new(expected_data_response), MapSet.new(data_response))
       refute Map.has_key?(data_response, "update_token")
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post conn, event_path(conn, :create), event: @invalid_attrs
+      assert json_response(conn, 422)["errors"] != %{}
+    end
+
+    test "returns empty response when validating valid data", %{conn: conn} do
+      conn = post conn, event_path(conn, :create), event: @create_attrs_1, validate: true
+      assert "" = response(conn, 200)
+    end
+
+    test "renders errors when validating invalid data", %{conn: conn} do
+      conn = post conn, event_path(conn, :create), event: @invalid_attrs, validate: true
       assert json_response(conn, 422)["errors"] != %{}
     end
   end

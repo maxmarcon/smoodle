@@ -12,7 +12,10 @@ defmodule SmoodleWeb.EventController do
   end
 
   def create(_, %{"event" => event_params, "validate" => true}) do
-    Scheduler.create_event(event_params, validate: true)
+    case Scheduler.create_event(event_params, validate: true) do
+      %{:valid? => true} -> :ok
+      changeset -> {:error, changeset}
+    end
   end
 
   def create(conn, %{"event" => event_params}) do
