@@ -13,6 +13,7 @@
     "vue-router": "^3.0.1"
   },
   "devDependencies": {
+    "axios": "^0.18.0",
     "babel-brunch": "6.1.1",
     "babel-plugin-transform-runtime": "^6.23.0",
     "brunch": "2.10.9",
@@ -25,6 +26,7 @@
     "uglify-js-brunch": "2.10.0",
     "vue": "^2.5.16",
     "vue-airbnb-style-datepicker": "^1.7.2",
+    "vue-axios": "^2.1.1",
     "vue-brunch": "^2.0.1",
     "vue-i18n": "^7.6.0"
   }

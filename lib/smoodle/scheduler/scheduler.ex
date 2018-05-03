@@ -61,7 +61,7 @@ defmodule Smoodle.Scheduler do
   """
   def create_event(attrs, opts \\ [])
 
-  def create_event(attrs, validate: true) do
+  def create_event(attrs, dry_run: true) do
     Event.changeset_insert(attrs)
   end
 

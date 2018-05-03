@@ -11,8 +11,8 @@ defmodule SmoodleWeb.EventController do
     render(conn, "index.json", events: events)
   end
 
-  def create(_, %{"event" => event_params, "validate" => true}) do
-    case Scheduler.create_event(event_params, validate: true) do
+  def create(_, %{"event" => event_params, "dry_run" => true}) do
+    case Scheduler.create_event(event_params, dry_run: true) do
       %{:valid? => true} -> :ok
       changeset -> {:error, changeset}
     end

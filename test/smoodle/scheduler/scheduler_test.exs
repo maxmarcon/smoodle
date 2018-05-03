@@ -61,7 +61,7 @@ defmodule Smoodle.SchedulerTest do
     end
 
     test "create_event/2 with valid data for validation does not create an event and returns valid changeset" do
-      assert %{valid?: true} = Scheduler.create_event(@valid_attrs_1, validate: true)
+      assert %{valid?: true} = Scheduler.create_event(@valid_attrs_1, dry_run: true)
       assert Scheduler.list_events() == []
     end
 
@@ -70,7 +70,7 @@ defmodule Smoodle.SchedulerTest do
     end
 
     test "create_event/2 with invalid data for validation returns invalid changeset" do
-      assert %Ecto.Changeset{valid?: false} = Scheduler.create_event(@invalid_attrs, validate: true)
+      assert %Ecto.Changeset{valid?: false} = Scheduler.create_event(@invalid_attrs, dry_run: true)
     end
 
     test "update_event/2 with valid data updates the event" do

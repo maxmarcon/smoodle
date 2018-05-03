@@ -8,9 +8,12 @@ export default {
 			event: {
 				name: "Event title",
 				name_help: "Enter a name for your event",
+				name_required: "You must enter a name",
 				desc: "What is going to happen?",
 				desc_help: "Describe the event",
-				dates: "Dates"
+				desc_required: "You must enter a description",
+				dates: "Dates",
+				dates_required: "You must specify a time period"
 			},
 			this_week: "This week",
 			next_week: "Next week",

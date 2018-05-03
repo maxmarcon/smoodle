@@ -102,12 +102,12 @@ defmodule SmoodleWeb.EventControllerTest do
     end
 
     test "returns empty response when validating valid data", %{conn: conn} do
-      conn = post conn, event_path(conn, :create), event: @create_attrs_1, validate: true
+      conn = post conn, event_path(conn, :create), event: @create_attrs_1, dry_run: true
       assert "" = response(conn, 200)
     end
 
     test "renders errors when validating invalid data", %{conn: conn} do
-      conn = post conn, event_path(conn, :create), event: @invalid_attrs, validate: true
+      conn = post conn, event_path(conn, :create), event: @invalid_attrs, dry_run: true
       assert json_response(conn, 422)["errors"] != %{}
     end
   end

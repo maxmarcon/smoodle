@@ -1,17 +1,21 @@
 <template lang="pug">
 	transition(name="slide" mode="out-in")
-		form(:key="$route.query.step" @submit.prevent="")
+		form(:key="$route.query.step" @submit.prevent="" novalidate=true)
 			div(v-if="$route.query.step == 1")
 				.form-group.row.mt-md-3
 					label.col-md-2.col-form-label(for="eventName") {{ $t('event_editor.event.name') }}
 					.col-md-6
-						input#eventName.form-control(v-model="eventName" type="text")
 						small.form-text.text-muted(id="eventNameHelp") {{ $t('event_editor.event.name_help') }}
+						input#eventName.form-control(v-model="eventName" type="text"
+						:class="{'is-invalid': errors.name}")
+						.invalid-feedback {{ $t('event_editor.event.name_required') }}
 				.form-group.row
 					label.col-md-2.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
 					.col-md-6
-						textarea#eventDesc.form-control(v-model="eventDesc")
 						small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.desc_help') }}
+						textarea#eventDesc.form-control(v-model="eventDesc"
+						:class="{'is-invalid': errors.desc}")
+						.invalid-feedback {{ $t('event_editor.event.desc_required') }}
 
 			div(v-else-if="$route.query.step == 2")
 				.form-group.row.mt-md-3.date-picker-trigger
@@ -20,6 +24,7 @@
 						input#eventDates.form-control(
 						:value="dateRange"
 						)
+						.invalid-feedback {{ $t('event_editor.event.dates_required') }}
 
 					AirbnbStyleDatepicker(
 						:trigger-element-id="'eventDates'"
@@ -54,7 +59,6 @@
 </template>
 
 <script>
-
 import dateFns from 'date-fns'
 
 const minStep = 1;
@@ -62,14 +66,46 @@ const maxStep = 3;
 const today = new Date();
 const InvalidDate = 'Invalid Date';
 
-const sanitizeParameters = (to, from, next) => {
+const sanitizeParameters = (to) => {
 	let step = parseInt(to.query.step);
 	if (isNaN(step) || step < minStep || step > maxStep) {
-		next({ path: to.path, query: {step: minStep}});
+		return { path: to.path, query: {step: minStep} };
 	} else {
-		next();
+		return true;
 	}
 }
+
+function beforeRouteUpdate(to, from, next) {
+	let res = sanitizeParameters(to);
+	if (res != true) {
+		next(res);
+	} else {
+
+	 	var self = this;
+
+		this.$http.post("/v1/events", {
+			dry_run: true,
+			event: {
+				name: this.eventName,
+				desc: this.eventDesc
+			}
+		})
+		.then(function(result) {
+			self.errors = false;
+			next();
+		})
+		.catch(function(result){
+			for (let k in self.errors) {
+				self.errors[k] = false;
+			}
+			for (let k in result.response.data.errors) {
+				self.errors[k] = true;
+			}
+			next(false);
+		});
+	}
+}
+
 
 export default {
 	data: () => ({
@@ -79,11 +115,20 @@ export default {
 		dateTo: '',
 		minStep,
 		maxStep,
+		errors: {
+			name: false,
+			desc: false
+		},
 		showThisWeekButton: (dateFns.getDay(today) > 0 && dateFns.getDay(today) < 4) // betewn Mon and Wed
  	}),
-	beforeRouteEnter: sanitizeParameters,
-	beforeRouteUpdate: sanitizeParameters,
+	beforeRouteEnter: (to, from, next) => {
+		next(sanitizeParameters(to));
+	},
+	beforeRouteUpdate,
 	computed: {
+		showValidationResult() {
+			return this.errors.name || this.errors.desc;
+		},
 		dateRange() {
 			let fromDate_s = dateFns.format(this.dateFrom, 'DD/MM/YYYY (ddd)', {locale: this.$i18n.t('date_fns_locale')});
 			let toDate_s = dateFns.format(this.dateTo, 'DD/MM/YYYY (ddd)', {locale: this.$i18n.t('date_fns_locale')});
@@ -97,8 +142,8 @@ export default {
 	},
 	methods: {
 		applyDates(from, to) {
-			this.dateFrom = from;//DateFns.format(from, 'YYYY-MM-DD');
-			this.dateTo = to;//DateFns.format(to, 'YYYY-MM-DD');
+			this.dateFrom = from;
+			this.dateTo = to;
 		},
 		pickThisWeek() {
 			let today = new Date();
