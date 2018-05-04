@@ -24,7 +24,9 @@ const router = new VueRouter({
 import messages from './messages.js'
 // importing these here because otherwise single file components (e.g. eventEditor)
 // won't be able to "see" them and import. Probably an issue with vue-brunch, babel, or both
-import dateFns from 'date-fns'
+import 'date-fns'
+// this is super annoying!!!
+import 'babel-runtime/core-js/object/assign'
 
 const i18n = new VueI18n({
   locale: smoodle_locale,

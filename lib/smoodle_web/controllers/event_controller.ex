@@ -14,7 +14,13 @@ defmodule SmoodleWeb.EventController do
   def create(_, %{"event" => event_params, "dry_run" => true}) do
     case Scheduler.create_event(event_params, dry_run: true) do
       %{:valid? => true} -> :ok
-      changeset -> {:error, changeset}
+      # if the errors only affect parameters that were not specified by the client
+      # we return ok. This allows for partial validation
+      changeset -> if Enum.empty?(Keyword.take(changeset.errors, Enum.map(Map.keys(event_params), &String.to_atom/1))) do
+        :ok
+      else
+        {:error, changeset}
+      end
     end
   end
 

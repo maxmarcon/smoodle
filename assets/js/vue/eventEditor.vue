@@ -7,15 +7,15 @@
 					.col-md-6
 						small.form-text.text-muted(id="eventNameHelp") {{ $t('event_editor.event.name_help') }}
 						input#eventName.form-control(v-model="eventName" type="text"
-						:class="{'is-invalid': errors.name}")
-						.invalid-feedback {{ $t('event_editor.event.name_required') }}
+						:class="{'is-invalid': eventNameError}")
+						.invalid-feedback {{ eventNameError }}
 				.form-group.row
 					label.col-md-2.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
 					.col-md-6
 						small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.desc_help') }}
 						textarea#eventDesc.form-control(v-model="eventDesc"
-						:class="{'is-invalid': errors.desc}")
-						.invalid-feedback {{ $t('event_editor.event.desc_required') }}
+						:class="{'is-invalid': eventDescError}")
+						.invalid-feedback {{ eventDescError }}
 
 			div(v-else-if="$route.query.step == 2")
 				.form-group.row.mt-md-3.date-picker-trigger
@@ -23,8 +23,9 @@
 					.col-md-4
 						input#eventDates.form-control(
 						:value="dateRange"
+						:class="{'is-invalid': eventDatesError}"
 						)
-						.invalid-feedback {{ $t('event_editor.event.dates_required') }}
+						.invalid-feedback {{ eventDatesError }}
 
 					AirbnbStyleDatepicker(
 						:trigger-element-id="'eventDates'"
@@ -43,12 +44,12 @@
 							b-dropdown-item(@click="pickNextWeek") {{ $t('event_editor.next_week') }}
 							b-dropdown-item(@click="pickNextMonths(1)") {{ $tc('event_editor.within_months', 1) }}
 
-			.row
+			.row(v-if="$route.query.step < 3")
 				.col
 					router-link.btn.btn-primary(
 						role="button"
-						:to="{ name: 'new_event', query: {step: ($route.query.step == minStep ? $route.query.step : parseInt($route.query.step) - 1) }}"
-						:class="{disabled: $route.query.step == minStep}"
+						:to="{ name: 'new_event', query: {step: ($route.query.step == firstStep ? $route.query.step : parseInt($route.query.step) - 1) }}"
+						:class="{disabled: $route.query.step == firstStep}"
 					) {{ $t('event_editor.prev') }}
 				.col
 					router-link.btn.btn-primary(
@@ -61,15 +62,15 @@
 <script>
 import dateFns from 'date-fns'
 
-const minStep = 1;
-const maxStep = 3;
+const firstStep = 1;
+const lastStep = 3;
 const today = new Date();
 const InvalidDate = 'Invalid Date';
 
-const sanitizeParameters = (to) => {
+const sanitizeParameters = (to, forceFirstStep=false) => {
 	let step = parseInt(to.query.step);
-	if (isNaN(step) || step < minStep || step > maxStep) {
-		return { path: to.path, query: {step: minStep} };
+	if (isNaN(step) || step < firstStep || step > lastStep || (forceFirstStep && step != firstStep)) {
+		return { path: to.path, query: {step: firstStep} };
 	} else {
 		return true;
 	}
@@ -80,55 +81,55 @@ function beforeRouteUpdate(to, from, next) {
 	if (res != true) {
 		next(res);
 	} else {
-
-	 	var self = this;
-
-		this.$http.post("/v1/events", {
-			dry_run: true,
-			event: {
-				name: this.eventName,
-				desc: this.eventDesc
-			}
-		})
-		.then(function(result) {
-			self.errors = false;
+		if (from.query.step > to.query.step) {
 			next();
-		})
-		.catch(function(result){
-			for (let k in self.errors) {
-				self.errors[k] = false;
-			}
-			for (let k in result.response.data.errors) {
-				self.errors[k] = true;
-			}
-			next(false);
-		});
+		} else {
+		 	let self = this;
+			this.$http.post("/v1/events", {
+				dry_run: true,
+				event: self.dataForStep(from.query.step)
+			})
+			.then(function(result) {
+				self.setErrorsForStep({}, from.query.step);
+				next();
+			})
+			.catch(function(result) {
+				self.setErrorsForStep(result.response.data.errors, from.query.step);
+				next(false);
+			});
+		}
 	}
 }
 
+const errorsMap = {
+	"1": {
+		name: "eventNameError",
+		desc: "eventDescError"
+	},
+	"2": {
+		time_window_from: "eventDatesError",
+		time_window_to: "eventDatesError"
+	}
+};
 
 export default {
 	data: () => ({
 		eventName: '',
+		eventNameError: null,
 		eventDesc: '',
+		eventDescError: null,
 		dateFrom: '',
 		dateTo: '',
-		minStep,
-		maxStep,
-		errors: {
-			name: false,
-			desc: false
-		},
+		eventDatesError: null,
+		firstStep,
+		lastStep,
 		showThisWeekButton: (dateFns.getDay(today) > 0 && dateFns.getDay(today) < 4) // betewn Mon and Wed
  	}),
 	beforeRouteEnter: (to, from, next) => {
-		next(sanitizeParameters(to));
+		next(sanitizeParameters(to, true));
 	},
 	beforeRouteUpdate,
 	computed: {
-		showValidationResult() {
-			return this.errors.name || this.errors.desc;
-		},
 		dateRange() {
 			let fromDate_s = dateFns.format(this.dateFrom, 'DD/MM/YYYY (ddd)', {locale: this.$i18n.t('date_fns_locale')});
 			let toDate_s = dateFns.format(this.dateTo, 'DD/MM/YYYY (ddd)', {locale: this.$i18n.t('date_fns_locale')});
@@ -141,6 +142,30 @@ export default {
 		}
 	},
 	methods: {
+		dataForStep(step) {
+			let data = {};
+			if (step >= "1") {
+				Object.assign(data, {
+					name: this.eventName,
+					desc: this.eventDesc
+				});
+			}
+			if (step >= "2") {
+				Object.assign(data, {
+					time_window_from: this.dateFrom,
+					time_window_to: this.dateTo
+				});
+			}
+			return data;
+		},
+		setErrorsForStep(errors, step) {
+			let map = errorsMap[step];
+			if (map) {
+				for (let k in map) {
+					this[map[k]] = (k in errors ? errors[k][0] : null)
+				}
+			}
+		},
 		applyDates(from, to) {
 			this.dateFrom = from;
 			this.dateTo = to;
