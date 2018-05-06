@@ -35,13 +35,13 @@ defmodule Smoodle.Scheduler.EventTest do
 	end
 
 	test "changeset with name too long" do
-		changeset = Event.changeset(%Event{}, Map.replace!(@valid_attrs, :name, String.pad_trailing("Party", 256, "123")))
-		assert [name: {_,  [count: 255, validation: :length, max: 255]}] = changeset.errors
+		changeset = Event.changeset(%Event{}, Map.replace!(@valid_attrs, :name, String.pad_trailing("Party", 51, "123")))
+		assert [name: {_,  [count: 50, validation: :length, max: 50]}] = changeset.errors
 	end
 
 	test "changeset with description too long" do
-		changeset = Event.changeset(%Event{}, Map.replace!(@valid_attrs, :desc, String.pad_trailing("Yeah!", 2501, "123")))
-		assert [desc: {_,  [count: 2500, validation: :length, max: 2500]}] = changeset.errors
+		changeset = Event.changeset(%Event{}, Map.replace!(@valid_attrs, :desc, String.pad_trailing("Yeah!", 251, "123")))
+		assert [desc: {_,  [count: 250, validation: :length, max: 250]}] = changeset.errors
 	end
 
 	test "validate both time window ends must be defined" do

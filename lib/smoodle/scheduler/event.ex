@@ -24,11 +24,11 @@ defmodule Smoodle.Scheduler.Event do
     event
     |> cast(attrs, [:name, :time_window_from, :time_window_to, :scheduled_from, :scheduled_to, :desc])
     |> validate_required([:name, :desc, :time_window_from, :time_window_to])
-    |> validate_length(:name, max: 255)
-    |> validate_length(:desc, max: 2500)
+    |> validate_length(:name, max: 50)
+    |> validate_length(:desc, max: 250)
     |> validate_window_defined([:scheduled_from, :scheduled_to], :scheduled)
-    |> validate_time_window_consistent([:time_window_from, :time_window_to], :time_window)
-    |> validate_scheduled_window_consistent([:scheduled_from, :scheduled_to], :scheduled)
+    |> validate_date_window_consistent([:time_window_from, :time_window_to], :time_window)
+    |> validate_datetime_window_consistent([:scheduled_from, :scheduled_to], :scheduled)
 
     # TODO: validate scheduled window lies inside time window
   end
@@ -51,7 +51,7 @@ defmodule Smoodle.Scheduler.Event do
     end
   end
 
-  defp validate_time_window_consistent(changeset, keys, error_key) do
+  defp validate_date_window_consistent(changeset, keys, error_key) do
     with applied <- apply_changes(changeset) |> Map.take(keys) |> Map.values,
       true <- Enum.all?(applied, &(!is_nil(&1))),
       [t1, t2] <- applied,
@@ -63,7 +63,7 @@ defmodule Smoodle.Scheduler.Event do
     end
   end
 
-  defp validate_scheduled_window_consistent(changeset, keys, error_key) do
+  defp validate_datetime_window_consistent(changeset, keys, error_key) do
     with applied <- apply_changes(changeset) |> Map.take(keys) |> Map.values,
       true <- Enum.all?(applied, &(!is_nil(&1))),
       [t1, t2] <- applied,
@@ -74,4 +74,6 @@ defmodule Smoodle.Scheduler.Event do
       _ -> changeset
     end
   end
+
+  defp validate_date_not_in_the_future
 end

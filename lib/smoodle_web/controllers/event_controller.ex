@@ -3,7 +3,6 @@ defmodule SmoodleWeb.EventController do
 
   alias Smoodle.Scheduler
   alias Smoodle.Scheduler.Event
-
   action_fallback SmoodleWeb.FallbackController
 
   def index(conn, _params) do
@@ -11,12 +10,13 @@ defmodule SmoodleWeb.EventController do
     render(conn, "index.json", events: events)
   end
 
-  def create(_, %{"event" => event_params, "dry_run" => true}) do
+  def create(_, %{"event" => event_params, "dry_run" => true} = params) do
     case Scheduler.create_event(event_params, dry_run: true) do
       %{:valid? => true} -> :ok
+      # for partial validation, we return ok
       # if the errors only affect parameters that were not specified by the client
-      # we return ok. This allows for partial validation
-      changeset -> if Enum.empty?(Keyword.take(changeset.errors, Enum.map(Map.keys(event_params), &String.to_atom/1))) do
+      changeset -> if params["partial"] &&
+        Enum.empty?(Keyword.take(changeset.errors, Enum.map(Map.keys(event_params), &String.to_atom/1))) do
         :ok
       else
         {:error, changeset}

@@ -6,14 +6,14 @@
 					label.col-md-2.col-form-label(for="eventName") {{ $t('event_editor.event.name') }}
 					.col-md-6
 						small.form-text.text-muted(id="eventNameHelp") {{ $t('event_editor.event.name_help') }}
-						input#eventName.form-control(v-model="eventName" type="text"
+						input#eventName.form-control(v-model.trim="eventName" type="text"
 						:class="{'is-invalid': eventNameError}")
 						.invalid-feedback {{ eventNameError }}
 				.form-group.row
 					label.col-md-2.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
 					.col-md-6
 						small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.desc_help') }}
-						textarea#eventDesc.form-control(v-model="eventDesc"
+						textarea#eventDesc.form-control(v-model.trim="eventDesc"
 						:class="{'is-invalid': eventDescError}")
 						.invalid-feedback {{ eventDescError }}
 
@@ -87,7 +87,10 @@ function beforeRouteUpdate(to, from, next) {
 		 	let self = this;
 			this.$http.post("/v1/events", {
 				dry_run: true,
-				event: self.dataForStep(from.query.step)
+				partial: from.query.step < 2,
+				event: self.eventDataForStep(from.query.step)
+			}, {
+				headers: { 'Accept-Language': this.$i18n.locale }
 			})
 			.then(function(result) {
 				self.setErrorsForStep({}, from.query.step);
@@ -102,11 +105,11 @@ function beforeRouteUpdate(to, from, next) {
 }
 
 const errorsMap = {
-	"1": {
+	1: {
 		name: "eventNameError",
 		desc: "eventDescError"
 	},
-	"2": {
+	2: {
 		time_window_from: "eventDatesError",
 		time_window_to: "eventDatesError"
 	}
@@ -142,15 +145,15 @@ export default {
 		}
 	},
 	methods: {
-		dataForStep(step) {
+		eventDataForStep(step) {
 			let data = {};
-			if (step >= "1") {
+			if (step >= 1) {
 				Object.assign(data, {
 					name: this.eventName,
 					desc: this.eventDesc
 				});
 			}
-			if (step >= "2") {
+			if (step >= 2) {
 				Object.assign(data, {
 					time_window_from: this.dateFrom,
 					time_window_to: this.dateTo

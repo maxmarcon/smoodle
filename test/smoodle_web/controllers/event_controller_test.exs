@@ -115,8 +115,8 @@ defmodule SmoodleWeb.EventControllerTest do
       assert json_response(conn, 422)["errors"] != %{}
     end
 
-    test "returns empty ok response for partially valid data", %{conn: conn} do
-      conn = post conn, event_path(conn, :create), event: @partial_valid_data, dry_run: true
+    test "returns empty ok response for partially valid data and partial validation", %{conn: conn} do
+      conn = post conn, event_path(conn, :create), event: @partial_valid_data, dry_run: true, partial: true
       assert "" = response(conn, 200)
     end
   end
