@@ -7,11 +7,11 @@ defmodule SmoodleWeb.Router do
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-    plug SmoodleWeb.Plugs.Locale, [default: "en", use_session: true]
+    plug SmoodleWeb.Plugs.Locale
   end
 
   pipeline :api do
-    plug SmoodleWeb.Plugs.Locale, [default: "en", use_session: false]
+    plug SmoodleWeb.Plugs.Locale, use_session: false
     plug :accepts, ["json"]
   end
 
