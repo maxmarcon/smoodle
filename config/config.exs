@@ -20,7 +20,7 @@ config :smoodle, SmoodleWeb.Endpoint,
 
 config :smoodle, SmoodleWeb.Plugs.Locale,
 	use_session: true,
-	available_locales: ["en", "de", "it"]
+	available_locales: ~w(en de it)
 
 # Configures Elixir's Logger
 config :logger, :console,
