@@ -16,21 +16,7 @@ defmodule SmoodleWeb.Plugs.Locale do
     end
   end
 
-  @doc """
-
-    iex> SmoodleWeb.Plugs.Locale.parse_accept_language_header("fr-CH")
-    [{"fr-CH", 1.0}]
-
-    iex> SmoodleWeb.Plugs.Locale.parse_accept_language_header("fr-CH, de-AU;q=0.9, it;q=0.1")
-    [{"fr-CH", 1.0}, {"de-AU", 0.9}, {"it", 0.1}]
-
-    iex> SmoodleWeb.Plugs.Locale.parse_accept_language_header("en-US,en;q=0.9,de;q=0.8")
-    [{"en-US", 1.0}, {"en", 0.9}, {"de", 0.8}]
-
-    iex> SmoodleWeb.Plugs.Locale.parse_accept_language_header("")
-    []
-  """
-  def parse_accept_language_header(header) do
+  defp parse_accept_language_header(header) do
     with {:ok, header} <- Enum.fetch(header, 0) do
       header
       |> String.split(",", trim: true)
@@ -53,17 +39,7 @@ defmodule SmoodleWeb.Plugs.Locale do
     end
   end
 
-  @doc """
-    iex> SmoodleWeb.Plugs.Locale.locale_from_params(%{params: %{"locale" => "de"}}, available_locales: ~w(fr en de))
-    "de"
-
-    iex> SmoodleWeb.Plugs.Locale.locale_from_params(%{params: %{"locale" => "de"}}, available_locales: ~w(fr en))
-    nil
-
-    iex> SmoodleWeb.Plugs.Locale.locale_from_params(%{params: %{"locale" => "de"}}, available_locales: ~w(fr en de))
-    "de"
-  """
-  def locale_from_params(conn, config) do
+  defp locale_from_params(conn, config) do
     with %{params: %{"locale" => locale}} <- conn,
       true <- locale in config[:available_locales]
     do
