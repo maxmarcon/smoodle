@@ -33,6 +33,7 @@
 							:fullscreen-mobile="true"
 							:date-one="dateFrom"
 							:date-two="dateTo"
+							:min-date="today"
 							@date-one-selected="val => { dateFrom = val }"
 							@date-two-selected="val => { dateTo = val }"
 					)
@@ -127,6 +128,7 @@ export default {
 		eventDatesError: null,
 		firstStep,
 		lastStep,
+		today,
 		showThisWeekButton: (dateFns.getDay(today) > 0 && dateFns.getDay(today) < 4) // betewn Mon and Wed
  	}),
 	beforeRouteEnter: (to, from, next) => {
@@ -177,21 +179,19 @@ export default {
 			this.dateTo = to;
 		},
 		pickThisWeek() {
-			let today = new Date();
 			this.applyDates(
 				dateFns.startOfWeek(today, {weekStartsOn: 1}),
 				dateFns.endOfWeek(today, {weekStartsOn: 1})
 			);
 		},
 		pickNextWeek() {
-			let today_next_week = dateFns.addWeeks(new Date(), 1);
+			let today_next_week = dateFns.addWeeks(today, 1);
 			this.applyDates(
 				dateFns.startOfWeek(today_next_week, {weekStartsOn: 1}),
 				dateFns.endOfWeek(today_next_week, {weekStartsOn: 1})
 			);
 		},
 		pickNextMonths(months) {
-			let today = new Date();
 			this.applyDates(today, dateFns.addMonths(today,1));
 		}
 	}
