@@ -10,6 +10,7 @@ defmodule Smoodle.Scheduler.Event do
 
   schema "events" do
     field :name, :string
+    field :organizer, :string
     field :update_token, :string
     field :time_window_from, :date
     field :time_window_to, :date
@@ -23,9 +24,10 @@ defmodule Smoodle.Scheduler.Event do
   @doc false
   def changeset(%Event{} = event, attrs) do
     event
-    |> cast(attrs, [:name, :time_window_from, :time_window_to, :scheduled_from, :scheduled_to, :desc])
-    |> validate_required([:name, :desc, :time_window_from, :time_window_to])
+    |> cast(attrs, [:name, :organizer, :time_window_from, :time_window_to, :scheduled_from, :scheduled_to, :desc])
+    |> validate_required([:name, :organizer, :desc, :time_window_from, :time_window_to])
     |> validate_length(:name, max: 50)
+    |> validate_length(:organizer, max: 50)
     |> validate_length(:desc, max: 250)
     |> validate_window_defined([:scheduled_from, :scheduled_to], :scheduled)
     |> validate_window_consistent([:time_window_from, :time_window_to], :time_window, Date)

@@ -9,24 +9,26 @@ defmodule Smoodle.SchedulerTest do
     @valid_attrs_1 %{
       name: "Party",
       desc: "Yeah!",
-      time_window_from: "2017-03-01",
-      time_window_to: "2017-06-01"
+      organizer: "The Hoff",
+      time_window_from: "2117-03-01",
+      time_window_to: "2117-06-01"
     }
     @valid_attrs_2 %{
       name: "Breakfast",
       desc: "Mmmhhh!",
-      time_window_from: "2018-01-01",
-      time_window_to: "2018-06-01"
+      organizer: "The Hoff",
+      time_window_from: "2118-01-01",
+      time_window_to: "2118-06-01"
     }
 
     @update_attrs %{
       name: "New name",
-      scheduled_from: "2017-03-20 20:10:00",
-      scheduled_to: "2017-03-20 23:10:00"
+      scheduled_from: "2117-03-20 20:10:00",
+      scheduled_to: "2117-03-20 23:10:00"
     }
     @invalid_attrs %{
-      scheduled_to: "2017-03-20 20:10:00",
-      scheduled_from: "2017-03-20 23:10:00"
+      scheduled_to: "2117-03-20 20:10:00",
+      scheduled_from: "2117-03-20 23:10:00"
     }
 
     def event_fixture([_ | _] = attr_list) do

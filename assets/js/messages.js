@@ -8,19 +8,19 @@ export default {
 			event: {
 				name: "Event title",
 				name_help: "Enter a name for your event",
-				name_required: "You must enter a name",
 				desc: "What is going to happen?",
 				desc_help: "Describe the event",
-				desc_required: "You must enter a description",
 				dates: "Dates",
-				dates_required: "You must specify a time period"
+				organizer: "Who are you?",
+				organizer_help: "Let your friend know who invitied them..."
 			},
 			this_week: "This week",
 			next_week: "Next week",
 			within_months: "Within one month | Within {count} months",
 			next: "Next",
 			prev: "Previous",
-			dates_quick_selection: "Quick pre-selection"
+			dates_quick_selection: "Quick pre-selection",
+			step: "Step {step} of {lastStep}"
 		},
 		date_picker: {
 			days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
@@ -39,14 +39,17 @@ export default {
 				name_help: "Gib deinem Event einen Namen",
 				desc: "Was ist der Anlass?",
 				desc_help: "Beschreibe dein Event",
-				dates: "Daten"
+				dates: "Daten",
+				organizer: "Wer bist Du?",
+				organizer_help: "Lass deine Freunde wissen, wer sie einlädt..."
 			},
 			next: "Weiter",
 			prev: "Zurück",
 			this_week: "Diese Woche",
 			next_week: "Nächste Woche",
 			within_months: "Innerhalb eines Monats | Innerhalb der nächsten {count} Monate",
-			dates_quick_selection: "Schnelle Vorauswahl"
+			dates_quick_selection: "Schnelle Vorauswahl",
+			step: "Schritt {step} von {lastStep}"
 		},
 		date_picker: {
 			days: ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'],
@@ -65,14 +68,17 @@ export default {
 				name_help: "Dai un nome al tuo evento",
 				desc: "Qual'è l'occasione?",
 				desc_help: "Descrivi l'evento",
-				dates: "Date"
+				dates: "Date",
+				organizer: "Chi sei?",
+				organizer_help: "Fai sapere ai tuoi amici chi li invita..."
 			},
 			next: "Avanti",
 			prev: "Indietro",
 			this_week: "Questa settimana",
 			next_week: "La prossima settimana",
 			within_months: "Entro un mese | Entro {count} mesi",
-			dates_quick_selection: "Preselezione veloce"
+			dates_quick_selection: "Preselezione veloce",
+			step: "Passo {step} di {lastStep}"
 		},
 		date_picker: {
 			days: ['Lunedí', 'Martedí', 'Mercoledí', 'Giovedí', 'Venerdí', 'Sabato', 'Domenica'],

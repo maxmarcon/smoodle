@@ -7,14 +7,16 @@ defmodule SmoodleWeb.EventControllerTest do
   @create_attrs_1 %{
     name: "Party",
     desc: "Yeah!",
-    time_window_from: "2017-03-01",
-    time_window_to: "2017-06-01"
+    organizer: "The Hoff",
+    time_window_from: "2117-03-01",
+    time_window_to: "2117-06-01"
   }
   @create_attrs_2 %{
     name: "Dinner",
     desc: "Yummy!",
-    time_window_from: "2017-04-01",
-    time_window_to: "2017-08-20"
+    organizer: "The Hoff",
+    time_window_from: "2117-04-01",
+    time_window_to: "2117-08-20"
   }
 
   defp rest_repr(%{ scheduled_from: scheduled_from, scheduled_to: scheduled_to }) do
@@ -36,13 +38,13 @@ defmodule SmoodleWeb.EventControllerTest do
   end
 
   @update_attrs %{
-    scheduled_from: "2017-04-05 21:10:00",
-    scheduled_to: "2017-04-05 22:10:00"
+    scheduled_from: "2117-04-05 21:10:00",
+    scheduled_to: "2117-04-05 22:10:00"
   }
   @invalid_attrs %{
     name: "",
-    scheduled_to: "2017-04-05 21:10:00",
-    scheduled_from: "2017-04-05 22:10:00"
+    scheduled_to: "2117-04-05 21:10:00",
+    scheduled_from: "2117-04-05 22:10:00"
   }
   @partial_valid_data %{
     name: "Event"

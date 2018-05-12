@@ -6,6 +6,7 @@ defmodule Smoodle.Scheduler.EventTest do
 	@valid_attrs %{
 		name: "Party",
 		desc: "Yeah!",
+		organizer: "Donald Trump",
 		time_window_from: "2118-01-10",
 		time_window_to: "2118-03-20",
 		scheduled_from: "2118-02-05 19:00:00",
@@ -15,6 +16,7 @@ defmodule Smoodle.Scheduler.EventTest do
 	@past_event %{
 		name: "Party",
 		desc: "Yeah!",
+		organizer: "Donald Trump",
 		time_window_from: "1118-01-10",
 		time_window_to: "1118-03-20",
 		scheduled_from: "1118-02-05 19:00:00",
@@ -29,6 +31,11 @@ defmodule Smoodle.Scheduler.EventTest do
 	test "changeset without name" do
 		changeset = Event.changeset(%Event{}, Map.delete(@valid_attrs, :name))
 		assert [name: {_, [validation: :required]}] = changeset.errors
+	end
+
+	test "changeset without organizer" do
+		changeset = Event.changeset(%Event{}, Map.delete(@valid_attrs, :organizer))
+		assert [organizer: {_, [validation: :required]}] = changeset.errors
 	end
 
 	test "changeset ignores id" do
@@ -46,6 +53,11 @@ defmodule Smoodle.Scheduler.EventTest do
 	test "changeset with name too long" do
 		changeset = Event.changeset(%Event{}, Map.replace!(@valid_attrs, :name, String.pad_trailing("Party", 51, "123")))
 		assert [name: {_,  [count: 50, validation: :length, max: 50]}] = changeset.errors
+	end
+
+	test "changeset with organizer too long" do
+		changeset = Event.changeset(%Event{}, Map.replace!(@valid_attrs, :organizer, String.pad_trailing("Trump", 51, "123")))
+		assert [organizer: {_,  [count: 50, validation: :length, max: 50]}] = changeset.errors
 	end
 
 	test "changeset with description too long" do
