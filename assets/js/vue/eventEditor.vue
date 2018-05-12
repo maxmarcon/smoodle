@@ -105,13 +105,14 @@ function beforeRouteUpdate(to, from, next) {
 }
 
 const errorsMap = {
+	// maps, for each step, the error fields in the vue model to
+	// the error keys received by the back end
 	1: {
-		name: "eventNameError",
-		desc: "eventDescError"
+		eventNameError: "name",
+		eventDescError: "desc"
 	},
 	2: {
-		time_window_from: "eventDatesError",
-		time_window_to: "eventDatesError"
+		eventDatesError: ["time_window_to", "time_window_from", "time_window"]
 	}
 };
 
@@ -164,8 +165,10 @@ export default {
 		setErrorsForStep(errors, step) {
 			let map = errorsMap[step];
 			if (map) {
-				for (let k in map) {
-					this[map[k]] = (k in errors ? errors[k][0] : null)
+				for (let error_field in map) {
+					let error_keys = (map[error_field] instanceof Array ? map[error_field] : [map[error_field]]);
+					let key_with_error = error_keys.find(key => errors[key]);
+					this[error_field] = (key_with_error ? errors[key_with_error][0] : null);
 				}
 			}
 		},

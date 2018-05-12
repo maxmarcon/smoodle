@@ -3,6 +3,7 @@ defmodule Smoodle.Scheduler.Event do
   alias Smoodle.Scheduler.Event
   require Integer
   import Ecto.Changeset
+  import SmoodleWeb.Gettext
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @update_token_len 16
@@ -27,10 +28,10 @@ defmodule Smoodle.Scheduler.Event do
     |> validate_length(:name, max: 50)
     |> validate_length(:desc, max: 250)
     |> validate_window_defined([:scheduled_from, :scheduled_to], :scheduled)
-    |> validate_date_window_consistent([:time_window_from, :time_window_to], :time_window)
-    |> validate_datetime_window_consistent([:scheduled_from, :scheduled_to], :scheduled)
-
-    # TODO: validate scheduled window lies inside time window
+    |> validate_window_consistent([:time_window_from, :time_window_to], :time_window, Date)
+    |> validate_window_consistent([:scheduled_from, :scheduled_to], :scheduled)
+    |> validate_is_the_future([:scheduled_from, :scheduled_to])
+    |> validate_is_the_future([:time_window_from, :time_window_to], Date)
   end
 
   def changeset_insert(attrs) do
@@ -39,41 +40,48 @@ defmodule Smoodle.Scheduler.Event do
   end
 
   defp validate_window_defined(changeset, keys, error_key) do
-    if apply_changes(changeset)
-      |> Map.take(keys)
-      |> Map.values
-      |> Enum.count(&(is_nil(&1)))
-      |> Integer.is_odd
-    do
-      add_error(changeset, error_key, "both ends must be defined or none", [validation: :only_one_end_defined])
+    if Enum.map(keys, &fetch_field(changeset, &1))
+      |> Enum.count(&is_nil(elem(&1, 1)))
+      |> Integer.is_odd do
+      add_error(changeset, error_key, dgettext("errors", "both ends must be defined or none"), [validation: :only_one_end_defined])
     else
       changeset
     end
   end
 
-  defp validate_date_window_consistent(changeset, keys, error_key) do
-    with applied <- apply_changes(changeset) |> Map.take(keys) |> Map.values,
-      true <- Enum.all?(applied, &(!is_nil(&1))),
-      [t1, t2] <- applied,
-      :gt <- Date.compare(t1, t2)
+  defp validate_window_consistent(changeset, keys, error_key, t \\ NaiveDateTime) do
+    with [t1, t2] <- Enum.map(keys, &fetch_field(changeset, &1))
+      |> Enum.map(&elem(&1, 1)),
+      false <- Enum.any?([t1, t2], &is_nil/1),
+      :gt <- t.compare(t1, t2)
     do
-      add_error(changeset, error_key, "the right side of the window must happen later than the left one", [validation: :inconsistent_interval])
+      add_error(changeset, error_key, dgettext("errors", "the right side of the window must happen later than the left one"), [validation: :inconsistent_interval])
     else
       _ -> changeset
     end
   end
 
-  defp validate_datetime_window_consistent(changeset, keys, error_key) do
-    with applied <- apply_changes(changeset) |> Map.take(keys) |> Map.values,
-      true <- Enum.all?(applied, &(!is_nil(&1))),
-      [t1, t2] <- applied,
-      :gt <- NaiveDateTime.compare(t1, t2)
+  defp validate_is_the_future(changeset, keys, t \\ NaiveDateTime)
+
+  defp validate_is_the_future(changeset, [], _t) do
+    changeset
+  end
+
+  defp validate_is_the_future(changeset, [key | tail], t) do
+    {_, date_or_time} = fetch_field(changeset, key)
+    today = case t do
+      NaiveDateTime -> NaiveDateTime.utc_now
+      Date -> Date.utc_today
+    end
+
+    changeset = with %{} <- date_or_time,
+      :gt <- t.compare(today, date_or_time)
     do
-      add_error(changeset, error_key, "the right side of the window must happen later than the left one", [validation: :inconsistent_interval])
+      add_error(changeset, key, dgettext("errors", "you cannot schedule an event in the past"), [validation: :in_the_past])
     else
       _ -> changeset
     end
-  end
 
-  defp validate_date_not_in_the_future
+    validate_is_the_future(changeset, tail, t)
+  end
 end

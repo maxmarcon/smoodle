@@ -92,3 +92,18 @@ msgstr ""
 
 msgid "must be equal to %{number}"
 msgstr ""
+
+#, elixir-format
+#: lib/smoodle/scheduler/event.ex:80
+msgid "you cannot schedule an event in the past"
+msgstr ""
+
+#, elixir-format
+#: lib/smoodle/scheduler/event.ex:46
+msgid "both ends must be defined or none"
+msgstr ""
+
+#, elixir-format
+#: lib/smoodle/scheduler/event.ex:58
+msgid "the right side of the window must happen later than the left one"
+msgstr ""

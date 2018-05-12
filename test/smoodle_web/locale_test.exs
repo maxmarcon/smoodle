@@ -2,7 +2,7 @@ defmodule LocaleSetterTest do
   use SmoodleWeb.ConnCase
 
   setup do
-  	{:ok, [available_locales: ["de", "it", "en"]]}
+  	{:ok, [available_locales: ["de", "it", "en"], use_session: false]}
   end
 
   test "setting locale through request parameters works", config do
@@ -37,7 +37,7 @@ defmodule LocaleSetterTest do
 	  end
 
 	  test "invalid header is ignored", config do
-	  	conn = put_req_header(build_conn(), "accept-language", "xxxx")
+	  	conn = put_req_header(build_conn(), "accept-language", "this is, an invalid , header")
 	  	SmoodleWeb.Plugs.Locale.call conn, config
 	  	assert Gettext.get_locale(SmoodleWeb.Gettext) == "en"
 	  end

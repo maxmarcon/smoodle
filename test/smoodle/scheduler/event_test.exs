@@ -6,10 +6,19 @@ defmodule Smoodle.Scheduler.EventTest do
 	@valid_attrs %{
 		name: "Party",
 		desc: "Yeah!",
-		time_window_from: "2018-01-10",
-		time_window_to: "2018-03-20",
-		scheduled_from: "2018-02-05 19:00:00",
-		scheduled_to: "2018-02-05 23:00:00"
+		time_window_from: "2118-01-10",
+		time_window_to: "2118-03-20",
+		scheduled_from: "2118-02-05 19:00:00",
+		scheduled_to: "2118-02-05 23:00:00"
+	}
+
+	@past_event %{
+		name: "Party",
+		desc: "Yeah!",
+		time_window_from: "1118-01-10",
+		time_window_to: "1118-03-20",
+		scheduled_from: "1118-02-05 19:00:00",
+		scheduled_to: "1118-02-05 23:00:00"
 	}
 
 	test "changeset with valid attrs" do
@@ -58,12 +67,20 @@ defmodule Smoodle.Scheduler.EventTest do
 	end
 
 	test "validate both time window ends must be consistent" do
-		changeset = Event.changeset(%Event{}, Map.replace!(@valid_attrs, :time_window_from, "2018-03-21"))
+		changeset = Event.changeset(%Event{}, Map.replace!(@valid_attrs, :time_window_from, "2118-03-21"))
 		assert [time_window: {_, [validation: :inconsistent_interval]}] = changeset.errors
 	end
 
 	test "validate both scheduled ends must be consistent" do
-		changeset = Event.changeset(%Event{}, Map.replace!(@valid_attrs, :scheduled_to, "2018-02-05 18:00:01"))
+		changeset = Event.changeset(%Event{}, Map.replace!(@valid_attrs, :scheduled_to, "2118-02-05 18:00:01"))
 		assert [scheduled: {_, [validation: :inconsistent_interval]}] = changeset.errors
+	end
+
+	test "validate events cannot be in the past" do
+		changeset = Event.changeset(%Event{}, @past_event)
+		assert {_, [validation: :in_the_past]} = changeset.errors[:scheduled_to]
+		assert {_, [validation: :in_the_past]} = changeset.errors[:scheduled_from]
+		assert {_, [validation: :in_the_past]} = changeset.errors[:time_window_to]
+		assert {_, [validation: :in_the_past]} = changeset.errors[:time_window_from]
 	end
 end
