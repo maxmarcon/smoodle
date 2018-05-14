@@ -1,31 +1,31 @@
 <template lang="pug">
 	transition(name="slide" mode="out-in")
 		form(:key="$route.query.step" @submit.prevent="" novalidate=true)
-			.row
-				.col-8
-					div.progress(style="height: 20px;")
-						div.progress-bar.bg-success(:style="{ width: progressBarWidth }")
+			.row.mt-3.justify-content-center
+				.col-10
+					b-progress(:max="lastStep")
+						b-progress-bar(:value="parseInt($route.query.step)" variant="success")
 							| {{ $t('event_editor.step', {step: $route.query.step, lastStep: lastStep}) }}
 
 			div(v-if="$route.query.step == 1")
-				.form-group.row.mt-md-3
-					label.col-md-2.col-form-label(for="eventName") {{ $t('event_editor.event.name') }}
+				.form-group.row.mt-md-3.justify-content-center
+					label.col-md-3.col-form-label(for="eventName") {{ $t('event_editor.event.name') }}
 					.col-md-6
 						small.form-text.text-muted(id="eventNameHelp") {{ $t('event_editor.event.name_help') }}
 						input#eventName.form-control(v-model.trim="eventName" type="text"
 						:disabled="createdEvent"
 						:class="{'is-invalid': eventNameError}")
 						.invalid-feedback {{ eventNameError }}
-				.form-group.row
-					label.col-md-2.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
+				.form-group.row.justify-content-center
+					label.col-md-3.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
 					.col-md-6
 						small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.desc_help') }}
 						textarea#eventDesc.form-control(v-model.trim="eventDesc"
 						:disabled="createdEvent"
 						:class="{'is-invalid': eventDescError}")
 						.invalid-feedback {{ eventDescError }}
-				.form-group.row
-					label.col-md-2.col-form-label(for="eventOrganizer") {{ $t('event_editor.event.organizer') }}
+				.form-group.row.justify-content-center
+					label.col-md-3.col-form-label(for="eventOrganizer") {{ $t('event_editor.event.organizer') }}
 					.col-md-6
 						small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.organizer_help') }}
 						input#eventOrganizer.form-control(v-model.trim="eventOrganizer"
@@ -35,9 +35,9 @@
 
 
 			div(v-else-if="$route.query.step == 2")
-				.form-group.row.mt-md-3.date-picker-trigger
-					label.col-md-2.col-form-label(for="eventDates") {{ $t('event_editor.event.dates') }}
-					.col-md-4
+				.form-group.row.mt-md-3.date-picker-trigger.justify-content-center
+					label.col-md-3.col-form-label(for="eventDates") {{ $t('event_editor.event.dates') }}
+					.col-md-6
 						input#eventDates.form-control(
 						:disabled="createdEvent"
 						:value="dateRange"
@@ -57,33 +57,35 @@
 								@date-two-selected="val => { dateTo = val }"
 						)
 
-				.form-group.row
-					.col-md-2.offset-md-2
+				.form-group.row.justify-content-center
+					.col-md-6.offset-md-3
 						b-dropdown(:text="$t('event_editor.dates_quick_selection')")
 							b-dropdown-item(v-if="showThisWeekButton" @click="pickThisWeek") {{ $t('event_editor.this_week') }}
 							b-dropdown-item(@click="pickNextWeek") {{ $t('event_editor.next_week') }}
 							b-dropdown-item(@click="pickNextMonths(1)") {{ $tc('event_editor.within_months', 1) }}
 
 			div(v-else-if="$route.query.step == 3")
-				.row
+				.row.justify-content-center
 					.col-8
 						.jumbotron
 							h2 Your event has been created
 							p {{ createdEvent.id }}
 
 
-			.row(v-if="$route.query.step < 3")
-				.col
-					router-link.btn.btn-primary(
-						role="button"
-						:to="{ name: 'new_event', query: {step: ($route.query.step == firstStep ? $route.query.step : parseInt($route.query.step) - 1) }}"
-						:class="{disabled: $route.query.step == firstStep}"
-					) {{ $t('event_editor.prev') }}
-				.col
-					router-link.btn.btn-primary(
-						role="button"
-						:to="{ name: 'new_event', query: {step: parseInt($route.query.step) + 1 }}"
-					) {{ $t('event_editor.next') }}
+			.row.mt-4.justify-content-center(v-if="$route.query.step < 3")
+				.col-10
+					.row.justify-content-between
+						.col.text-left
+							router-link.btn.btn-primary(
+								role="button"
+								:to="{ name: 'new_event', query: {step: ($route.query.step == firstStep ? $route.query.step : parseInt($route.query.step) - 1) }}"
+								:class="{disabled: $route.query.step == firstStep}"
+							) {{ $t('event_editor.prev') }}
+						.col.text-right
+							router-link.btn.btn-primary(
+								role="button"
+								:to="{ name: 'new_event', query: {step: parseInt($route.query.step) + 1 }}"
+							) {{ $t('event_editor.next') }}
 
 </template>
 
@@ -174,9 +176,6 @@ export default {
 	},
 	beforeRouteUpdate,
 	computed: {
-		progressBarWidth() {
-			return (this.$route.query.step / this.lastStep)*100 + "%";
-		},
 		dateRange() {
 			let fromDate_s = dateFns.format(this.dateFrom, 'DD/MM/YYYY (ddd)', {locale: this.$i18n.t('date_fns_locale')});
 			let toDate_s = dateFns.format(this.dateTo, 'DD/MM/YYYY (ddd)', {locale: this.$i18n.t('date_fns_locale')});
