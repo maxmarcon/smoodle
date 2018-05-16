@@ -7,7 +7,7 @@ defmodule SmoodleWeb.EventController do
 
   def index(conn, _params) do
     events = Scheduler.list_events()
-    render(conn, "index.json", events: events)
+    render(conn, "index.json", events: Enum.map(events, &Map.delete(&1, :owner_token)))
   end
 
   def create(_, %{"event" => event_params, "dry_run" => true} = params) do
@@ -29,25 +29,25 @@ defmodule SmoodleWeb.EventController do
      conn
      |> put_status(:created)
      |> put_resp_header("location", event_path(conn, :show, event))
-     |> render("show.json", event: event, with_update_token: true)
+     |> render("show.json", event: event)
     end
   end
 
   def show(conn, %{"id" => id}) do
     event = Scheduler.get_event!(id)
-    render(conn, "show.json", event: event)
+    render(conn, "show.json", event: Map.delete(event, :owner_token))
   end
 
-  def update(conn, %{"id" => id, "event" => event_params = %{"update_token" => update_token}}) do
-    event = Scheduler.get_event_for_update!(id, update_token)
+  def update(conn, %{"id" => id, "event" => event_params = %{"owner_token" => owner_token}}) do
+    event = Scheduler.get_event_for_update!(id, owner_token)
 
     with {:ok, %Event{} = event} <- Scheduler.update_event(event, event_params) do
-      render(conn, "show.json", event: event)
+      render(conn, "show.json", event: Map.delete(event, :owner_token))
     end
   end
 
-  def delete(conn, %{"id" => id, "update_token" => update_token}) do
-    event = Scheduler.get_event_for_update!(id, update_token)
+  def delete(conn, %{"id" => id, "owner_token" => owner_token}) do
+    event = Scheduler.get_event_for_update!(id, owner_token)
 
     with {:ok, %Event{}} <- Scheduler.delete_event(event) do
       send_resp(conn, :no_content, "")

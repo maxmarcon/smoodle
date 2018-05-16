@@ -44,10 +44,10 @@ defmodule Smoodle.Scheduler.EventTest do
 		refute Map.has_key?(changeset.changes, :id)
 	end
 
-	test "changeset ignores update_token" do
-		changeset = Event.changeset(%Event{}, Map.merge(@valid_attrs, %{update_token: "sneaky_token"}))
+	test "changeset ignores owner_token" do
+		changeset = Event.changeset(%Event{}, Map.merge(@valid_attrs, %{owner_token: "sneaky_token"}))
 		assert changeset.valid?
-		refute Map.has_key?(changeset.changes, :update_token)
+		refute Map.has_key?(changeset.changes, :owner_token)
 	end
 
 	test "changeset with name too long" do

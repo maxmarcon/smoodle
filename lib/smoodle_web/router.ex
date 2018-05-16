@@ -20,13 +20,16 @@ defmodule SmoodleWeb.Router do
 
     get "/", PageController, :welcome
     get "/new_event", PageController, :new_event
-    get "/poll", PageController, :poll
+    get "/event/:event_id/edit", PageController, :edit_event
+    get "/poll/:event_id", PageController, :new_poll
   end
 
   scope "/v1", SmoodleWeb do
     pipe_through :api
 
-    resources "/events", EventController, except: [:new, :edit]
+    resources "/events", EventController, except: [:new, :edit] do
+      resources "/polls", PollController, except: [:new, :edit, :delete]
+    end
   end
 
   # Other scopes may use custom stacks.

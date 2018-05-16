@@ -58,7 +58,7 @@ defmodule Smoodle.SchedulerTest do
     test "create_event/2 with valid data creates an event" do
       assert {:ok, %Event{} = event} = Scheduler.create_event(@valid_attrs_1)
       assert Map.take(event, [:name, :desc]) == Map.take(@valid_attrs_1, [:name, :desc])
-      assert String.length(event.update_token) == 32
+      assert String.length(event.owner_token) == 32
       assert Scheduler.get_event!(event.id) == event
     end
 
@@ -83,10 +83,10 @@ defmodule Smoodle.SchedulerTest do
 
     test "update_event/2 with valid data cannot update the token" do
       event = event_fixture(@valid_attrs_1)
-      old_token = event.update_token
-      assert {:ok, event} = Scheduler.update_event(event, Map.merge(@update_attrs, %{update_token: "sneaky_token"}))
+      old_token = event.owner_token
+      assert {:ok, event} = Scheduler.update_event(event, Map.merge(@update_attrs, %{owner_token: "sneaky_token"}))
       assert event.name == @update_attrs.name
-      assert event.update_token == old_token
+      assert event.owner_token == old_token
     end
 
     test "update_event/2 with valid data cannot update the id" do
@@ -109,4 +109,68 @@ defmodule Smoodle.SchedulerTest do
       assert_raise Ecto.NoResultsError, fn -> Scheduler.get_event!(event.id) end
     end
   end
+
+  #describe "polls" do
+  #  alias Smoodle.Scheduler.Poll
+#
+  #  @valid_attrs %{bad_dates: [], good_dates: [], weekdays_rank: "some weekdays_rank"}
+  #  @update_attrs %{bad_dates: [], good_dates: [], weekdays_rank: "some updated weekdays_rank"}
+  #  @invalid_attrs %{bad_dates: nil, good_dates: nil, weekdays_rank: nil}
+#
+  #  def poll_fixture(attrs \\ %{}) do
+  #    {:ok, poll} =
+  #      attrs
+  #      |> Enum.into(@valid_attrs)
+  #      |> Scheduler.create_poll()
+#
+  #    poll
+  #  end
+#
+  #  test "list_polls/0 returns all polls" do
+  #    poll = poll_fixture()
+  #    assert Scheduler.list_polls() == [poll]
+  #  end
+#
+  #  test "get_poll!/1 returns the poll with given id" do
+  #    poll = poll_fixture()
+  #    assert Scheduler.get_poll!(poll.id) == poll
+  #  end
+#
+  #  test "create_poll/1 with valid data creates a poll" do
+  #    assert {:ok, %Poll{} = poll} = Scheduler.create_poll(@valid_attrs)
+  #    assert poll.bad_dates == []
+  #    assert poll.good_dates == []
+  #    assert poll.weekdays_rank == "some weekdays_rank"
+  #  end
+#
+  #  test "create_poll/1 with invalid data returns error changeset" do
+  #    assert {:error, %Ecto.Changeset{}} = Scheduler.create_poll(@invalid_attrs)
+  #  end
+#
+  #  test "update_poll/2 with valid data updates the poll" do
+  #    poll = poll_fixture()
+  #    assert {:ok, poll} = Scheduler.update_poll(poll, @update_attrs)
+  #    assert %Poll{} = poll
+  #    assert poll.bad_dates == []
+  #    assert poll.good_dates == []
+  #    assert poll.weekdays_rank == "some updated weekdays_rank"
+  #  end
+#
+  #  test "update_poll/2 with invalid data returns error changeset" do
+  #    poll = poll_fixture()
+  #    assert {:error, %Ecto.Changeset{}} = Scheduler.update_poll(poll, @invalid_attrs)
+  #    assert poll == Scheduler.get_poll!(poll.id)
+  #  end
+#
+  #  test "delete_poll/1 deletes the poll" do
+  #    poll = poll_fixture()
+  #    assert {:ok, %Poll{}} = Scheduler.delete_poll(poll)
+  #    assert_raise Ecto.NoResultsError, fn -> Scheduler.get_poll!(poll.id) end
+  #  end
+#
+  #  test "change_poll/1 returns a poll changeset" do
+  #    poll = poll_fixture()
+  #    assert %Ecto.Changeset{} = Scheduler.change_poll(poll)
+  #  end
+  #end
 end
