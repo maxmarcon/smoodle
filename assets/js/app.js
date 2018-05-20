@@ -7,6 +7,8 @@ import AirbnbStyleDatepicker from 'vue-airbnb-style-datepicker'
 import BootstrapVue from 'bootstrap-vue'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import ClipboardJS from 'clipboard/dist/clipboard.min.js'
+import VueClipboard from 'vue-clipboard2'
 
 const router = new VueRouter({
 	mode: 'history',
@@ -36,6 +38,8 @@ const i18n = new VueI18n({
 Vue.use(BootstrapVue);
 
 Vue.use(VueAxios, axios);
+
+Vue.use(VueClipboard);
 
 Vue.use(AirbnbStyleDatepicker, {
 	monthNames: i18n.t('date_picker.months'),

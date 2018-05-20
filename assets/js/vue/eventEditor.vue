@@ -1,14 +1,14 @@
 <template lang="pug">
 	transition(name="slide" mode="out-in")
 		form(:key="$route.query.step" @submit.prevent="" novalidate=true)
-			.row.mt-3.justify-content-center
-				.col-10
+			.row.mt-3.justify-content-left
+				.col-md-10
 					b-progress(:max="lastStep")
 						b-progress-bar(:value="parseInt($route.query.step)" variant="success")
 							| {{ $t('event_editor.step', {step: $route.query.step, lastStep: lastStep}) }}
 
 			div(v-if="$route.query.step == 1")
-				.form-group.row.mt-md-3.justify-content-center
+				.form-group.row.mt-md-3.justify-content-left
 					label.col-md-3.col-form-label(for="eventName") {{ $t('event_editor.event.name') }}
 					.col-md-6
 						small.form-text.text-muted(id="eventNameHelp") {{ $t('event_editor.event.name_help') }}
@@ -16,7 +16,7 @@
 						:disabled="createdEvent"
 						:class="{'is-invalid': eventNameError}")
 						.invalid-feedback {{ eventNameError }}
-				.form-group.row.justify-content-center
+				.form-group.row.justify-content-left
 					label.col-md-3.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
 					.col-md-6
 						small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.desc_help') }}
@@ -24,7 +24,7 @@
 						:disabled="createdEvent"
 						:class="{'is-invalid': eventDescError}")
 						.invalid-feedback {{ eventDescError }}
-				.form-group.row.justify-content-center
+				.form-group.row.justify-content-left
 					label.col-md-3.col-form-label(for="eventOrganizer") {{ $t('event_editor.event.organizer') }}
 					.col-md-6
 						small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.organizer_help') }}
@@ -35,45 +35,68 @@
 
 
 			div(v-else-if="$route.query.step == 2")
-				.form-group.row.mt-md-3.date-picker-trigger.justify-content-center
-					label.col-md-3.col-form-label(for="eventDates") {{ $t('event_editor.event.dates') }}
-					.col-md-6
-						input#eventDates.form-control(
-						:disabled="createdEvent"
-						:value="dateRange"
-						:class="{'is-invalid': eventDatesError}"
-						)
-						.invalid-feedback {{ eventDatesError }}
+				.form-row.justify-content-left
+					.form-group.col-md-5.mt-md-3.date-picker-trigger.justify-content-left
+						label(for="eventDates") {{ $t('event_editor.event.dates') }}
+						.datepicker-trigger
+							input#eventDates.form-control(
+							:disabled="createdEvent"
+							:value="dateRange"
+							:class="{'is-invalid': eventDatesError}"
+							)
+							.invalid-feedback {{ eventDatesError }}
 
-					div(v-if="!createdEvent")
-						AirbnbStyleDatepicker(
-							:trigger-element-id="'eventDates'"
-								:mode="'range'"
-								:fullscreen-mobile="true"
-								:date-one="dateFrom"
-								:date-two="dateTo"
-								:min-date="today"
-								@date-one-selected="val => { dateFrom = val }"
-								@date-two-selected="val => { dateTo = val }"
-						)
+							div(v-if="!createdEvent")
+								AirbnbStyleDatepicker(
+									:trigger-element-id="'eventDates'"
+										:mode="'range'"
+										:fullscreen-mobile="true"
+										:date-one="dateFrom"
+										:date-two="dateTo"
+										:min-date="today"
+										@date-one-selected="val => { dateFrom = val }"
+										@date-two-selected="val => { dateTo = val }"
+								)
 
-				.form-group.row.justify-content-center
-					.col-md-6.offset-md-3
-						b-dropdown(:text="$t('event_editor.dates_quick_selection')")
+					.form-group.col-md-3.mt-md-3
+						label Select some common options
+						b-dropdown(:text="$t('event_editor.dates_quick_selection')" :disabled="createdEvent != null")
 							b-dropdown-item(v-if="showThisWeekButton" @click="pickThisWeek") {{ $t('event_editor.this_week') }}
 							b-dropdown-item(@click="pickNextWeek") {{ $t('event_editor.next_week') }}
 							b-dropdown-item(@click="pickNextMonths(1)") {{ $tc('event_editor.within_months', 1) }}
 
 			div(v-else-if="$route.query.step == 3")
-				.row.justify-content-center
-					.col-8
-						.jumbotron
-							h2 Your event has been created
-							p {{ createdEvent.id }}
+				.row.mt-3
+					.col-md-10
+						p
+							strong {{ $t('event_editor.event_created', {eventName: createdEvent.name}) }}
+						hr.my-1
+				.form-group.row
+					.col-md-9
+						label {{ $t('event_editor.share_link') }}
+						.input-group.border.border-success
+							input.form-control(:value="createdEvent.share_link" readonly=true @success="clipboard")
+							.input-group-append
+								button.btn.btn-sm.btn-outline-secondary(
+									v-clipboard:copy="createdEvent.share_link"
+									v-clipboard:success="clipboard"
+								)
+									span.oi.oi-clipboard
+						hr.my-4
+				.form-group.row
+					.col-md-9
+						label {{ $t('event_editor.owner_link') }}
+						.input-group.border.border-danger
+							input.form-control(:value="createdEvent.owner_link" readonly=true @success="clipboard")
+							.input-group-append
+								button.btn.btn-sm.btn-outline-secondary(
+									v-clipboard:copy="createdEvent.owner_link"
+									v-clipboard:success="clipboard"
+								)
+									span.oi.oi-clipboard
 
-
-			.row.mt-4.justify-content-center(v-if="$route.query.step < 3")
-				.col-10
+			.row.mt-4(v-if="$route.query.step < 3")
+				.col-md-10
 					.row.justify-content-between
 						.col.text-left
 							router-link.btn.btn-primary(
@@ -87,6 +110,8 @@
 								:to="{ name: 'new_event', query: {step: parseInt($route.query.step) + 1 }}"
 							) {{ $t('event_editor.next') }}
 
+			b-modal(ref="copiedToClipboardModal" hide-header=true ok-only=true)
+				p.my-4 {{ $t('event_editor.link_copied') }}
 </template>
 
 <script>
@@ -112,11 +137,15 @@ function beforeRouteUpdate(to, from, next) {
 		next(res);
 	} else {
 		if (from.query.step > to.query.step) {
+			// going back
 			next();
 		} else {
+			// going forward
 			if (this.createdEvent) {
+				// event was already created
 				next();
 			} else {
+				// we still have to create it...
 			 	let self = this;
 				this.$http.post("/v1/events", {
 					dry_run: from.query.step < 2,
@@ -131,8 +160,7 @@ function beforeRouteUpdate(to, from, next) {
 						self.createdEvent = result.data.data;
 					}
 					next();
-				})
-				.catch(function(result) {
+				}, function(result) {
 					self.setErrorsForStep(result.response.data.errors, from.query.step);
 					next(false);
 				});
@@ -169,7 +197,11 @@ export default {
 		lastStep,
 		today,
 		showThisWeekButton: (dateFns.getDay(today) > 0 && dateFns.getDay(today) < 4), // betewn Mon and Wed
-		createdEvent: null
+		createdEvent: null/*{
+						name: "Dinner party",
+						share_link: "http://share",
+						owner_link: "http://share"
+					}*/
  	}),
 	beforeRouteEnter: (to, from, next) => {
 		next(sanitizeParameters(to, true));
@@ -188,6 +220,9 @@ export default {
 		}
 	},
 	methods: {
+		clipboard(e) {
+      this.$refs.copiedToClipboardModal.show();
+		},
 		eventDataForStep(step) {
 			let data = {};
 			if (step >= 1) {

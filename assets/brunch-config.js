@@ -7,7 +7,7 @@ exports.config = {
       //},
       entryPoints: {
        'js/app.js': 'js/bundle.js'
-      },
+      }
       // To use a separate vendor.js bundle, specify two files path
       // http://brunch.io/docs/config#-files-
       // joinTo: {
@@ -53,6 +53,9 @@ exports.config = {
       // Do not use ES6 compiler in vendor code
       ignore: [/vendor/],
       pattern: /\.(js|vue)$/
+    },
+    copycat: {
+      fonts: ['node_modules/open-iconic/font/fonts']
     }
   },
 
