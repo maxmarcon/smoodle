@@ -2,7 +2,7 @@
 	transition(name="slide" mode="out-in")
 		form(:key="$route.query.step" @submit.prevent="" novalidate=true)
 			.row.mt-3.justify-content-left
-				.col-md-10
+				.col
 					b-progress(:max="lastStep")
 						b-progress-bar(:value="parseInt($route.query.step)" variant="success")
 							| {{ $t('event_editor.step', {step: $route.query.step, lastStep: lastStep}) }}
@@ -10,7 +10,7 @@
 			div(v-if="$route.query.step == 1")
 				.form-group.row.mt-md-3.justify-content-left
 					label.col-md-3.col-form-label(for="eventName") {{ $t('event_editor.event.name') }}
-					.col-md-6
+					.col-md-9
 						small.form-text.text-muted(id="eventNameHelp") {{ $t('event_editor.event.name_help') }}
 						input#eventName.form-control(v-model.trim="eventName" type="text"
 						:disabled="createdEvent"
@@ -18,7 +18,7 @@
 						.invalid-feedback {{ eventNameError }}
 				.form-group.row.justify-content-left
 					label.col-md-3.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
-					.col-md-6
+					.col-md-9
 						small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.desc_help') }}
 						textarea#eventDesc.form-control(v-model.trim="eventDesc"
 						:disabled="createdEvent"
@@ -26,7 +26,7 @@
 						.invalid-feedback {{ eventDescError }}
 				.form-group.row.justify-content-left
 					label.col-md-3.col-form-label(for="eventOrganizer") {{ $t('event_editor.event.organizer') }}
-					.col-md-6
+					.col-md-9
 						small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.organizer_help') }}
 						input#eventOrganizer.form-control(v-model.trim="eventOrganizer"
 						:disabled="createdEvent"
@@ -36,7 +36,7 @@
 
 			div(v-else-if="$route.query.step == 2")
 				.form-row.justify-content-left
-					.form-group.col-md-5.mt-md-3.date-picker-trigger.justify-content-left
+					.form-group.col-md-9.mt-md-3.date-picker-trigger.justify-content-left
 						label(for="eventDates") {{ $t('event_editor.event.dates') }}
 						.datepicker-trigger
 							input#eventDates.form-control(
@@ -67,12 +67,12 @@
 
 			div(v-else-if="$route.query.step == 3")
 				.row.mt-3
-					.col-md-10
+					.col
 						p
 							strong {{ $t('event_editor.event_created', {eventName: createdEvent.name}) }}
 						hr.my-1
 				.form-group.row
-					.col-md-9
+					.col
 						label {{ $t('event_editor.share_link') }}
 						.input-group.border.border-success
 							input.form-control(:value="createdEvent.share_link" readonly=true @success="clipboard")
@@ -84,7 +84,7 @@
 									span.oi.oi-clipboard
 						hr.my-4
 				.form-group.row
-					.col-md-9
+					.col
 						label {{ $t('event_editor.owner_link') }}
 						.input-group.border.border-danger
 							input.form-control(:value="createdEvent.owner_link" readonly=true @success="clipboard")
@@ -96,19 +96,17 @@
 									span.oi.oi-clipboard
 
 			.row.mt-4(v-if="$route.query.step < 3")
-				.col-md-10
-					.row.justify-content-between
-						.col.text-left
-							router-link.btn.btn-primary(
-								role="button"
-								:to="{ name: 'new_event', query: {step: ($route.query.step == firstStep ? $route.query.step : parseInt($route.query.step) - 1) }}"
-								:class="{disabled: $route.query.step == firstStep}"
-							) {{ $t('event_editor.prev') }}
-						.col.text-right
-							router-link.btn.btn-primary(
-								role="button"
-								:to="{ name: 'new_event', query: {step: parseInt($route.query.step) + 1 }}"
-							) {{ $t('event_editor.next') }}
+				.col.text-left
+					router-link.btn.btn-primary(
+						role="button"
+						:to="{ name: 'new_event', query: {step: ($route.query.step == firstStep ? $route.query.step : parseInt($route.query.step) - 1) }}"
+						:class="{disabled: $route.query.step == firstStep}"
+					) {{ $t('event_editor.prev') }}
+				.col.text-right
+					router-link.btn.btn-primary(
+						role="button"
+						:to="{ name: 'new_event', query: {step: parseInt($route.query.step) + 1 }}"
+					) {{ $t('event_editor.next') }}
 
 			b-modal(ref="copiedToClipboardModal" hide-header=true ok-only=true)
 				p.my-4 {{ $t('event_editor.link_copied') }}
