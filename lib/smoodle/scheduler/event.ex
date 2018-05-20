@@ -6,12 +6,12 @@ defmodule Smoodle.Scheduler.Event do
   import SmoodleWeb.Gettext
 
   @primary_key {:id, :binary_id, autogenerate: true}
-  @update_token_len 16
+  @owner_token_len 16
 
   schema "events" do
     field :name, :string
     field :organizer, :string
-    field :update_token, :string
+    field :owner_token, :string
     field :time_window_from, :date
     field :time_window_to, :date
     field :scheduled_from, :naive_datetime
@@ -34,11 +34,19 @@ defmodule Smoodle.Scheduler.Event do
     |> validate_window_consistent([:scheduled_from, :scheduled_to], :scheduled)
     |> validate_is_the_future([:scheduled_from, :scheduled_to])
     |> validate_is_the_future([:time_window_from, :time_window_to], Date)
+    |> trim_text_fields
   end
 
   def changeset_insert(attrs) do
     changeset(%Event{}, attrs) |>
-    change(%{update_token: SecureRandom.urlsafe_base64(@update_token_len)})
+    change(%{owner_token: SecureRandom.urlsafe_base64(@owner_token_len)})
+  end
+
+  defp trim_text_fields(changeset) do
+    changeset
+    |> update_change(:name, &String.trim/1)
+    |> update_change(:organizer, &String.trim/1)
+    |> update_change(:desc, &String.trim/1)
   end
 
   defp validate_window_defined(changeset, keys, error_key) do

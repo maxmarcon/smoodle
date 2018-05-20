@@ -95,4 +95,11 @@ defmodule Smoodle.Scheduler.EventTest do
 		assert {_, [validation: :in_the_past]} = changeset.errors[:time_window_to]
 		assert {_, [validation: :in_the_past]} = changeset.errors[:time_window_from]
 	end
+
+	test "changeset removes trailing and leading spaces" do
+		changeset = Event.changeset(%Event{}, Map.replace!(@valid_attrs, :name, "  Too many leading and trailing spaces    "))
+		{:ok, new_name} = Ecto.Changeset.fetch_change(changeset, :name)
+		refute new_name =~ ~r/^\s/
+		refute new_name =~ ~r/\s$/
+	end
 end
