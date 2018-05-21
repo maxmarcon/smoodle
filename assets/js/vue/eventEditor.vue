@@ -1,14 +1,14 @@
 <template lang="pug">
 	transition(name="slide" mode="out-in")
-		form(:key="$route.query.step" @submit.prevent="" novalidate=true)
-			.row.mt-3.justify-content-left
+		form(:key="$route.query.step" @submit.prevent="" novalidate)
+			.row.mt-3
 				.col
 					b-progress(:max="lastStep")
 						b-progress-bar(:value="parseInt($route.query.step)" variant="success")
 							| {{ $t('event_editor.step', {step: $route.query.step, lastStep: lastStep}) }}
 
 			div(v-if="$route.query.step == 1")
-				.form-group.row.mt-md-3.justify-content-left
+				.form-group.row.mt-md-3
 					label.col-md-3.col-form-label(for="eventName") {{ $t('event_editor.event.name') }}
 					.col-md-9
 						small.form-text.text-muted(id="eventNameHelp") {{ $t('event_editor.event.name_help') }}
@@ -16,7 +16,7 @@
 						:disabled="createdEvent"
 						:class="{'is-invalid': eventNameError}")
 						.invalid-feedback {{ eventNameError }}
-				.form-group.row.justify-content-left
+				.form-group.row
 					label.col-md-3.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
 					.col-md-9
 						small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.desc_help') }}
@@ -24,7 +24,7 @@
 						:disabled="createdEvent"
 						:class="{'is-invalid': eventDescError}")
 						.invalid-feedback {{ eventDescError }}
-				.form-group.row.justify-content-left
+				.form-group.row
 					label.col-md-3.col-form-label(for="eventOrganizer") {{ $t('event_editor.event.organizer') }}
 					.col-md-9
 						small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.organizer_help') }}
@@ -35,9 +35,9 @@
 
 
 			div(v-else-if="$route.query.step == 2")
-				.form-row.justify-content-left
-					.form-group.col-md-9.mt-md-3.date-picker-trigger.justify-content-left
-						label(for="eventDates") {{ $t('event_editor.event.dates') }}
+				.form-group.row.mt-md-3.date-picker-trigger
+					label.col-md-4.col-form-label(for="eventDates") {{ $t('event_editor.event.dates') }}
+					.col-md-4
 						.datepicker-trigger
 							input#eventDates.form-control(
 							:disabled="createdEvent"
@@ -58,8 +58,8 @@
 										@date-two-selected="val => { dateTo = val }"
 								)
 
-					.form-group.col-md-3.mt-md-3
-						label Select some common options
+				.form-group.row
+					.col.offset-md-4
 						b-dropdown(:text="$t('event_editor.dates_quick_selection')" :disabled="createdEvent != null")
 							b-dropdown-item(v-if="showThisWeekButton" @click="pickThisWeek") {{ $t('event_editor.this_week') }}
 							b-dropdown-item(@click="pickNextWeek") {{ $t('event_editor.next_week') }}
@@ -69,13 +69,13 @@
 				.row.mt-3
 					.col
 						p
-							strong {{ $t('event_editor.event_created', {eventName: createdEvent.name}) }}
+							strong {{ $t('event_editor.event_created', {eventName: createdEvent.name, organizer: createdEvent.organizer}) }}
 						hr.my-1
 				.form-group.row
 					.col
 						label {{ $t('event_editor.share_link') }}
 						.input-group.border.border-success
-							input.form-control(:value="createdEvent.share_link" readonly=true @success="clipboard")
+							input.form-control(:value="createdEvent.share_link" readonly @success="clipboard")
 							.input-group-append
 								button.btn.btn-sm.btn-outline-secondary(
 									v-clipboard:copy="createdEvent.share_link"
@@ -87,7 +87,7 @@
 					.col
 						label {{ $t('event_editor.owner_link') }}
 						.input-group.border.border-danger
-							input.form-control(:value="createdEvent.owner_link" readonly=true @success="clipboard")
+							input.form-control(:value="createdEvent.owner_link" readonly @success="clipboard")
 							.input-group-append
 								button.btn.btn-sm.btn-outline-secondary(
 									v-clipboard:copy="createdEvent.owner_link"
@@ -95,20 +95,25 @@
 								)
 									span.oi.oi-clipboard
 
-			.row.mt-4(v-if="$route.query.step < 3")
+			.row.mt-4(v-if="$route.query.step < lastStep")
 				.col.text-left
 					router-link.btn.btn-primary(
+						v-if="$route.query.step > firstStep"
 						role="button"
 						:to="{ name: 'new_event', query: {step: ($route.query.step == firstStep ? $route.query.step : parseInt($route.query.step) - 1) }}"
 						:class="{disabled: $route.query.step == firstStep}"
-					) {{ $t('event_editor.prev') }}
+					)
+						span.oi.oi-arrow-thick-left
+						span &nbsp; {{ $t('event_editor.prev') }}
 				.col.text-right
-					router-link.btn.btn-primary(
+					router-link.btn.btn-primary.btn-(
 						role="button"
 						:to="{ name: 'new_event', query: {step: parseInt($route.query.step) + 1 }}"
-					) {{ $t('event_editor.next') }}
+					)
+						span {{ $t('event_editor.next') }} &nbsp;
+						span.oi.oi-arrow-thick-right
 
-			b-modal(ref="copiedToClipboardModal" hide-header=true ok-only=true)
+			b-modal(ref="copiedToClipboardModal" hide-header ok-only)
 				p.my-4 {{ $t('event_editor.link_copied') }}
 </template>
 

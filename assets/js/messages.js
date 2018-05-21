@@ -10,7 +10,7 @@ export default {
 				name_help: "Enter a name for your event",
 				desc: "What is going to happen?",
 				desc_help: "Describe the event",
-				dates: "Dates",
+				dates: "When should it happen (roughly)?",
 				organizer: "Who are you?",
 				organizer_help: "Let your friends know who invitied them..."
 			},
@@ -22,7 +22,7 @@ export default {
 			dates_quick_selection: "Quick pre-selection",
 			step: "Step {step} of {lastStep}",
 			link_copied: "Link copied to clipboard",
-			event_created: "Your event for \u201C{eventName}\u201E has been created",
+			event_created: "Congratulations {organizer}! Your event for \u201C{eventName}\u201E has been created",
 			share_link: "Share this link with your friends:",
 			owner_link: "Keep this link private and use it to manage the event. Do not share this with your friends!"
 		},
