@@ -5,6 +5,7 @@ import date_fns_it from 'date-fns/locale/it'
 export default {
 	en: {
 		event_editor: {
+			title: 'New event',
 			event: {
 				name: "Event title",
 				name_help: "Enter a name for your event",
@@ -23,8 +24,9 @@ export default {
 			step: "Step {step} of {lastStep}",
 			link_copied: "Link copied to clipboard",
 			event_created: "Congratulations {organizer}! Your event for \u201C{eventName}\u201E has been created",
-			share_link: "Share this link with your friends:",
-			owner_link: "Keep this link private and use it to manage the event. Do not share this with your friends!"
+			share_link: "Now share this link with your friends, so they can enter which dates work best for them:",
+			manage_event: "Mange event",
+			poll_event: "Enter your availability"
 		},
 		date_picker: {
 			days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],

@@ -2,16 +2,3 @@
 @import "node_modules/vue-airbnb-style-datepicker/dist/styles";
 @import "node_modules/bootstrap-vue/dist/bootstrap-vue";
 @import "node_modules/open-iconic/font/css/open-iconic-bootstrap.scss";
-
-.slide-enter-active, .slide-leave-active {
-  transition: opacity 0.5s, transform 0.5s;
-}
-
-.slide-leave-to {
-  opacity: 0;
-  transform: translateX(-90%);
-}
-
-.slide-enter {
-  opacity: 0;
-}

@@ -1,101 +1,94 @@
 <template lang="pug">
-	transition(name="slide" mode="out-in")
-		form(:key="$route.query.step" @submit.prevent="" novalidate)
-			.row.mt-3
+	.card
+		.card-header
+			.row.align-items-center
+				.col-md-2.text-center.align-items-center
+					strong.h5 {{ $t('event_editor.title') }}
 				.col
 					b-progress(:max="lastStep")
 						b-progress-bar(:value="parseInt($route.query.step)" variant="success")
 							| {{ $t('event_editor.step', {step: $route.query.step, lastStep: lastStep}) }}
 
-			div(v-if="$route.query.step == 1")
-				.form-group.row.mt-md-3
-					label.col-md-3.col-form-label(for="eventName") {{ $t('event_editor.event.name') }}
-					.col-md-9
-						small.form-text.text-muted(id="eventNameHelp") {{ $t('event_editor.event.name_help') }}
-						input#eventName.form-control(v-model.trim="eventName" type="text"
-						:disabled="createdEvent"
-						:class="{'is-invalid': eventNameError}")
-						.invalid-feedback {{ eventNameError }}
-				.form-group.row
-					label.col-md-3.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
-					.col-md-9
-						small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.desc_help') }}
-						textarea#eventDesc.form-control(v-model.trim="eventDesc"
-						:disabled="createdEvent"
-						:class="{'is-invalid': eventDescError}")
-						.invalid-feedback {{ eventDescError }}
-				.form-group.row
-					label.col-md-3.col-form-label(for="eventOrganizer") {{ $t('event_editor.event.organizer') }}
-					.col-md-9
-						small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.organizer_help') }}
-						input#eventOrganizer.form-control(v-model.trim="eventOrganizer"
-						:disabled="createdEvent"
-						:class="{'is-invalid': eventOrganizerError}")
-						.invalid-feedback {{ eventOrganizerError }}
-
-
-			div(v-else-if="$route.query.step == 2")
-				.form-group.row.mt-md-3.date-picker-trigger
-					label.col-md-4.col-form-label(for="eventDates") {{ $t('event_editor.event.dates') }}
-					.col-md-4
-						.datepicker-trigger
-							input#eventDates.form-control(
+		.card-body
+			form(:key="$route.query.step" @submit.prevent="" novalidate)
+				div(v-if="$route.query.step == 1")
+					.form-group.row.mt-md-3
+						label.col-md-3.col-form-label(for="eventName") {{ $t('event_editor.event.name') }}
+						.col-md-9
+							small.form-text.text-muted(id="eventNameHelp") {{ $t('event_editor.event.name_help') }}
+							input#eventName.form-control(v-model.trim="eventName" type="text"
 							:disabled="createdEvent"
-							:value="dateRange"
-							:class="{'is-invalid': eventDatesError}"
-							)
-							.invalid-feedback {{ eventDatesError }}
+							:class="{'is-invalid': eventNameError}")
+							.invalid-feedback {{ eventNameError }}
+					.form-group.row
+						label.col-md-3.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
+						.col-md-9
+							small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.desc_help') }}
+							textarea#eventDesc.form-control(v-model.trim="eventDesc"
+							:disabled="createdEvent"
+							:class="{'is-invalid': eventDescError}")
+							.invalid-feedback {{ eventDescError }}
+					.form-group.row
+						label.col-md-3.col-form-label(for="eventOrganizer") {{ $t('event_editor.event.organizer') }}
+						.col-md-9
+							small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.organizer_help') }}
+							input#eventOrganizer.form-control(v-model.trim="eventOrganizer"
+							:disabled="createdEvent"
+							:class="{'is-invalid': eventOrganizerError}")
+							.invalid-feedback {{ eventOrganizerError }}
 
-							div(v-if="!createdEvent")
-								AirbnbStyleDatepicker(
-									:trigger-element-id="'eventDates'"
-										:mode="'range'"
-										:fullscreen-mobile="true"
-										:date-one="dateFrom"
-										:date-two="dateTo"
-										:min-date="today"
-										@date-one-selected="val => { dateFrom = val }"
-										@date-two-selected="val => { dateTo = val }"
+
+				div(v-else-if="$route.query.step == 2")
+					.form-group.row.mt-md-3.date-picker-trigger
+						label.col-md-4.col-form-label(for="eventDates") {{ $t('event_editor.event.dates') }}
+						.col-md-4
+							.datepicker-trigger
+								input#eventDates.form-control(
+								:disabled="createdEvent"
+								:value="dateRange"
+								:class="{'is-invalid': eventDatesError}"
 								)
+								.invalid-feedback {{ eventDatesError }}
 
-				.form-group.row
-					.col.offset-md-4
-						b-dropdown(:text="$t('event_editor.dates_quick_selection')" :disabled="createdEvent != null")
-							b-dropdown-item(v-if="showThisWeekButton" @click="pickThisWeek") {{ $t('event_editor.this_week') }}
-							b-dropdown-item(@click="pickNextWeek") {{ $t('event_editor.next_week') }}
-							b-dropdown-item(@click="pickNextMonths(1)") {{ $tc('event_editor.within_months', 1) }}
+								div(v-if="!createdEvent")
+									AirbnbStyleDatepicker(
+										:trigger-element-id="'eventDates'"
+											:mode="'range'"
+											:fullscreen-mobile="true"
+											:date-one="dateFrom"
+											:date-two="dateTo"
+											:min-date="today"
+											@date-one-selected="val => { dateFrom = val }"
+											@date-two-selected="val => { dateTo = val }"
+									)
 
-			div(v-else-if="$route.query.step == 3")
-				.row.mt-3
-					.col
-						p
-							strong {{ $t('event_editor.event_created', {eventName: createdEvent.name, organizer: createdEvent.organizer}) }}
-						hr.my-1
-				.form-group.row
-					.col
-						label {{ $t('event_editor.share_link') }}
-						.input-group.border.border-success
-							input.form-control(:value="createdEvent.share_link" readonly @success="clipboard")
-							.input-group-append
-								button.btn.btn-sm.btn-outline-secondary(
-									v-clipboard:copy="createdEvent.share_link"
-									v-clipboard:success="clipboard"
-								)
-									span.oi.oi-clipboard
-						hr.my-4
-				.form-group.row
-					.col
-						label {{ $t('event_editor.owner_link') }}
-						.input-group.border.border-danger
-							input.form-control(:value="createdEvent.owner_link" readonly @success="clipboard")
-							.input-group-append
-								button.btn.btn-sm.btn-outline-secondary(
-									v-clipboard:copy="createdEvent.owner_link"
-									v-clipboard:success="clipboard"
-								)
-									span.oi.oi-clipboard
+					.form-group.row
+						.col.offset-md-4
+							b-dropdown(:text="$t('event_editor.dates_quick_selection')" :disabled="createdEvent != null")
+								b-dropdown-item(v-if="showThisWeekButton" @click="pickThisWeek") {{ $t('event_editor.this_week') }}
+								b-dropdown-item(@click="pickNextWeek") {{ $t('event_editor.next_week') }}
+								b-dropdown-item(@click="pickNextMonths(1)") {{ $tc('event_editor.within_months', 1) }}
 
-			.row.mt-4(v-if="$route.query.step < lastStep")
+				div(v-else-if="$route.query.step == 3")
+					p.text-center
+						strong {{ $t('event_editor.event_created', {eventName: createdEvent.name, organizer: createdEvent.organizer}) }}
+					hr.mb-3
+					.row.justify-content-center
+						.col-md-8.text-center
+							p {{ $t('event_editor.share_link') }}
+					.row.justify-content-center.mb-5
+						.col-md-6
+							.input-group.border.border-success
+								input.form-control(:value="createdEvent.share_link" readonly @success="clipboard")
+								.input-group-append
+									button.btn.btn-sm.btn-outline-secondary(
+										v-clipboard:copy="createdEvent.share_link"
+										v-clipboard:success="clipboard"
+									)
+										span.oi.oi-clipboard
+
+		.card-footer
+			.row(v-if="$route.query.step < lastStep")
 				.col.text-left
 					router-link.btn.btn-primary(
 						v-if="$route.query.step > firstStep"
@@ -113,8 +106,17 @@
 						span {{ $t('event_editor.next') }} &nbsp;
 						span.oi.oi-arrow-thick-right
 
-			b-modal(ref="copiedToClipboardModal" hide-header ok-only)
-				p.my-4 {{ $t('event_editor.link_copied') }}
+			.row.justify-content-end(v-else)
+				.col-md-auto.text-center.mt-1
+					router-link.btn.btn-success(
+						role="button"
+						:to="{ name: 'poll', params: {event_id: createdEvent.id}}"
+					) {{ $t('event_editor.poll_event') }}
+				.col-md-auto.text-center.mt-1
+					button.btn.btn-primary {{ $t('event_editor.manage_event') }}
+
+		b-modal(ref="copiedToClipboardModal" hide-header ok-only)
+			p.my-4 {{ $t('event_editor.link_copied') }}
 </template>
 
 <script>
