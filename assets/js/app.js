@@ -16,13 +16,17 @@ const router = new VueRouter({
 	  	path: '/new_event',
 	  	name: 'new_event',
 	  	component: EventEditor,
-	  	props: true
+	  	props: (route) => ({
+		  	step: parseInt(route.query.step)
+	  	})
 	  },
 	  {
-	  	path: '/event/:event_id/poll',
+	  	path: '/event/:eventId/poll',
 	  	name: 'poll',
 	  	component: PollVue,
-	  	props: true
+			props: (route) => {
+				return Object.assign(route.params, {step: parseInt(route.query.step)})
+	  	}
 	  }
   ]
 });

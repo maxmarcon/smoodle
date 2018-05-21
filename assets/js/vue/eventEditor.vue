@@ -10,21 +10,21 @@
 						strong.h5 {{ $t('event_editor.title') }}
 					.col
 						b-progress(:max="lastStep")
-							b-progress-bar(:value="parseInt($route.query.step)" variant="success")
-								| {{ $t('event_editor.step', {step: $route.query.step, lastStep: lastStep}) }}
+							b-progress-bar(:value="step" variant="success")
+								| {{ $t('event_editor.step', {step: step, lastStep: lastStep}) }}
 
 			.card-body
 				.row.justify-content-center
 					.col-md-8.text-center
 						p
-							div(v-if="$route.query.step == 3")
+							div(v-if="step == 3")
 								strong {{ $t('event_editor.event_created', {eventName: createdEvent.name, eventOrganizer: createdEvent.organizer}) }}
 							div(v-else)
 								strong {{ $t('event_editor.welcome') }}
 				hr.mb-3
 
-				form(:key="$route.query.step" @submit.prevent="" novalidate)
-					div(v-if="$route.query.step == 1")
+				form(:key="step" @submit.prevent="" novalidate)
+					div(v-if="step == 1")
 						.form-group.row.mt-md-3
 							label.col-md-3.col-form-label(for="eventName") {{ $t('event_editor.event.name') }}
 							.col-md-9
@@ -51,7 +51,7 @@
 								.invalid-feedback {{ eventOrganizerError }}
 
 
-					div(v-else-if="$route.query.step == 2")
+					div(v-else-if="step == 2")
 						.form-group.row.mt-md-3.date-picker-trigger
 							label.col-md-4.col-form-label(for="eventDates") {{ $t('event_editor.event.dates') }}
 							.col-md-4
@@ -82,7 +82,7 @@
 									b-dropdown-item(@click="pickNextWeek") {{ $t('event_editor.next_week') }}
 									b-dropdown-item(@click="pickNextMonths(1)") {{ $tc('event_editor.within_months', 1) }}
 
-					div(v-else-if="$route.query.step == 3")
+					div(v-else-if="step == 3")
 						.row.justify-content-center
 							.col-md-8.text-center
 								p {{ $t('event_editor.share_link') }}
@@ -98,20 +98,20 @@
 											span.oi.oi-clipboard
 
 			.card-footer
-				.row(v-if="$route.query.step < lastStep")
+				.row(v-if="step < lastStep")
 					.col.text-left
 						router-link.btn.btn-primary(
-							v-if="$route.query.step > firstStep"
+							v-if="step > firstStep"
 							role="button"
-							:to="{ name: 'new_event', query: {step: ($route.query.step == firstStep ? $route.query.step : parseInt($route.query.step) - 1) }}"
-							:class="{disabled: $route.query.step == firstStep}"
+							:to="{ name: 'new_event', query: {step: (step == firstStep ? step : step - 1) }}"
+							:class="{disabled: step == firstStep}"
 						)
 							span.oi.oi-arrow-thick-left
 							span &nbsp; {{ $t('event_editor.prev') }}
 					.col.text-right
 						router-link.btn.btn-primary.btn-(
 							role="button"
-							:to="{ name: 'new_event', query: {step: parseInt($route.query.step) + 1 }}"
+							:to="{ name: 'new_event', query: {step: step + 1 }}"
 						)
 							span {{ $t('event_editor.next') }} &nbsp;
 							span.oi.oi-arrow-thick-right
@@ -192,6 +192,7 @@ const errorsMap = {
 };
 
 export default {
+	props: ['step'],
 	data: () => ({
 		eventName: null,
 		eventNameError: null,

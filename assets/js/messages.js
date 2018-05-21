@@ -30,7 +30,7 @@ export default {
 			poll_event: "Enter your availability"
 		},
 		event_poll: {
-			welcome: "{eventOrganizer} has invited you to a {eventName}. Please let us know what dates work best for you by answering a few questions.",
+			welcome: "{eventOrganizer} has invited you to a {eventName}. Please let them know what dates work best for you by answering a few questions.",
 			title: "Poll for \u201C{eventName}\u201E"
 		},
 		date_picker: {

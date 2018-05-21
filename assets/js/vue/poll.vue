@@ -10,8 +10,8 @@
 						strong.h5 {{ $t('event_poll.title', {eventName}) }}
 					.col
 						b-progress(:max="lastStep")
-							b-progress-bar(:value="parseInt($route.query.step)" variant="success")
-								| {{ $t('event_editor.step', {step: $route.query.step, lastStep: lastStep}) }}
+							b-progress-bar(:value="step" variant="success")
+								| {{ $t('event_editor.step', {step: step, lastStep: lastStep}) }}
 
 			.card-body
 				.row
@@ -31,24 +31,24 @@
 						p {{ timeWindow }}
 				hr.my-3
 
-				div(v-if="$route.query.step == 1")
+				div(v-if="step == 1")
 					ul.list-group
 
 			.card-footer
-				.row(v-if="$route.query.step < lastStep")
+				.row(v-if="step < lastStep")
 					.col.text-left
 						router-link.btn.btn-primary(
-							v-if="$route.query.step > firstStep"
+							v-if="step > firstStep"
 							role="button"
-							:to="{ name: 'poll', params: { event_id: eventId }, query: {step: ($route.query.step == firstStep ? $route.query.step : parseInt($route.query.step) - 1) }}"
-							:class="{disabled: $route.query.step == firstStep}"
+							:to="{ name: 'poll', params: { event_id: eventId }, query: {step: (step == firstStep ? step : pstep - 1) }}"
+							:class="{disabled: step == firstStep}"
 						)
 							span.oi.oi-arrow-thick-left
 							span &nbsp; {{ $t('event_editor.prev') }}
 					.col.text-right
 						router-link.btn.btn-primary.btn-(
 							role="button"
-							:to="{ name: 'poll', params: { event_id: eventId }, query: {step: parseInt($route.query.step) + 1 }}"
+							:to="{ name: 'poll', params: { event_id: eventId }, query: {step: step + 1 }}"
 						)
 							span {{ $t('event_editor.next') }} &nbsp;
 							span.oi.oi-arrow-thick-right
@@ -63,7 +63,7 @@ const lastStep = 3;
 
 function fetchEvent(event_id) {
 	let self = this;
-	return this.$http.get("/v1/events/" + this.$route.params.event_id
+	return this.$http.get("/v1/events/" + this.eventId
 		,{
 			headers: { 'Accept-Language': this.$i18n.locale }
 		}).then(function(result) {
@@ -74,8 +74,8 @@ function fetchEvent(event_id) {
 }
 
 export default {
+	props: ['eventId', 'step'],
 	data: () => ({
-		eventId: null,
 		eventName: null,
 		eventOrganizer: null,
 		evendDesc: null,
@@ -91,7 +91,6 @@ export default {
 		let self = this;
 		fetchEvent.call(this).then(function(eventData) {
 			if (eventData) {
-				self.eventId = eventData.id;
 				self.eventName = eventData.name;
 				self.eventOrganizer = eventData.organizer;
 				self.eventDesc = eventData.desc;
