@@ -120,7 +120,7 @@
 					.col-md-auto.text-center.mt-1
 						router-link.btn.btn-success(
 							role="button"
-							:to="{ name: 'poll', params: {event_id: createdEvent.id}}"
+							:to="{ name: 'poll', params: {eventId: createdEvent.id}}"
 						) {{ $t('event_editor.poll_event') }}
 					.col-md-auto.text-center.mt-1
 						button.btn.btn-primary {{ $t('event_editor.manage_event') }}

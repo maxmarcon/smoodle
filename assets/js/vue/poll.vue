@@ -79,8 +79,8 @@ export default {
 		eventName: null,
 		eventOrganizer: null,
 		evendDesc: null,
-		eventDateFrom: null,
-		eventDateTo: null,
+		eventTimeWindowFrom: null,
+		eventTimeWindowTo: null,
 		firstStep,
 		lastStep
 	}),
