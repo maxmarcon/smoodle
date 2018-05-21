@@ -27,12 +27,15 @@ const router = new VueRouter({
   ]
 });
 
-import messages from './messages.js'
+import messages from './messages'
 // importing these here because otherwise single file components (e.g. eventEditor)
 // won't be able to "see" them and import. Probably an issue with vue-brunch, babel, or both
 // UPDATE: fixed by having vue-brunch run before babel-brunch (via correct order in package.json)
 //import 'date-fns'
 // this is super annoying!!!
+
+import messageBar from './vue/messageBar.vue'
+Vue.component('message-bar', messageBar);
 
 const i18n = new VueI18n({
   locale: smoodle_locale,

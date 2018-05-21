@@ -1,143 +1,143 @@
 <template lang="pug">
-	.card
-		.card-header
-			.row.align-items-center
-				.col-md-2.text-center.align-items-center
-					strong.h5 {{ $t('event_editor.title') }}
-				.col
-					b-progress(:max="lastStep")
-						b-progress-bar(:value="parseInt($route.query.step)" variant="success")
-							| {{ $t('event_editor.step', {step: $route.query.step, lastStep: lastStep}) }}
-
-		.card-body
-			form(:key="$route.query.step" @submit.prevent="" novalidate)
-				div(v-if="$route.query.step == 1")
-					.form-group.row.mt-md-3
-						label.col-md-3.col-form-label(for="eventName") {{ $t('event_editor.event.name') }}
-						.col-md-9
-							small.form-text.text-muted(id="eventNameHelp") {{ $t('event_editor.event.name_help') }}
-							input#eventName.form-control(v-model.trim="eventName" type="text"
-							:disabled="createdEvent"
-							:class="{'is-invalid': eventNameError}")
-							.invalid-feedback {{ eventNameError }}
-					.form-group.row
-						label.col-md-3.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
-						.col-md-9
-							small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.desc_help') }}
-							textarea#eventDesc.form-control(v-model.trim="eventDesc"
-							:disabled="createdEvent"
-							:class="{'is-invalid': eventDescError}")
-							.invalid-feedback {{ eventDescError }}
-					.form-group.row
-						label.col-md-3.col-form-label(for="eventOrganizer") {{ $t('event_editor.event.organizer') }}
-						.col-md-9
-							small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.organizer_help') }}
-							input#eventOrganizer.form-control(v-model.trim="eventOrganizer"
-							:disabled="createdEvent"
-							:class="{'is-invalid': eventOrganizerError}")
-							.invalid-feedback {{ eventOrganizerError }}
-
-
-				div(v-else-if="$route.query.step == 2")
-					.form-group.row.mt-md-3.date-picker-trigger
-						label.col-md-4.col-form-label(for="eventDates") {{ $t('event_editor.event.dates') }}
-						.col-md-4
-							.datepicker-trigger
-								input#eventDates.form-control(
-								:disabled="createdEvent"
-								:value="dateRange"
-								:class="{'is-invalid': eventDatesError}"
-								)
-								.invalid-feedback {{ eventDatesError }}
-
-								div(v-if="!createdEvent")
-									AirbnbStyleDatepicker(
-										:trigger-element-id="'eventDates'"
-											:mode="'range'"
-											:fullscreen-mobile="true"
-											:date-one="dateFrom"
-											:date-two="dateTo"
-											:min-date="today"
-											@date-one-selected="val => { dateFrom = val }"
-											@date-two-selected="val => { dateTo = val }"
-									)
-
-					.form-group.row
-						.col.offset-md-4
-							b-dropdown(:text="$t('event_editor.dates_quick_selection')" :disabled="createdEvent != null")
-								b-dropdown-item(v-if="showThisWeekButton" @click="pickThisWeek") {{ $t('event_editor.this_week') }}
-								b-dropdown-item(@click="pickNextWeek") {{ $t('event_editor.next_week') }}
-								b-dropdown-item(@click="pickNextMonths(1)") {{ $tc('event_editor.within_months', 1) }}
-
-				div(v-else-if="$route.query.step == 3")
-					p.text-center
-						strong {{ $t('event_editor.event_created', {eventName: createdEvent.name, organizer: createdEvent.organizer}) }}
-					hr.mb-3
-					.row.justify-content-center
-						.col-md-8.text-center
-							p {{ $t('event_editor.share_link') }}
-					.row.justify-content-center.mb-5
-						.col-md-6
-							.input-group.border.border-success
-								input.form-control(:value="createdEvent.share_link" readonly @success="clipboard")
-								.input-group-append
-									button.btn.btn-sm.btn-outline-secondary(
-										v-clipboard:copy="createdEvent.share_link"
-										v-clipboard:success="clipboard"
-									)
-										span.oi.oi-clipboard
-
-		.card-footer
-			.row(v-if="$route.query.step < lastStep")
-				.col.text-left
-					router-link.btn.btn-primary(
-						v-if="$route.query.step > firstStep"
-						role="button"
-						:to="{ name: 'new_event', query: {step: ($route.query.step == firstStep ? $route.query.step : parseInt($route.query.step) - 1) }}"
-						:class="{disabled: $route.query.step == firstStep}"
-					)
-						span.oi.oi-arrow-thick-left
-						span &nbsp; {{ $t('event_editor.prev') }}
-				.col.text-right
-					router-link.btn.btn-primary.btn-(
-						role="button"
-						:to="{ name: 'new_event', query: {step: parseInt($route.query.step) + 1 }}"
-					)
-						span {{ $t('event_editor.next') }} &nbsp;
-						span.oi.oi-arrow-thick-right
-
-			.row.justify-content-end(v-else)
-				.col-md-auto.text-center.mt-1
-					router-link.btn.btn-success(
-						role="button"
-						:to="{ name: 'poll', params: {event_id: createdEvent.id}}"
-					) {{ $t('event_editor.poll_event') }}
-				.col-md-auto.text-center.mt-1
-					button.btn.btn-primary {{ $t('event_editor.manage_event') }}
-
+	div
+		message-bar(ref="errorBar" variant="danger")
 		b-modal(ref="copiedToClipboardModal" hide-header ok-only)
-			p.my-4 {{ $t('event_editor.link_copied') }}
+				p.my-4 {{ $t('event_editor.link_copied') }}
+		.card
+			.card-header
+				.row.align-items-center
+					.col-md-2.text-center.align-items-center
+						strong.h5 {{ $t('event_editor.title') }}
+					.col
+						b-progress(:max="lastStep")
+							b-progress-bar(:value="parseInt($route.query.step)" variant="success")
+								| {{ $t('event_editor.step', {step: $route.query.step, lastStep: lastStep}) }}
+
+			.card-body
+				.row.justify-content-center
+					.col-md-8.text-center
+						p
+							div(v-if="$route.query.step == 3")
+								strong {{ $t('event_editor.event_created', {eventName: createdEvent.name, eventOrganizer: createdEvent.organizer}) }}
+							div(v-else)
+								strong {{ $t('event_editor.welcome') }}
+				hr.mb-3
+
+				form(:key="$route.query.step" @submit.prevent="" novalidate)
+					div(v-if="$route.query.step == 1")
+						.form-group.row.mt-md-3
+							label.col-md-3.col-form-label(for="eventName") {{ $t('event_editor.event.name') }}
+							.col-md-9
+								small.form-text.text-muted(id="eventNameHelp") {{ $t('event_editor.event.name_help') }}
+								input#eventName.form-control(v-model.trim="eventName" type="text"
+								:disabled="createdEvent"
+								:class="{'is-invalid': eventNameError}")
+								.invalid-feedback {{ eventNameError }}
+						.form-group.row
+							label.col-md-3.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
+							.col-md-9
+								small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.desc_help') }}
+								textarea#eventDesc.form-control(v-model.trim="eventDesc"
+								:disabled="createdEvent"
+								:class="{'is-invalid': eventDescError}")
+								.invalid-feedback {{ eventDescError }}
+						.form-group.row
+							label.col-md-3.col-form-label(for="eventOrganizer") {{ $t('event_editor.event.organizer') }}
+							.col-md-9
+								small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.organizer_help') }}
+								input#eventOrganizer.form-control(v-model.trim="eventOrganizer"
+								:disabled="createdEvent"
+								:class="{'is-invalid': eventOrganizerError}")
+								.invalid-feedback {{ eventOrganizerError }}
+
+
+					div(v-else-if="$route.query.step == 2")
+						.form-group.row.mt-md-3.date-picker-trigger
+							label.col-md-4.col-form-label(for="eventDates") {{ $t('event_editor.event.dates') }}
+							.col-md-4
+								.datepicker-trigger
+									input#eventDates.form-control(
+									:disabled="createdEvent"
+									:value="dateRange"
+									:class="{'is-invalid': eventDatesError}"
+									)
+									.invalid-feedback {{ eventDatesError }}
+
+									div(v-if="!createdEvent")
+										AirbnbStyleDatepicker(
+											:trigger-element-id="'eventDates'"
+												:mode="'range'"
+												:fullscreen-mobile="true"
+												:date-one="dateFrom"
+												:date-two="dateTo"
+												:min-date="today"
+												@date-one-selected="val => { dateFrom = val }"
+												@date-two-selected="val => { dateTo = val }"
+										)
+
+						.form-group.row
+							.col.offset-md-4
+								b-dropdown(:text="$t('event_editor.dates_quick_selection')" :disabled="createdEvent != null")
+									b-dropdown-item(v-if="showThisWeekButton" @click="pickThisWeek") {{ $t('event_editor.this_week') }}
+									b-dropdown-item(@click="pickNextWeek") {{ $t('event_editor.next_week') }}
+									b-dropdown-item(@click="pickNextMonths(1)") {{ $tc('event_editor.within_months', 1) }}
+
+					div(v-else-if="$route.query.step == 3")
+						.row.justify-content-center
+							.col-md-8.text-center
+								p {{ $t('event_editor.share_link') }}
+						.row.justify-content-center.mb-5
+							.col-md-6
+								.input-group.border.border-success
+									input.form-control(:value="createdEvent.share_link" readonly @success="clipboard")
+									.input-group-append
+										button.btn.btn-sm.btn-outline-secondary(
+											v-clipboard:copy="createdEvent.share_link"
+											v-clipboard:success="clipboard"
+										)
+											span.oi.oi-clipboard
+
+			.card-footer
+				.row(v-if="$route.query.step < lastStep")
+					.col.text-left
+						router-link.btn.btn-primary(
+							v-if="$route.query.step > firstStep"
+							role="button"
+							:to="{ name: 'new_event', query: {step: ($route.query.step == firstStep ? $route.query.step : parseInt($route.query.step) - 1) }}"
+							:class="{disabled: $route.query.step == firstStep}"
+						)
+							span.oi.oi-arrow-thick-left
+							span &nbsp; {{ $t('event_editor.prev') }}
+					.col.text-right
+						router-link.btn.btn-primary.btn-(
+							role="button"
+							:to="{ name: 'new_event', query: {step: parseInt($route.query.step) + 1 }}"
+						)
+							span {{ $t('event_editor.next') }} &nbsp;
+							span.oi.oi-arrow-thick-right
+
+				.row.justify-content-end(v-else)
+					.col-md-auto.text-center.mt-1
+						router-link.btn.btn-success(
+							role="button"
+							:to="{ name: 'poll', params: {event_id: createdEvent.id}}"
+						) {{ $t('event_editor.poll_event') }}
+					.col-md-auto.text-center.mt-1
+						button.btn.btn-primary {{ $t('event_editor.manage_event') }}
+
 </template>
 
 <script>
 import dateFns from 'date-fns'
+import { sanitizeStepRouteParameter } from '../globals.js'
 
 const firstStep = 1;
 const lastStep = 3;
 const today = new Date();
 const InvalidDate = 'Invalid Date';
 
-const sanitizeParameters = (to, forceFirstStep=false) => {
-	let step = parseInt(to.query.step);
-	if (isNaN(step) || step < firstStep || step > lastStep || (forceFirstStep && step != firstStep)) {
-		return { path: to.path, query: {step: firstStep} };
-	} else {
-		return true;
-	}
-}
-
 function beforeRouteUpdate(to, from, next) {
-	let res = sanitizeParameters(to);
+	let res = sanitizeStepRouteParameter(to, firstStep, lastStep);
 	if (res != true) {
 		next(res);
 	} else {
@@ -166,7 +166,11 @@ function beforeRouteUpdate(to, from, next) {
 					}
 					next();
 				}, function(result) {
-					self.setErrorsForStep(result.response.data.errors, from.query.step);
+					if (result.response.status === 422) {
+						self.setErrorsForStep(result.response.data.errors, from.query.step);
+					} else {
+						self.$refs.errorBar.show(self.$i18n.t('errors.network'));
+					}
 					next(false);
 				});
 			}
@@ -189,27 +193,29 @@ const errorsMap = {
 
 export default {
 	data: () => ({
-		eventName: '',
+		eventName: null,
 		eventNameError: null,
-		eventOrganizer: '',
+		eventOrganizer: null,
 		eventOrganizerError: null,
-		eventDesc: '',
+		eventDesc: null,
 		eventDescError: null,
-		dateFrom: '',
-		dateTo: '',
+		dateFrom: null,
+		dateTo: null,
 		eventDatesError: null,
 		firstStep,
 		lastStep,
 		today,
 		showThisWeekButton: (dateFns.getDay(today) > 0 && dateFns.getDay(today) < 4), // betewn Mon and Wed
-		createdEvent: null/*{
+		createdEvent: null/* {
+						id: 'd8763187-ed3d-4572-ae50-02d5cc874804',
 						name: "Dinner party",
+						organizer: "Max",
 						share_link: "http://share",
 						owner_link: "http://share"
 					}*/
  	}),
 	beforeRouteEnter: (to, from, next) => {
-		next(sanitizeParameters(to, true));
+		next(sanitizeStepRouteParameter(to, firstStep, lastStep, true));
 	},
 	beforeRouteUpdate,
 	computed: {
@@ -218,7 +224,7 @@ export default {
 			let toDate_s = dateFns.format(this.dateTo, 'DD/MM/YYYY (ddd)', {locale: this.$i18n.t('date_fns_locale')});
 
 			if (fromDate_s == InvalidDate || toDate_s == InvalidDate) {
-				return '';
+				return null;
 			} else {
 				return fromDate_s + ' - ' + toDate_s;
 			}

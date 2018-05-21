@@ -6,6 +6,7 @@ export default {
 	en: {
 		event_editor: {
 			title: 'New event',
+			welcome: 'Hello! Here you can create a new event and share it with participants in order to schedule a date that works best for most of them',
 			event: {
 				name: "Event title",
 				name_help: "Enter a name for your event",
@@ -23,10 +24,14 @@ export default {
 			dates_quick_selection: "Quick pre-selection",
 			step: "Step {step} of {lastStep}",
 			link_copied: "Link copied to clipboard",
-			event_created: "Congratulations {organizer}! Your event for \u201C{eventName}\u201E has been created",
+			event_created: "Congratulations {eventOrganizer}! Your event for \u201C{eventName}\u201E has been created",
 			share_link: "Now share this link with your friends, so they can enter which dates work best for them:",
 			manage_event: "Mange event",
 			poll_event: "Enter your availability"
+		},
+		event_poll: {
+			welcome: "{eventOrganizer} has invited you to a {eventName}. Please let us know what dates work best for you by answering a few questions.",
+			title: "Poll for \u201C{eventName}\u201E"
 		},
 		date_picker: {
 			days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
@@ -35,7 +40,10 @@ export default {
 			apply: 'Apply',
 			cancel: 'Cancel'
 		},
-		date_fns_locale: date_fns_en
+		date_fns_locale: date_fns_en,
+		errors: {
+			network: "The server is not responding or cannot be reached. Please try again later."
+		}
 	},
 
 	de: {
