@@ -31,11 +31,7 @@ export default {
 		},
 		show(errorMsg) {
 			this.errorMsg = errorMsg;
-			if (this.seconds > 0) {
-				this.dismissCountDown = this.seconds;
-			} else {
-				this.dismissCountDown = true;
-			}
+			this.dismissCountDown = (this.seconds > 0 ? this.seconds : true);
 		}
 	}
 }

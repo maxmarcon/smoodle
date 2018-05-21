@@ -166,7 +166,7 @@ function beforeRouteUpdate(to, from, next) {
 					}
 					next();
 				}, function(result) {
-					if (result.response.status === 422) {
+					if (result.response && result.response.status == 422) {
 						self.setErrorsForStep(result.response.data.errors, from.query.step);
 					} else {
 						self.$refs.errorBar.show(self.$i18n.t('errors.network'));

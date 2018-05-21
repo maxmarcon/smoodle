@@ -40,7 +40,7 @@
 						router-link.btn.btn-primary(
 							v-if="step > firstStep"
 							role="button"
-							:to="{ name: 'poll', params: { event_id: eventId }, query: {step: (step == firstStep ? step : pstep - 1) }}"
+							:to="{ name: 'poll', params: { eventId: eventId }, query: {step: (step == firstStep ? step : step - 1) }}"
 							:class="{disabled: step == firstStep}"
 						)
 							span.oi.oi-arrow-thick-left
@@ -48,7 +48,7 @@
 					.col.text-right
 						router-link.btn.btn-primary.btn-(
 							role="button"
-							:to="{ name: 'poll', params: { event_id: eventId }, query: {step: step + 1 }}"
+							:to="{ name: 'poll', params: { eventId: eventId }, query: {step: step + 1 }}"
 						)
 							span {{ $t('event_editor.next') }} &nbsp;
 							span.oi.oi-arrow-thick-right
@@ -61,7 +61,7 @@ import { sanitizeStepRouteParameter } from '../globals.js'
 const firstStep = 1;
 const lastStep = 3;
 
-function fetchEvent(event_id) {
+function fetchEvent() {
 	let self = this;
 	return this.$http.get("/v1/events/" + this.eventId
 		,{
