@@ -71,27 +71,22 @@ defmodule Smoodle.Scheduler.Event do
     end
   end
 
-  defp validate_is_the_future(changeset, keys, t \\ NaiveDateTime)
+  defp validate_is_the_future(changeset, keys, t \\ NaiveDateTime) do
+    Enum.reduce(keys, changeset, fn(key, changeset) ->
+      {_, date_or_time} = fetch_field(changeset, key)
+      today = case t do
+        NaiveDateTime -> NaiveDateTime.utc_now
+        Date -> Date.utc_today
+      end
 
-  defp validate_is_the_future(changeset, [], _t) do
-    changeset
-  end
-
-  defp validate_is_the_future(changeset, [key | tail], t) do
-    {_, date_or_time} = fetch_field(changeset, key)
-    today = case t do
-      NaiveDateTime -> NaiveDateTime.utc_now
-      Date -> Date.utc_today
-    end
-
-    changeset = with %{} <- date_or_time,
-      :gt <- t.compare(today, date_or_time)
-    do
-      add_error(changeset, key, dgettext("errors", "you cannot schedule an event in the past"), [validation: :in_the_past])
-    else
-      _ -> changeset
-    end
-
-    validate_is_the_future(changeset, tail, t)
+      with %{} <- date_or_time,
+        :gt <- t.compare(today, date_or_time)
+      do
+        changeset
+        add_error(changeset, key, dgettext("errors", "you cannot schedule an event in the past"), [validation: :in_the_past])
+      else
+        _ -> changeset
+      end
+    end)
   end
 end
