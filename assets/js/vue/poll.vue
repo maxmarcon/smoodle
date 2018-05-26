@@ -3,7 +3,7 @@
 		message-bar(ref="errorBar" variant="danger")
 		b-modal(ref="welcomeModal" hide-header ok-only)
 				p.my-3 {{ $t('event_poll.welcome', {eventName, eventOrganizer}) }}
-		.card(v-if="eventId")
+		.card(v-if="eventName")
 			.card-header
 				.row.align-items-center
 					.col-md-2.text-center.align-items-center
@@ -31,8 +31,11 @@
 						p {{ timeWindow }}
 				hr.my-3
 
-				div(v-if="step == 1")
-					ul.list-group
+				ul.list-group
+					li.list-group-item
+						b-btn.btn-block(v-b-toggle.weekday-ranker="" variant="info") Which days work best for you?
+					b-collapse#weekday-ranker(accordion="poll-questions")
+						weekday-ranker(:days="$t('date_picker.days')")
 
 			.card-footer
 				.row(v-if="step < lastStep")
@@ -74,7 +77,16 @@ function fetchEvent() {
 }
 
 export default {
-	props: ['eventId', 'step'],
+	props: {
+		eventId: {
+			type: String,
+			required: true
+		},
+		step: {
+			type: Number,
+			default: 1
+		}
+	},
 	data: () => ({
 		eventName: null,
 		eventOrganizer: null,

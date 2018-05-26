@@ -6,7 +6,7 @@ export default {
 	en: {
 		event_editor: {
 			title: 'New event',
-			welcome: 'Hello! Here you can create a new event and share it with participants in order to schedule a date that works best for most of them',
+			welcome: 'Hello! Here you can create a new event and share it with participants',
 			event: {
 				name: "Event title",
 				name_help: "Enter a name for your event",
@@ -16,6 +16,9 @@ export default {
 				organizer: "Who are you?",
 				organizer_help: "Let your friends know who invitied them..."
 			},
+			general_info_group: 'What kind of event is it?',
+			dates_group: 'When should it happen?',
+			organizer_group: 'Who\'s organizing the event?',
 			this_week: "This week",
 			next_week: "Next week",
 			within_months: "Within one month | Within {count} months",
@@ -25,8 +28,9 @@ export default {
 			step: "Step {step} of {lastStep}",
 			link_copied: "Link copied to clipboard",
 			event_created: "Congratulations {eventOrganizer}! Your event for \u201C{eventName}\u201E has been created",
+			event_created_short: "Your event has been created",
 			share_link: "Now share this link with your friends, so they can enter which dates work best for them:",
-			manage_event: "Mange event",
+			manage_event: "Manage event",
 			poll_event: "Enter your availability"
 		},
 		event_poll: {

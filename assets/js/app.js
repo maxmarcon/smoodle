@@ -15,18 +15,13 @@ const router = new VueRouter({
 	  {
 	  	path: '/new_event',
 	  	name: 'new_event',
-	  	component: EventEditor,
-	  	props: (route) => ({
-		  	step: parseInt(route.query.step)
-	  	})
+	  	component: EventEditor
 	  },
 	  {
 	  	path: '/event/:eventId/poll',
 	  	name: 'poll',
 	  	component: PollVue,
-			props: (route) => {
-				return Object.assign(route.params, {step: parseInt(route.query.step)})
-	  	}
+			props: true
 	  }
   ]
 });
@@ -41,10 +36,16 @@ import messages from './messages'
 import messageBar from './vue/messageBar.vue'
 Vue.component('message-bar', messageBar);
 
+import weekdayRanker from './vue/weekdayRanker.vue'
+Vue.component('weekday-ranker', weekdayRanker);
+
 const i18n = new VueI18n({
   locale: smoodle_locale,
   messages
 });
+
+import ToggleButton from 'vue-js-toggle-button'
+Vue.use(ToggleButton)
 
 Vue.use(BootstrapVue);
 

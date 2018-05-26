@@ -82,7 +82,6 @@ defmodule Smoodle.Scheduler.Event do
       with %{} <- date_or_time,
         :gt <- t.compare(today, date_or_time)
       do
-        changeset
         add_error(changeset, key, dgettext("errors", "you cannot schedule an event in the past"), [validation: :in_the_past])
       else
         _ -> changeset
