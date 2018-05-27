@@ -46,6 +46,7 @@ export default {
 		},
 		date_fns_locale: date_fns_en,
 		errors: {
+			required_field: "Can't be blank",
 			network: "The server is not responding or cannot be reached. Please try again later."
 		}
 	},

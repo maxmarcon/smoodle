@@ -30,7 +30,7 @@
 
 				hr.mb-3
 
-				form(@submit.prevent="" novalidate)
+				form(ref="form" @submit.prevent="" novalidate)
 					b-btn.btn-block.d-flex.justify-content-between(
 						v-b-toggle.organizer-group=""
 						:variant="groupVariant('organizer-group')"
@@ -42,14 +42,19 @@
 						div(v-if="showGroupErrorIcon('organizer-group')").oi.oi-x
 						div(v-else-if="showGroupOkIcon('organizer-group')").oi.oi-check
 					b-collapse#organizer-group(accordion="event-creation" v-model="groupVisibility['organizer-group']")
-						.form-group.row.mt-md-3
-							label.col-md-3.col-form-label(for="eventOrganizer") {{ $t('event_editor.event.organizer') }}
-							.col-md-9
-								small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.organizer_help') }}
-								input#eventOrganizer.form-control(v-model.trim="eventOrganizer"
-								:disabled="createdEvent"
-								:class="{'is-invalid': eventOrganizerError, 'is-valid': !eventOrganizerError && wasValidated}")
-								.invalid-feedback {{ eventOrganizerError }}
+						b-card
+							.form-group.row
+								label.col-md-3.col-form-label(for="eventOrganizer") {{ $t('event_editor.event.organizer') }}
+								.col-md-9
+									small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.organizer_help') }}
+									input#eventOrganizer.form-control(
+										v-model.trim="eventOrganizer"
+										@change="localValidation"
+										@blur="localValidation"
+										:disabled="createdEvent"
+										:class="inputFieldClass('eventOrganizer')"
+									)
+									.invalid-feedback {{ eventOrganizerError }}
 
 
 					b-btn.btn-block.d-flex.justify-content-between.mt-2(
@@ -66,22 +71,29 @@
 						accordion="event-creation"
 						v-model="groupVisibility['general-info-group']"
 					)
-						.form-group.row.mt-md-3
-							label.col-md-3.col-form-label(for="eventName") {{ $t('event_editor.event.name') }}
-							.col-md-9
-								small.form-text.text-muted(id="eventNameHelp") {{ $t('event_editor.event.name_help') }}
-								input#eventName.form-control(v-model.trim="eventName" type="text"
-								:disabled="createdEvent"
-								:class="{'is-invalid': eventNameError, 'is-valid': !eventNameError && wasValidated}")
-								.invalid-feedback {{ eventNameError }}
-						.form-group.row
-							label.col-md-3.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
-							.col-md-9
-								small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.desc_help') }}
-								textarea#eventDesc.form-control(v-model.trim="eventDesc"
-								:disabled="createdEvent"
-								:class="{'is-invalid': eventDescError, 'is-valid': !eventDescError && wasValidated}")
-								.invalid-feedback {{ eventDescError }}
+						b-card
+							.form-group.row
+								label.col-md-3.col-form-label(for="eventName") {{ $t('event_editor.event.name') }}
+								.col-md-9
+									small.form-text.text-muted(id="eventNameHelp") {{ $t('event_editor.event.name_help') }}
+									input#eventName.form-control(v-model.trim="eventName" type="text"
+									:disabled="createdEvent"
+									@change="localValidation"
+									@blur="localValidation"
+									:class="inputFieldClass('eventName')"
+									)
+									.invalid-feedback {{ eventNameError }}
+							.form-group.row
+								label.col-md-3.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
+								.col-md-9
+									small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.desc_help') }}
+									textarea#eventDesc.form-control(v-model.trim="eventDesc"
+									:disabled="createdEvent"
+									@change="localValidation"
+									@blur="localValidation"
+									:class="inputFieldClass('eventDesc')"
+									)
+									.invalid-feedback {{ eventDescError }}
 
 
 					b-btn.btn-block.d-flex.justify-content-between.mt-2(
@@ -98,34 +110,37 @@
 						accordion="event-creation"
 						v-model="groupVisibility['dates-group']"
 					)
-						.form-group.row.mt-md-3.date-picker-trigger
-							label.col-md-4.col-form-label(for="eventDates") {{ $t('event_editor.event.dates') }}
-							.col-md-4.mb-3
-								.datepicker-trigger
-									input#eventDates.form-control(
-									:disabled="createdEvent"
-									:value="dateRange"
-									:class="{'is-invalid': eventDatesError, 'is-valid': !eventDatesError && wasValidated}"
-									)
-									.invalid-feedback {{ eventDatesError }}
-
-									div(v-if="!createdEvent")
-										AirbnbStyleDatepicker(
-											:trigger-element-id="'eventDates'"
-												:mode="'range'"
-												:fullscreen-mobile="true"
-												:date-one="dateFrom"
-												:date-two="dateTo"
-												:min-date="today"
-												@date-one-selected="val => { dateFrom = val }"
-												@date-two-selected="val => { dateTo = val }"
+						b-card
+							.form-group.row.date-picker-trigger
+								label.col-md-4.col-form-label(for="eventDates") {{ $t('event_editor.event.dates') }}
+								.col-md-4.mb-3
+									.datepicker-trigger
+										input#eventDates.form-control(
+										:disabled="createdEvent"
+										:value="dateRange"
+										:class="inputFieldClass('dateRange')"
+										readonly
 										)
+										.invalid-feedback {{ eventDatesError }}
 
-							.col-md-auto
-								b-dropdown(:text="$t('event_editor.dates_quick_selection')" :disabled="createdEvent != null")
-									b-dropdown-item(v-if="showThisWeekButton" @click="pickThisWeek") {{ $t('event_editor.this_week') }}
-									b-dropdown-item(@click="pickNextWeek") {{ $t('event_editor.next_week') }}
-									b-dropdown-item(@click="pickNextMonths(1)") {{ $tc('event_editor.within_months', 1) }}
+										div(v-if="!createdEvent")
+											AirbnbStyleDatepicker(
+												:trigger-element-id="'eventDates'"
+													:mode="'range'"
+													:fullscreen-mobile="true"
+													:date-one="dateFrom"
+													:date-two="dateTo"
+													:min-date="today"
+													@closed="localValidation"
+													@date-one-selected="val => { dateFrom = val }"
+													@date-two-selected="val => { dateTo = val }"
+											)
+
+								.col-md-auto
+									b-dropdown(:text="$t('event_editor.dates_quick_selection')" :disabled="createdEvent != null")
+										b-dropdown-item(v-if="showThisWeekButton" @click="pickThisWeek") {{ $t('event_editor.this_week') }}
+										b-dropdown-item(@click="pickNextWeek(); localValidation();") {{ $t('event_editor.next_week') }}
+										b-dropdown-item(@click="pickNextMonths(1); localValidation();") {{ $tc('event_editor.within_months', 1) }}
 
 			.card-footer
 				.row.justify-content-center
@@ -150,17 +165,29 @@ const today = new Date();
 const InvalidDate = 'Invalid Date';
 
 const errorsMap = {
-	// maps, for each input group, the error fields in the vue model to
-	// the error keys received by the back end
+	// maps, for each input group, the fields in the vue model to
+	// the error fields and the error keys received by the back end
 	'organizer-group': {
-		eventOrganizerError: "organizer"
+		eventOrganizer: {
+			errorField: 'eventOrganizerError',
+			errorKeys: 'organizer'
+		}
 	},
 	'general-info-group': {
-		eventNameError: "name",
-		eventDescError: "desc"
+		eventName: {
+			errorField: 'eventNameError',
+			errorKeys: 'name'
+		},
+		eventDesc: {
+			errorField: 'eventDescError',
+			errorKeys: 'desc'
+		}
 	},
 	'dates-group': {
-		eventDatesError: ["time_window_to", "time_window_from", "time_window"]
+		dateRange: {
+			errorField: 'eventDatesError',
+			errorKeys: ['time_window_to', 'time_window_from', 'time_window']
+		}
 	}
 };
 
@@ -176,11 +203,12 @@ export default {
 		dateTo: null,
 		eventDatesError: null,
 		today,
-		wasValidated: false,
+		wasServerValidated: false,
+		wasLocalValidated: false,
 		groupVisibility: {
 			'general-info-group': false,
 			'dates-group': false,
-			'organizer-group': false
+			'organizer-group': true
 		},
 		showThisWeekButton: (dateFns.getDay(today) > 0 && dateFns.getDay(today) < 4), // betewn Mon and Wed
 		createdEvent: null/* {
@@ -218,25 +246,48 @@ export default {
 		}
 	},
 	methods: {
+		inputFieldClass(field) {
+			let fieldMap = Object.values(errorsMap).find(map => map[field]);
+			if (fieldMap) {
+				let errorField = fieldMap[field].errorField;
+				if (this[errorField]) {
+					return 'is-invalid';
+				} else if (this.wasServerValidated || this.wasLocalValidated) {
+					return 'is-valid';
+				}
+			}
+		},
+		localValidation() {
+			self = this;
+			Object.values(errorsMap).forEach(function(fieldMap) {
+				for (let field in fieldMap) {
+					let errorField = fieldMap[field].errorField;
+					self[errorField] = !self[field] ? self.$i18n.t('errors.required_field') : null;
+				}
+			});
+			this.wasLocalValidated = true;
+		},
 		collapseAllGroups() {
 			for (let group in this.groupVisibility) {
 				this.groupVisibility[group] = false;
 			}
 		},
 		showGroupOkIcon(group) {
-			return this.wasValidated && !this.groupHasErrors(group);
+			return this.wasServerValidated && !this.groupHasErrors(group);
 		},
 		showGroupErrorIcon(group) {
-			return this.groupHasErrors(group);
+			return this.wasServerValidated && this.groupHasErrors(group);
 		},
 		groupVariant(group) {
-			return (this.groupHasErrors(group) ? 'danger' : (this.wasValidated ? 'success' : ''));
+			if (this.wasServerValidated) {
+				return (this.groupHasErrors(group) ? 'danger' : 'success');
+			}
 		},
 		groupHasErrors(group) {
 			let groupErrorsMap = errorsMap[group] || {}
-			for (let key in groupErrorsMap) {
-				if (this[key]) {
-					return true
+			for (let field in groupErrorsMap) {
+				if (this[groupErrorsMap[field].errorField]) {
+					return true;
 				}
 			}
 			return false;
@@ -244,18 +295,20 @@ export default {
 		clipboard(e) {
       this.$refs.copiedToClipboardModal.show();
 		},
-		setErrors(errors={}) {
-			let noGroupShownBecauseOfErrors = true;
+		setServerErrors(errors={}) {
+			let groupShownBecauseOfErrors = null;
 			for (let group in errorsMap) {
-				let map = errorsMap[group];
-				for (let error_field in errorsMap[group]) {
-					let error_keys = (map[error_field] instanceof Array ? map[error_field] : [map[error_field]]);
-					let key_with_error = error_keys.find(key => errors[key]);
+				let fieldMap = errorsMap[group];
+				for (let field in fieldMap) {
+					let errorKeys = fieldMap[field].errorKeys;
+					let errorField = fieldMap[field].errorField;
+					errorKeys = errorKeys instanceof Array ? errorKeys : [errorKeys];
+					let key_with_error = errorKeys.find(key => errors[key]);
 					// only show first error
-					this[error_field] = (key_with_error ? errors[key_with_error].join(', ') : null);
-					if (key_with_error && noGroupShownBecauseOfErrors) {
+					this[errorField] = (key_with_error ? errors[key_with_error].join(', ') : null);
+					if (key_with_error && !groupShownBecauseOfErrors) {
 						this.groupVisibility[group] = true;
-						noGroupShownBecauseOfErrors = false;
+						groupShownBecauseOfErrors = group;
 					}
 				}
 			}
@@ -288,19 +341,19 @@ export default {
 				headers: { 'Accept-Language': this.$i18n.locale }
 			})
 			.then(function(result) {
-				self.setErrors();
+				self.setServerErrors();
 				self.createdEvent = result.data.data;
 				self.collapseAllGroups();
 				self.$refs.eventCreatedModal.show();
 			}, function(result) {
 				if (result.response && result.response.status == 422) {
-					self.setErrors(result.response.data.errors);
+					self.setServerErrors(result.response.data.errors);
 				} else {
 					self.$refs.errorBar.show(self.$i18n.t('errors.network'));
 				}
 			})
 			.finally(function() {
-				self.wasValidated = true;
+				self.wasServerValidated = true;
 			});
 		}
 	}
