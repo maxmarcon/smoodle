@@ -34,20 +34,48 @@
 					ul.list-group
 						li.list-group-item
 							b-btn.btn-block.d-flex.justify-content-between(
+								v-b-toggle.organizer-group=""
+								:variant="groupVariant('organizer-group')"
+							)
+								div
+									span.oi.oi-chevron-bottom(v-if="groupVisibility['organizer-group']")
+									span.oi.oi-chevron-top(v-else)
+									span.ml-2 {{ $t('event_editor.organizer_group') }}
+								div(v-if="showGroupErrorIcon('organizer-group')").oi.oi-x
+								div(v-else-if="showGroupOkIcon('organizer-group')").oi.oi-check
+							b-collapse#organizer-group(accordion="event-creation" v-model="groupVisibility['organizer-group']")
+								.form-group.row.mt-md-3
+									label.col-md-3.col-form-label(for="eventOrganizer") {{ $t('event_editor.event.organizer') }}
+									.col-md-9
+										small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.organizer_help') }}
+										input#eventOrganizer.form-control(v-model.trim="eventOrganizer"
+										:disabled="createdEvent"
+										:class="{'is-invalid': eventOrganizerError, 'is-valid': !eventOrganizerError && wasValidated}")
+										.invalid-feedback {{ eventOrganizerError }}
+
+
+						li.list-group-item
+							b-btn.btn-block.d-flex.justify-content-between(
 								v-b-toggle.general-info-group=""
 								:variant="groupVariant('general-info-group')"
 							)
-								div {{ $t('event_editor.general_info_group') }}
+								div
+									span.oi.oi-chevron-bottom(v-if="groupVisibility['general-info-group']")
+									span.oi.oi-chevron-top(v-else)
+									span.ml-2 {{ $t('event_editor.general_info_group') }}
 								div(v-if="showGroupErrorIcon('general-info-group')").oi.oi-x
 								div(v-else-if="showGroupOkIcon('general-info-group')").oi.oi-check
-							b-collapse#general-info-group(accordion="event-creation" v-model="groupVisibility['general-info-group']")
+							b-collapse#general-info-group(
+								accordion="event-creation"
+								v-model="groupVisibility['general-info-group']"
+							)
 								.form-group.row.mt-md-3
 									label.col-md-3.col-form-label(for="eventName") {{ $t('event_editor.event.name') }}
 									.col-md-9
 										small.form-text.text-muted(id="eventNameHelp") {{ $t('event_editor.event.name_help') }}
 										input#eventName.form-control(v-model.trim="eventName" type="text"
 										:disabled="createdEvent"
-										:class="{'is-invalid': eventNameError}")
+										:class="{'is-invalid': eventNameError, 'is-valid': !eventNameError && wasValidated}")
 										.invalid-feedback {{ eventNameError }}
 								.form-group.row
 									label.col-md-3.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
@@ -55,7 +83,7 @@
 										small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.desc_help') }}
 										textarea#eventDesc.form-control(v-model.trim="eventDesc"
 										:disabled="createdEvent"
-										:class="{'is-invalid': eventDescError}")
+										:class="{'is-invalid': eventDescError, 'is-valid': !eventDescError && wasValidated}")
 										.invalid-feedback {{ eventDescError }}
 
 
@@ -64,10 +92,16 @@
 								v-b-toggle.dates-group=""
 								:variant="groupVariant('dates-group')"
 							)
-									div {{ $t('event_editor.dates_group') }}
-									div(v-if="showGroupErrorIcon('dates-group')").oi.oi-x
-									div(v-else-if="showGroupOkIcon('dates-group')").oi.oi-check
-							b-collapse#dates-group(accordion="event-creation" v-model="groupVisibility['dates-group']")
+								div
+									span.oi.oi-chevron-bottom(v-if="groupVisibility['dates-group']")
+									span.oi.oi-chevron-top(v-else)
+									span.ml-2 {{ $t('event_editor.dates_group') }}
+								div(v-if="showGroupErrorIcon('dates-group')").oi.oi-x
+								div(v-else-if="showGroupOkIcon('dates-group')").oi.oi-check
+							b-collapse#dates-group(
+								accordion="event-creation"
+								v-model="groupVisibility['dates-group']"
+							)
 								.form-group.row.mt-md-3.date-picker-trigger
 									label.col-md-4.col-form-label(for="eventDates") {{ $t('event_editor.event.dates') }}
 									.col-md-4.mb-3
@@ -75,7 +109,7 @@
 											input#eventDates.form-control(
 											:disabled="createdEvent"
 											:value="dateRange"
-											:class="{'is-invalid': eventDatesError}"
+											:class="{'is-invalid': eventDatesError, 'is-valid': !eventDatesError && wasValidated}"
 											)
 											.invalid-feedback {{ eventDatesError }}
 
@@ -96,24 +130,6 @@
 											b-dropdown-item(v-if="showThisWeekButton" @click="pickThisWeek") {{ $t('event_editor.this_week') }}
 											b-dropdown-item(@click="pickNextWeek") {{ $t('event_editor.next_week') }}
 											b-dropdown-item(@click="pickNextMonths(1)") {{ $tc('event_editor.within_months', 1) }}
-
-						li.list-group-item
-							b-btn.btn-block.d-flex.justify-content-between(
-								v-b-toggle.organizer-group=""
-								:variant="groupVariant('organizer-group')"
-							)
-									div {{ $t('event_editor.organizer_group') }}
-									div(v-if="showGroupErrorIcon('organizer-group')").oi.oi-x
-									div(v-else-if="showGroupOkIcon('organizer-group')").oi.oi-check
-							b-collapse#organizer-group(accordion="event-creation" v-model="groupVisibility['organizer-group']")
-								.form-group.row.mt-md-3
-									label.col-md-3.col-form-label(for="eventOrganizer") {{ $t('event_editor.event.organizer') }}
-									.col-md-9
-										small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.organizer_help') }}
-										input#eventOrganizer.form-control(v-model.trim="eventOrganizer"
-										:disabled="createdEvent"
-										:class="{'is-invalid': eventOrganizerError}")
-										.invalid-feedback {{ eventOrganizerError }}
 
 			.card-footer
 				.row.justify-content-end
@@ -140,15 +156,15 @@ const InvalidDate = 'Invalid Date';
 const errorsMap = {
 	// maps, for each input group, the error fields in the vue model to
 	// the error keys received by the back end
+	'organizer-group': {
+		eventOrganizerError: "organizer"
+	},
 	'general-info-group': {
 		eventNameError: "name",
 		eventDescError: "desc"
 	},
 	'dates-group': {
 		eventDatesError: ["time_window_to", "time_window_from", "time_window"]
-	},
-	'organizer-group': {
-		eventOrganizerError: "organizer"
 	}
 };
 
@@ -181,8 +197,8 @@ export default {
  	}),
 	computed: {
 		dateRange() {
-			let fromDate_s = dateFns.format(this.dateFrom, 'DD/MM/YYYY (ddd)', {locale: this.$i18n.t('date_fns_locale')});
-			let toDate_s = dateFns.format(this.dateTo, 'DD/MM/YYYY (ddd)', {locale: this.$i18n.t('date_fns_locale')});
+			let fromDate_s = dateFns.format(this.dateFrom, 'DD/MM/YYYY', {locale: this.$i18n.t('date_fns_locale')});
+			let toDate_s = dateFns.format(this.dateTo, 'DD/MM/YYYY', {locale: this.$i18n.t('date_fns_locale')});
 
 			if (fromDate_s == InvalidDate || toDate_s == InvalidDate) {
 				return null;

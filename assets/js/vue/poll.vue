@@ -81,10 +81,6 @@ export default {
 		eventId: {
 			type: String,
 			required: true
-		},
-		step: {
-			type: Number,
-			default: 1
 		}
 	},
 	data: () => ({
