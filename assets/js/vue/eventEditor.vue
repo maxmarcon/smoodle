@@ -31,118 +31,114 @@
 				hr.mb-3
 
 				form(@submit.prevent="" novalidate)
-					ul.list-group
-						li.list-group-item
-							b-btn.btn-block.d-flex.justify-content-between(
-								v-b-toggle.organizer-group=""
-								:variant="groupVariant('organizer-group')"
-							)
-								div
-									span.oi.oi-chevron-bottom(v-if="groupVisibility['organizer-group']")
-									span.oi.oi-chevron-top(v-else)
-									span.ml-2 {{ $t('event_editor.organizer_group') }}
-								div(v-if="showGroupErrorIcon('organizer-group')").oi.oi-x
-								div(v-else-if="showGroupOkIcon('organizer-group')").oi.oi-check
-							b-collapse#organizer-group(accordion="event-creation" v-model="groupVisibility['organizer-group']")
-								.form-group.row.mt-md-3
-									label.col-md-3.col-form-label(for="eventOrganizer") {{ $t('event_editor.event.organizer') }}
-									.col-md-9
-										small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.organizer_help') }}
-										input#eventOrganizer.form-control(v-model.trim="eventOrganizer"
-										:disabled="createdEvent"
-										:class="{'is-invalid': eventOrganizerError, 'is-valid': !eventOrganizerError && wasValidated}")
-										.invalid-feedback {{ eventOrganizerError }}
+					b-btn.btn-block.d-flex.justify-content-between(
+						v-b-toggle.organizer-group=""
+						:variant="groupVariant('organizer-group')"
+					)
+						div
+							span.oi.oi-chevron-bottom(v-if="groupVisibility['organizer-group']")
+							span.oi.oi-chevron-top(v-else)
+							span.ml-2 {{ $t('event_editor.organizer_group') }}
+						div(v-if="showGroupErrorIcon('organizer-group')").oi.oi-x
+						div(v-else-if="showGroupOkIcon('organizer-group')").oi.oi-check
+					b-collapse#organizer-group(accordion="event-creation" v-model="groupVisibility['organizer-group']")
+						.form-group.row.mt-md-3
+							label.col-md-3.col-form-label(for="eventOrganizer") {{ $t('event_editor.event.organizer') }}
+							.col-md-9
+								small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.organizer_help') }}
+								input#eventOrganizer.form-control(v-model.trim="eventOrganizer"
+								:disabled="createdEvent"
+								:class="{'is-invalid': eventOrganizerError, 'is-valid': !eventOrganizerError && wasValidated}")
+								.invalid-feedback {{ eventOrganizerError }}
 
 
-						li.list-group-item
-							b-btn.btn-block.d-flex.justify-content-between(
-								v-b-toggle.general-info-group=""
-								:variant="groupVariant('general-info-group')"
-							)
-								div
-									span.oi.oi-chevron-bottom(v-if="groupVisibility['general-info-group']")
-									span.oi.oi-chevron-top(v-else)
-									span.ml-2 {{ $t('event_editor.general_info_group') }}
-								div(v-if="showGroupErrorIcon('general-info-group')").oi.oi-x
-								div(v-else-if="showGroupOkIcon('general-info-group')").oi.oi-check
-							b-collapse#general-info-group(
-								accordion="event-creation"
-								v-model="groupVisibility['general-info-group']"
-							)
-								.form-group.row.mt-md-3
-									label.col-md-3.col-form-label(for="eventName") {{ $t('event_editor.event.name') }}
-									.col-md-9
-										small.form-text.text-muted(id="eventNameHelp") {{ $t('event_editor.event.name_help') }}
-										input#eventName.form-control(v-model.trim="eventName" type="text"
-										:disabled="createdEvent"
-										:class="{'is-invalid': eventNameError, 'is-valid': !eventNameError && wasValidated}")
-										.invalid-feedback {{ eventNameError }}
-								.form-group.row
-									label.col-md-3.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
-									.col-md-9
-										small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.desc_help') }}
-										textarea#eventDesc.form-control(v-model.trim="eventDesc"
-										:disabled="createdEvent"
-										:class="{'is-invalid': eventDescError, 'is-valid': !eventDescError && wasValidated}")
-										.invalid-feedback {{ eventDescError }}
+					b-btn.btn-block.d-flex.justify-content-between.mt-2(
+						v-b-toggle.general-info-group=""
+						:variant="groupVariant('general-info-group')"
+					)
+						div
+							span.oi.oi-chevron-bottom(v-if="groupVisibility['general-info-group']")
+							span.oi.oi-chevron-top(v-else)
+							span.ml-2 {{ $t('event_editor.general_info_group') }}
+						div(v-if="showGroupErrorIcon('general-info-group')").oi.oi-x
+						div(v-else-if="showGroupOkIcon('general-info-group')").oi.oi-check
+					b-collapse#general-info-group(
+						accordion="event-creation"
+						v-model="groupVisibility['general-info-group']"
+					)
+						.form-group.row.mt-md-3
+							label.col-md-3.col-form-label(for="eventName") {{ $t('event_editor.event.name') }}
+							.col-md-9
+								small.form-text.text-muted(id="eventNameHelp") {{ $t('event_editor.event.name_help') }}
+								input#eventName.form-control(v-model.trim="eventName" type="text"
+								:disabled="createdEvent"
+								:class="{'is-invalid': eventNameError, 'is-valid': !eventNameError && wasValidated}")
+								.invalid-feedback {{ eventNameError }}
+						.form-group.row
+							label.col-md-3.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
+							.col-md-9
+								small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.desc_help') }}
+								textarea#eventDesc.form-control(v-model.trim="eventDesc"
+								:disabled="createdEvent"
+								:class="{'is-invalid': eventDescError, 'is-valid': !eventDescError && wasValidated}")
+								.invalid-feedback {{ eventDescError }}
 
 
-						li.list-group-item
-							b-btn.btn-block.d-flex.justify-content-between(
-								v-b-toggle.dates-group=""
-								:variant="groupVariant('dates-group')"
-							)
-								div
-									span.oi.oi-chevron-bottom(v-if="groupVisibility['dates-group']")
-									span.oi.oi-chevron-top(v-else)
-									span.ml-2 {{ $t('event_editor.dates_group') }}
-								div(v-if="showGroupErrorIcon('dates-group')").oi.oi-x
-								div(v-else-if="showGroupOkIcon('dates-group')").oi.oi-check
-							b-collapse#dates-group(
-								accordion="event-creation"
-								v-model="groupVisibility['dates-group']"
-							)
-								.form-group.row.mt-md-3.date-picker-trigger
-									label.col-md-4.col-form-label(for="eventDates") {{ $t('event_editor.event.dates') }}
-									.col-md-4.mb-3
-										.datepicker-trigger
-											input#eventDates.form-control(
-											:disabled="createdEvent"
-											:value="dateRange"
-											:class="{'is-invalid': eventDatesError, 'is-valid': !eventDatesError && wasValidated}"
-											)
-											.invalid-feedback {{ eventDatesError }}
+					b-btn.btn-block.d-flex.justify-content-between.mt-2(
+						v-b-toggle.dates-group=""
+						:variant="groupVariant('dates-group')"
+					)
+						div
+							span.oi.oi-chevron-bottom(v-if="groupVisibility['dates-group']")
+							span.oi.oi-chevron-top(v-else)
+							span.ml-2 {{ $t('event_editor.dates_group') }}
+						div(v-if="showGroupErrorIcon('dates-group')").oi.oi-x
+						div(v-else-if="showGroupOkIcon('dates-group')").oi.oi-check
+					b-collapse#dates-group(
+						accordion="event-creation"
+						v-model="groupVisibility['dates-group']"
+					)
+						.form-group.row.mt-md-3.date-picker-trigger
+							label.col-md-4.col-form-label(for="eventDates") {{ $t('event_editor.event.dates') }}
+							.col-md-4.mb-3
+								.datepicker-trigger
+									input#eventDates.form-control(
+									:disabled="createdEvent"
+									:value="dateRange"
+									:class="{'is-invalid': eventDatesError, 'is-valid': !eventDatesError && wasValidated}"
+									)
+									.invalid-feedback {{ eventDatesError }}
 
-											div(v-if="!createdEvent")
-												AirbnbStyleDatepicker(
-													:trigger-element-id="'eventDates'"
-														:mode="'range'"
-														:fullscreen-mobile="true"
-														:date-one="dateFrom"
-														:date-two="dateTo"
-														:min-date="today"
-														@date-one-selected="val => { dateFrom = val }"
-														@date-two-selected="val => { dateTo = val }"
-												)
+									div(v-if="!createdEvent")
+										AirbnbStyleDatepicker(
+											:trigger-element-id="'eventDates'"
+												:mode="'range'"
+												:fullscreen-mobile="true"
+												:date-one="dateFrom"
+												:date-two="dateTo"
+												:min-date="today"
+												@date-one-selected="val => { dateFrom = val }"
+												@date-two-selected="val => { dateTo = val }"
+										)
 
-									.col-md-auto
-										b-dropdown(:text="$t('event_editor.dates_quick_selection')" :disabled="createdEvent != null")
-											b-dropdown-item(v-if="showThisWeekButton" @click="pickThisWeek") {{ $t('event_editor.this_week') }}
-											b-dropdown-item(@click="pickNextWeek") {{ $t('event_editor.next_week') }}
-											b-dropdown-item(@click="pickNextMonths(1)") {{ $tc('event_editor.within_months', 1) }}
+							.col-md-auto
+								b-dropdown(:text="$t('event_editor.dates_quick_selection')" :disabled="createdEvent != null")
+									b-dropdown-item(v-if="showThisWeekButton" @click="pickThisWeek") {{ $t('event_editor.this_week') }}
+									b-dropdown-item(@click="pickNextWeek") {{ $t('event_editor.next_week') }}
+									b-dropdown-item(@click="pickNextMonths(1)") {{ $tc('event_editor.within_months', 1) }}
 
 			.card-footer
-				.row.justify-content-end
+				.row.justify-content-center
 					.col-auto(v-if="!createdEvent")
 						button.btn.btn-primary(@click="createEvent") Create Event
 
-					.row.justify-content-end(v-else)
-						.col-md-auto.text-center.mt-1
+					.row.justify-content-center(v-else)
+						.col-md-auto.mt-1.text-center
 							router-link.btn.btn-success(
 								role="button"
 								:to="{ name: 'poll', params: {eventId: createdEvent.id}}"
 							) {{ $t('event_editor.poll_event') }}
-						.col-md-auto.text-center.mt-1
+						.col-md-auto.mt-1.text-center
 							button.btn.btn-primary {{ $t('event_editor.manage_event') }}
 
 </template>
