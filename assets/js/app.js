@@ -36,16 +36,16 @@ import messages from './messages'
 import messageBar from './vue/messageBar.vue'
 Vue.component('message-bar', messageBar);
 
-import weekdayRanker from './vue/weekdayRanker.vue'
-Vue.component('weekday-ranker', weekdayRanker);
+import ranker from './vue/ranker.vue'
+Vue.component('ranker', ranker);
 
 const i18n = new VueI18n({
   locale: smoodle_locale,
   messages
 });
 
-import ToggleButton from 'vue-js-toggle-button'
-Vue.use(ToggleButton)
+import PrettyCheckbox from 'pretty-checkbox-vue';
+Vue.use(PrettyCheckbox);
 
 Vue.use(BootstrapVue);
 

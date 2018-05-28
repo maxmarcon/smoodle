@@ -24,6 +24,7 @@
     "jquery": "^3.3.1",
     "open-iconic": "^1.1.1",
     "popper.js": "^1.14.3",
+    "pretty-checkbox-vue": "^1.1.8",
     "pug": "^2.0.3",
     "sass-brunch": "^2.10.4",
     "uglify-js-brunch": "^2.10.0",
@@ -31,7 +32,6 @@
     "vue-airbnb-style-datepicker": "^1.8.0",
     "vue-axios": "^2.1.1",
     "vue-clipboard2": "^0.1.1",
-    "vue-i18n": "^7.7.0",
-    "vue-js-toggle-button": "^1.2.3"
+    "vue-i18n": "^7.7.0"
   }
 }

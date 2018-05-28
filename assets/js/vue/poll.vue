@@ -5,15 +5,9 @@
 				p.my-3 {{ $t('event_poll.welcome', {eventName, eventOrganizer}) }}
 		.card(v-if="eventName")
 			.card-header
-				.row.align-items-center
-					.col-md-2.text-center.align-items-center
-						strong.h5 {{ $t('event_poll.title', {eventName}) }}
+				.row
 					.col
-						b-progress(:max="lastStep")
-							b-progress-bar(:value="step" variant="success")
-								| {{ $t('event_editor.step', {step: step, lastStep: lastStep}) }}
-
-			.card-body
+						h5 {{ $t('event_poll.title', {eventName}) }}
 				.row
 					.col-md-4
 						p.text-muted Organizer:
@@ -31,38 +25,16 @@
 						p {{ timeWindow }}
 				hr.my-3
 
-				ul.list-group
-					li.list-group-item
-						b-btn.btn-block(v-b-toggle.weekday-ranker="" variant="info") Which days work best for you?
-					b-collapse#weekday-ranker(accordion="poll-questions")
-						weekday-ranker(:days="$t('date_picker.days')")
+				b-btn.btn-block(v-b-toggle.weekday-ranker="" variant="info") Which days work best for you?
+				b-collapse#weekday-ranker(accordion="poll-questions" :visible="true")
+					ranker(:elements="$t('date_picker.days').map((day, index) => ({name: day, rank: 1}))")
 
 			.card-footer
-				.row(v-if="step < lastStep")
-					.col.text-left
-						router-link.btn.btn-primary(
-							v-if="step > firstStep"
-							role="button"
-							:to="{ name: 'poll', params: { eventId: eventId }, query: {step: (step == firstStep ? step : step - 1) }}"
-							:class="{disabled: step == firstStep}"
-						)
-							span.oi.oi-arrow-thick-left
-							span &nbsp; {{ $t('event_editor.prev') }}
-					.col.text-right
-						router-link.btn.btn-primary.btn-(
-							role="button"
-							:to="{ name: 'poll', params: { eventId: eventId }, query: {step: step + 1 }}"
-						)
-							span {{ $t('event_editor.next') }} &nbsp;
-							span.oi.oi-arrow-thick-right
 
 </template>
 <script>
 import dateFns from 'date-fns'
-import { sanitizeStepRouteParameter } from '../globals.js'
 
-const firstStep = 1;
-const lastStep = 3;
 
 function fetchEvent() {
 	let self = this;
@@ -88,13 +60,8 @@ export default {
 		eventOrganizer: null,
 		evendDesc: null,
 		eventTimeWindowFrom: null,
-		eventTimeWindowTo: null,
-		firstStep,
-		lastStep
+		eventTimeWindowTo: null
 	}),
-	beforeRouteEnter: (to, from, next) => {
-		next(sanitizeStepRouteParameter(to, firstStep, lastStep, true));
-	},
 	created() {
 		let self = this;
 		fetchEvent.call(this).then(function(eventData) {
