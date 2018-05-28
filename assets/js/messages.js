@@ -12,12 +12,12 @@ export default {
 				name_help: "Enter a name for your event",
 				desc: "What is going to happen?",
 				desc_help: "Describe the event",
-				dates: "When should it happen (roughly)?",
+				dates: "Specify a custom time period or select one from the drop-down",
 				organizer: "Who are you?",
 				organizer_help: "Let your friends know who invitied them..."
 			},
 			general_info_group: 'What kind of event is it?',
-			dates_group: 'When should it happen?',
+			dates_group: 'How soon should it happen?',
 			organizer_group: 'Who\'s organizing the event?',
 			this_week: "This week",
 			next_week: "Next week",
@@ -31,7 +31,8 @@ export default {
 			event_created_short: "Your event has been created",
 			share_link: "Now share this link with your friends, so they can enter which dates work best for them:",
 			manage_event: "Manage event",
-			poll_event: "Enter your availability"
+			poll_event: "Enter your availability",
+			dates_placeholder: 'Click to enter dates'
 		},
 		event_poll: {
 			welcome: "{eventOrganizer} has invited you to a {eventName}. Please let them know what dates work best for you by answering a few questions.",
