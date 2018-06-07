@@ -1,9 +1,11 @@
 defmodule Smoodle.Scheduler.Event do
   use Ecto.Schema
   alias Smoodle.Scheduler.Event
+  alias Smoodle.Scheduler.Poll
   require Integer
   import Ecto.Changeset
   import SmoodleWeb.Gettext
+  alias Smoodle.Repo
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @owner_token_len 16
@@ -17,6 +19,7 @@ defmodule Smoodle.Scheduler.Event do
     field :scheduled_from, :naive_datetime
     field :scheduled_to, :naive_datetime
     field :desc, :string
+    has_many :polls, Poll
 
     timestamps(usec: false)
   end
@@ -24,6 +27,7 @@ defmodule Smoodle.Scheduler.Event do
   @doc false
   def changeset(%Event{} = event, attrs) do
     event
+    |> Repo.preload(:polls)
     |> cast(attrs, [:name, :organizer, :time_window_from, :time_window_to, :scheduled_from, :scheduled_to, :desc])
     |> validate_required([:name, :organizer, :desc, :time_window_from, :time_window_to])
     |> validate_length(:name, max: 50)
@@ -53,7 +57,7 @@ defmodule Smoodle.Scheduler.Event do
     if Enum.map(keys, &fetch_field(changeset, &1))
       |> Enum.count(&is_nil(elem(&1, 1)))
       |> Integer.is_odd do
-      add_error(changeset, error_key, dgettext("errors", "both ends must be defined or none"), [validation: :only_one_end_defined])
+      add_error(changeset, error_key, dgettext("errors", "both ends must be defined or none"), validation: :only_one_end_defined)
     else
       changeset
     end
@@ -65,7 +69,7 @@ defmodule Smoodle.Scheduler.Event do
       false <- Enum.any?([t1, t2], &is_nil/1),
       :gt <- t.compare(t1, t2)
     do
-      add_error(changeset, error_key, dgettext("errors", "the right side of the window must happen later than the left one"), [validation: :inconsistent_interval])
+      add_error(changeset, error_key, dgettext("errors", "the right side of the window must happen later than the left one"), validation: :inconsistent_interval)
     else
       _ -> changeset
     end
@@ -82,7 +86,7 @@ defmodule Smoodle.Scheduler.Event do
       with %{} <- date_or_time,
         :gt <- t.compare(today, date_or_time)
       do
-        add_error(changeset, key, dgettext("errors", "you cannot schedule an event in the past"), [validation: :in_the_past])
+        add_error(changeset, key, dgettext("errors", "you cannot schedule an event in the past"), validation: :in_the_past)
       else
         _ -> changeset
       end

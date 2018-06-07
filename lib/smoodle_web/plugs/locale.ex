@@ -61,8 +61,6 @@ defmodule SmoodleWeb.Plugs.Locale do
   end
 
   defp locale_from_header(conn, config) do
-    # TODO: proper decoding of a real header: fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
-    # should return "fr"
     parse_accept_language_header(get_req_header(conn, "accept-language"))
     |> Enum.map(&elem(&1, 0))
     |> Enum.map(&Enum.fetch!(String.split(&1, "-"), 0))

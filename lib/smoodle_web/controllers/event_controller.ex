@@ -7,7 +7,7 @@ defmodule SmoodleWeb.EventController do
 
   def index(conn, _params) do
     events = Scheduler.list_events()
-    render(conn, "index.json", events: Enum.map(events, &Map.delete(&1, :owner_token)))
+    render(conn, "index.json", events: Enum.map(events, &Map.drop(&1, [:owner_token, :polls])))
   end
 
   def create(_, %{"event" => event_params, "dry_run" => true} = params) do
@@ -35,7 +35,7 @@ defmodule SmoodleWeb.EventController do
 
   def show(conn, %{"id" => id}) do
     event = Scheduler.get_event!(id)
-    render(conn, "show.json", event: Map.delete(event, :owner_token))
+    render(conn, "show.json", event: Map.drop(event, [:owner_token, :polls]))
   end
 
   def update(conn, %{"id" => id, "event" => event_params = %{"owner_token" => owner_token}}) do

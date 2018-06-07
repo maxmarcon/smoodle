@@ -7,8 +7,8 @@ defmodule Smoodle.Repo.Migrations.CreateEvents do
   		add :name, :string, null: false
       add :organizer, :string, null: false
       add :owner_token, :string, null: false
-  		add :time_window_from, :date
-  		add :time_window_to, :date
+  		add :time_window_from, :date, null: false
+  		add :time_window_to, :date, null: false
   		add :scheduled_from, :naive_datetime
   		add :scheduled_to, :naive_datetime
   		add :desc, :text

@@ -1,14 +1,22 @@
 defmodule Smoodle.Scheduler.Poll do
   use Ecto.Schema
   import Ecto.Changeset
+  alias Smoodle.Scheduler.Event
   alias Smoodle.Scheduler.Poll
+  alias Smoodle.Scheduler.DateRank
+  alias Smoodle.Scheduler.WeekDayRank
+  import SmoodleWeb.Gettext
 
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
 
   schema "polls" do
-    field :bad_dates, {:array, :string}
-    field :good_dates, {:array, :string}
-    field :weekdays_rank, {:map, :string}
-    field :event_id, :id
+    field :participant, :string
+    has_many :dates_ranks, DateRank
+    embeds_one :preferences, Preferences, primary_key: false, on_replace: :delete do
+      embeds_many :weekday_ranks, WeekDayRank
+    end
+    belongs_to :event, Event
 
     timestamps()
   end
@@ -16,7 +24,29 @@ defmodule Smoodle.Scheduler.Poll do
   @doc false
   def changeset(%Poll{} = poll, attrs) do
     poll
-    |> cast(attrs, [:weekdays_rank, :bad_dates, :good_dates])
-    |> validate_required([:weekdays_rank, :bad_dates, :good_dates])
+    |> cast(attrs, [:participant, :event_id])
+    |> validate_required(:participant)
+    |> cast_assoc(:dates_ranks)
+    |> cast_embed(:preferences, with: &preferences_changeset/2)
+    |> assoc_constraint(:event)
+  end
+
+  def preferences_changeset(preferences, attrs) do
+    preferences
+    |> cast(attrs, [])
+    |> cast_embed(:weekday_ranks)
+    |> no_weekday_duplicates
+  end
+
+  def no_weekday_duplicates(changeset) do
+    case fetch_field(changeset, :weekday_ranks) do
+      {_, changes} ->
+          if Enum.count(Enum.uniq_by(changes, fn %{day: day} -> day end)) != Enum.count(changes) do
+            add_error(changeset, :weekday_ranks, dgettext("errors", "you can only rank a weekday once"), validation: :weekday_ranked_twice)
+          else
+            changeset
+          end
+      _ -> changeset
+    end
   end
 end

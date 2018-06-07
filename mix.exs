@@ -42,7 +42,8 @@ defmodule Smoodle.Mixfile do
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
       {:secure_random, "~> 0.5"},
-      {:phoenix_expug, "~> 0.1.1"}
+      {:phoenix_expug, "~> 0.1.1"},
+      {:poison, "~> 3.1"}
     ]
   end
 

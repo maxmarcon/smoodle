@@ -47,19 +47,19 @@ defmodule Smoodle.SchedulerTest do
 
     test "list_events/0 returns all events" do
       events = event_fixture([@valid_attrs_1, @valid_attrs_2])
-      assert MapSet.new(Scheduler.list_events()) == MapSet.new(events)
+      assert MapSet.new(Repo.preload(Scheduler.list_events(), :polls)) == MapSet.new(events)
     end
 
     test "get_event!/1 returns the event with given id" do
       event = event_fixture(@valid_attrs_1)
-      assert Scheduler.get_event!(event.id) == event
+      assert Repo.preload(Scheduler.get_event!(event.id), :polls) == event
     end
 
     test "create_event/2 with valid data creates an event" do
       assert {:ok, %Event{} = event} = Scheduler.create_event(@valid_attrs_1)
       assert Map.take(event, [:name, :desc]) == Map.take(@valid_attrs_1, [:name, :desc])
       assert String.length(event.owner_token) == 32
-      assert Scheduler.get_event!(event.id) == event
+      assert Repo.preload(Scheduler.get_event!(event.id), :polls) == event
     end
 
     test "create_event/2 with valid data for validation does not create an event and returns valid changeset" do
@@ -100,7 +100,7 @@ defmodule Smoodle.SchedulerTest do
     test "update_event/2 with invalid data returns error changeset" do
       event = event_fixture(@valid_attrs_1)
       assert {:error, %Ecto.Changeset{}} = Scheduler.update_event(event, @invalid_attrs)
-      assert event == Scheduler.get_event!(event.id)
+      assert event == Repo.preload(Scheduler.get_event!(event.id), :polls)
     end
 
     test "delete_event/1 deletes the event" do
@@ -110,10 +110,10 @@ defmodule Smoodle.SchedulerTest do
     end
   end
 
-  #describe "polls" do
-  #  alias Smoodle.Scheduler.Poll
+  describe "polls" do
+    alias Smoodle.Scheduler.Poll
 #
-  #  @valid_attrs %{bad_dates: [], good_dates: [], weekdays_rank: "some weekdays_rank"}
+    @valid_attrs %{bad_dates: [], good_dates: [], weekdays_rank: "some weekdays_rank"}
   #  @update_attrs %{bad_dates: [], good_dates: [], weekdays_rank: "some updated weekdays_rank"}
   #  @invalid_attrs %{bad_dates: nil, good_dates: nil, weekdays_rank: nil}
 #

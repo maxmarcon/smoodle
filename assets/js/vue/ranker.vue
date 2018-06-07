@@ -2,7 +2,7 @@
 ul.list-group
 	li.d-flex.justify-content-between.list-group-item(v-for="(el,index) in elements")
 		h5.text-info {{ el.name }}
-		.div
+		.div(style="font-size: 22px;")
 			p-radio.p-icon.p-plain(:name="el.name" :value="2" v-model="el.rank" toggle)
 				i.icon.oi.oi-heart.text-success(slot="extra")
 				i.icon.oi.oi-heart(slot="off-extra")
