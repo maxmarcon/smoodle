@@ -110,10 +110,10 @@ defmodule Smoodle.SchedulerTest do
     end
   end
 
-  describe "polls" do
-    alias Smoodle.Scheduler.Poll
+#  describe "polls" do
+#    alias Smoodle.Scheduler.Poll
 #
-    @valid_attrs %{bad_dates: [], good_dates: [], weekdays_rank: "some weekdays_rank"}
+#    @valid_attrs %{bad_dates: [], good_dates: [], weekdays_rank: "some weekdays_rank"}
   #  @update_attrs %{bad_dates: [], good_dates: [], weekdays_rank: "some updated weekdays_rank"}
   #  @invalid_attrs %{bad_dates: nil, good_dates: nil, weekdays_rank: nil}
 #

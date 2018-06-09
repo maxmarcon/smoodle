@@ -25,20 +25,20 @@ defmodule Smoodle.Scheduler.Poll do
   def changeset(%Poll{} = poll, attrs) do
     poll
     |> cast(attrs, [:participant, :event_id])
-    |> validate_required(:participant)
+    |> validate_required([:participant, :event_id])
     |> cast_assoc(:dates_ranks)
     |> cast_embed(:preferences, with: &preferences_changeset/2)
     |> assoc_constraint(:event)
   end
 
-  def preferences_changeset(preferences, attrs) do
+  defp preferences_changeset(preferences, attrs) do
     preferences
     |> cast(attrs, [])
     |> cast_embed(:weekday_ranks)
     |> no_weekday_duplicates
   end
 
-  def no_weekday_duplicates(changeset) do
+  defp no_weekday_duplicates(changeset) do
     case fetch_field(changeset, :weekday_ranks) do
       {_, changes} ->
           if Enum.count(Enum.uniq_by(changes, fn %{day: day} -> day end)) != Enum.count(changes) do

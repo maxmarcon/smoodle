@@ -20,13 +20,14 @@ defmodule Smoodle.Scheduler.PollTest do
 		event_id: Ecto.UUID.generate()
 	}
 
+
 	def create_event(_) do
 		{:ok, event} = Event.changeset_insert(@event_attrs) |> Repo.insert
 		%{event: event}
 	end
 
 	def build_weekday_ranks(_) do
-		%{weekday_ranks: Enum.map(0..6, fn d -> %{day: d, rank: Enum.random([0, 0.1, 0.2, 0.5, 0.6])} end)}
+		%{weekday_ranks: Enum.map(0..6, fn d -> %{day: d, rank: Enum.random([0, -0.2, -0.1, 0.1, 0.2])} end)}
 	end
 
 	def create_poll(context) do
@@ -48,6 +49,12 @@ defmodule Smoodle.Scheduler.PollTest do
 		changeset = Poll.changeset(%Poll{}, @poll_attrs)
 		assert {:error, changeset} = Repo.insert(changeset)
 		assert [event: {"does not exist", _}] = changeset.errors
+	end
+
+	test "poll cannot be inserted without an event id" do
+		changeset = Poll.changeset(%Poll{}, Map.delete(@poll_attrs, :event_id))
+		refute changeset.valid?
+		assert [event_id: {_, [validation: :required]}] = changeset.errors
 	end
 
 	test "poll cannot be inserted without a participant" do
@@ -83,7 +90,7 @@ defmodule Smoodle.Scheduler.PollTest do
 					@poll_attrs,
 					%{
 						preferences: %{
-							weekday_ranks: List.replace_at(context[:weekday_ranks], 0, %{day: 0, rank: -0.1})
+							weekday_ranks: List.replace_at(context[:weekday_ranks], 0, %{day: 0, rank: "bad"})
 						}
 					}
 				)
@@ -117,7 +124,7 @@ defmodule Smoodle.Scheduler.PollTest do
 					@poll_attrs,
 					%{
 						preferences: %{
-							weekday_ranks: [%{goo: 1}, %{day: 2, rank: 0.1}, "good", 123]
+							weekday_ranks: [%{goo: 1, rank: 0.23}, %{day: 2, rank: 0.1}, "good", 123]
 						}
 					}
 				)

@@ -1,11 +1,13 @@
 defmodule Smoodle.Scheduler.Event do
   use Ecto.Schema
-  alias Smoodle.Scheduler.Event
-  alias Smoodle.Scheduler.Poll
   require Integer
   import Ecto.Changeset
   import SmoodleWeb.Gettext
+
   alias Smoodle.Repo
+  alias Smoodle.Scheduler.Event
+  alias Smoodle.Scheduler.Poll
+  import Smoodle.Scheduler.Utils
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @owner_token_len 16
@@ -60,18 +62,6 @@ defmodule Smoodle.Scheduler.Event do
       add_error(changeset, error_key, dgettext("errors", "both ends must be defined or none"), validation: :only_one_end_defined)
     else
       changeset
-    end
-  end
-
-  defp validate_window_consistent(changeset, keys, error_key, t \\ NaiveDateTime) do
-    with [t1, t2] <- Enum.map(keys, &fetch_field(changeset, &1))
-      |> Enum.map(&elem(&1, 1)),
-      false <- Enum.any?([t1, t2], &is_nil/1),
-      :gt <- t.compare(t1, t2)
-    do
-      add_error(changeset, error_key, dgettext("errors", "the right side of the window must happen later than the left one"), validation: :inconsistent_interval)
-    else
-      _ -> changeset
     end
   end
 

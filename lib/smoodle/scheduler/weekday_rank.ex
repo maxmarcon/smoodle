@@ -14,7 +14,6 @@ defmodule Smoodle.Scheduler.WeekDayRank do
 		weekday_rank
 		|> cast(attrs, [:day, :rank])
 		|> validate_required([:day, :rank])
-		|> validate_number(:rank, greater_than_or_equal_to: 0.0)
 		|> validate_number(:day, greater_than_or_equal_to: 0, less_than: 7)
 	end
 end
