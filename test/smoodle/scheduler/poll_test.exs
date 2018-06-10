@@ -44,6 +44,27 @@ defmodule Smoodle.Scheduler.PollTest do
 		%{poll: poll}
 	end
 
+	def create_date_ranks(_) do
+		%{date_ranks: [
+				%{
+					date_from: ~D[2118-01-12],
+					date_to: ~D[2118-01-12],
+					rank: -0.1
+				},
+				%{
+					date_from: ~D[2118-01-15],
+					date_to: ~D[2118-02-12],
+					rank: +4.0
+				},
+				%{
+					date_from: ~D[2118-02-20],
+					date_to: ~D[2118-03-05],
+					rank: -0.2
+				}
+			]
+		}
+	end
+
 
 	test "poll cannot be inserted without a valid event id" do
 		changeset = Poll.changeset(%Poll{}, @poll_attrs)
@@ -161,6 +182,79 @@ defmodule Smoodle.Scheduler.PollTest do
 				)
 			)
 			assert {:ok, _} = Repo.insert(changeset)
+		end
+	end
+
+	describe "with valid date ranks" do
+
+		setup [:create_event, :create_date_ranks]
+
+		test "the poll can be inserted", context do
+			changeset = Poll.changeset(
+				%Poll{},
+				Map.merge(
+					@poll_attrs,
+					%{
+						event_id: context[:event].id,
+						date_ranks: context[:date_ranks]
+					}
+				)
+			)
+			assert {:ok, p} = Repo.insert(changeset)
+		end
+	end
+
+	describe "with overlapping date ranks" do
+
+		setup [:create_event, :create_date_ranks]
+
+		test "the poll cannot be inserted", context do
+			changeset = Poll.changeset(
+				%Poll{},
+				Map.merge(
+					@poll_attrs,
+					%{
+						event_id: context[:event].id,
+						date_ranks: [
+							%{
+								date_from: ~D[2118-01-31],
+								date_to: ~D[2118-02-14],
+								rank: +4.0
+							}
+							| context[:date_ranks]
+						]
+					}
+				)
+			)
+
+			refute changeset.valid?
+		end
+	end
+
+	describe "with date ranks outside of the event time window" do
+
+		setup [:create_event, :create_date_ranks]
+
+		test "the poll cannot be inserted", context do
+			changeset = Poll.changeset(
+				%Poll{},
+				Map.merge(
+					@poll_attrs,
+					%{
+						event_id: context[:event].id,
+						date_ranks: [
+							%{
+								date_from: ~D[2118-03-10],
+								date_to: ~D[2118-03-22],
+								rank: +4.0
+							}
+							| context[:date_ranks]
+						]
+					}
+				)
+			)
+
+			refute changeset.valid?
 		end
 	end
 

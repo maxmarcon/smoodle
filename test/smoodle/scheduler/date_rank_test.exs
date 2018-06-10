@@ -58,8 +58,9 @@ defmodule Smoodle.Scheduler.DateRankTest do
 
   test "date rank cannot be inserted without a poll id" do
   	changeset = DateRank.changeset(%DateRank{}, Map.delete(@valid_attrs, :poll_id))
-  	refute changeset.valid?
-  	assert [poll_id: {_, [validation: :required]}] = changeset.errors
+  	assert_raise(Mariaex.Error, fn ->
+  		Repo.insert(changeset)
+  	end)
   end
 
 	test "date rank cannot be inserted without a date" do

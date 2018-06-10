@@ -18,7 +18,7 @@ defmodule Smoodle.Scheduler.DateRank do
   def changeset(%DateRank{} = date_rank, attrs) do
   	date_rank
   	|> cast(attrs, [:date_from, :date_to, :rank, :poll_id])
-  	|> validate_required([:date_from, :date_to, :rank, :poll_id])
+  	|> validate_required([:date_from, :date_to, :rank])
     |> validate_window_consistent([:date_from, :date_to], :dates, Date)
   	|> assoc_constraint(:poll)
   end
