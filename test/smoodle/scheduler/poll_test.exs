@@ -254,4 +254,20 @@ defmodule Smoodle.Scheduler.PollTest do
 			assert %{date_ranks: [{_, [validation: :date_ranks_outside_of_event_window]}]} = traverse_errors(changeset, &(&1))
 		end
 	end
+
+	describe "with date ranks inside the event time window" do
+
+		setup [:create_date_ranks]
+
+		test "the poll is valid", context do
+
+			changeset = change(%Poll{})
+			|> put_assoc(:event, struct(Event, @event_attrs))
+			|> Poll.changeset(Map.merge(@poll_attrs,
+				%{date_ranks: context[:date_ranks] }
+			))
+
+			assert changeset.valid?
+		end
+	end
 end

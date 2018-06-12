@@ -35,12 +35,12 @@ defmodule Smoodle.Scheduler.Poll do
   end
 
   defp date_ranks_within_event_time_window(changeset) do
-    with %Event{} = event <- get_field(changeset, :event) do
+    with %Event{time_window_from: from, time_window_to: to} <- get_field(changeset, :event) do
       if changeset
         |> get_field(:date_ranks)
         |> Enum.flat_map(&([&1.date_from, &1.date_to]))
         |> Enum.all?(fn date ->
-          Enum.member?(Date.range(event.time_window_from, event.time_window_to), date)
+          Enum.member?(Date.range(from, to), date)
         end) do
         changeset
       else
