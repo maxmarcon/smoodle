@@ -16,8 +16,7 @@ defmodule Smoodle.Scheduler.PollTest do
 	}
 
 	@poll_attrs %{
-		participant: "Betty Davies",
-		event_id: Ecto.UUID.generate()
+		participant: "Betty Davies"
 	}
 
 	def build_weekday_ranks(_) do
@@ -45,17 +44,35 @@ defmodule Smoodle.Scheduler.PollTest do
 		}
 	end
 
-
-	test "poll is invalid without a valid event id" do
+	test "poll with basic data is valid" do
 		changeset = Poll.changeset(%Poll{}, @poll_attrs)
-		assert {:error, changeset} = Repo.insert(changeset)
-		assert [event: {"does not exist", _}] = changeset.errors
+		assert changeset.valid?
 	end
 
 	test "poll is invalid without a participant" do
 		changeset = Poll.changeset(%Poll{}, Map.delete(@poll_attrs, :participant))
-		assert {:error, changeset} = Repo.insert(changeset)
+		refute changeset.valid?
 		assert [participant: {_, [validation: :required]}] = changeset.errors
+	end
+
+	describe "with valid weekday_ranks" do
+
+		setup :build_weekday_ranks
+
+		test "poll is valid ", context do
+			changeset = Poll.changeset(
+				%Poll{},
+				Map.merge(
+					@poll_attrs,
+					%{
+						preferences: %{
+							weekday_ranks: context[:weekday_ranks]
+						}
+					}
+				)
+			)
+			assert changeset.valid?
+		end
 	end
 
 	describe "with invalid weekday_ranks" do
@@ -205,7 +222,7 @@ defmodule Smoodle.Scheduler.PollTest do
 
 	describe "with bogus date ranks" do
 
-		test "the poll is invalid", context do
+		test "the poll is invalid" do
 
 			changeset = Poll.changeset(%Poll{}, Map.merge(@poll_attrs, %{date_ranks: "foo"}))
 
