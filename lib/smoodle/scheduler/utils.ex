@@ -42,6 +42,16 @@ defmodule Smoodle.Scheduler.Utils do
     end
   end
 
+  @doc """
+		iex> Smoodle.Scheduler.Utils.<=(~D[2018-02-01], ~D[2018-02-02])
+		true
+
+		iex> Smoodle.Scheduler.Utils.<=(~D[2018-02-01], ~D[2018-02-01])
+		true
+
+		iex> Smoodle.Scheduler.Utils.<=(~D[2018-02-01], ~D[2018-01-31])
+		false
+  """
   def (%Date{} = d1)<=(%Date{} = d2) do
   	Date.compare(d1, d2) != :gt
  	end
