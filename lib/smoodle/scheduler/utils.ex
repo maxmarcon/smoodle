@@ -41,4 +41,8 @@ defmodule Smoodle.Scheduler.Utils do
       _ -> changeset
     end
   end
+
+  def (%Date{} = d1)<=(%Date{} = d2) do
+  	Date.compare(d1, d2) != :gt
+ 	end
 end

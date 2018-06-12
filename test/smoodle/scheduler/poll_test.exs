@@ -47,11 +47,6 @@ defmodule Smoodle.Scheduler.PollTest do
 	def create_date_ranks(_) do
 		%{date_ranks: [
 				%{
-					date_from: ~D[2118-01-12],
-					date_to: ~D[2118-01-12],
-					rank: -0.1
-				},
-				%{
 					date_from: ~D[2118-01-15],
 					date_to: ~D[2118-02-12],
 					rank: +4.0
@@ -60,6 +55,11 @@ defmodule Smoodle.Scheduler.PollTest do
 					date_from: ~D[2118-02-20],
 					date_to: ~D[2118-03-05],
 					rank: -0.2
+				},
+				%{
+					date_from: ~D[2118-01-12],
+					date_to: ~D[2118-01-12],
+					rank: -0.1
 				}
 			]
 		}
@@ -74,8 +74,9 @@ defmodule Smoodle.Scheduler.PollTest do
 
 	test "poll cannot be inserted without an event id" do
 		changeset = Poll.changeset(%Poll{}, Map.delete(@poll_attrs, :event_id))
-		refute changeset.valid?
-		assert [event_id: {_, [validation: :required]}] = changeset.errors
+		assert_raise(Mariaex.Error, fn ->
+			Repo.insert changeset
+		end)
 	end
 
 	test "poll cannot be inserted without a participant" do
@@ -228,6 +229,7 @@ defmodule Smoodle.Scheduler.PollTest do
 			)
 
 			refute changeset.valid?
+			assert %{date_ranks: [{_, [validation: :overlapping_date_ranks]}]} = traverse_errors(changeset, &(&1))
 		end
 	end
 
@@ -267,7 +269,7 @@ defmodule Smoodle.Scheduler.PollTest do
 			new_weekday_ranks = [%{day: 0, rank: 0.1}, %{day: 6, rank: 0.2}]
 
 			changeset = Poll.changeset(
-				context[:poll],
+				Repo.preload(context[:poll], :date_ranks),
 				%{
 					preferences: %{
 						weekday_ranks: new_weekday_ranks
