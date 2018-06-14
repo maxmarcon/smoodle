@@ -11,11 +11,6 @@ defmodule Smoodle.Scheduler do
   @doc """
   Returns the list of events.
 
-  ## Examples
-
-      iex> list_events()
-      [%Event{}, ...]
-
   """
   def list_events do
     Repo.all(Event)
@@ -25,11 +20,6 @@ defmodule Smoodle.Scheduler do
   Gets a single event.
 
   Raises if the Event does not exist.
-
-  ## Examples
-
-      iex> get_event!(123)
-      %Event{}
 
   """
   def get_event!(id) do
@@ -48,15 +38,7 @@ defmodule Smoodle.Scheduler do
 
 
   @doc """
-  Creates a event.
-
-  ## Examples
-
-      iex> create_event(%{field: value})
-      {:ok, %Event{}}
-
-      iex> create_event(%{field: bad_value})
-      {:error, ...}
+  Creates an event.
 
   """
   def create_event(attrs, opts \\ [])
@@ -74,14 +56,6 @@ defmodule Smoodle.Scheduler do
   @doc """
   Updates a event.
 
-  ## Examples
-
-      iex> update_event(event, %{field: new_value})
-      {:ok, %Event{}}
-
-      iex> update_event(event, %{field: bad_value})
-      {:error, ...}
-
   """
   def update_event(%Event{} = event, attrs) do
     event
@@ -92,14 +66,6 @@ defmodule Smoodle.Scheduler do
   @doc """
   Deletes a Event.
 
-  ## Examples
-
-      iex> delete_event(event)
-      {:ok, %Event{}}
-
-      iex> delete_event(event)
-      {:error, ...}
-
   """
   def delete_event(%Event{} = event) do
     Repo.delete(event)
@@ -109,11 +75,6 @@ defmodule Smoodle.Scheduler do
 
   @doc """
   Returns the list of polls.
-
-  ## Examples
-
-      iex> list_polls()
-      [%Poll{}, ...]
 
   """
   def list_polls do
@@ -134,36 +95,22 @@ defmodule Smoodle.Scheduler do
       ** (Ecto.NoResultsError)
 
   """
-  def get_poll!(id), do: Repo.get!(Poll, id)
+  def get_poll!(id) do
+    Repo.get!(Poll, id)
+  end
 
   @doc """
   Creates a poll.
 
-  ## Examples
-
-      iex> create_poll(%{field: value})
-      {:ok, %Poll{}}
-
-      iex> create_poll(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
   """
-  def create_poll(attrs \\ %{}) do
-    %Poll{}
+  def create_poll(%Event{} = event, attrs \\ %{}) do
+    Ecto.build_assoc(event, :polls)
     |> Poll.changeset(attrs)
     |> Repo.insert()
   end
 
   @doc """
   Updates a poll.
-
-  ## Examples
-
-      iex> update_poll(poll, %{field: new_value})
-      {:ok, %Poll{}}
-
-      iex> update_poll(poll, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
 
   """
   def update_poll(%Poll{} = poll, attrs) do
@@ -173,31 +120,10 @@ defmodule Smoodle.Scheduler do
   end
 
   @doc """
-  Deletes a Poll.
-
-  ## Examples
-
-      iex> delete_poll(poll)
-      {:ok, %Poll{}}
-
-      iex> delete_poll(poll)
-      {:error, %Ecto.Changeset{}}
+  Deletes a poll
 
   """
   def delete_poll(%Poll{} = poll) do
     Repo.delete(poll)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking poll changes.
-
-  ## Examples
-
-      iex> change_poll(poll)
-      %Ecto.Changeset{source: %Poll{}}
-
-  """
-  def change_poll(%Poll{} = poll) do
-    Poll.changeset(poll, %{})
   end
 end
