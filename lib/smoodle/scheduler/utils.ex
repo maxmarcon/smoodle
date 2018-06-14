@@ -43,16 +43,22 @@ defmodule Smoodle.Scheduler.Utils do
   end
 
   @doc """
-		iex> Smoodle.Scheduler.Utils.<=(~D[2018-02-01], ~D[2018-02-02])
+		iex> Smoodle.Scheduler.Utils.date_lte(~D[2018-02-01], ~D[2018-02-02])
 		true
 
-		iex> Smoodle.Scheduler.Utils.<=(~D[2018-02-01], ~D[2018-02-01])
+		iex> Smoodle.Scheduler.Utils.date_lte(~D[2018-02-01], ~D[2018-02-01])
 		true
 
-		iex> Smoodle.Scheduler.Utils.<=(~D[2018-02-01], ~D[2018-01-31])
+		iex> Smoodle.Scheduler.Utils.date_lte(~D[2018-02-01], ~D[2018-01-31])
 		false
   """
-  def (%Date{} = d1)<=(%Date{} = d2) do
+  def date_lte(%Date{} = d1, %Date{} = d2) do
   	Date.compare(d1, d2) != :gt
  	end
+
+ 	def trim_text_fields(changeset, fields) do
+    Enum.reduce(fields, changeset, fn field, changeset ->
+    	update_change(changeset, field, &String.trim/1)
+    end)
+  end
 end

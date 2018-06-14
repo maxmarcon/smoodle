@@ -40,19 +40,12 @@ defmodule Smoodle.Scheduler.Event do
     |> validate_window_consistent([:scheduled_from, :scheduled_to], :scheduled)
     |> validate_is_the_future([:scheduled_from, :scheduled_to])
     |> validate_is_the_future([:time_window_from, :time_window_to], Date)
-    |> trim_text_fields
+    |> trim_text_fields([:name, :organizer, :desc])
   end
 
   def changeset_insert(attrs) do
     changeset(%Event{}, attrs) |>
     change(%{owner_token: SecureRandom.urlsafe_base64(@owner_token_len)})
-  end
-
-  defp trim_text_fields(changeset) do
-    changeset
-    |> update_change(:name, &String.trim/1)
-    |> update_change(:organizer, &String.trim/1)
-    |> update_change(:desc, &String.trim/1)
   end
 
   defp validate_window_defined(changeset, keys, error_key) do

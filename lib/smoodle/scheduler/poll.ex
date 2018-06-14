@@ -6,7 +6,7 @@ defmodule Smoodle.Scheduler.Poll do
   alias Smoodle.Scheduler.DateRank
   alias Smoodle.Scheduler.WeekDayRank
   import SmoodleWeb.Gettext
-  alias Smoodle.Scheduler.Utils
+  import Smoodle.Scheduler.Utils
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -29,12 +29,13 @@ defmodule Smoodle.Scheduler.Poll do
     |> validate_required([:participant])
     |> cast_assoc(:date_ranks)
     |> cast_embed(:preferences, with: &preferences_changeset/2)
-    |> no_overlapping_date_ranks
-    |> date_ranks_within_event_time_window
+    |> validate_no_overlapping_date_ranks
+    |> validate_date_ranks_within_event_time_window
     |> assoc_constraint(:event)
+    |> trim_text_fields([:participant])
   end
 
-  defp date_ranks_within_event_time_window(changeset) do
+  defp validate_date_ranks_within_event_time_window(changeset) do
     with %Event{time_window_from: from, time_window_to: to} <- get_field(changeset, :event) do
       if changeset
         |> get_field(:date_ranks)
@@ -51,13 +52,13 @@ defmodule Smoodle.Scheduler.Poll do
     end
   end
 
-  defp no_overlapping_date_ranks(changeset) do
+  defp validate_no_overlapping_date_ranks(changeset) do
     flattened_ranks_sorted_by_date_from = changeset
     |> get_field(:date_ranks)
-    |> Enum.sort_by(&(&1.date_from), &Utils.<=/2)
+    |> Enum.sort_by(&(&1.date_from), &date_lte/2)
     |> Enum.flat_map(&([&1.date_from, &1.date_to]))
 
-    if flattened_ranks_sorted_by_date_from != Enum.sort(flattened_ranks_sorted_by_date_from, &Utils.<=/2) do
+    if flattened_ranks_sorted_by_date_from != Enum.sort(flattened_ranks_sorted_by_date_from, &date_lte/2) do
       add_error(changeset, :date_ranks, dgettext("errors", "dates cannot overlap"), validation: :overlapping_date_ranks)
     else
       changeset
@@ -68,10 +69,10 @@ defmodule Smoodle.Scheduler.Poll do
     preferences
     |> cast(attrs, [])
     |> cast_embed(:weekday_ranks)
-    |> no_weekday_duplicates
+    |> validate_no_weekday_duplicates
   end
 
-  defp no_weekday_duplicates(changeset) do
+  defp validate_no_weekday_duplicates(changeset) do
     case fetch_field(changeset, :weekday_ranks) do
       {_, changes} ->
         if Enum.count(Enum.uniq_by(changes, fn %{day: day} -> day end)) != Enum.count(changes) do
