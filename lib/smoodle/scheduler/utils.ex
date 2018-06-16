@@ -51,9 +51,16 @@ defmodule Smoodle.Scheduler.Utils do
 
 		iex> Smoodle.Scheduler.Utils.date_lte(~D[2018-02-01], ~D[2018-01-31])
 		false
+
+		iex> Smoodle.Scheduler.Utils.date_lte(nil, ~D[2018-01-31])
+		true
   """
-  def date_lte(%Date{} = d1, %Date{} = d2) do
+  def date_lte(d1, d2) when is_map(d1) and is_map(d2) do
   	Date.compare(d1, d2) != :gt
+ 	end
+
+  def date_lte(d1, d2) do
+  	true
  	end
 
  	@doc """

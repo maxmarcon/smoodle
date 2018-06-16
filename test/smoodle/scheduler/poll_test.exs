@@ -193,7 +193,7 @@ defmodule Smoodle.Scheduler.PollTest do
 		end
 	end
 
-	describe "with other overlapping date ranks" do
+	describe "with more overlapping date ranks" do
 
 		setup [:create_date_ranks]
 

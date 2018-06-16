@@ -12,7 +12,7 @@ defmodule Smoodle.Scheduler.Poll do
 
   schema "polls" do
     field :participant, :string
-    has_many :date_ranks, DateRank
+    has_many :date_ranks, DateRank, on_replace: :delete
     embeds_one :preferences, Preferences, primary_key: false, on_replace: :delete do
       embeds_many :weekday_ranks, WeekDayRank
     end
@@ -40,6 +40,7 @@ defmodule Smoodle.Scheduler.Poll do
       if changeset
         |> get_field(:date_ranks)
         |> Enum.flat_map(&([&1.date_from, &1.date_to]))
+        |> Enum.filter(&(!is_nil(&1)))
         |> Enum.all?(fn date ->
           Enum.member?(Date.range(from, to), date)
         end) do
@@ -57,6 +58,7 @@ defmodule Smoodle.Scheduler.Poll do
     |> get_field(:date_ranks)
     |> Enum.sort_by(&(&1.date_from), &date_lte/2)
     |> Enum.flat_map(&(Enum.uniq([&1.date_from, &1.date_to])))
+    |> Enum.filter(&(!is_nil(&1)))
 
     all_dates_sorted = Enum.sort(flattened_ranks_sorted_by_date_from, &date_lte/2)
 
