@@ -115,6 +115,7 @@ defmodule Smoodle.Scheduler do
   """
   def update_poll(%Poll{} = poll, attrs) do
     poll
+    |> Repo.preload([:event, :date_ranks])
     |> Poll.changeset(attrs)
     |> Repo.update()
   end

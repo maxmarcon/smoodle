@@ -58,26 +58,26 @@ defmodule Smoodle.Scheduler.Utils do
 
  	@doc """
 		iex> cs = Ecto.Changeset.change({%{name: " Snoopy "}, %{name: :string, job: :string}}, %{job: "		dog"})
-		iex> cs = Smoodle.Scheduler.Utils.trim_text_fields(cs, [:name, :job])
+		iex> cs = Smoodle.Scheduler.Utils.trim_text_changes(cs, [:name, :job])
 		iex> Ecto.Changeset.apply_changes(cs)
 		%{name: " Snoopy ", job: "dog"}
 
 		iex> cs = Ecto.Changeset.change({%{name: " Snoopy  "}, %{name: :string, job: :string}}, %{name: "Snoopy ", job: "		dog"})
-		iex> cs = Smoodle.Scheduler.Utils.trim_text_fields(cs, [:name, :job])
+		iex> cs = Smoodle.Scheduler.Utils.trim_text_changes(cs, [:name, :job])
 		iex> Ecto.Changeset.apply_changes(cs)
 		%{name: "Snoopy", job: "dog"}
 
 		iex> cs = Ecto.Changeset.change({%{name: " Snoopy	", job: "		dog"}, %{name: :string, job: :string}})
-		iex> cs = Smoodle.Scheduler.Utils.trim_text_fields(cs, [])
+		iex> cs = Smoodle.Scheduler.Utils.trim_text_changes(cs, [])
 		iex> Ecto.Changeset.apply_changes(cs)
 		%{name: " Snoopy	", job: "		dog"}
 
 		iex> cs = Ecto.Changeset.change({%{name: " Snoopy	", job: "		dog"}, %{name: :string, job: :string}}, %{name: "Snoopy	", job: "		dog"})
-		iex> cs = Smoodle.Scheduler.Utils.trim_text_fields(cs, [])
+		iex> cs = Smoodle.Scheduler.Utils.trim_text_changes(cs, [])
 		iex> Ecto.Changeset.apply_changes(cs)
 		%{name: "Snoopy	", job: "		dog"}
  	"""
- 	def trim_text_fields(changeset, fields) do
+ 	def trim_text_changes(changeset, fields) do
     Enum.reduce(fields, changeset, fn field, cs ->
     	update_change(cs, field, &String.trim/1)
     end)

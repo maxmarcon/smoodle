@@ -10,6 +10,6 @@ defmodule Smoodle.Repo.Migrations.CreatePolls do
       timestamps()
     end
 
-    #create unique_index(:polls, [:event_id, :participant])
+    create unique_index(:polls, [:event_id, :participant])
   end
 end

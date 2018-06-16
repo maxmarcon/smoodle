@@ -40,7 +40,7 @@ defmodule Smoodle.Scheduler.Event do
     |> validate_window_consistent([:scheduled_from, :scheduled_to], :scheduled)
     |> validate_is_the_future([:scheduled_from, :scheduled_to])
     |> validate_is_the_future([:time_window_from, :time_window_to], Date)
-    |> trim_text_fields([:name, :organizer, :desc])
+    |> trim_text_changes([:name, :organizer, :desc])
   end
 
   def changeset_insert(attrs) do

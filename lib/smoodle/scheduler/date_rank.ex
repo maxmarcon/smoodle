@@ -4,8 +4,6 @@ defmodule Smoodle.Scheduler.DateRank do
   alias Smoodle.Scheduler.DateRank
   import Smoodle.Scheduler.Utils
 
-  @foreign_key_type :binary_id
-
   schema "date_ranks" do
   	field :date_from, :date
   	field :date_to, :date

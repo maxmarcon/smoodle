@@ -8,7 +8,6 @@ defmodule Smoodle.Scheduler.Poll do
   import SmoodleWeb.Gettext
   import Smoodle.Scheduler.Utils
 
-  @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
   schema "polls" do
@@ -32,7 +31,8 @@ defmodule Smoodle.Scheduler.Poll do
     |> validate_no_overlapping_date_ranks
     |> validate_date_ranks_within_event_time_window
     |> assoc_constraint(:event)
-    |> trim_text_fields([:participant])
+    |> unique_constraint(:participant, name: :polls_event_id_participant_index)
+    |> trim_text_changes([:participant])
   end
 
   defp validate_date_ranks_within_event_time_window(changeset) do
@@ -56,9 +56,11 @@ defmodule Smoodle.Scheduler.Poll do
     flattened_ranks_sorted_by_date_from = changeset
     |> get_field(:date_ranks)
     |> Enum.sort_by(&(&1.date_from), &date_lte/2)
-    |> Enum.flat_map(&([&1.date_from, &1.date_to]))
+    |> Enum.flat_map(&(Enum.uniq([&1.date_from, &1.date_to])))
 
-    if flattened_ranks_sorted_by_date_from != Enum.sort(flattened_ranks_sorted_by_date_from, &date_lte/2) do
+    all_dates_sorted = Enum.sort(flattened_ranks_sorted_by_date_from, &date_lte/2)
+
+    if flattened_ranks_sorted_by_date_from != all_dates_sorted || Enum.uniq(all_dates_sorted) != all_dates_sorted do
       add_error(changeset, :date_ranks, dgettext("errors", "dates cannot overlap"), validation: :overlapping_date_ranks)
     else
       changeset

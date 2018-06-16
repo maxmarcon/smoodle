@@ -178,8 +178,8 @@ defmodule Smoodle.Scheduler.PollTest do
 					%{
 						date_ranks: [
 							%{
-								date_from: ~D[2118-01-31],
-								date_to: ~D[2118-02-14],
+								date_from: ~D[2118-03-05],
+								date_to: ~D[2118-03-06],
 								rank: +4.0
 							}
 							| context[:date_ranks]

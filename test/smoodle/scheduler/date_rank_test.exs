@@ -20,8 +20,7 @@ defmodule Smoodle.Scheduler.DateRankTest do
   @valid_attrs %{
   	date_from: "2017-02-01",
   	date_to: "2017-03-24",
-  	rank: 0.2,
-		poll_id: Ecto.UUID.generate()
+  	rank: 0.2
   }
 
   test "date rank is valid with valid data" do
