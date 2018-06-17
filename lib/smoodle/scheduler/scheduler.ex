@@ -101,24 +101,41 @@ defmodule Smoodle.Scheduler do
 
   @doc """
   Creates a poll.
-
   """
-  def create_poll(%Event{} = event, attrs \\ %{}) do
+  def create_poll(event, attrs, opts \\ [])
+
+  def create_poll(%Event{} = event, attrs, dry_run: true) do
+    Ecto.build_assoc(event, :polls)
+    |> Poll.changeset(attrs)
+  end
+
+  def create_poll(%Event{} = event, attrs, _) do
     Ecto.build_assoc(event, :polls)
     |> Poll.changeset(attrs)
     |> Repo.insert()
   end
 
+
+
   @doc """
   Updates a poll.
 
   """
-  def update_poll(%Poll{} = poll, attrs) do
+  def update_poll(poll, attrs, opts \\ [])
+
+  def update_poll(%Poll{} = poll, attrs, dry_run: true) do
+    poll
+    |> Repo.preload([:event, :date_ranks])
+    |> Poll.changeset(attrs)
+  end
+
+  def update_poll(%Poll{} = poll, attrs, _) do
     poll
     |> Repo.preload([:event, :date_ranks])
     |> Poll.changeset(attrs)
     |> Repo.update()
   end
+
 
   @doc """
   Deletes a poll

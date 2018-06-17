@@ -43,12 +43,14 @@ defmodule Smoodle.SchedulerTest do
     end
 
     test "list_events/0 returns all events", context do
-      assert MapSet.new(Repo.preload(Scheduler.list_events(), :polls)) == MapSet.new(context[:events])
+      events = Repo.preload(Scheduler.list_events(), :polls)
+      assert MapSet.new(events) == MapSet.new(context[:events])
     end
 
     test "get_event!/1 returns the event with given id", context do
-      [event | _] = context[:events]
-      assert Repo.preload(Scheduler.get_event!(event.id), :polls) == event
+      [event1 | _] = context[:events]
+      event = Repo.preload(Scheduler.get_event!(event1.id), :polls)
+      assert event == event1
     end
   end
 
@@ -132,7 +134,7 @@ defmodule Smoodle.SchedulerTest do
   }
 
   @poll_valid_attrs_2 %{
-    participant: "Betty Davies",
+    participant: "Kim Novak",
     preferences: %{
       weekday_ranks: [
         %{
@@ -148,7 +150,7 @@ defmodule Smoodle.SchedulerTest do
   }
 
   @poll_valid_attrs_3 %{
-    participant: "Betty Davies",
+    participant: "Michael Jordan",
     preferences: %{
       weekday_ranks: [
         %{
@@ -208,6 +210,26 @@ defmodule Smoodle.SchedulerTest do
     }
   ]
 
+  describe "when retrieving polls" do
+
+    setup do
+      {:ok, event} = Scheduler.create_event(@event_valid_attrs_1)
+      {:ok, poll1} = Scheduler.create_poll(event, @poll_valid_attrs_1)
+      {:ok, poll2} = Scheduler.create_poll(event, @poll_valid_attrs_2)
+      %{event: event, polls: [poll1, poll2]}
+    end
+
+    test "get_poll!/1 fetches a poll", context do
+      [poll1 | _] = context[:polls]
+      poll = Scheduler.get_poll!(poll1.id)
+      assert poll == poll1
+    end
+
+    test "list_polls/0 fetches all polls", context do
+      polls = Scheduler.list_polls
+      assert MapSet.new(polls) == MapSet.new(context[:polls])
+    end
+  end
 
   describe "when creating a poll" do
 
@@ -217,30 +239,41 @@ defmodule Smoodle.SchedulerTest do
       %{event: event, poll: poll}
     end
 
-    test "can create a simple poll for an event", context do
+    test "create_poll/3 valid data", context do
       assert {:ok, poll = %Poll{}} = Scheduler.create_poll(context[:event], @poll_valid_attrs_1)
       assert @poll_valid_attrs_1 = poll
       assert poll.event_id == context[:event].id
     end
 
-    test "cannot create a poll for an event without id", context do
+    test "create_poll/3 valid data for dry run does not create poll and returns valid changeset", context do
+      assert changeset = Scheduler.create_poll(context[:event], @poll_valid_attrs_1, dry_run: true)
+      assert changeset.valid?
+      assert 1 = Repo.one(from p in Poll, select: count(p.id))
+    end
+
+    test "create_poll/3 event without id", context do
       assert_raise(Mariaex.Error, fn ->
         Scheduler.create_poll(Map.delete(context[:event], :id), @poll_valid_attrs_1)
       end)
     end
 
-    test "cannot create 2 polls for the same event and participant", context do
-      assert {:ok, _} = Scheduler.create_poll(context[:event], @poll_valid_attrs_1)
-      assert {:error, changeset} = Scheduler.create_poll(context[:event], @poll_valid_attrs_1)
-      assert %{participant: [{_, []}]} = traverse_errors(changeset, &(&1))
+    test "create_poll/3 with invalid data returns changeset with errors", context do
+      assert {:error, changeset} = Scheduler.create_poll(context[:event], Map.delete(@poll_valid_attrs_2, :participant))
+      assert %{participant: [{_, validation: :required}]} = traverse_errors(changeset, &(&1))
     end
 
-    test "can create a poll with weekday ranks", context do
+    test "create_poll/3 with invalid data for dry run returns changeset with errors", context do
+      changeset = Scheduler.create_poll(context[:event], Map.delete(@poll_valid_attrs_2, :participant), dry_run: true)
+      refute changeset.valid?
+      assert %{participant: [{_, validation: :required}]} = traverse_errors(changeset, &(&1))
+    end
+
+    test "create_poll/3 with weekday ranks", context do
       assert {:ok, poll = %Poll{}} = Scheduler.create_poll(context[:event], @poll_valid_attrs_2)
       assert @poll_valid_attrs_2 = poll
     end
 
-    test "can create a poll with date ranks", context do
+    test "create_poll/3 poll with date ranks", context do
       assert {:ok, poll = %Poll{}} = Scheduler.create_poll(context[:event], @poll_valid_attrs_3)
       expected_date_ranks = Enum.map(@poll_valid_attrs_3[:date_ranks], fn dr_attr ->
         %{
@@ -258,10 +291,10 @@ defmodule Smoodle.SchedulerTest do
       end)
     end
 
-    test "cannot create a poll with the same event and participant as another one", context do
+    test "create_poll/3 with the same event and participant as another one", context do
       assert {:error, changeset} = Scheduler.create_poll(
         context[:event],
-        Map.replace(@poll_valid_attrs_1, :participant, context[:poll].participant)
+        Map.replace!(@poll_valid_attrs_1, :participant, context[:poll].participant)
       )
       assert %{participant: [{_, _}]} = traverse_errors(changeset, &(&1))
     end
@@ -275,20 +308,44 @@ defmodule Smoodle.SchedulerTest do
       %{event: event, poll: poll}
     end
 
-    test "can update the basic information", context do
+    test "update_poll/3 with basic information", context do
       assert {:ok, poll = %Poll{}} = Scheduler.update_poll(context[:poll], %{participant: "Mike"})
       assert %{participant: "Mike"} = poll
     end
 
-    test "can update the weekday_ranks", context do
+    test "update_poll/3 with invalid data for dry run does not update the poll and returns invalid changeset", context do
+      changeset = Scheduler.update_poll(context[:poll], %{participant: 1}, dry_run: true)
+      refute changeset.valid?
+      assert %{participant: [{_, [type: :string, validation: :cast]}]} = traverse_errors(changeset, &(&1))
+    end
+
+    test "update_poll/3 with weekday_ranks", context do
       assert {:ok, poll = %Poll{}} = Scheduler.update_poll(context[:poll],
         %{preferences: %{ weekday_ranks: @new_weekday_ranks } }
       )
       assert @new_weekday_ranks = poll.preferences.weekday_ranks
-      assert 3 = Enum.count(poll.preferences.weekday_ranks)
+      assert Enum.count(@new_weekday_ranks) == Enum.count(poll.preferences.weekday_ranks)
     end
 
-    test "can update the date ranks", context do
+    test "update_poll/3 valid data for dry run does not update the poll and returns valid changeset", context do
+      changeset = Scheduler.update_poll(context[:poll], %{participant: "Mike"}, dry_run: true)
+      assert changeset.valid?
+      assert context[:poll].participant == Repo.get!(Poll, context[:poll].id).participant
+    end
+
+    test "update_poll/3 with invalid data returns changeset with errors", context do
+      assert {:error, changeset} = Scheduler.update_poll(context[:poll], %{participant: 1})
+      refute changeset.valid?
+      assert %{participant: [{_, [type: :string, validation: :cast]}]} = traverse_errors(changeset, &(&1))
+    end
+
+    test "update_poll/3 with invalid data returns error changeset", context do
+      changeset = Scheduler.update_poll(context[:poll], %{participant: 1}, dry_run: true)
+      refute changeset.valid?
+      assert %{participant: [{_, [type: :string, validation: :cast]}]} = traverse_errors(changeset, &(&1))
+    end
+
+    test "update_poll/3 with date ranks", context do
       assert {:ok, poll = %Poll{}} = Scheduler.update_poll(context[:poll],
         %{date_ranks: @new_date_ranks}
       )
@@ -299,7 +356,7 @@ defmodule Smoodle.SchedulerTest do
           rank: dr_attr.rank
         }
       end)
-      assert 2 = Repo.one(from p in DateRank, select: count(p.id))
+      assert Enum.count(@new_date_ranks) == Repo.one(from p in DateRank, select: count(p.id))
     end
   end
 
@@ -311,7 +368,7 @@ defmodule Smoodle.SchedulerTest do
       %{event: event, poll: poll}
     end
 
-    test "the poll can be deleted", context do
+    test "delete_poll/3 works", context do
       {:ok, poll} = Scheduler.delete_poll(context[:poll])
       assert_raise Ecto.NoResultsError, fn -> Scheduler.get_poll!(poll.id) end
       assert 0 = Repo.one(from p in DateRank, select: count(p.id))

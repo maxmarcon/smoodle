@@ -18,7 +18,7 @@ defmodule Smoodle.Scheduler.Poll do
     end
     belongs_to :event, Event
 
-    timestamps()
+    timestamps(usec: false)
   end
 
   @doc false
@@ -39,8 +39,8 @@ defmodule Smoodle.Scheduler.Poll do
     with %Event{time_window_from: from, time_window_to: to} <- get_field(changeset, :event) do
       if changeset
         |> get_field(:date_ranks)
+        |> Enum.filter(&(!is_nil(&1.date_from) && !is_nil(&1.date_to)))
         |> Enum.flat_map(&([&1.date_from, &1.date_to]))
-        |> Enum.filter(&(!is_nil(&1)))
         |> Enum.all?(fn date ->
           Enum.member?(Date.range(from, to), date)
         end) do
@@ -56,9 +56,9 @@ defmodule Smoodle.Scheduler.Poll do
   defp validate_no_overlapping_date_ranks(changeset) do
     flattened_ranks_sorted_by_date_from = changeset
     |> get_field(:date_ranks)
+    |> Enum.filter(&(!is_nil(&1.date_from) && !is_nil(&1.date_to)))
     |> Enum.sort_by(&(&1.date_from), &date_lte/2)
     |> Enum.flat_map(&(Enum.uniq([&1.date_from, &1.date_to])))
-    |> Enum.filter(&(!is_nil(&1)))
 
     all_dates_sorted = Enum.sort(flattened_ranks_sorted_by_date_from, &date_lte/2)
 

@@ -10,7 +10,7 @@ defmodule Smoodle.Scheduler.DateRank do
   	field :rank, :float
   	belongs_to :poll, Poll
 
-    timestamps()
+    timestamps(usec: false)
   end
 
   def changeset(%DateRank{} = date_rank, attrs) do
