@@ -225,8 +225,8 @@ defmodule Smoodle.SchedulerTest do
       assert poll == poll1
     end
 
-    test "list_polls/0 fetches all polls", context do
-      polls = Scheduler.list_polls
+    test "list_polls/1 fetches all polls for an event", context do
+      polls = Scheduler.list_polls(context[:event])
       assert MapSet.new(polls) == MapSet.new(context[:polls])
     end
   end

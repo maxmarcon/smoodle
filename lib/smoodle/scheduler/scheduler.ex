@@ -77,8 +77,9 @@ defmodule Smoodle.Scheduler do
   Returns the list of polls.
 
   """
-  def list_polls do
-    Repo.all(Poll)
+  def list_polls(%Event{} = event) do
+    filter = [event_id: event.id]
+    Repo.all(from p in Poll, where: ^filter)
   end
 
   @doc """

@@ -28,8 +28,10 @@ defmodule SmoodleWeb.Router do
     pipe_through :api
 
     resources "/events", EventController, except: [:new, :edit] do
-      resources "/polls", PollController, except: [:new, :edit, :delete]
+      resources "/polls", PollController, only: [:create, :index]
     end
+
+    resources "/polls", PollController, only: [:update, :delete, :show]
   end
 
   # Other scopes may use custom stacks.
