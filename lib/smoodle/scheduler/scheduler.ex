@@ -41,13 +41,13 @@ defmodule Smoodle.Scheduler do
   Creates an event.
 
   """
-  def create_event(attrs, opts \\ [])
+#  def create_event(attrs, opts \\ [])
 
-  def create_event(attrs, dry_run: true) do
-    Event.changeset_insert(attrs)
-  end
+#  def create_event(attrs, dry_run: true) do
+#    Event.changeset_insert(attrs)
+#  end
 
-  def create_event(attrs, _) do
+  def create_event(attrs) do
     Event.changeset_insert(attrs)
     |> Repo.insert
   end
@@ -102,14 +102,14 @@ defmodule Smoodle.Scheduler do
   @doc """
   Creates a poll.
   """
-  def create_poll(event, attrs, opts \\ [])
+#  def create_poll(event, attrs, opts \\ [])
 
-  def create_poll(%Event{} = event, attrs, dry_run: true) do
-    Ecto.build_assoc(event, :polls)
-    |> Poll.changeset(attrs)
-  end
+#  def create_poll(%Event{} = event, attrs, dry_run: true) do
+#    Ecto.build_assoc(event, :polls)
+#    |> Poll.changeset(attrs)
+#  end
 
-  def create_poll(%Event{} = event, attrs, _) do
+  def create_poll(%Event{} = event, attrs) do
     Ecto.build_assoc(event, :polls)
     |> Poll.changeset(attrs)
     |> Repo.insert()
@@ -121,15 +121,15 @@ defmodule Smoodle.Scheduler do
   Updates a poll.
 
   """
-  def update_poll(poll, attrs, opts \\ [])
+ # def update_poll(poll, attrs, opts \\ [])
 
-  def update_poll(%Poll{} = poll, attrs, dry_run: true) do
-    poll
-    |> Repo.preload([:event, :date_ranks])
-    |> Poll.changeset(attrs)
-  end
+#  def update_poll(%Poll{} = poll, attrs, dry_run: true) do
+#    poll
+#    |> Repo.preload([:event, :date_ranks])
+#    |> Poll.changeset(attrs)
+#  end
 
-  def update_poll(%Poll{} = poll, attrs, _) do
+  def update_poll(%Poll{} = poll, attrs) do
     poll
     |> Repo.preload([:event, :date_ranks])
     |> Poll.changeset(attrs)

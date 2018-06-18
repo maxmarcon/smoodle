@@ -6,7 +6,7 @@ defmodule Smoodle.Repo.Migrations.CreateDateRanks do
   		add :date_from, :date, null: false
   		add :date_to, :date, null: false
   		add :rank, :float, null: false
-  		add :poll_id, references(:polls, on_delete: :delete_all, on_update: :update_all), null: false
+  		add :poll_id, references(:polls, on_delete: :delete_all, on_update: :update_all, type: :uuid), null: false
 
   		timestamps()
   	end

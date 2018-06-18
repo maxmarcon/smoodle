@@ -10,19 +10,19 @@ defmodule SmoodleWeb.EventController do
     render(conn, "index.json", events: Enum.map(events, &Map.drop(&1, [:owner_token, :polls])))
   end
 
-  def create(_, %{"event" => event_params, "dry_run" => true} = params) do
-    case Scheduler.create_event(event_params, dry_run: true) do
-      %{:valid? => true} -> :ok
-      # for partial validation, we return ok
-      # if the errors only affect parameters that were not specified by the client
-      changeset -> if params["partial"] &&
-        Enum.empty?(Keyword.take(changeset.errors, Enum.map(Map.keys(event_params), &String.to_atom/1))) do
-        :ok
-      else
-        {:error, changeset}
-      end
-    end
-  end
+  #def create(_, %{"event" => event_params, "dry_run" => true} = params) do
+  #  case Scheduler.create_event(event_params, dry_run: true) do
+  #    %{:valid? => true} -> :ok
+  #    # for partial validation, we return ok
+  #    # if the errors only affect parameters that were not specified by the client
+  #    changeset -> if params["partial"] &&
+  #      Enum.empty?(Keyword.take(changeset.errors, Enum.map(Map.keys(event_params), &String.to_atom/1))) do
+  #      :ok
+  #    else
+  #      {:error, changeset}
+  #    end
+  #  end
+  #end
 
   def create(conn, %{"event" => event_params}) do
     with {:ok, %Event{} = event} <- Scheduler.create_event(event_params) do

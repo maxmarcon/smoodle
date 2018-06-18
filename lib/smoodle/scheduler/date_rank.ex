@@ -8,7 +8,7 @@ defmodule Smoodle.Scheduler.DateRank do
   	field :date_from, :date
   	field :date_to, :date
   	field :rank, :float
-  	belongs_to :poll, Poll
+  	belongs_to :poll, Poll, type: :binary_id
 
     timestamps(usec: false)
   end

@@ -46,9 +46,9 @@ defmodule SmoodleWeb.EventControllerTest do
     scheduled_to: "2117-04-05 21:10:00",
     scheduled_from: "2117-04-05 22:10:00"
   }
-  @partial_valid_data %{
-    name: "Event"
-  }
+  #@partial_valid_data %{
+  #  name: "Event"
+  #}
 
   def fixture(:event) do
     {:ok, event} = Scheduler.create_event(@create_attrs_1)
@@ -107,20 +107,20 @@ defmodule SmoodleWeb.EventControllerTest do
       assert json_response(conn, 422)["errors"] != %{}
     end
 
-    test "returns empty ok response when validating valid data", %{conn: conn} do
-      conn = post conn, event_path(conn, :create), event: @create_attrs_1, dry_run: true
-      assert "" = response(conn, 200)
-    end
+   # test "returns empty ok response when validating valid data", %{conn: conn} do
+   #   conn = post conn, event_path(conn, :create), event: @create_attrs_1, dry_run: true
+   #   assert "" = response(conn, 200)
+   # end
 
-    test "renders errors when validating invalid data", %{conn: conn} do
-      conn = post conn, event_path(conn, :create), event: @invalid_attrs, dry_run: true
-      assert json_response(conn, 422)["errors"] != %{}
-    end
+   # test "renders errors when validating invalid data", %{conn: conn} do
+   #   conn = post conn, event_path(conn, :create), event: @invalid_attrs, dry_run: true
+   #   assert json_response(conn, 422)["errors"] != %{}
+   # end
 
-    test "returns empty ok response for partially valid data and partial validation", %{conn: conn} do
-      conn = post conn, event_path(conn, :create), event: @partial_valid_data, dry_run: true, partial: true
-      assert "" = response(conn, 200)
-    end
+    #test "returns empty ok response for partially valid data and partial validation", %{conn: conn} do
+    #  conn = post conn, event_path(conn, :create), event: @partial_valid_data, dry_run: true, partial: true
+    #  assert "" = response(conn, 200)
+    #end
   end
 
   describe "update event" do

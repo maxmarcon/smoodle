@@ -8,7 +8,7 @@ defmodule Smoodle.Scheduler.Poll do
   import SmoodleWeb.Gettext
   import Smoodle.Scheduler.Utils
 
-  @foreign_key_type :binary_id
+  @primary_key {:id, :binary_id, autogenerate: true}
 
   schema "polls" do
     field :participant, :string
@@ -16,7 +16,7 @@ defmodule Smoodle.Scheduler.Poll do
     embeds_one :preferences, Preferences, primary_key: false, on_replace: :delete do
       embeds_many :weekday_ranks, WeekDayRank
     end
-    belongs_to :event, Event
+    belongs_to :event, Event, type: :binary_id
 
     timestamps(usec: false)
   end
