@@ -5,11 +5,11 @@ defmodule SmoodleWeb.PollController do
   alias Smoodle.Scheduler.Poll
   action_fallback SmoodleWeb.FallbackController
 
-	def index(conn, %{"event_id" => event_id}) do
-		event = Scheduler.get_event!(event_id)
+	def index(conn, %{"event_id" => event_id, "owner_token" => owner_token}) do
+		event = Scheduler.get_event!(event_id, owner_token)
 
     polls = Scheduler.list_polls(event)
-    render(conn, "index.json", events: polls)
+    render(conn, "index.json", polls: polls)
   end
 
   def create(conn, %{"event_id" => event_id, "poll" => poll_params}) do
@@ -19,13 +19,17 @@ defmodule SmoodleWeb.PollController do
 		conn
      |> put_status(:created)
      |> put_resp_header("location", event_path(conn, :show, poll))
-     |> render("show.json", event: poll)
+     |> render("show.json", poll: poll)
     end
 	end
 
 	def show(conn, %{"id" => id}) do
-
     poll = Scheduler.get_poll!(id)
+    render(conn, "show.json", poll: poll)
+  end
+
+	def show(conn, %{"event_id" => event_id, "participant" => participant}) do
+    poll = Scheduler.get_poll!(event_id, participant)
     render(conn, "show.json", poll: poll)
   end
 

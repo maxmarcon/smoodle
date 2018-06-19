@@ -39,7 +39,7 @@ defmodule SmoodleWeb.EventController do
   end
 
   def update(conn, %{"id" => id, "event" => event_params = %{"owner_token" => owner_token}}) do
-    event = Scheduler.get_event_for_update!(id, owner_token)
+    event = Scheduler.get_event!(id, owner_token)
 
     with {:ok, %Event{} = event} <- Scheduler.update_event(event, event_params) do
       render(conn, "show.json", event: Map.delete(event, :owner_token))
@@ -47,7 +47,7 @@ defmodule SmoodleWeb.EventController do
   end
 
   def delete(conn, %{"id" => id, "owner_token" => owner_token}) do
-    event = Scheduler.get_event_for_update!(id, owner_token)
+    event = Scheduler.get_event!(id, owner_token)
 
     with {:ok, %Event{}} <- Scheduler.delete_event(event) do
       send_resp(conn, :no_content, "")

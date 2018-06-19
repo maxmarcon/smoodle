@@ -32,7 +32,7 @@ defmodule Smoodle.Scheduler do
 
   Raises if the Event does not exist or the token is wrong
   """
-  def get_event_for_update!(id, owner_token) do
+  def get_event!(id, owner_token) do
     Repo.get_by!(Event, id: id, owner_token: owner_token)
   end
 
@@ -99,6 +99,11 @@ defmodule Smoodle.Scheduler do
   def get_poll!(id) do
     Repo.get!(Poll, id)
   end
+
+  def get_poll!(event_id, participant) do
+    Repo.get_by!(Poll, [event_id: event_id, participant: participant])
+  end
+
 
   @doc """
   Creates a poll.

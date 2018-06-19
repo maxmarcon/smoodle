@@ -52,6 +52,17 @@ defmodule Smoodle.SchedulerTest do
       event = Repo.preload(Scheduler.get_event!(event1.id), :polls)
       assert event == event1
     end
+
+    test "get_event!/2 returns the event with given id and owner_token", context do
+      [event1 | _] = context[:events]
+      event = Repo.preload(Scheduler.get_event!(event1.id, event1.owner_token), :polls)
+      assert event == event1
+    end
+
+    test "get_event!/2 does not returns the event if the owner_token is wrong", context do
+      [event1 | _] = context[:events]
+      assert_raise(Ecto.NoResultsError, fn -> Scheduler.get_event!(event1.id, "wrong token") end)
+    end
   end
 
   describe "when creating an event" do
@@ -223,6 +234,17 @@ defmodule Smoodle.SchedulerTest do
       [poll1 | _] = context[:polls]
       poll = Scheduler.get_poll!(poll1.id)
       assert poll == poll1
+    end
+
+    test "get_poll!/2 fetches a poll", context do
+      [poll1 | _] = context[:polls]
+      poll = Scheduler.get_poll!(poll1.event_id, poll1.participant)
+      assert poll == poll1
+    end
+
+    test "get_poll!/2 does not fetch a poll if the participant is wrong", context do
+      [poll1 | _] = context[:polls]
+      assert_raise(Ecto.NoResultsError, fn -> Scheduler.get_poll!(poll1.event_id, "wrong participant") end)
     end
 
     test "list_polls/1 fetches all polls for an event", context do
