@@ -1,6 +1,7 @@
 defmodule SmoodleWeb.PollView do
   use SmoodleWeb, :view
   alias SmoodleWeb.PollView
+  alias SmoodleWeb.DateRankView
 
   def render("index.json", %{polls: polls}) do
     %{data: render_many(polls, PollView, "poll.json")}
@@ -11,6 +12,10 @@ defmodule SmoodleWeb.PollView do
   end
 
   def render("poll.json", %{poll: poll}) do
-    Map.delete(poll, :__meta__)
+    poll
+    |> Map.drop([:__meta__, :event])
+    |> Map.update(:date_ranks, %{}, fn date_ranks ->
+      render_many(date_ranks, DateRankView, "date_rank.json")
+    end)
   end
 end

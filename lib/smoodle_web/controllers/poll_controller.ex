@@ -3,12 +3,14 @@ defmodule SmoodleWeb.PollController do
 
   alias Smoodle.Scheduler
   alias Smoodle.Scheduler.Poll
+  alias Smoodle.Repo
+
   action_fallback SmoodleWeb.FallbackController
 
 	def index(conn, %{"event_id" => event_id, "owner_token" => owner_token}) do
 		event = Scheduler.get_event!(event_id, owner_token)
 
-    polls = Scheduler.list_polls(event)
+    polls = Repo.preload(Scheduler.list_polls(event), :date_ranks)
     render(conn, "index.json", polls: polls)
   end
 
@@ -19,7 +21,8 @@ defmodule SmoodleWeb.PollController do
 		conn
      |> put_status(:created)
      |> put_resp_header("location", event_path(conn, :show, poll))
-     |> render("show.json", poll: poll)
+     # need to preload date_ranks for the case when the poll_params don't include any date ranks
+     |> render("show.json", poll: Repo.preload(poll, :date_ranks))
     end
 	end
 

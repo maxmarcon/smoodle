@@ -20,6 +20,6 @@ defmodule SmoodleWeb.EventView do
   end
 
   def render("event.json", %{event: event}) do
-    Map.delete(event, :__meta__)
+    Map.drop(event, [:__meta__, :polls])
   end
 end
