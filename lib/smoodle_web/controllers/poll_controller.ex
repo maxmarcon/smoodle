@@ -14,6 +14,11 @@ defmodule SmoodleWeb.PollController do
     render(conn, "index.json", polls: polls)
   end
 
+  def index(conn, %{"event_id" => event_id, "participant" => participant}) do
+    poll = Repo.preload(Scheduler.get_poll!(event_id, participant), :date_ranks)
+    render(conn, "show.json", poll: poll)
+  end
+
   def create(conn, %{"event_id" => event_id, "poll" => poll_params}) do
 		event = Scheduler.get_event!(event_id)
 
@@ -27,12 +32,7 @@ defmodule SmoodleWeb.PollController do
 	end
 
 	def show(conn, %{"id" => id}) do
-    poll = Scheduler.get_poll!(id)
-    render(conn, "show.json", poll: poll)
-  end
-
-	def show(conn, %{"event_id" => event_id, "participant" => participant}) do
-    poll = Scheduler.get_poll!(event_id, participant)
+    poll = Repo.preload(Scheduler.get_poll!(id), :date_ranks)
     render(conn, "show.json", poll: poll)
   end
 
@@ -47,7 +47,7 @@ defmodule SmoodleWeb.PollController do
   def delete(conn, %{"id" => id}) do
     poll = Scheduler.get_poll!(id)
 
-    with {:ok, %Poll{}} <- Scheduler.delete_event(poll) do
+    with {:ok, %Poll{}} <- Scheduler.delete_poll(poll) do
       send_resp(conn, :no_content, "")
     end
   end

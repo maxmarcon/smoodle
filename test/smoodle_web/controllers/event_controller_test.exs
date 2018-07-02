@@ -50,25 +50,19 @@ defmodule SmoodleWeb.EventControllerTest do
   #  name: "Event"
   #}
 
-  def fixture(:event) do
+  def create_event(_) do
     {:ok, event} = Scheduler.create_event(@create_attrs_1)
     {:ok, event: event}
   end
 
-  def fixture(:events) do
+  def create_events(_) do
     {:ok, event1} = Scheduler.create_event(@create_attrs_1)
     {:ok, event2} = Scheduler.create_event(@create_attrs_2)
     {:ok, events: [event1, event2]}
   end
 
-  setup %{conn: conn} do
-   {:ok, conn: put_req_header(conn, "accept", "application/json")}
-  end
-
   describe "index" do
-    setup do
-      fixture(:events)
-    end
+    setup :create_events
 
     test "lists all events", %{conn: conn, events: events} do
       conn = get conn, event_path(conn, :index)
@@ -124,9 +118,7 @@ defmodule SmoodleWeb.EventControllerTest do
   end
 
   describe "update event" do
-    setup do
-      fixture(:event)
-    end
+    setup :create_event
 
     test "renders event when data is valid", %{conn: conn, event: %Event{id: id} = event} do
       conn = put conn, event_path(conn, :update, event), event: Map.merge(@update_attrs, %{owner_token: event.owner_token})
@@ -157,9 +149,7 @@ defmodule SmoodleWeb.EventControllerTest do
   end
 
   describe "delete event" do
-    setup do
-      fixture(:event)
-    end
+    setup :create_event
 
     test "deletes chosen event", %{conn: conn, event: event} do
       conn = delete conn, event_path(conn, :delete, event), owner_token: event.owner_token
