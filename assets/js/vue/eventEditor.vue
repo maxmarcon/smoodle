@@ -31,14 +31,13 @@
 				hr.mb-3
 
 				form(ref="form" @submit.prevent="" novalidate)
-					b-btn.btn-block.d-flex.justify-content-between(
+					b-btn.btn-block.d-flex(
 						v-b-toggle.organizer-group=""
 						:variant="groupVariant('organizer-group')"
 					)
-						div
-							span.oi.oi-chevron-bottom(v-if="groupVisibility['organizer-group']")
-							span.oi.oi-chevron-top(v-else)
-							span.ml-2 {{ $t('event_editor.organizer_group') }}
+						span.oi.oi-chevron-bottom(v-if="groupVisibility['organizer-group']")
+						span.oi.oi-chevron-top(v-else)
+						span.ml-2.mr-auto {{ $t('event_editor.organizer_group') }}
 						div(v-if="showGroupErrorIcon('organizer-group')").oi.oi-x
 						div(v-else-if="showGroupOkIcon('organizer-group')").oi.oi-check
 					b-collapse#organizer-group(accordion="event-creation" v-model="groupVisibility['organizer-group']")
@@ -46,7 +45,7 @@
 							.form-group.row
 								label.col-md-3.col-form-label(for="eventOrganizer") {{ $t('event_editor.event.organizer') }}
 								.col-md-9
-									small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.organizer_help') }}
+									small.form-text.text-muted {{ $t('event_editor.event.organizer_help') }}
 									input#eventOrganizer.form-control(
 										v-model.trim="eventOrganizer"
 										@change="localValidation"
@@ -57,14 +56,13 @@
 									.invalid-feedback {{ eventOrganizerError }}
 
 
-					b-btn.btn-block.d-flex.justify-content-between.mt-2(
+					b-btn.btn-block.d-flex.mt-2(
 						v-b-toggle.general-info-group=""
 						:variant="groupVariant('general-info-group')"
 					)
-						div
-							span.oi.oi-chevron-bottom(v-if="groupVisibility['general-info-group']")
-							span.oi.oi-chevron-top(v-else)
-							span.ml-2 {{ $t('event_editor.general_info_group') }}
+						span.oi.oi-chevron-bottom(v-if="groupVisibility['general-info-group']")
+						span.oi.oi-chevron-top(v-else)
+						span.ml-2.mr-auto {{ $t('event_editor.general_info_group') }}
 						div(v-if="showGroupErrorIcon('general-info-group')").oi.oi-x
 						div(v-else-if="showGroupOkIcon('general-info-group')").oi.oi-check
 					b-collapse#general-info-group(
@@ -75,7 +73,7 @@
 							.form-group.row
 								label.col-md-3.col-form-label(for="eventName") {{ $t('event_editor.event.name') }}
 								.col-md-9
-									small.form-text.text-muted(id="eventNameHelp") {{ $t('event_editor.event.name_help') }}
+									small.form-text.text-muted {{ $t('event_editor.event.name_help') }}
 									input#eventName.form-control(v-model.trim="eventName" type="text"
 									:disabled="createdEvent"
 									@change="localValidation"
@@ -86,7 +84,7 @@
 							.form-group.row
 								label.col-md-3.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
 								.col-md-9
-									small.form-text.text-muted(id="eventDescHelp") {{ $t('event_editor.event.desc_help') }}
+									small.form-text.text-muted {{ $t('event_editor.event.desc_help') }}
 									textarea#eventDesc.form-control(v-model.trim="eventDesc"
 									:disabled="createdEvent"
 									@change="localValidation"
@@ -96,14 +94,13 @@
 									.invalid-feedback {{ eventDescError }}
 
 
-					b-btn.btn-block.d-flex.justify-content-between.mt-2(
+					b-btn.btn-block.d-flex.mt-2(
 						v-b-toggle.dates-group=""
 						:variant="groupVariant('dates-group')"
 					)
-						div
-							span.oi.oi-chevron-bottom(v-if="groupVisibility['dates-group']")
-							span.oi.oi-chevron-top(v-else)
-							span.ml-2 {{ $t('event_editor.dates_group') }}
+						span.oi.oi-chevron-bottom(v-if="groupVisibility['dates-group']")
+						span.oi.oi-chevron-top(v-else)
+						span.ml-2.mr-auto {{ $t('event_editor.dates_group') }}
 						div(v-if="showGroupErrorIcon('dates-group')").oi.oi-x
 						div(v-else-if="showGroupOkIcon('dates-group')").oi.oi-check
 					b-collapse#dates-group(

@@ -1,6 +1,6 @@
 //import 'vueify/lib/insert-css'
 import EventEditor from './vue/eventEditor.vue'
-import PollVue from './vue/poll.vue'
+import PollEditor from './vue/pollEditor.vue'
 import VueRouter from 'vue-router'
 import VueI18n from 'vue-i18n'
 import AirbnbStyleDatepicker from 'vue-airbnb-style-datepicker'
@@ -18,9 +18,9 @@ const router = new VueRouter({
 	  	component: EventEditor
 	  },
 	  {
-	  	path: '/event/:eventId/poll',
+	  	path: '/event/:eventId/poll/:pollId?',
 	  	name: 'poll',
-	  	component: PollVue,
+	  	component: PollEditor,
 			props: true
 	  }
   ]

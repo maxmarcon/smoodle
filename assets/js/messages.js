@@ -34,9 +34,13 @@ export default {
 			poll_event: "Enter your availability",
 			dates_placeholder: 'Click to enter dates'
 		},
-		event_poll: {
+		poll_editor: {
 			welcome: "{eventOrganizer} has invited you to a {eventName}. Please let them know what dates work best for you by answering a few questions.",
-			title: "Poll for \u201C{eventName}\u201E"
+			title: "Poll for \u201C{eventName}\u201E",
+			poll: {
+				weekday_ranks: "Which days of the week work best for you?",
+				weekday_ranks_help: "Specify which days of the week are perfect, good, or bad for the event"
+			}
 		},
 		date_picker: {
 			days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
@@ -48,7 +52,8 @@ export default {
 		date_fns_locale: date_fns_en,
 		errors: {
 			required_field: "Can't be blank",
-			network: "The server is not responding or cannot be reached. Please try again later."
+			network: "The server is not responding or cannot be reached. Please try again later.",
+			not_found: "The requested data record could not be found on the server"
 		}
 	},
 
