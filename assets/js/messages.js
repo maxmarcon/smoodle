@@ -37,10 +37,9 @@ export default {
 		poll_editor: {
 			welcome: "{eventOrganizer} has invited you to a {eventName}. Please let them know what dates work best for you by answering a few questions.",
 			title: "Poll for \u201C{eventName}\u201E",
-			poll: {
-				weekday_ranks: "Which days of the week work best for you?",
-				weekday_ranks_help: "Specify which days of the week are perfect, good, or bad for the event"
-			}
+			particpiant_group: "Who are you?",
+			weekday_ranks_group: "Which days of the week work best for you?",
+			weekday_ranks_help: "Specify which days of the week are perfect, good, or bad for the event"
 		},
 		date_picker: {
 			days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
