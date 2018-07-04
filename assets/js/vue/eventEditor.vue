@@ -22,7 +22,7 @@
 									v-clipboard:copy="createdEvent.share_link"
 									v-clipboard:success="clipboard"
 								)
-									span.oi.oi-clipboard
+									span.fas.fa-clipboard
 
 				.row.justify-content-center(v-else)
 					.col-md-8.text-center
@@ -35,11 +35,11 @@
 						v-b-toggle.organizer-group=""
 						:variant="groupVariant('organizer-group')"
 					)
-						span.oi.oi-chevron-bottom(v-if="groupVisibility['organizer-group']")
-						span.oi.oi-chevron-top(v-else)
+						span.fas.fa-chevron-down(v-if="groupVisibility['organizer-group']")
+						span.fas.fa-chevron-up(v-else)
 						span.ml-2.mr-auto {{ $t('event_editor.organizer_group') }}
-						div(v-if="showGroupErrorIcon('organizer-group')").oi.oi-x
-						div(v-else-if="showGroupOkIcon('organizer-group')").oi.oi-check
+						div(v-if="showGroupErrorIcon('organizer-group')").fas.fa-exclamation
+						div(v-else-if="showGroupOkIcon('organizer-group')").fas.fa-check
 					b-collapse#organizer-group(accordion="event-creation" v-model="groupVisibility['organizer-group']")
 						b-card
 							.form-group.row
@@ -60,11 +60,11 @@
 						v-b-toggle.general-info-group=""
 						:variant="groupVariant('general-info-group')"
 					)
-						span.oi.oi-chevron-bottom(v-if="groupVisibility['general-info-group']")
-						span.oi.oi-chevron-top(v-else)
+						span.fas.fa-chevron-down(v-if="groupVisibility['general-info-group']")
+						span.fas.fa-chevron-up(v-else)
 						span.ml-2.mr-auto {{ $t('event_editor.general_info_group') }}
-						div(v-if="showGroupErrorIcon('general-info-group')").oi.oi-x
-						div(v-else-if="showGroupOkIcon('general-info-group')").oi.oi-check
+						div(v-if="showGroupErrorIcon('general-info-group')").fas.fa-exclamation
+						div(v-else-if="showGroupOkIcon('general-info-group')").fas.fa-check
 					b-collapse#general-info-group(
 						accordion="event-creation"
 						v-model="groupVisibility['general-info-group']"
@@ -98,11 +98,11 @@
 						v-b-toggle.dates-group=""
 						:variant="groupVariant('dates-group')"
 					)
-						span.oi.oi-chevron-bottom(v-if="groupVisibility['dates-group']")
-						span.oi.oi-chevron-top(v-else)
+						span.fas.fa-chevron-down(v-if="groupVisibility['dates-group']")
+						span.fas.fa-chevron-up(v-else)
 						span.ml-2.mr-auto {{ $t('event_editor.dates_group') }}
-						div(v-if="showGroupErrorIcon('dates-group')").oi.oi-x
-						div(v-else-if="showGroupOkIcon('dates-group')").oi.oi-check
+						div(v-if="showGroupErrorIcon('dates-group')").fas.fa-exclamation
+						div(v-else-if="showGroupOkIcon('dates-group')").fas.fa-check
 					b-collapse#dates-group(
 						accordion="event-creation"
 						v-model="groupVisibility['dates-group']"

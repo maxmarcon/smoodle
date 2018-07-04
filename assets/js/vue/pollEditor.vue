@@ -29,11 +29,11 @@
 						v-b-toggle.organizer-group=""
 						:variant="groupVariant('participant-group')"
 					)
-						span.oi.oi-chevron-bottom(v-if="groupVisibility['participant-group']")
-						span.oi.oi-chevron-top(v-else)
+						span.fas.fa-chevron-down(v-if="groupVisibility['participant-group']")
+						span.fas.fa-chevron-up(v-else)
 						span.ml-2.mr-auto {{ $t('poll_editor.participant_group') }}
-						div(v-if="showGroupErrorIcon('participant-group')").oi.oi-x
-						div(v-else-if="showGroupOkIcon('participant-group')").oi.oi-check
+						div(v-if="showGroupErrorIcon('participant-group')").fas.fa-exclamation
+						div(v-else-if="showGroupOkIcon('participant-group')").fas.fa-check
 				b-collapse#organizer-group(accordion="poll-editor" v-model="groupVisibility['participant-group']")
 						b-card
 							.form-group.row
@@ -50,8 +50,8 @@
 
 
 				b-btn#weekday-ranker-button.d-flex.btn-block.mt-2(v-b-toggle.weekday-ranker="")
-					span.oi.oi-chevron-bottom(v-if="groupVisibility['weekday-ranker-group']")
-					span.oi.oi-chevron-top(v-else)
+					span.fas.fa-chevron-down(v-if="groupVisibility['weekday-ranker-group']")
+					span.fas.fa-chevron-up(v-else)
 					span.ml-2
 					| {{ $t('poll_editor.weekday_ranks_group') }}
 				b-tooltip(
@@ -65,7 +65,7 @@
 					v-model="groupVisibility['weekday-ranker-group']"
 					:visible="true"
 				)
-					ranker(:elements="$t('date_picker.days').map((day, index) => ({name: day, rank: 1}))")
+					ranker(:elements="$t('date_picker.days').map((day, index) => ({name: day, rank: 0}))")
 
 			.card-footer
 

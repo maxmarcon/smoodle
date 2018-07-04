@@ -55,7 +55,7 @@ exports.config = {
       pattern: /\.(js|vue)$/
     },
     copycat: {
-      fonts: ['node_modules/open-iconic/font/fonts']
+      webfonts: ['node_modules/@fortawesome/fontawesome-free/webfonts']
     }
   },
 
