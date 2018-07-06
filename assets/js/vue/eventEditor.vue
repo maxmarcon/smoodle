@@ -142,18 +142,18 @@
 										b-dropdown-item(@click="pickNextMonths(3); localValidation();") {{ $tc('event_editor.within_months', 3, {count: 3}) }}
 
 			.card-footer
-				.row.justify-content-center
-					.col-auto(v-if="!createdEvent")
-						button.btn.btn-primary(@click="createEvent") Create Event
+				.row.justify-content-center(v-if="!createdEvent")
+					.col-auto
+						button.btn.btn-primary(@click="createEvent") {{ $t('event_editor.create_event') }}
 
-					.row.justify-content-center(v-else)
-						.col-md-auto.mt-1.text-center
-							router-link.btn.btn-success(
-								role="button"
-								:to="{ name: 'poll', params: {eventId: createdEvent.id}}"
-							) {{ $t('event_editor.poll_event') }}
-						.col-md-auto.mt-1.text-center
-							button.btn.btn-primary {{ $t('event_editor.manage_event') }}
+				.row.justify-content-center(v-else)
+					.col-auto.mt-1
+						router-link.btn.btn-success(
+							role="button"
+							:to="{ name: 'poll', params: {eventId: createdEvent.id}}"
+						) {{ $t('event_editor.poll_event') }}
+					.col-auto.mt-1
+						button.btn.btn-primary {{ $t('event_editor.manage_event') }}
 
 </template>
 
