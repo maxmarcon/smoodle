@@ -261,7 +261,9 @@ export default {
 			Object.values(errorsMap).forEach(function(fieldMap) {
 				for (let field in fieldMap) {
 					let errorField = fieldMap[field].errorField;
-					self[errorField] = !self[field] ? self.$i18n.t('errors.required_field') : null;
+					if (!self[field]) {
+						self[errorField] = self.$i18n.t('errors.required_field')
+					}
 				}
 			});
 			this.wasLocalValidated = true;
@@ -303,7 +305,6 @@ export default {
 					let errorField = fieldMap[field].errorField;
 					errorKeys = errorKeys instanceof Array ? errorKeys : [errorKeys];
 					let key_with_error = errorKeys.find(key => errors[key]);
-					// only show first error
 					this[errorField] = (key_with_error ? errors[key_with_error].join(', ') : null);
 					if (key_with_error && !groupShownBecauseOfErrors) {
 						this.groupVisibility[group] = true;

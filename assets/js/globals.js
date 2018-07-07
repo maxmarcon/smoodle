@@ -10,6 +10,27 @@ export const sanitizeStepRouteParameter = (to, firstStep, lastStep, forceFirstSt
 	}
 }
 
+export function dotAccessObject(obj, deep_key) {
+	if (!obj instanceof Object) {
+		throw "dotAccessObject should be called with an object";
+	}
+	let retval = undefined;
+	let keys = deep_key.split('.');
+	keys.every(function(key) {
+		if (obj.hasOwnProperty(key)) {
+			obj = obj[key]
+			if (!obj instanceof Object || obj instanceof Array) {
+				retval = obj
+				return false;
+			}
+			return true;
+		} else {
+			return false;
+		}
+	});
+	return retval;
+}
+
 class LocalStorageProxy {
 	constructor() {
 		try {

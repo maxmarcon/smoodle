@@ -31,15 +31,22 @@ export default {
 			event_created_short: "Your event has been created",
 			share_link: "Now share this link with your friends, so they can enter which dates work best for them:",
 			manage_event: "Manage event",
+			create_event: "Create event",
 			poll_event: "Enter your availability",
 			dates_placeholder: 'Click to enter dates'
 		},
 		poll_editor: {
 			welcome: "{eventOrganizer} has invited you to a {eventName}. Please let them know what dates work best for you by answering a few questions.",
 			title: "Poll for \u201C{eventName}\u201E",
-			particpiant_group: "Who are you?",
+			participant_group: "Who are you?",
+			poll: {
+				participant: "Participant name",
+				participant_help: "Tell the organizer who you are..."
+			},
 			weekday_ranks_group: "Which days of the week work best for you?",
-			weekday_ranks_help: "Specify which days of the week are perfect, good, or bad for the event"
+			weekday_ranks_help: "Specify which days of the week are perfect, good, or bad for the event",
+			save_poll: "Save poll",
+			poll_saved: "Your poll has been saved",
 		},
 		date_picker: {
 			days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
