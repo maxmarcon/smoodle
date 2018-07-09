@@ -22,7 +22,7 @@ defmodule SmoodleWeb.Router do
     get "/new_event", PageController, :new_event
     get "/event/:event_id/poll", PageController, :poll
     get "/event/:event_id/poll/:poll_id", PageController, :poll
-    get "/event/:event_id/manage", PageController, :manage
+    get "/event/:event_id", PageController, :event
   end
 
   scope "/v1", SmoodleWeb do

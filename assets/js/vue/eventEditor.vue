@@ -159,39 +159,46 @@
 
 <script>
 import dateFns from 'date-fns'
+import { formWithErrorsMixin } from '../globals'
 
 const today = new Date();
 const InvalidDate = 'Invalid Date';
 
-const errorsMap = {
-	// maps, for each input group, the fields in the vue model to
-	// the error fields and the error keys received by the back end
-	'organizer-group': {
-		eventOrganizer: {
-			errorField: 'eventOrganizerError',
-			errorKeys: 'organizer'
-		}
-	},
-	'general-info-group': {
-		eventName: {
-			errorField: 'eventNameError',
-			errorKeys: 'name'
-		},
-		eventDesc: {
-			errorField: 'eventDescError',
-			errorKeys: 'desc'
-		}
-	},
-	'dates-group': {
-		dateRange: {
-			errorField: 'eventDatesError',
-			errorKeys: ['time_window_to', 'time_window_from', 'time_window']
-		}
-	}
-};
 
 export default {
+	mixins: [formWithErrorsMixin],
 	data: () => ({
+		errorsMap: {
+			// maps, for each input group, the fields in the vue model to
+			// the error fields and the error keys received by the back end
+			'organizer-group': {
+				eventOrganizer: {
+					errorField: 'eventOrganizerError',
+					errorKeys: 'organizer'
+				}
+			},
+			'general-info-group': {
+				eventName: {
+					errorField: 'eventNameError',
+					errorKeys: 'name'
+				},
+				eventDesc: {
+					errorField: 'eventDescError',
+					errorKeys: 'desc'
+				}
+			},
+			'dates-group': {
+				dateRange: {
+					errorField: 'eventDatesError',
+					errorKeys: ['time_window_to', 'time_window_from', 'time_window']
+				}
+			}
+		},
+		groupVisibility: {
+			'general-info-group': false,
+			'dates-group': false,
+			'organizer-group': true
+		},
 		eventName: null,
 		eventNameError: null,
 		eventOrganizer: null,
@@ -204,11 +211,6 @@ export default {
 		today,
 		wasServerValidated: false,
 		wasLocalValidated: false,
-		groupVisibility: {
-			'general-info-group': false,
-			'dates-group': false,
-			'organizer-group': true
-		},
 		showThisWeekButton: (dateFns.getDay(today) > 0 && dateFns.getDay(today) < 4), // betewn Mon and Wed
 		createdEvent: null/* {
 						id: 'd8763187-ed3d-4572-ae50-02d5cc874804',
@@ -245,73 +247,8 @@ export default {
 		}
 	},
 	methods: {
-		inputFieldClass(field) {
-			let fieldMap = Object.values(errorsMap).find(map => map[field]);
-			if (fieldMap) {
-				let errorField = fieldMap[field].errorField;
-				if (this[errorField]) {
-					return 'is-invalid';
-				} else if (this.wasServerValidated || this.wasLocalValidated) {
-					return 'is-valid';
-				}
-			}
-		},
-		localValidation() {
-			self = this;
-			Object.values(errorsMap).forEach(function(fieldMap) {
-				for (let field in fieldMap) {
-					let errorField = fieldMap[field].errorField;
-					if (!self[field]) {
-						self[errorField] = self.$i18n.t('errors.required_field')
-					}
-				}
-			});
-			this.wasLocalValidated = true;
-		},
-		collapseAllGroups() {
-			for (let group in this.groupVisibility) {
-				this.groupVisibility[group] = false;
-			}
-		},
-		showGroupOkIcon(group) {
-			return this.wasServerValidated && !this.groupHasErrors(group);
-		},
-		showGroupErrorIcon(group) {
-			return this.wasServerValidated && this.groupHasErrors(group);
-		},
-		groupVariant(group) {
-			if (this.wasServerValidated) {
-				return (this.groupHasErrors(group) ? 'danger' : 'success');
-			}
-		},
-		groupHasErrors(group) {
-			let groupErrorsMap = errorsMap[group] || {}
-			for (let field in groupErrorsMap) {
-				if (this[groupErrorsMap[field].errorField]) {
-					return true;
-				}
-			}
-			return false;
-		},
 		clipboard(e) {
       this.$refs.copiedToClipboardModal.show();
-		},
-		setServerErrors(errors={}) {
-			let groupShownBecauseOfErrors = null;
-			for (let group in errorsMap) {
-				let fieldMap = errorsMap[group];
-				for (let field in fieldMap) {
-					let errorKeys = fieldMap[field].errorKeys;
-					let errorField = fieldMap[field].errorField;
-					errorKeys = errorKeys instanceof Array ? errorKeys : [errorKeys];
-					let key_with_error = errorKeys.find(key => errors[key]);
-					this[errorField] = (key_with_error ? errors[key_with_error].join(', ') : null);
-					if (key_with_error && !groupShownBecauseOfErrors) {
-						this.groupVisibility[group] = true;
-						groupShownBecauseOfErrors = group;
-					}
-				}
-			}
 		},
 		applyDates(from, to) {
 			this.dateFrom = from;

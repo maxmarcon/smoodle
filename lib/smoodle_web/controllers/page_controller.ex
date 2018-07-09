@@ -11,5 +11,5 @@ defmodule SmoodleWeb.PageController do
 
   def new_event(conn, params), do: app(conn, params)
   def poll(conn, params), do: app(conn, params)
-  def manage(conn, params), do: app(conn, params)
+  def event(conn, params), do: app(conn, params)
 end

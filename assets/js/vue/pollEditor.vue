@@ -80,44 +80,10 @@
 </template>
 <script>
 import dateFns from 'date-fns'
-import { showToolTip, dotAccessObject } from '../globals'
-
-const errorsMap = {
-	// maps, for each input group, the fields in the vue model to
-	// the error fields and the error keys received by the back end
-	'participant-group': {
-		pollParticipant: {
-			errorField: 'pollParticipantError',
-			errorKeys: 'participant'
-		}
-	},
-	'weekday-ranker-group': {
-		pollWeekdayRanks: {
-			errorField: 'pollWeekdayRanksError',
-			errorKeys: 'preferences.weekday_ranks'
-		}
-	}
-};
-
-
-function fetchEvent() {
-	let self = this;
-	return this.$http.get("/v1/events/" + this.eventId
-		,{
-			headers: { 'Accept-Language': this.$i18n.locale }
-		}).then(function(result) {
-			return result.data.data;
-		}, function(result) {
-			if (result.request.status == 404) {
-				self.$refs.errorBar.show(self.$i18n.t('errors.not_found'));
-			} else {
-				self.$refs.errorBar.show(self.$i18n.t('errors.network'));
-			}
-		});
-}
-
+import { showToolTip, dotAccessObject, formWithErrorsMixin, fetchEventMixin } from '../globals'
 
 export default {
+	mixins: [formWithErrorsMixin, fetchEventMixin],
 	props: {
 		eventId: {
 			type: String,
@@ -129,6 +95,26 @@ export default {
 	},
 	data() {
 		return {
+			errorsMap: {
+				// maps, for each input group, the fields in the vue model to
+				// the error fields and the error keys received by the back end
+				'participant-group': {
+					pollParticipant: {
+						errorField: 'pollParticipantError',
+						errorKeys: 'participant'
+					}
+				},
+				'weekday-ranker-group': {
+					pollWeekdayRanks: {
+						errorField: 'pollWeekdayRanksError',
+						errorKeys: 'preferences.weekday_ranks'
+					}
+				}
+			},
+			groupVisibility: {
+				'participant-group': true,
+				'weekday-ranker-group': false
+			},
 			showToolTip,
 			eventName: null,
 			eventOrganizer: null,
@@ -137,10 +123,6 @@ export default {
 			eventTimeWindowTo: null,
 			wasServerValidated: false,
 			wasLocalValidated: false,
-			groupVisibility: {
-				'participant-group': true,
-				'weekday-ranker-group': false
-			},
 			pollWeekdayRanks: this.$i18n.t('date_picker.days').map((day, index) => ({day: index, name: day, rank: 0})),
 			pollParticipant: null,
 			pollParticipantError: null
@@ -148,7 +130,7 @@ export default {
 	},
 	created() {
 		let self = this;
-		fetchEvent.call(this).then(function(eventData) {
+		this.fetchEvent(this.eventId).then(function(eventData) {
 			if (eventData) {
 				self.eventName = eventData.name;
 				self.eventOrganizer = eventData.organizer;
@@ -186,72 +168,7 @@ export default {
 			.finally(function() {
 				self.wasServerValidated = true;
 			});
-		},
-		inputFieldClass(field) {
-			let fieldMap = Object.values(errorsMap).find(map => map[field]);
-			if (fieldMap) {
-				let errorField = fieldMap[field].errorField;
-				if (this[errorField]) {
-					return 'is-invalid';
-				} else if (this.wasServerValidated || this.wasLocalValidated) {
-					return 'is-valid';
-				}
-			}
-		},
-		localValidation() {
-			self = this;
-			Object.values(errorsMap).forEach(function(fieldMap) {
-				for (let field in fieldMap) {
-					let errorField = fieldMap[field].errorField;
-					if (!self[field]) {
-						self[errorField] = self.$i18n.t('errors.required_field')
-					}
-				}
-			});
-			this.wasLocalValidated = true;
-		},
-		collapseAllGroups() {
-			for (let group in this.groupVisibility) {
-				this.groupVisibility[group] = false;
-			}
-		},
-		showGroupOkIcon(group) {
-			return this.wasServerValidated && !this.groupHasErrors(group);
-		},
-		showGroupErrorIcon(group) {
-			return this.wasServerValidated && this.groupHasErrors(group);
-		},
-		groupVariant(group) {
-			if (this.wasServerValidated) {
-				return (this.groupHasErrors(group) ? 'danger' : 'success');
-			}
-		},
-		setServerErrors(errors={}) {
-			let groupShownBecauseOfErrors = null;
-			for (let group in errorsMap) {
-				let fieldMap = errorsMap[group];
-				for (let field in fieldMap) {
-					let errorKeys = fieldMap[field].errorKeys;
-					let errorField = fieldMap[field].errorField;
-					errorKeys = errorKeys instanceof Array ? errorKeys : [errorKeys];
-					let key_with_error = errorKeys.find(key => dotAccessObject(errors, key));
-					this[errorField] = (key_with_error ? dotAccessObject(errors, key_with_error).join(', ') : null);
-					if (key_with_error && !groupShownBecauseOfErrors) {
-						this.groupVisibility[group] = true;
-						groupShownBecauseOfErrors = group;
-					}
-				}
-			}
-		},
-		groupHasErrors(group) {
-			let groupErrorsMap = errorsMap[group] || {}
-			for (let field in groupErrorsMap) {
-				if (this[groupErrorsMap[field].errorField]) {
-					return true;
-				}
-			}
-			return false;
-		},
+		}
 	},
 	computed: {
 		pollData() {

@@ -14,7 +14,7 @@ defmodule SmoodleWeb.EventView do
     event
     |> Map.delete(:__meta__)
     |> Map.merge(%{
-      owner_link: page_url(SmoodleWeb.Endpoint, :manage, event.id, owner_token: event.owner_token),
+      owner_link: page_url(SmoodleWeb.Endpoint, :event, event.id, owner_token: event.owner_token),
       share_link: page_url(SmoodleWeb.Endpoint, :poll, event.id)
     })
   end
