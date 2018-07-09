@@ -52,7 +52,7 @@ exports.config = {
     babel: {
       // Do not use ES6 compiler in vendor code
       ignore: [/vendor/],
-      pattern: /\.(js|vue)$/
+      pattern: /\.(js)$/
     },
     copycat: {
       webfonts: ['node_modules/@fortawesome/fontawesome-free/webfonts']

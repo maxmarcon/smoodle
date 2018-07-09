@@ -1,31 +1,25 @@
 <template lang="pug">
 	div
 		message-bar(ref="errorBar" variant="danger")
-		.card
+		.card(v-if="eventName")
 			.card-header
+				event-header(
+					:name="eventName"
+					:organizer="eventOrganizer"
+					:timeWindowFrom="eventTimeWindowFrom"
+					:timeWindowTo="eventTimeWindowTo"
+				)
+			.card-body
+				p {{ eventDesc }}
+			.card-footer
 				.row.justify-content-center
-					.col-auto
-						h5 {{ eventName }}
-				.row
-					.col-md-4
-						h6.text-muted Organizer:
-					.col-md-8
-						h6 {{ eventOrganizer }}
-				.row
-					.col-md-4
-						h6.text-muted Event description:
-					.col-md-8
-						h6 {{ eventDesc }}
-				.row
-					.col-md-4
-						h6.text-muted When can it take place:
-					.col-md-8
-						h6 {{ timeWindow }}
-				hr.my-3
+					.col-auto.mt-1
+						button.btn.btn-success(@click="newPoll") {{ $t('event_viewer.create_poll') }}
+					.col-auto.mt-1
+						button.btn.btn-primary {{ $t('event_viewer.update_poll') }}
 
 </template>
 <script>
-import dateFns from 'date-fns'
 import { fetchEventMixin } from '../globals'
 
 export default {
@@ -56,11 +50,9 @@ export default {
 			}
 		});
 	},
-	computed: {
-		timeWindow() {
-			return dateFns.format(this.eventTimeWindowFrom, 'DD/MM/YYYY (ddd)', {locale: this.$i18n.t('date_fns_locale')})
-			 + " - " +
-			 dateFns.format(this.eventTimeWindowTo, 'DD/MM/YYYY (ddd)', {locale: this.$i18n.t('date_fns_locale')});
+	methods: {
+		newPoll() {
+			this.$router.push({name: 'poll', params: {eventId: this.eventId}});
 		}
 	}
 }

@@ -43,10 +43,17 @@ export default {
 				participant: "Participant name",
 				participant_help: "Tell the organizer who you are..."
 			},
-			weekday_ranks_group: "Which days of the week work best for you?",
-			weekday_ranks_help: "Specify which days of the week are perfect, good, or bad for the event",
+			weekday_ranker_group: "Which days of the week work best for you?",
+			weekday_ranker_help: "Specify which days of the week are perfect, good, or bad for the event",
 			save_poll: "Save poll",
 			poll_saved: "Your poll has been saved",
+		},
+		event_viewer: {
+			organizer: "Organizer:",
+			description: "Description:",
+			should_happen: "Should happen:",
+			create_poll: "Create new poll",
+			update_poll: "Update existing poll"
 		},
 		date_picker: {
 			days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
@@ -60,7 +67,8 @@ export default {
 			required_field: "Can't be blank",
 			network: "The server is not responding or cannot be reached. Please try again later.",
 			not_found: "The requested data record could not be found on the server"
-		}
+		},
+		event_by: "by {organizer}"
 	},
 
 	de: {

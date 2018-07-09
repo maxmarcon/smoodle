@@ -1,3 +1,5 @@
+import dateFns from 'date-fns'
+
 export const sanitizeStepRouteParameter = (to, firstStep, lastStep, forceFirstStep=false, stepParameter="step") => {
 	let query = to.query;
 	let step = parseInt(to.query[stepParameter]);
@@ -78,7 +80,11 @@ export function showToolTip(name) {
 	}
 }
 
-export let formWithErrorsMixin = {
+export const formWithErrorsMixin = {
+	data: () => ({
+		wasServerValidated: false,
+		wasLocalValidated: false
+	}),
 	methods: {
 		localValidation() {
 			self = this;
@@ -146,7 +152,7 @@ export let formWithErrorsMixin = {
 	}
 }
 
-export let fetchEventMixin = {
+export const fetchEventMixin = {
 	methods: {
 		fetchEvent(eventId) {
 			let self = this;
@@ -162,6 +168,16 @@ export let fetchEventMixin = {
 						self.$refs.errorBar.show(self.$i18n.t('errors.network'));
 					}
 			});
+		}
+	}
+}
+
+export const timeWindowMixin = {
+	computed: {
+		timeWindow() {
+			return dateFns.format(this.timeWindowFrom, 'DD/MM/YYYY', {locale: this.$i18n.t('date_fns_locale')})
+			 + " - " +
+			 dateFns.format(this.timeWindowTo, 'DD/MM/YYYY', {locale: this.$i18n.t('date_fns_locale')});
 		}
 	}
 }

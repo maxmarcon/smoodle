@@ -209,8 +209,6 @@ export default {
 		dateTo: null,
 		eventDatesError: null,
 		today,
-		wasServerValidated: false,
-		wasLocalValidated: false,
 		showThisWeekButton: (dateFns.getDay(today) > 0 && dateFns.getDay(today) < 4), // betewn Mon and Wed
 		createdEvent: null/* {
 						id: 'd8763187-ed3d-4572-ae50-02d5cc874804',

@@ -46,6 +46,9 @@ Vue.component('message-bar', messageBar);
 import ranker from './vue/ranker.vue'
 Vue.component('ranker', ranker);
 
+import eventHeader from './vue/eventHeader.vue'
+Vue.component('event-header', eventHeader);
+
 const i18n = new VueI18n({
   locale: smoodle_locale,
   messages

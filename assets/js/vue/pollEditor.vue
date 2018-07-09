@@ -3,30 +3,17 @@
 		message-bar(ref="errorBar" variant="danger")
 		b-modal(ref="welcomeModal" hide-header ok-only)
 				p.my-3 {{ $t('poll_editor.welcome', {eventName, eventOrganizer}) }}
-		b-modal(ref="pollSavedModal" hide-header ok-only)
+		b-modal(ref="pollSavedModal" hide-header ok-only @hidden="backToEvent")
 			p.my-4 {{ $t('poll_editor.poll_saved') }}
 		.card(v-if="eventName")
 			.card-header
-				.row
-					.col
-						h5 {{ $t('poll_editor.title', {eventName}) }}
-				.row
-					.col-md-4
-						p.text-muted Organizer:
-					.col-md-8
-						p {{ eventOrganizer }}
-				.row
-					.col-md-4
-						p.text-muted Event description:
-					.col-md-8
-						p {{ eventDesc }}
-				.row
-					.col-md-4
-						p.text-muted When can it take place:
-					.col-md-8
-						p {{ timeWindow }}
-				hr.my-3
-
+				event-header(
+					:name="eventName"
+					:organizer="eventOrganizer"
+					:timeWindowFrom="eventTimeWindowFrom"
+					:timeWindowTo="eventTimeWindowTo"
+				)
+			.card-body
 				b-btn.btn-block.d-flex(
 						v-b-toggle.organizer-group=""
 						:variant="groupVariant('participant-group')"
@@ -57,13 +44,13 @@
 				)
 					span.fas.fa-chevron-down(v-if="groupVisibility['weekday-ranker-group']")
 					span.fas.fa-chevron-up(v-else)
-					span.ml-2.mr-auto {{ $t('poll_editor.weekday_ranks_group') }}
+					span.ml-2.mr-auto {{ $t('poll_editor.weekday_ranker_group') }}
 					div(v-if="showGroupErrorIcon('weekday-ranker-group')").fas.fa-exclamation
 					div(v-else-if="showGroupOkIcon('weekday-ranker-group')").fas.fa-check
 				b-tooltip(
 					target="weekday-ranker-button"
 					triggers=""
-					:title="$t('poll_editor.weekday_ranks_help')"
+					:title="$t('poll_editor.weekday_ranker_help')"
 					:show="groupVisibility['weekday-ranker-group'] && showToolTip('weekday-ranker')"
 				)
 				b-collapse#weekday-ranker(
@@ -75,11 +62,10 @@
 					ranker(:elements="pollWeekdayRanks")
 
 			.card-footer.text-center
-				button.btn.btn-primary(@click="saveEvent") {{ $t('poll_editor.save_poll') }}
+				button.btn.btn-primary(@click="savePoll") {{ $t('poll_editor.save_poll') }}
 
 </template>
 <script>
-import dateFns from 'date-fns'
 import { showToolTip, dotAccessObject, formWithErrorsMixin, fetchEventMixin } from '../globals'
 
 export default {
@@ -121,8 +107,6 @@ export default {
 			evendDesc: null,
 			eventTimeWindowFrom: null,
 			eventTimeWindowTo: null,
-			wasServerValidated: false,
-			wasLocalValidated: false,
 			pollWeekdayRanks: this.$i18n.t('date_picker.days').map((day, index) => ({day: index, name: day, rank: 0})),
 			pollParticipant: null,
 			pollParticipantError: null
@@ -146,7 +130,7 @@ export default {
 		}
 	},
 	methods: {
-		saveEvent() {
+		savePoll() {
 			let self = this;
 			this.$http.post("/v1/events/" + this.eventId + "/polls", {
 				poll: self.pollData
@@ -168,6 +152,9 @@ export default {
 			.finally(function() {
 				self.wasServerValidated = true;
 			});
+		},
+		backToEvent() {
+			self.$router.push({name: 'event', params: {eventId: self.eventId}});
 		}
 	},
 	computed: {
@@ -178,11 +165,6 @@ export default {
 					weekday_ranks: this.pollWeekdayRanks.filter(weekday_rank => weekday_rank.rank) // exclude 0 ranks
 				}
 			}
-		},
-		timeWindow() {
-			return dateFns.format(this.eventTimeWindowFrom, 'DD/MM/YYYY (ddd)', {locale: this.$i18n.t('date_fns_locale')})
-			 + " - " +
-			 dateFns.format(this.eventTimeWindowTo, 'DD/MM/YYYY (ddd)', {locale: this.$i18n.t('date_fns_locale')});
 		}
 	}
 }
