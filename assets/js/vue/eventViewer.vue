@@ -4,17 +4,17 @@
 		b-modal#updateAnswerModal(
 			:title="$t('event_viewer.update.title')"
 			:ok-title="$t('event_viewer.update.load')"
-			@ok="loadAnswer"
+			:ok-disabled="!pollParticipant"
+			@ok="loadPoll"
 		)
-			.container-fluid
-				p.form-text {{ $t('event_viewer.update.how_to') }}
-				.form-group
-					input#pollParticipant.form-control(
-						v-model.trim="pollParticipant"
-						:class="{'is-invalid': pollParticipantError}"
-						:placeholder="$t('event_viewer.update.name_placeholder')"
-					)
-					.invalid-feedback {{ pollParticipantError }}
+			p.form-text {{ $t('event_viewer.update.how_to') }}
+			.form-group
+				input#pollParticipant.form-control(
+					v-model.trim="pollParticipant"
+					:class="{'is-invalid': pollParticipantError}"
+					:placeholder="$t('event_viewer.update.name_placeholder')"
+				)
+				.invalid-feedback {{ pollParticipantError }}
 
 		.card(v-if="eventName")
 			.card-header
@@ -37,7 +37,7 @@
 					.col-auto.mt-1
 						router-link.btn.btn-success(
 							role="button"
-							:to="{ name: 'poll', params: {eventId: eventId}}"
+							:to="{ name: 'new_poll', params: {eventId: eventId}}"
 						) {{ $t('event_viewer.create_poll') }}
 					.col-auto.mt-1
 						button.btn.btn-primary(v-b-modal.updateAnswerModal="") {{ $t('event_viewer.update_poll') }}
@@ -77,10 +77,33 @@ export default {
 		});
 	},
 	methods: {
-		loadAnswer(bvEvt) {
-			// TEST
-			this.pollParticipantError = "Not found";
+		fetchPoll(participant) {
+			let self = this;
+			return this.$http.get("/v1/events/" + this.eventId + "/polls",
+				{
+					headers: { 'Accept-Language': this.$i18n.locale },
+					params: {
+						participant
+					}
+				}).then(function(result) {
+					self.pollParticipantError = null;
+					return result.data.data;
+				}, function(result) {
+					if (result.request.status == 404) {
+						self.pollParticipantError = self.$i18n.t('event_viewer.update.poll_not_found');
+					} else {
+						self.$refs.errorBar.show(self.$i18n.t('errors.network'));
+					}
+			});
+		},
+		loadPoll(bvEvt) {
 			bvEvt.preventDefault();
+			let self = this;
+			this.fetchPoll(this.pollParticipant).then(function(poll) {
+				if (poll) {
+					self.$router.push({name: 'edit_poll', params: {pollId: poll.id}});
+				}
+			});
 		}
 	}
 }

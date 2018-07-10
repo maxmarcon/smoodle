@@ -32,7 +32,10 @@ defmodule SmoodleWeb.PollController do
 	end
 
 	def show(conn, %{"id" => id}) do
-    poll = Repo.preload(Scheduler.get_poll!(id), :date_ranks)
+    poll = Scheduler.get_poll!(id)
+    |> Repo.preload(:date_ranks)
+    |> Repo.preload(:event)
+
     render(conn, "show.json", poll: poll)
   end
 

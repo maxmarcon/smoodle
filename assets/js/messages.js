@@ -60,7 +60,8 @@ export default {
 				title: "Update your answer",
 				load: "Load your answer",
 				how_to: "Enter the name you used to save your answer",
-				name_placeholder: "Enter your name here..."
+				name_placeholder: "Enter your name here...",
+				poll_not_found: "No answer found under this name. Did you spell the name correctly?"
 			}
 		},
 		date_picker: {

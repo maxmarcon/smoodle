@@ -62,14 +62,13 @@
 
 </template>
 <script>
-import { showToolTip, dotAccessObject, formWithErrorsMixin, fetchEventMixin } from '../globals'
+import { showToolTip, dotAccessObject, formWithErrorsMixin, fetchEventMixin, fetchPollMixin } from '../globals'
 
 export default {
-	mixins: [formWithErrorsMixin, fetchEventMixin],
+	mixins: [formWithErrorsMixin, fetchEventMixin, fetchPollMixin],
 	props: {
 		eventId: {
 			type: String,
-			required: true
 		},
 		pollId: {
 			type: String
@@ -103,38 +102,62 @@ export default {
 			evendDesc: null,
 			eventTimeWindowFrom: null,
 			eventTimeWindowTo: null,
-			pollWeekdayRanks: this.$i18n.t('date_picker.days').map((day, index) => ({day: index, name: day, rank: 0})),
+			pollWeekdayRanks: null,
 			pollParticipant: null,
 			pollParticipantError: null
 		}
 	},
 	created() {
 		let self = this;
-		this.fetchEvent(this.eventId).then(function(eventData) {
-			if (eventData) {
-				self.eventName = eventData.name;
-				self.eventOrganizer = eventData.organizer;
-				self.eventDesc = eventData.desc;
-				self.eventTimeWindowFrom = eventData.time_window_from;
-				self.eventTimeWindowTo = eventData.time_window_to;
-			}
-		});
-
-		if (this.pollId) {
-			console.log("we should fetch an existing poll here");
+		if (this.eventId) {
+			this.fetchEvent(this.eventId).then(function(event) {
+				if (event) {
+					self.assignEventData(event);
+					self.assignPollData(null);
+				}
+			});
+		} else {
+			this.fetchPoll(this.pollId).then(function(poll) {
+				if (poll) {
+					self.assignEventData(poll.event);
+					self.assignPollData(poll);
+				}
+			});
 		}
 	},
 	methods: {
+		assignEventData(eventData) {
+			this.eventName = eventData.name;
+			this.eventOrganizer = eventData.organizer;
+			this.eventDesc = eventData.desc;
+			this.eventTimeWindowFrom = eventData.time_window_from;
+			this.eventTimeWindowTo = eventData.time_window_to;
+		},
+		assignPollData(poll) {
+			if (poll) {
+				this.eventId = poll.event_id;
+				this.pollParticipant = poll.participant;
+				this.pollWeekdayRanks = this.initialWeeklyRanks;
+				let self = this;
+				poll.preferences.weekday_ranks.forEach(function(rank) {
+					self.pollWeekdayRanks[rank.day].rank = rank.rank;
+				});
+			} else {
+				this.pollWeekdayRanks = this.initialWeeklyRanks;
+			}
+		},
 		savePoll() {
 			let self = this;
-			this.$http.post("/v1/events/" + this.eventId + "/polls", {
-				poll: self.pollData
-			}, {
+			this.$http.request({
+				method: (this.pollId ? 'put' : 'post'),
+				url: (this.pollId ? '/v1/polls/' + this.pollId : '/v1/events/' + this.eventId + '/polls'),
+				data: {
+					poll: self.pollData
+				},
 				headers: { 'Accept-Language': this.$i18n.locale }
 			})
 			.then(function(result) {
 				self.setServerErrors();
-				self.poll = result.data.data;
 				self.collapseAllGroups();
 				self.$refs.pollSavedModal.show();
 			}, function(result) {
@@ -153,6 +176,9 @@ export default {
 		}
 	},
 	computed: {
+		initialWeeklyRanks() {
+			return this.$i18n.t('date_picker.days').map((day, index) => ({day: index, name: day, rank: 0}));
+		},
 		pollData() {
 			return {
 				participant: this.pollParticipant,

@@ -194,6 +194,14 @@ defmodule SmoodleWeb.PollControllerTest do
   		data = json_response(conn, 200)["data"]
   		assert data["id"] == poll.id
   	end
+
+    test "fetching a poll via its id does not leak event owner token", %{conn: conn, polls: [poll | _]} do
+      conn = get conn, poll_path(conn, :show, poll.id)
+      data = json_response(conn, 200)["data"]
+      assert data["id"] == poll.id
+      assert data["event"]
+      refute data["event"]["owner_token"]
+    end
   end
 
   describe "create" do

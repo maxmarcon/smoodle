@@ -172,6 +172,26 @@ export const fetchEventMixin = {
 	}
 }
 
+export const fetchPollMixin = {
+	methods: {
+		fetchPoll(pollId) {
+			let self = this;
+			return this.$http.get("/v1/polls/" + pollId
+				,{
+					headers: { 'Accept-Language': this.$i18n.locale }
+				}).then(function(result) {
+					return result.data.data;
+				}, function(result) {
+					if (result.request.status == 404) {
+						self.$refs.errorBar.show(self.$i18n.t('errors.not_found'));
+					} else {
+						self.$refs.errorBar.show(self.$i18n.t('errors.network'));
+					}
+			});
+		}
+	}
+}
+
 export const timeWindowMixin = {
 	computed: {
 		timeWindow() {

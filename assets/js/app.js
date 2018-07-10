@@ -25,8 +25,14 @@ const router = new VueRouter({
 	  	props: true
 	  },
 	  {
-	  	path: '/event/:eventId/poll/:pollId?',
-	  	name: 'poll',
+	  	path: '/event/:eventId/poll',
+	  	name: 'new_poll',
+	  	component: PollEditor,
+			props: true
+	  },
+	  {
+	  	path: '/poll/:pollId',
+	  	name: 'edit_poll',
 	  	component: PollEditor,
 			props: true
 	  }
