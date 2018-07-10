@@ -237,11 +237,6 @@ export default {
 				time_window_from: this.dateFrom,
 				time_window_to: this.dateTo
 			};
-		},
-		eventHeader() {
-			if (this.eventName) {
-				return this.eventName + (this.dateRange ? ': ' + this.dateRange : '');
-			}
 		}
 	},
 	methods: {

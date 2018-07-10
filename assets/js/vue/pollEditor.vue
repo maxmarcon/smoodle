@@ -1,8 +1,6 @@
 <template lang="pug">
 	div
 		message-bar(ref="errorBar" variant="danger")
-		b-modal(ref="welcomeModal" hide-header ok-only)
-				p.my-3 {{ $t('poll_editor.welcome', {eventName, eventOrganizer}) }}
 		b-modal(ref="pollSavedModal" hide-header ok-only @hidden="backToEvent")
 			p.my-4 {{ $t('poll_editor.poll_saved') }}
 		.card(v-if="eventName")
@@ -47,22 +45,20 @@
 					span.ml-2.mr-auto {{ $t('poll_editor.weekday_ranker_group') }}
 					div(v-if="showGroupErrorIcon('weekday-ranker-group')").fas.fa-exclamation
 					div(v-else-if="showGroupOkIcon('weekday-ranker-group')").fas.fa-check
-				b-tooltip(
-					target="weekday-ranker-button"
-					triggers=""
-					:title="$t('poll_editor.weekday_ranker_help')"
-					:show="groupVisibility['weekday-ranker-group'] && showToolTip('weekday-ranker')"
-				)
 				b-collapse#weekday-ranker(
 					accordion="poll-editor"
 					v-model="groupVisibility['weekday-ranker-group']"
 					:visible="true"
 				)
-					.invalid-feedback {{ pollWeekdayRanksError }}
+					p.small.text-muted.mt-3 {{ $t('poll_editor.weekday_ranker_help') }}
 					ranker(:elements="pollWeekdayRanks")
 
-			.card-footer.text-center
-				button.btn.btn-primary(@click="savePoll") {{ $t('poll_editor.save_poll') }}
+			.card-footer
+				.row.justify-content-center
+					.col-auto.mt-1
+						button.btn.btn-primary(@click="savePoll") {{ $t('poll_editor.save_poll') }}
+					.col-auto.mt-1
+						button.btn.btn-secondary(@click="backToEvent") {{ $t('actions.cancel') }}
 
 </template>
 <script>
@@ -121,7 +117,6 @@ export default {
 				self.eventDesc = eventData.desc;
 				self.eventTimeWindowFrom = eventData.time_window_from;
 				self.eventTimeWindowTo = eventData.time_window_to;
-				//self.$refs.welcomeModal.show();
 			}
 		});
 
@@ -154,7 +149,7 @@ export default {
 			});
 		},
 		backToEvent() {
-			self.$router.push({name: 'event', params: {eventId: self.eventId}});
+			this.$router.push({name: 'event', params: {eventId: this.eventId}});
 		}
 	},
 	computed: {

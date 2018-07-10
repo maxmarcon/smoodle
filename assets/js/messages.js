@@ -36,15 +36,14 @@ export default {
 			dates_placeholder: 'Click to enter dates'
 		},
 		poll_editor: {
-			welcome: "{eventOrganizer} has invited you to a {eventName}. Please let them know what dates work best for you by answering a few questions.",
 			title: "Poll for \u201C{eventName}\u201E",
 			participant_group: "Who are you?",
 			poll: {
 				participant: "Participant name",
 				participant_help: "Tell the organizer who you are..."
 			},
-			weekday_ranker_group: "Which days of the week work best for you?",
-			weekday_ranker_help: "Specify which days of the week are perfect, good, or bad for the event",
+			weekday_ranker_group: "How does your week look?",
+			weekday_ranker_help: "Specify which days of the week are in general just perfect, ok, or bad for the event",
 			save_poll: "Save poll",
 			poll_saved: "Your poll has been saved",
 		},
@@ -52,8 +51,17 @@ export default {
 			organizer: "Organizer:",
 			description: "Description:",
 			should_happen: "Should happen:",
-			create_poll: "Create new poll",
-			update_poll: "Update existing poll"
+			create_poll: "Answer the poll",
+			update_poll: "Update your answer",
+			no_participants: "Nobody participated yet. As soon as there are some participants, the best dates for the event will appear here.",
+			welcome: "{organizer} has invited you to this event, which will happen on a day in the period {timeWindow}. Please answer a poll\
+								to enter your availability. You can also update your answer if you already entered one.",
+			update: {
+				title: "Update your answer",
+				load: "Load your answer",
+				how_to: "Enter the name you used to save your answer",
+				name_placeholder: "Enter your name here..."
+			}
 		},
 		date_picker: {
 			days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
@@ -62,13 +70,21 @@ export default {
 			apply: 'Apply',
 			cancel: 'Cancel'
 		},
+		ranker: {
+			good: "Good",
+			ok: "Ok",
+			bad: "Bad"
+		},
 		date_fns_locale: date_fns_en,
 		errors: {
 			required_field: "Can't be blank",
 			network: "The server is not responding or cannot be reached. Please try again later.",
 			not_found: "The requested data record could not be found on the server"
 		},
-		event_by: "by {organizer}"
+		event_by: "by {organizer}",
+		actions: {
+			cancel: "Cancel"
+		}
 	},
 
 	de: {

@@ -175,9 +175,11 @@ export const fetchEventMixin = {
 export const timeWindowMixin = {
 	computed: {
 		timeWindow() {
-			return dateFns.format(this.timeWindowFrom, 'DD/MM/YYYY', {locale: this.$i18n.t('date_fns_locale')})
+			let from = this.timeWindowFrom || this.eventTimeWindowFrom;
+			let to = this.timeWindowTo || this.eventTimeWindowTo;
+			return dateFns.format(from, 'DD/MM/YYYY', {locale: this.$i18n.t('date_fns_locale')})
 			 + " - " +
-			 dateFns.format(this.timeWindowTo, 'DD/MM/YYYY', {locale: this.$i18n.t('date_fns_locale')});
+			 dateFns.format(to, 'DD/MM/YYYY', {locale: this.$i18n.t('date_fns_locale')});
 		}
 	}
 }
