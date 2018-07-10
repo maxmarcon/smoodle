@@ -89,4 +89,12 @@ defmodule Smoodle.Scheduler.Utils do
     	update_change(cs, field, &String.trim/1)
     end)
   end
-end
+
+  def validate_nonzero(changeset, field) do
+  	if get_change(changeset, field) == 0 do
+      add_error(changeset, field, dgettext("errors", "must be different than zero"), validation: :must_be_nonzero)
+  	else
+  		changeset
+  	end
+  end
+ end

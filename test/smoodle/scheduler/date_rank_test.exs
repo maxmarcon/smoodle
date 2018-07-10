@@ -40,6 +40,12 @@ defmodule Smoodle.Scheduler.DateRankTest do
   	assert [rank: {_, [validation: :required]}] = changeset.errors
   end
 
+	test "date rank is invalid with 0 rank" do
+		changeset = DateRank.changeset(%DateRank{}, Map.put(@valid_attrs, :rank, 0.0))
+  	refute changeset.valid?
+  	assert [rank: {_, [validation: :must_be_nonzero]}] = changeset.errors
+  end
+
 	test "date rank is invalid with a date_from later than date_to" do
 		changeset = DateRank.changeset(%DateRank{}, Map.merge(
 				@valid_attrs,

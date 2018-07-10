@@ -20,7 +20,7 @@ defmodule Smoodle.Scheduler.PollTest do
 	}
 
 	def build_weekday_ranks(_) do
-		%{weekday_ranks: Enum.map(0..6, fn d -> %{day: d, rank: Enum.random([0, -0.2, -0.1, 0.1, 0.2])} end)}
+		%{weekday_ranks: Enum.map(0..6, fn d -> %{day: d, rank: Enum.random([-0.2, -0.1, 0.1, 0.2])} end)}
 	end
 
 	def create_date_ranks(_) do
@@ -110,6 +110,23 @@ defmodule Smoodle.Scheduler.PollTest do
 			refute changeset.valid?
 
 			assert %{preferences: %{weekday_ranks: [%{rank: _} | _]}} = traverse_errors(changeset, &(&1))
+		end
+
+		test "poll is invalid with 0 weekday rank", context do
+			changeset = Poll.changeset(
+				%Poll{},
+				Map.merge(
+					@poll_attrs,
+					%{
+						preferences: %{
+							weekday_ranks: List.replace_at(context[:weekday_ranks], 0, %{day: 0, rank: 0.0})
+						}
+					}
+				)
+			)
+			refute changeset.valid?
+
+			assert %{preferences: %{weekday_ranks: [%{rank: [{_, validation: :must_be_nonzero}]} | _]}} = traverse_errors(changeset, &(&1))
 		end
 
 		test "poll is invalid if a weekday is ranked more than once", context do

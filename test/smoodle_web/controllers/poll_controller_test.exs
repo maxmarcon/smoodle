@@ -39,7 +39,7 @@ defmodule SmoodleWeb.PollControllerTest do
       %{
         date_from: "2117-04-05",
         date_to: "2117-04-05",
-        rank: 0.0
+        rank: -0.5
       }
     ]
   }

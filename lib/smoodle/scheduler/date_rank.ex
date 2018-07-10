@@ -18,6 +18,7 @@ defmodule Smoodle.Scheduler.DateRank do
   	|> cast(attrs, [:date_from, :date_to, :rank, :poll_id])
   	|> validate_required([:date_from, :date_to, :rank])
     |> validate_window_consistent([:date_from, :date_to], :dates, Date)
+    |> validate_nonzero(:rank)
   	|> assoc_constraint(:poll)
   end
 end
