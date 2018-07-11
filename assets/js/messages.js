@@ -85,7 +85,7 @@ export default {
 		errors: {
 			required_field: "Can't be blank",
 			network: "The server is not responding or cannot be reached. Please try again later.",
-			not_found: "The requested data record could not be found on the server"
+			not_found: "The requested data could not be found on the server"
 		},
 		event_header: {
 			by: "by {organizer}",

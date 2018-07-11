@@ -80,7 +80,7 @@ export function showToolTip(name) {
 	}
 }
 
-export const formWithErrorsMixin = {
+export const accordionGroupsMixin = {
 	data: () => ({
 		wasServerValidated: false,
 		wasLocalValidated: false

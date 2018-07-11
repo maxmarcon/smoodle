@@ -55,6 +55,9 @@ Vue.component('ranker', ranker);
 import eventHeader from './vue/eventHeader.vue'
 Vue.component('event-header', eventHeader);
 
+import errorPage from './vue/errorPage.vue'
+Vue.component('error-page', errorPage);
+
 const i18n = new VueI18n({
   locale: smoodle_locale,
   messages

@@ -164,14 +164,14 @@
 
 <script>
 import dateFns from 'date-fns'
-import { formWithErrorsMixin } from '../globals'
+import { accordionGroupsMixin } from '../globals'
 
 const today = new Date();
 const InvalidDate = 'Invalid Date';
 
 
 export default {
-	mixins: [formWithErrorsMixin],
+	mixins: [accordionGroupsMixin],
 	data: () => ({
 		errorsMap: {
 			// maps, for each input group, the fields in the vue model to

@@ -77,12 +77,16 @@
 							i.fas.fa-ban
 							| &nbsp; {{ $t('actions.cancel') }}
 
+		error-page(
+			v-else=""
+			:message="$t('errors.not_found')"
+		)
 </template>
 <script>
-import { showToolTip, dotAccessObject, formWithErrorsMixin, fetchEventMixin, fetchPollMixin } from '../globals'
+import { showToolTip, dotAccessObject, accordionGroupsMixin, fetchEventMixin, fetchPollMixin } from '../globals'
 
 export default {
-	mixins: [formWithErrorsMixin, fetchEventMixin, fetchPollMixin],
+	mixins: [accordionGroupsMixin, fetchEventMixin, fetchPollMixin],
 	props: {
 		eventId: {
 			type: String,
@@ -140,6 +144,8 @@ export default {
 					self.assignPollData(poll);
 				}
 			});
+			this.groupVisibility['participant-group'] = false;
+			this.groupVisibility['weekday-ranker-group'] = true;
 		}
 	},
 	methods: {
@@ -153,7 +159,7 @@ export default {
 		assignPollData(poll) {
 			this.pollWeekdayRanks = this.initialWeeklyRanks;
 			if (poll) {
-				this.eventId = poll.event_id;
+				this.eventIdFromPoll = poll.event_id;
 				this.pollParticipant = poll.participant;
 				let self = this;
 				poll.preferences.weekday_ranks.forEach(function(rank) {
@@ -196,10 +202,13 @@ export default {
 			});
 		},
 		backToEvent() {
-			this.$router.push({name: 'event', params: {eventId: this.eventId}});
+			this.$router.push({name: 'event', params: {eventId: this.computedEventId}});
 		}
 	},
 	computed: {
+		computedEventId() {
+			return (this.eventId ? this.eventId : this.eventIdFromPoll);
+		},
 		initialWeeklyRanks() {
 			return this.$i18n.t('date_picker.days').map((day, index) => ({day: index, name: day, rank: 0}));
 		},

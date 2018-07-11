@@ -13,6 +13,7 @@
 					v-model.trim="pollParticipant"
 					:class="{'is-invalid': pollParticipantError}"
 					:placeholder="$t('event_viewer.update.name_placeholder')"
+					@keyup.enter="loadPoll"
 				)
 				.invalid-feedback {{ pollParticipantError }}
 
@@ -50,6 +51,10 @@
 							i.fas.fa-edit
 							| &nbsp; {{ $t('event_viewer.update_poll') }}
 
+		error-page(
+			v-else
+			:message="$t('errors.not_found')"
+		)
 </template>
 <script>
 import { fetchEventMixin, timeWindowMixin } from '../globals'
@@ -107,11 +112,13 @@ export default {
 		loadPoll(bvEvt) {
 			bvEvt.preventDefault();
 			let self = this;
-			this.fetchPoll(this.pollParticipant).then(function(poll) {
-				if (poll) {
-					self.$router.push({name: 'edit_poll', params: {pollId: poll.id}});
-				}
-			});
+			if (this.pollParticipant) {
+				this.fetchPoll(this.pollParticipant).then(function(poll) {
+					if (poll) {
+						self.$router.push({name: 'edit_poll', params: {pollId: poll.id}});
+					}
+				});
+			}
 		}
 	}
 }
