@@ -78,7 +78,7 @@
 							| &nbsp; {{ $t('actions.cancel') }}
 
 		error-page(
-			v-else=""
+			v-else-if="loaded"
 			:message="$t('errors.not_found')"
 		)
 </template>
@@ -88,12 +88,8 @@ import { showToolTip, dotAccessObject, accordionGroupsMixin, fetchEventMixin, fe
 export default {
 	mixins: [accordionGroupsMixin, fetchEventMixin, fetchPollMixin],
 	props: {
-		eventId: {
-			type: String,
-		},
-		pollId: {
-			type: String
-		}
+		eventId: String,
+		pollId: String
 	},
 	data() {
 		return {
@@ -125,7 +121,8 @@ export default {
 			eventTimeWindowTo: null,
 			pollWeekdayRanks: null,
 			pollParticipant: null,
-			pollParticipantError: null
+			pollParticipantError: null,
+			loaded: false
 		}
 	},
 	created() {
@@ -136,6 +133,7 @@ export default {
 					self.assignEventData(event);
 					self.assignPollData(null);
 				}
+				self.loaded = true;
 			});
 		} else {
 			this.fetchPoll(this.pollId).then(function(poll) {
@@ -143,6 +141,7 @@ export default {
 					self.assignEventData(poll.event);
 					self.assignPollData(poll);
 				}
+				self.loaded = true;
 			});
 			this.groupVisibility['participant-group'] = false;
 			this.groupVisibility['weekday-ranker-group'] = true;
@@ -162,8 +161,11 @@ export default {
 				this.eventIdFromPoll = poll.event_id;
 				this.pollParticipant = poll.participant;
 				let self = this;
-				poll.preferences.weekday_ranks.forEach(function(rank) {
-					self.pollWeekdayRanks[rank.day].rank = rank.rank;
+				poll.preferences.weekday_ranks.forEach((rank) => {
+					let el = self.pollWeekdayRanks.find((el) => el.day == rank.day);
+					if (el) {
+						el.rank = rank.rank;
+					}
 				});
 			}
 		},

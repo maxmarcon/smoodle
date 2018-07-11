@@ -52,7 +52,7 @@
 							| &nbsp; {{ $t('event_viewer.update_poll') }}
 
 		error-page(
-			v-else
+			v-else-if="loaded"
 			:message="$t('errors.not_found')"
 		)
 </template>
@@ -75,7 +75,8 @@ export default {
 		eventTimeWindowTo: null,
 		bestDates: null,
 		pollParticipant: null,
-		pollParticipantError: null
+		pollParticipantError: null,
+		loaded: false
 	}),
 	created() {
 		let self = this;
@@ -87,6 +88,7 @@ export default {
 				self.eventTimeWindowFrom = eventData.time_window_from;
 				self.eventTimeWindowTo = eventData.time_window_to;
 			}
+			self.loaded = true;
 		});
 	},
 	methods: {

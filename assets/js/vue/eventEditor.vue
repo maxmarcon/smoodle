@@ -10,8 +10,8 @@
 				event-header(
 					:name="eventName"
 					:organizer="eventOrganizer"
-					:timeWindowFrom="dateFrom"
-					:timeWindowTo="dateTo"
+					:timeWindowFrom="eventTimeWindowFrom"
+					:timeWindowTo="eventTimeWindowTo"
 				)
 			.card-body
 				.row.justify-content-center(v-if="createdEvent")
@@ -119,7 +119,7 @@
 									.datepicker-trigger
 										input#eventDates.form-control(
 										:disabled="createdEvent"
-										:value="dateRange"
+										:value="timeWindow"
 										:class="inputFieldClass('dateRange')"
 										:placeholder="$t('event_editor.dates_placeholder')"
 										readonly
@@ -131,12 +131,12 @@
 												:trigger-element-id="'eventDates'"
 													:mode="'range'"
 													:fullscreen-mobile="true"
-													:date-one="dateFrom"
-													:date-two="dateTo"
+													:date-one="eventTimeWindowFrom"
+													:date-two="eventTimeWindowTo"
 													:min-date="today"
 													@closed="localValidation"
-													@date-one-selected="val => { dateFrom = val }"
-													@date-two-selected="val => { dateTo = val }"
+													@date-one-selected="val => { eventTimeWindowFrom = val }"
+													@date-two-selected="val => { eventTimeWindowTo = val }"
 											)
 
 								.col-md-auto
@@ -149,29 +149,34 @@
 			.card-footer
 				.row.justify-content-center(v-if="!createdEvent")
 					.col-auto
-						button.btn.btn-primary(@click="createEvent") {{ $t('event_editor.create_event') }}
+						button.btn.btn-primary(@click="createEvent")
+							i.fas.fa-plus
+							| &nbsp; {{ $t('event_editor.create_event') }}
 
 				.row.justify-content-center(v-else)
 					.col-auto.mt-1
 						router-link.btn.btn-success(
 							role="button"
 							:to="{ name: 'poll', params: {eventId: createdEvent.id}}"
-						) {{ $t('event_editor.poll_event') }}
+						)
+							i.fas.fa-question
+							| &nbsp; {{ $t('event_editor.poll_event') }}
 					.col-auto.mt-1
-						button.btn.btn-primary {{ $t('event_editor.manage_event') }}
+						button.btn.btn-primary
+							i.fas.fa-gamepad
+							| &nbsp; {{ $t('event_editor.manage_event') }}
 
 </template>
 
 <script>
 import dateFns from 'date-fns'
-import { accordionGroupsMixin } from '../globals'
+import { accordionGroupsMixin, timeWindowMixin } from '../globals'
 
 const today = new Date();
 const InvalidDate = 'Invalid Date';
 
-
 export default {
-	mixins: [accordionGroupsMixin],
+	mixins: [accordionGroupsMixin, timeWindowMixin],
 	data: () => ({
 		errorsMap: {
 			// maps, for each input group, the fields in the vue model to
@@ -210,8 +215,8 @@ export default {
 		eventOrganizerError: null,
 		eventDesc: null,
 		eventDescError: null,
-		dateFrom: null,
-		dateTo: null,
+		eventTimeWindowFrom: null,
+		eventTimeWindowTo: null,
 		eventDatesError: null,
 		today,
 		showThisWeekButton: (dateFns.getDay(today) > 0 && dateFns.getDay(today) < 4), // betewn Mon and Wed
@@ -224,23 +229,13 @@ export default {
 					}*/
  	}),
 	computed: {
-		dateRange() {
-			let fromDate_s = dateFns.format(this.dateFrom, 'DD/MM/YYYY', {locale: this.$i18n.t('date_fns_locale')});
-			let toDate_s = dateFns.format(this.dateTo, 'DD/MM/YYYY', {locale: this.$i18n.t('date_fns_locale')});
-
-			if (fromDate_s == InvalidDate || toDate_s == InvalidDate) {
-				return null;
-			} else {
-				return fromDate_s + ' - ' + toDate_s;
-			}
-		},
 		eventData() {
 			return {
 				name: this.eventName,
 				desc: this.eventDesc,
 				organizer: this.eventOrganizer,
-				time_window_from: this.dateFrom,
-				time_window_to: this.dateTo
+				time_window_from: this.eventTimeWindowFrom,
+				time_window_to: this.eventTimeWindowTo
 			};
 		}
 	},
@@ -249,8 +244,8 @@ export default {
       this.$refs.copiedToClipboardModal.show();
 		},
 		applyDates(from, to) {
-			this.dateFrom = from;
-			this.dateTo = to;
+			this.eventTimeWindowFrom = from;
+			this.eventTimeWindowTo = to;
 		},
 		pickThisWeek() {
 			this.applyDates(

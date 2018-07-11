@@ -44,6 +44,7 @@ export default {
 			},
 			weekday_ranker_group: "How is your typical week?",
 			weekday_ranker_help: "Specify which days of the week are in general just perfect, ok, or bad for the event",
+			calendar_ranker_group: "Select specific dates",
 			save_poll: "Save poll",
 			delete_poll: "Delete poll",
 			poll_saved: "Your poll has been saved",
