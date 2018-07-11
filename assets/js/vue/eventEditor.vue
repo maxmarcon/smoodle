@@ -6,10 +6,13 @@
 		b-modal(ref="eventCreatedModal" hide-header ok-only)
 			p.my-4 {{ $t('event_editor.event_created_short') }}
 		.card
-			.card-header.d-flex(:class="{'bg-success': createdEvent, 'text-white': createdEvent}")
-				h5 {{ eventName || $t('event_editor.title') }}
-				h5.d-none.d-lg-block {{ (dateRange && eventName) ? ': ' + dateRange : '' }}
-
+			.card-header
+				event-header(
+					:name="eventName"
+					:organizer="eventOrganizer"
+					:timeWindowFrom="dateFrom"
+					:timeWindowTo="dateTo"
+				)
 			.card-body
 				.row.justify-content-center(v-if="createdEvent")
 					.col-md-8.text-center
@@ -26,7 +29,9 @@
 
 				.row.justify-content-center(v-else)
 					.col-md-8.text-center
-						h5 {{ $t('event_editor.welcome') }}
+						p
+							i.fas.fa-calendar-alt.fa-lg
+							| &nbsp; {{ $t('event_editor.welcome') }}
 
 				hr.mb-3
 

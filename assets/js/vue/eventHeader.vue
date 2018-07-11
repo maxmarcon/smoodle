@@ -1,9 +1,9 @@
 <template lang="pug">
 	div
 		.d-flex.justify-content-between
-			h5.card-title {{ name }}
-			small.text-muted {{ $t('event_by', {organizer: organizer}) }}
-		h6.card-subtitle.text-muted {{ timeWindow }}
+			h5.card-title {{ name || $t('event_header.no_name') }}
+			small.text-muted {{ organizer ? $t('event_header.by', {organizer: organizer}) : '' }}
+		h6.card-subtitle.text-muted {{ timeWindowFrom && timeWindowTo ? timeWindow : $t('event_header.no_dates') }}
 </template>
 <script>
 import { timeWindowMixin } from '../globals'
@@ -11,14 +11,8 @@ import { timeWindowMixin } from '../globals'
 export default {
 	mixins: [timeWindowMixin],
 	props: {
-		name: {
-			type: String,
-			required: true
-		},
-		organizer: {
-			type: String,
-			required: true
-		},
+		name: String,
+		organizer: String,
 		timeWindowFrom: String,
 		timeWindowTo: String
 	}

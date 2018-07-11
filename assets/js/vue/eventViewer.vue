@@ -26,21 +26,29 @@
 				)
 			ul.list-group.list-group-flush
 				li.list-group-item
-					p {{ eventDesc }}
+					p
+						em.text-muted {{ eventOrganizer }} {{ $t('event_viewer.says') }} &nbsp;
+						| {{ eventDesc }}
 				li.list-group-item
 					p.text-muted {{ $t('event_viewer.welcome', {organizer: eventOrganizer, timeWindow}) }}
 				li.list-group-item
 					div(v-if="bestDates")
-					div.alert.alert-primary(v-else) {{ $t('event_viewer.no_participants') }}
+					div.alert.alert-primary(v-else)
+						i.fas.fa-meh-rolling-eyes.fa-lg
+						| &nbsp; {{ $t('event_viewer.no_participants') }}
 			.card-footer
 				.row.justify-content-center
 					.col-auto.mt-1
 						router-link.btn.btn-success(
 							role="button"
 							:to="{ name: 'new_poll', params: {eventId: eventId}}"
-						) {{ $t('event_viewer.create_poll') }}
+						)
+							i.fas.fa-question
+							| &nbsp; {{ $t('event_viewer.create_poll') }}
 					.col-auto.mt-1
-						button.btn.btn-primary(v-b-modal.updateAnswerModal="") {{ $t('event_viewer.update_poll') }}
+						button.btn.btn-primary(v-b-modal.updateAnswerModal="")
+							i.fas.fa-edit
+							| &nbsp; {{ $t('event_viewer.update_poll') }}
 
 </template>
 <script>

@@ -42,10 +42,14 @@ export default {
 				participant: "Participant name",
 				participant_help: "Tell the organizer who you are..."
 			},
-			weekday_ranker_group: "How does your week look?",
+			weekday_ranker_group: "How is your typical week?",
 			weekday_ranker_help: "Specify which days of the week are in general just perfect, ok, or bad for the event",
 			save_poll: "Save poll",
+			delete_poll: "Delete poll",
 			poll_saved: "Your poll has been saved",
+			really_delete: "Do you really want to delete your poll? This operation can't be undone",
+			back_to_event: "Back to the event",
+			poll_deleted: "Your poll has been deleted"
 		},
 		event_viewer: {
 			organizer: "Organizer:",
@@ -56,6 +60,7 @@ export default {
 			no_participants: "Nobody participated yet. As soon as there are some participants, the best dates for the event will appear here.",
 			welcome: "{organizer} has invited you to this event, which will happen on a day in the period {timeWindow}. Please answer a poll\
 								to enter your availability. You can also update your answer if you already entered one.",
+			says: "says:",
 			update: {
 				title: "Update your answer",
 				load: "Load your answer",
@@ -82,7 +87,11 @@ export default {
 			network: "The server is not responding or cannot be reached. Please try again later.",
 			not_found: "The requested data record could not be found on the server"
 		},
-		event_by: "by {organizer}",
+		event_header: {
+			by: "by {organizer}",
+			no_name: "No event name yet",
+			no_dates: "No dates yet"
+		},
 		actions: {
 			cancel: "Cancel"
 		}

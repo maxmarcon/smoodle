@@ -1,8 +1,17 @@
 <template lang="pug">
 	div
 		message-bar(ref="errorBar" variant="danger")
-		b-modal(ref="pollSavedModal" hide-header ok-only @hidden="backToEvent")
+		b-modal(ref="pollSavedModal" hide-header ok-only :ok-title="$t('poll_editor.back_to_event')" @hidden="backToEvent")
 			p.my-4 {{ $t('poll_editor.poll_saved') }}
+		b-modal#pollDeleteModal(
+			hide-header
+			@ok="deletePoll"
+			:ok-title="$t('poll_editor.delete_poll')"
+			ok-variant="danger"
+		)
+			p.my-4 {{ $t('poll_editor.really_delete') }}
+		b-modal(ref="pollDeletedModal" hide-header ok-only :ok-title="$t('poll_editor.back_to_event')" @hidden="backToEvent")
+			p.my-4 {{ $t('poll_editor.poll_deleted') }}
 		.card(v-if="eventName")
 			.card-header
 				event-header(
@@ -56,9 +65,17 @@
 			.card-footer
 				.row.justify-content-center
 					.col-auto.mt-1
-						button.btn.btn-primary(@click="savePoll") {{ $t('poll_editor.save_poll') }}
+						button.btn.btn-primary(@click="savePoll")
+							i.fas.fa-save
+							| &nbsp; {{ $t('poll_editor.save_poll') }}
+					.col-auto.mt-1(v-if="pollId")
+						button.btn.btn-danger(v-b-modal.pollDeleteModal="")
+							i.fas.fa-trash-alt
+							| &nbsp; {{ $t('poll_editor.delete_poll') }}
 					.col-auto.mt-1
-						button.btn.btn-secondary(@click="backToEvent") {{ $t('actions.cancel') }}
+						button.btn.btn-secondary(@click="backToEvent")
+							i.fas.fa-ban
+							| &nbsp; {{ $t('actions.cancel') }}
 
 </template>
 <script>
@@ -134,16 +151,14 @@ export default {
 			this.eventTimeWindowTo = eventData.time_window_to;
 		},
 		assignPollData(poll) {
+			this.pollWeekdayRanks = this.initialWeeklyRanks;
 			if (poll) {
 				this.eventId = poll.event_id;
 				this.pollParticipant = poll.participant;
-				this.pollWeekdayRanks = this.initialWeeklyRanks;
 				let self = this;
 				poll.preferences.weekday_ranks.forEach(function(rank) {
 					self.pollWeekdayRanks[rank.day].rank = rank.rank;
 				});
-			} else {
-				this.pollWeekdayRanks = this.initialWeeklyRanks;
 			}
 		},
 		savePoll() {
@@ -152,7 +167,7 @@ export default {
 				method: (this.pollId ? 'put' : 'post'),
 				url: (this.pollId ? '/v1/polls/' + this.pollId : '/v1/events/' + this.eventId + '/polls'),
 				data: {
-					poll: self.pollData
+					poll: this.pollData
 				},
 				headers: { 'Accept-Language': this.$i18n.locale }
 			})
@@ -169,6 +184,15 @@ export default {
 			})
 			.finally(function() {
 				self.wasServerValidated = true;
+			});
+		},
+		deletePoll() {
+			let self = this;
+			this.$http.delete('/v1/polls/' + this.pollId)
+			.then(function() {
+				self.$refs.pollDeletedModal.show();
+			}, function() {
+				self.$refs.errorBar.show(self.$i18n.t('errors.network'));
 			});
 		},
 		backToEvent() {
