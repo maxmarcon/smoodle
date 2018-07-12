@@ -33,7 +33,7 @@ export default {
 			manage_event: "Manage event",
 			create_event: "Create event",
 			poll_event: "Enter your availability",
-			dates_placeholder: 'Click to enter dates'
+			dates_placeholder: "Select a date range"
 		},
 		poll_editor: {
 			title: "Poll for \u201C{eventName}\u201E",
@@ -50,7 +50,8 @@ export default {
 			poll_saved: "Your poll has been saved",
 			really_delete: "Do you really want to delete your poll? This operation can't be undone",
 			back_to_event: "Back to the event",
-			poll_deleted: "Your poll has been deleted"
+			poll_deleted: "Your poll has been deleted",
+			dates_placeholder: "Select a time period"
 		},
 		event_viewer: {
 			organizer: "Organizer:",

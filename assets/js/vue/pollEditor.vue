@@ -62,6 +62,60 @@
 					p.small.text-muted.mt-3 {{ $t('poll_editor.weekday_ranker_help') }}
 					ranker(:elements="pollWeekdayRanks")
 
+				b-btn#calendar-ranker-button.d-flex.btn-block.mt-2(
+					v-b-toggle.calendar-ranker=""
+					:variant="groupVariant('calendar-ranker-group')"
+				)
+					span.fas.fa-chevron-down(v-if="groupVisibility['calendar-ranker-group']")
+					span.fas.fa-chevron-up(v-else)
+					span.ml-2.mr-auto {{ $t('poll_editor.calendar_ranker_group') }}
+					div(v-if="showGroupErrorIcon('calendar-ranker-group')").fas.fa-exclamation
+					div(v-else-if="showGroupOkIcon('calendar-ranker-group')").fas.fa-check
+				b-collapse#calendar-ranker(
+					accordion="poll-editor"
+					v-model="groupVisibility['calendar-ranker-group']"
+					:visible="true"
+				)
+					b-card
+						.form-group.row
+							.col-auto
+								label
+									i.fas.fa-heart.text-success
+									| &nbsp; Add good date
+								v-date-picker(
+									mode="single"
+									v-model="new_good_date"
+									:min-date="minDate"
+									:max-date="maxDate"
+									@input="good_dates.push(new_good_date)"
+								)
+							.col-auto
+								label
+									i.fas.fa-thumbs-down.text-danger
+									| &nbsp; Add bad date
+								v-date-picker(
+									mode="single"
+									v-model="new_bad_date"
+									:min-date="minDate"
+									:max-date="maxDate"
+									@input="bad_dates.push(new_bad_date)"
+								)
+						.row
+							.col-auto
+								ul.list-group
+									li.d-flex.list-group-item(v-for="date in good_dates")
+										| {{ formatDate(date) }}
+							.col-auto
+								ul.list-group
+									li.d-flex.list-group-item(v-for="date in bad_dates")
+										| {{ formatDate(date) }}
+
+					//-v-calendar(
+						is-double-paned
+						:min-date="eventTimeWindowFrom"
+						:max-date="eventTimeWindowTo"
+						)
+
 			.card-footer
 				.row.justify-content-center
 					.col-auto.mt-1
@@ -84,6 +138,7 @@
 </template>
 <script>
 import { showToolTip, dotAccessObject, accordionGroupsMixin, fetchEventMixin, fetchPollMixin } from '../globals'
+import dateFns from 'date-fns'
 
 export default {
 	mixins: [accordionGroupsMixin, fetchEventMixin, fetchPollMixin],
@@ -111,7 +166,8 @@ export default {
 			},
 			groupVisibility: {
 				'participant-group': true,
-				'weekday-ranker-group': false
+				'weekday-ranker-group': false,
+				'calendar-ranker-group': false
 			},
 			showToolTip,
 			eventName: null,
@@ -122,7 +178,11 @@ export default {
 			pollWeekdayRanks: null,
 			pollParticipant: null,
 			pollParticipantError: null,
-			loaded: false
+			loaded: false,
+			new_good_date: null,
+			new_bad_date: null,
+			good_dates: [],
+			bad_dates: []
 		}
 	},
 	created() {
@@ -144,10 +204,13 @@ export default {
 				self.loaded = true;
 			});
 			this.groupVisibility['participant-group'] = false;
-			this.groupVisibility['weekday-ranker-group'] = true;
+			this.groupVisibility['weekday-ranker-group'] = false;
+			this.groupVisibility['calendar-ranker-group'] = true;
 		}
 	},
 	methods: {
+		//DEBUG
+		formatDate: (date) => dateFns.format(date, 'DD/MM/YYYY'),
 		assignEventData(eventData) {
 			this.eventName = eventData.name;
 			this.eventOrganizer = eventData.organizer;
@@ -208,6 +271,12 @@ export default {
 		}
 	},
 	computed: {
+		minDate() {
+			return dateFns.parse(this.eventTimeWindowFrom);
+		},
+		maxDate() {
+			return dateFns.parse(this.eventTimeWindowTo);
+		},
 		computedEventId() {
 			return (this.eventId ? this.eventId : this.eventIdFromPoll);
 		},

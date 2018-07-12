@@ -114,30 +114,18 @@
 					)
 						b-card
 							.form-group.row
-								label.col-md-4.col-form-label(for="eventDates") {{ $t('event_editor.event.dates') }}
+								label.col-md-4.col-form-label(for="eventTimeWindow") {{ $t('event_editor.event.dates') }}
 								.col-md-4.mb-3
-									.datepicker-trigger
-										input#eventDates.form-control(
-										:disabled="createdEvent"
-										:value="timeWindow"
-										:class="inputFieldClass('dateRange')"
-										:placeholder="$t('event_editor.dates_placeholder')"
-										readonly
-										)
-										.invalid-feedback {{ eventDatesError }}
-
-										div(v-if="!createdEvent")
-											AirbnbStyleDatepicker(
-												:trigger-element-id="'eventDates'"
-													:mode="'range'"
-													:fullscreen-mobile="true"
-													:date-one="eventTimeWindowFrom"
-													:date-two="eventTimeWindowTo"
-													:min-date="today"
-													@closed="localValidation"
-													@date-one-selected="val => { eventTimeWindowFrom = val }"
-													@date-two-selected="val => { eventTimeWindowTo = val }"
-											)
+									v-date-picker#eventTimeWindow(
+										mode="range"
+										v-model="eventTimeWindow"
+										:min-date="today"
+										:input-props="{readonly: true, placeholder: $t('event_editor.dates_placeholder'), class: [ 'form-control', inputFieldClass('eventTimeWindow') ]}"
+										:is-double-paned="true"
+										popover-visibility="focus"
+									)
+									//- invalid feedback won't work here because v-date-picker is not a form-control
+									.small.text-danger {{ eventTimeWindowError }}
 
 								.col-md-auto
 									b-dropdown(:text="$t('event_editor.dates_quick_selection')" :disabled="createdEvent != null")
@@ -198,8 +186,8 @@ export default {
 				}
 			},
 			'dates-group': {
-				dateRange: {
-					errorField: 'eventDatesError',
+				eventTimeWindow: {
+					errorField: 'eventTimeWindowError',
 					errorKeys: ['time_window_to', 'time_window_from', 'time_window']
 				}
 			}
@@ -215,9 +203,8 @@ export default {
 		eventOrganizerError: null,
 		eventDesc: null,
 		eventDescError: null,
-		eventTimeWindowFrom: null,
-		eventTimeWindowTo: null,
-		eventDatesError: null,
+		eventTimeWindow: null,
+		eventTimeWindowError: null,
 		today,
 		showThisWeekButton: (dateFns.getDay(today) > 0 && dateFns.getDay(today) < 4), // betewn Mon and Wed
 		createdEvent: null/* {
@@ -229,6 +216,12 @@ export default {
 					}*/
  	}),
 	computed: {
+		eventTimeWindowFrom() {
+			this.eventTimeWindow && this.eventTimeWindow.start;
+		},
+		eventTimeWindowTo() {
+			this.eventTimeWindow && this.eventTimeWindow.end;
+		},
 		eventData() {
 			return {
 				name: this.eventName,
@@ -244,8 +237,10 @@ export default {
       this.$refs.copiedToClipboardModal.show();
 		},
 		applyDates(from, to) {
-			this.eventTimeWindowFrom = from;
-			this.eventTimeWindowTo = to;
+			this.eventTimeWindow = {
+				start: from,
+				end: to
+			};
 		},
 		pickThisWeek() {
 			this.applyDates(

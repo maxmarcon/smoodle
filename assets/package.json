@@ -28,10 +28,10 @@
     "pug": "^2.0.3",
     "sass-brunch": "^2.10.4",
     "uglify-js-brunch": "^2.10.0",
+    "v-calendar": "^0.9.7",
     "vue": "^2.5.16",
-    "vue-airbnb-style-datepicker": "^1.8.0",
-    "vue-brunch": "^2.0.3",
     "vue-axios": "^2.1.1",
+    "vue-brunch": "^2.0.3",
     "vue-clipboard2": "^0.1.1",
     "vue-i18n": "^7.7.0"
   }

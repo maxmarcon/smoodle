@@ -4,11 +4,14 @@ import PollEditor from './vue/pollEditor.vue'
 import EventViewer from './vue/eventViewer.vue'
 import VueRouter from 'vue-router'
 import VueI18n from 'vue-i18n'
-import AirbnbStyleDatepicker from 'vue-airbnb-style-datepicker'
 import BootstrapVue from 'bootstrap-vue'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import VueClipboard from 'vue-clipboard2'
+import VCalendar from 'v-calendar'
+const Vue = require('vue/dist/vue.common.js');
+// becaue ES module vue.esm.js does not fucking work!!!
+// import Vue from 'vue/dist/vue.esm.js'
 
 const router = new VueRouter({
 	mode: 'history',
@@ -58,6 +61,7 @@ Vue.component('event-header', eventHeader);
 import errorPage from './vue/errorPage.vue'
 Vue.component('error-page', errorPage);
 
+Vue.use(VueI18n);
 const i18n = new VueI18n({
   locale: smoodle_locale,
   messages
@@ -72,15 +76,11 @@ Vue.use(VueAxios, axios);
 
 Vue.use(VueClipboard);
 
-Vue.use(AirbnbStyleDatepicker, {
-	monthNames: i18n.t('date_picker.months'),
-	days: i18n.t('date_picker.days'),
-	daysShort: i18n.t('date_picker.daysShort'),
-	texts: {
-		apply: i18n.t('date_picker.apply'),
-		cancel: i18n.t('date_picker.cancel')
-	}
+Vue.use(VCalendar, {
+	locale: smoodle_locale
 });
+
+Vue.use(VueRouter);
 
 const app = new Vue({
 	i18n,

@@ -1,6 +1,6 @@
 <template lang="pug">
 ul.list-group
-	li.d-flex.list-group-item.p-2.align-items-center(v-for="(el,index) in elements")
+	li.d-flex.list-group-item.p-2.align-items-center(v-for="el in elements")
 		h6.text-info.mr-auto {{ el.name }}
 		p-radio.p-icon.p-plain(:name="el.name" :value="1" v-model="el.rank" toggle)
 			i.icon.fas.fa-heart.text-success(slot="extra")
@@ -26,12 +26,6 @@ export default {
 					el instanceof Object && el.hasOwnProperty('rank') && el.hasOwnProperty('name')
 				);
 			}
-		}
-	},
-	methods: {
-		ppp() {
-			console.dir(this.rankedDays);
-
 		}
 	}
 }
