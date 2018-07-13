@@ -12,7 +12,9 @@ import VCalendar from 'v-calendar'
 const Vue = require('vue/dist/vue.common.js');
 // becaue ES module vue.esm.js does not fucking work!!!
 // import Vue from 'vue/dist/vue.esm.js'
+// ...
 
+Vue.use(VueRouter);
 const router = new VueRouter({
 	mode: 'history',
 	routes: [
@@ -64,6 +66,7 @@ Vue.component('error-page', errorPage);
 Vue.use(VueI18n);
 const i18n = new VueI18n({
   locale: smoodle_locale,
+  fallbackLocale: 'en',
   messages
 });
 
@@ -79,8 +82,6 @@ Vue.use(VueClipboard);
 Vue.use(VCalendar, {
 	locale: smoodle_locale
 });
-
-Vue.use(VueRouter);
 
 const app = new Vue({
 	i18n,

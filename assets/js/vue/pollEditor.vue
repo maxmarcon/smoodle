@@ -281,7 +281,7 @@ export default {
 			return (this.eventId ? this.eventId : this.eventIdFromPoll);
 		},
 		initialWeeklyRanks() {
-			return this.$i18n.t('date_picker.days').map((day, index) => ({day: index, name: day, rank: 0}));
+			return this.$i18n.t('week_days').map((day, index) => ({day: index, name: day, rank: 0}));
 		},
 		pollData() {
 			return {

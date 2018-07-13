@@ -198,9 +198,9 @@ export const timeWindowMixin = {
 			let from = this.timeWindowFrom || this.eventTimeWindowFrom;
 			let to = this.timeWindowTo || this.eventTimeWindowTo;
 			if (from && to) {
-				return dateFns.format(from, 'DD/MM/YYYY', {locale: this.$i18n.t('date_fns_locale')})
+				return dateFns.format(from, this.$i18n.t('date_format'), {locale: this.$i18n.t('date_fns_locale')})
 				 + " - " +
-				 dateFns.format(to, 'DD/MM/YYYY', {locale: this.$i18n.t('date_fns_locale')});
+				 dateFns.format(to, this.$i18n.t('date_format'), {locale: this.$i18n.t('date_fns_locale')});
 			}
 		}
 	}

@@ -217,10 +217,10 @@ export default {
  	}),
 	computed: {
 		eventTimeWindowFrom() {
-			this.eventTimeWindow && this.eventTimeWindow.start;
+			return this.eventTimeWindow && this.eventTimeWindow.start;
 		},
 		eventTimeWindowTo() {
-			this.eventTimeWindow && this.eventTimeWindow.end;
+			return this.eventTimeWindow && this.eventTimeWindow.end;
 		},
 		eventData() {
 			return {

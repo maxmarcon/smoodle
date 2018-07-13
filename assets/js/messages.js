@@ -71,13 +71,8 @@ export default {
 				poll_not_found: "No answer found under this name. Did you spell the name correctly?"
 			}
 		},
-		date_picker: {
-			days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-			daysShort: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-			months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-			apply: 'Apply',
-			cancel: 'Cancel'
-		},
+		date_format: 'MM/DD/YYYY',
+		week_days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
 		ranker: {
 			good: "Good",
 			ok: "Ok",
@@ -118,13 +113,8 @@ export default {
 			dates_quick_selection: "Schnelle Vorauswahl",
 			step: "Schritt {step} von {lastStep}"
 		},
-		date_picker: {
-			days: ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'],
-			daysShort: ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'],
-			months: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
-			apply: 'Übernehmen',
-			cancel: 'Abbrechen'
-		},
+		date_format: 'DD.MM.YYYY',
+		week_days: ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'],
 		date_fns_locale: date_fns_de
 	},
 
@@ -147,13 +137,8 @@ export default {
 			dates_quick_selection: "Preselezione veloce",
 			step: "Passo {step} di {lastStep}"
 		},
-		date_picker: {
-			days: ['Lunedí', 'Martedí', 'Mercoledí', 'Giovedí', 'Venerdí', 'Sabato', 'Domenica'],
-			daysShort: ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'],
-			months: ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'],
-			apply: 'Accetta',
-			cancel: 'Annulla'
-		},
+		date_format: 'DD/MM/YYYY',
+		week_days: ['Lunedí', 'Martedí', 'Mercoledí', 'Giovedí', 'Venerdí', 'Sabato', 'Domenica'],
 		date_fns_locale: date_fns_it
 	}
 }
