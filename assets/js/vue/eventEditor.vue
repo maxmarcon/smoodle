@@ -227,8 +227,8 @@ export default {
 				name: this.eventName,
 				desc: this.eventDesc,
 				organizer: this.eventOrganizer,
-				time_window_from: this.eventTimeWindowFrom,
-				time_window_to: this.eventTimeWindowTo
+				time_window_from: dateFns.format(this.eventTimeWindowFrom, 'YYYY-MM-DD'),
+				time_window_to: dateFns.format(this.eventTimeWindowTo, 'YYYY-MM-DD')
 			};
 		}
 	},

@@ -79,36 +79,37 @@
 					b-card
 						.form-group.row
 							.col-auto
-								label
-									i.fas.fa-heart.text-success
-									| &nbsp; Add good date
-								v-date-picker(
-									mode="single"
-									v-model="new_good_date"
-									:min-date="minDate"
-									:max-date="maxDate"
-									@input="good_dates.push(new_good_date)"
-								)
+								div
+									v-date-picker(
+										:mode="(selected_date_rank ? 'range' : 'single')"
+										v-model="selected_dates"
+										:min-date="minDate"
+										:max-date="maxDate"
+										:is-inline="true"
+										:is-double-paned="true"
+										:attributes="date_picker_attributes"
+										:tint-color="dateRankColor"
+										:is-linked="true"
+										:show-caps="true"
+										@input="newDate"
+										@dayclick="dayClicked"
+									)
 							.col-auto
-								label
-									i.fas.fa-thumbs-down.text-danger
-									| &nbsp; Add bad date
-								v-date-picker(
-									mode="single"
-									v-model="new_bad_date"
-									:min-date="minDate"
-									:max-date="maxDate"
-									@input="bad_dates.push(new_bad_date)"
-								)
-						.row
-							.col-auto
-								ul.list-group
-									li.d-flex.list-group-item(v-for="date in good_dates")
-										| {{ formatDate(date) }}
-							.col-auto
-								ul.list-group
-									li.d-flex.list-group-item(v-for="date in bad_dates")
-										| {{ formatDate(date) }}
+								.form-check
+									p-radio.p-icon.p-plain(name="selected_date_rank" :value="1" v-model="selected_date_rank" toggle)
+										i.icon.fas.fa-heart.text-success(slot="extra")
+										i.icon.far.fa-heart(slot="off-extra")
+										label(slot="off-label")
+								.form-check
+									p-radio.p-icon.p-plain(name="selected_date_rank" :value="-1" v-model="selected_date_rank" toggle)
+										i.icon.fas.fa-thumbs-down.text-danger(slot="extra")
+										i.icon.far.fa-thumbs-down(slot="off-extra")
+										label(slot="off-label")
+								.form-check
+									p-radio.p-icon.p-plain(name="selected_date_rank" :value="0" v-model="selected_date_rank" toggle)
+										i.icon.fas.fa-trash-alt(slot="extra")
+										i.icon.far.fa-trash-alt(slot="off-extra")
+										label(slot="off-label")
 
 					//-v-calendar(
 						is-double-paned
@@ -179,10 +180,10 @@ export default {
 			pollParticipant: null,
 			pollParticipantError: null,
 			loaded: false,
-			new_good_date: null,
-			new_bad_date: null,
-			good_dates: [],
-			bad_dates: []
+			selected_dates: null,
+			selected_date_rank: 1,
+			date_picker_attributes: [],
+			date_picker_attributes_key: 0
 		}
 	},
 	created() {
@@ -209,8 +210,33 @@ export default {
 		}
 	},
 	methods: {
-		//DEBUG
-		formatDate: (date) => dateFns.format(date, 'DD/MM/YYYY'),
+		newDate(value) {
+			if (this.selected_date_rank) {
+				this.date_picker_attributes_key += 1;
+				this.date_picker_attributes.push( // add current selection to the calendar attributes
+					{
+						key: this.date_picker_attributes_key,
+						dates: value,
+						bar: { backgroundColor: this.dateRankColor },
+						popover: {
+							label: `date ${this.date_picker_attributes_key}`
+						}
+					}
+				);
+			}
+			this.selected_dates = null; // disable current selection
+		},
+		dayClicked(day) {
+			if (!this.selected_date_rank) {
+				let self = this;
+				day.attributes.forEach(attr => {
+					let index = self.date_picker_attributes.findIndex(el => el.key == attr.key);
+					if (index > -1) {
+						self.date_picker_attributes.splice(index, 1);
+					}
+				});
+			}
+		},
 		assignEventData(eventData) {
 			this.eventName = eventData.name;
 			this.eventOrganizer = eventData.organizer;
@@ -271,6 +297,9 @@ export default {
 		}
 	},
 	computed: {
+		dateRankColor() {
+			return (this.selected_date_rank > 0 ? '#28a745' : '#dc3545');
+		},
 		minDate() {
 			return dateFns.parse(this.eventTimeWindowFrom);
 		},
