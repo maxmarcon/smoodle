@@ -88,12 +88,14 @@
 										:is-inline="true"
 										:is-double-paned="true"
 										:attributes="date_picker_attributes"
-										:tint-color="dateRankColor"
+										:tint-color="selectedDateRankColor"
 										:is-linked="true"
 										:show-caps="true"
+										:disabled-dates="disabledDates"
 										@input="newDate"
 										@dayclick="dayClicked"
 									)
+
 							.col-auto
 								.form-check
 									p-radio.p-icon.p-plain(name="selected_date_rank" :value="1" v-model="selected_date_rank" toggle)
@@ -211,15 +213,16 @@ export default {
 	},
 	methods: {
 		newDate(value) {
-			if (this.selected_date_rank) {
-				this.date_picker_attributes_key += 1;
+			if (this.selected_date_rank && value) {
 				this.date_picker_attributes.push( // add current selection to the calendar attributes
 					{
-						key: this.date_picker_attributes_key,
+						key: ++this.date_picker_attributes_key,
 						dates: value,
-						bar: { backgroundColor: this.dateRankColor },
-						popover: {
-							label: `date ${this.date_picker_attributes_key}`
+						bar: {
+							backgroundColor: this.selectedDateRankColor
+						},
+						customData: {
+							rank: this.selected_date_rank
 						}
 					}
 				);
@@ -256,6 +259,19 @@ export default {
 						el.rank = rank.rank;
 					}
 				});
+				this.date_picker_attributes = poll.date_ranks.map(date_rank => ({
+					key: ++self.date_picker_attributes_key,
+					dates: {
+						start: date_rank.date_from,
+						end: date_rank.date_to
+					},
+					bar: {
+						backgroundColor: self.colorForRank(date_rank.rank)
+					},
+					customData: {
+						rank: date_rank.rank
+					}
+				}));
 			}
 		},
 		savePoll() {
@@ -294,11 +310,15 @@ export default {
 		},
 		backToEvent() {
 			this.$router.push({name: 'event', params: {eventId: this.computedEventId}});
-		}
+		},
+		colorForRank: (rank) => (rank > 0 ? '#28a745' : '#dc3545')
 	},
 	computed: {
-		dateRankColor() {
-			return (this.selected_date_rank > 0 ? '#28a745' : '#dc3545');
+		disabledDates() {
+			return this.date_picker_attributes.map(attr => attr.dates);
+		},
+		selectedDateRankColor() {
+			return this.colorForRank(this.selected_date_rank);
 		},
 		minDate() {
 			return dateFns.parse(this.eventTimeWindowFrom);
@@ -317,7 +337,12 @@ export default {
 				participant: this.pollParticipant,
 				preferences: {
 					weekday_ranks: this.pollWeekdayRanks.filter(weekday_rank => weekday_rank.rank) // exclude 0 ranks
-				}
+				},
+				date_ranks: this.date_picker_attributes.map(attr => ({
+					date_from: dateFns.format(attr.dates.start, 'YYYY-MM-DD'),
+					date_to: dateFns.format(attr.dates.end, 'YYYY-MM-DD'),
+					rank: attr.customData.rank
+				}))
 			}
 		}
 	}
