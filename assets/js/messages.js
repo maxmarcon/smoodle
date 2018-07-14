@@ -43,7 +43,7 @@ export default {
 				participant_help: "Tell the organizer who you are..."
 			},
 			weekday_ranker_group: "How is your typical week?",
-			weekday_ranker_help: "Specify which days of the week are in general just perfect, ok, or bad for the event",
+			weekday_ranker_help: "Specify which days of the week are in general just perfect, ok, or bad for the event. You can add exception for sepcific dates below.",
 			calendar_ranker_group: "Select specific dates",
 			save_poll: "Save poll",
 			delete_poll: "Delete poll",
@@ -51,7 +51,8 @@ export default {
 			really_delete: "Do you really want to delete your poll? This operation can't be undone",
 			back_to_event: "Back to the event",
 			poll_deleted: "Your poll has been deleted",
-			dates_placeholder: "Select a time period"
+			dates_placeholder: "Select a time period",
+			dates_ranker_helper: "Select specific dates that are good or bad for the event. This takes precedence over the preferences you expressed for the week days."
 		},
 		event_viewer: {
 			organizer: "Organizer:",

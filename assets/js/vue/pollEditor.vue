@@ -59,8 +59,9 @@
 					v-model="groupVisibility['weekday-ranker-group']"
 					:visible="true"
 				)
-					p.small.text-muted.mt-3 {{ $t('poll_editor.weekday_ranker_help') }}
-					ranker(:elements="pollWeekdayRanks")
+					b-card
+						p.small.text-muted {{ $t('poll_editor.weekday_ranker_help') }}
+						ranker(:elements="pollWeekdayRanks")
 
 				b-btn#calendar-ranker-button.d-flex.btn-block.mt-2(
 					v-b-toggle.calendar-ranker=""
@@ -77,9 +78,10 @@
 					:visible="true"
 				)
 					b-card
-						.form-group.row
-							.col-auto
-								div
+						p.small.text-muted.d-block.d-md-none {{ $t('poll_editor.dates_ranker_helper') }}
+						.row.justify-content-center
+							.col-md-6.text-center
+								.form-group
 									v-date-picker(
 										:mode="(selected_date_rank ? 'range' : 'single')"
 										v-model="selected_dates"
@@ -96,22 +98,25 @@
 										@dayclick="dayClicked"
 									)
 
-							.col-auto
-								.form-check
-									p-radio.p-icon.p-plain(name="selected_date_rank" :value="1" v-model="selected_date_rank" toggle)
-										i.icon.fas.fa-heart.text-success(slot="extra")
-										i.icon.far.fa-heart(slot="off-extra")
-										label(slot="off-label")
-								.form-check
-									p-radio.p-icon.p-plain(name="selected_date_rank" :value="-1" v-model="selected_date_rank" toggle)
-										i.icon.fas.fa-thumbs-down.text-danger(slot="extra")
-										i.icon.far.fa-thumbs-down(slot="off-extra")
-										label(slot="off-label")
-								.form-check
-									p-radio.p-icon.p-plain(name="selected_date_rank" :value="0" v-model="selected_date_rank" toggle)
-										i.icon.fas.fa-trash-alt(slot="extra")
-										i.icon.far.fa-trash-alt(slot="off-extra")
-										label(slot="off-label")
+							.col-md-3
+								.form-group
+									p.small.text-muted.d-none.d-md-block {{ $t('poll_editor.dates_ranker_helper') }}
+									.d-flex.justify-content-center
+										.form-check
+											p-radio.p-icon.p-plain(name="selected_date_rank" :value="1" v-model="selected_date_rank" toggle)
+												i.icon.fas.fa-heart.text-success(slot="extra")
+												i.icon.far.fa-heart(slot="off-extra")
+												label(slot="off-label")
+										.form-check
+											p-radio.p-icon.p-plain(name="selected_date_rank" :value="-1" v-model="selected_date_rank" toggle)
+												i.icon.fas.fa-thumbs-down.text-danger(slot="extra")
+												i.icon.far.fa-thumbs-down(slot="off-extra")
+												label(slot="off-label")
+										.form-check
+											p-radio.p-icon.p-plain(name="selected_date_rank" :value="0" v-model="selected_date_rank" toggle)
+												i.icon.fas.fa-trash-alt(slot="extra")
+												i.icon.far.fa-trash-alt(slot="off-extra")
+												label(slot="off-label")
 
 					//-v-calendar(
 						is-double-paned

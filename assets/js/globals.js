@@ -81,6 +81,8 @@ export function showToolTip(name) {
 }
 
 export const accordionGroupsMixin = {
+	// TODO: add a 'required' boolean attribute to the field
+	// to specify that the field is required (if false, skip local validation for that field)
 	data: () => ({
 		wasServerValidated: false,
 		wasLocalValidated: false
