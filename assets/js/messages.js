@@ -43,7 +43,7 @@ export default {
 				participant_help: "Tell the organizer who you are..."
 			},
 			weekday_ranker_group: "How is your typical week?",
-			weekday_ranker_help: "Specify which days of the week are in general just perfect, ok, or bad for the event. You can add exception for sepcific dates below.",
+			weekday_ranker_help: "Specify which days of your typical week are good {0}, just fine {1}, or bad {2} for the event. You can add exception for specific dates later. {3}",
 			calendar_ranker_group: "Select specific dates",
 			save_poll: "Save poll",
 			delete_poll: "Delete poll",
@@ -52,7 +52,15 @@ export default {
 			back_to_event: "Back to the event",
 			poll_deleted: "Your poll has been deleted",
 			dates_placeholder: "Select a time period",
-			dates_ranker_helper: "Select specific dates that are good or bad for the event. This takes precedence over the preferences you expressed for the week days."
+			date_ranker_helper: "Select specific date ranges that are good {0} or bad {1} for the event. This takes precedence over the preferences you expressed for the week days. {2}",
+			date_ranker_help_modal_title: "Adding and removing dates",
+			date_ranker_help_modal_content: "First choose whether you are adding dates that are good {0} or bad {1}.\
+			Then, to add a date range, click on the first date, then on the second one. To select a single date, click twice on it.\
+			To remove dates, first select {2} and then click on them.",
+			weekday_ranker_help_modal_title: "Preferences for the days of the week",
+			weekday_ranker_help_modal_content: "Give us an idea of your typical week. For example, \
+			you might go to the gym every Wednesday and might want to mark it with {0}. On the other hand, a Friday might be a good day for this event\
+			and you might want to mark it with {1}. Other days might be just ok, and you can leave them as {2}."
 		},
 		event_viewer: {
 			organizer: "Organizer:",

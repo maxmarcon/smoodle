@@ -80,6 +80,15 @@ export function showToolTip(name) {
 	}
 }
 
+export function stringifyServerError(error) {
+	if (error instanceof Array) {
+		return error.map(stringifyServerError).join(', ');
+	} else if (error instanceof Object) {
+		return stringifyServerError(Object.values(error));
+	}
+	return error;
+}
+
 export const accordionGroupsMixin = {
 	// TODO: add a 'required' boolean attribute to the field
 	// to specify that the field is required (if false, skip local validation for that field)
@@ -92,8 +101,11 @@ export const accordionGroupsMixin = {
 			self = this;
 			Object.values(this.errorsMap).forEach(function(fieldMap) {
 				for (let field in fieldMap) {
-					let errorField = fieldMap[field].errorField;
-					self[errorField] = self[field] ? null : self.$i18n.t('errors.required_field');
+					let fieldMapObj = fieldMap[field];
+					let errorField = fieldMapObj.errorField;
+					if (fieldMapObj.required) {
+						self[errorField] = self[field] ? null : self.$i18n.t('errors.required_field');
+					}
 				}
 			});
 			this.wasLocalValidated = true;
@@ -142,8 +154,8 @@ export const accordionGroupsMixin = {
 					let errorKeys = fieldMap[field].errorKeys;
 					let errorField = fieldMap[field].errorField;
 					errorKeys = errorKeys instanceof Array ? errorKeys : [errorKeys];
-					let key_with_error = errorKeys.find(key => errors[key]);
-					this[errorField] = (key_with_error ? errors[key_with_error].join(', ') : null);
+					let key_with_error = errorKeys.find(key => dotAccessObject(errors, key));
+					this[errorField] = (key_with_error ? stringifyServerError(dotAccessObject(errors, key_with_error)) : null);
 					if (key_with_error && !groupShownBecauseOfErrors) {
 						this.groupVisibility[group] = true;
 						groupShownBecauseOfErrors = group;

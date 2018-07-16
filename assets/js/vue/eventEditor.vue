@@ -171,22 +171,26 @@ export default {
 			// the error fields and the error keys received by the back end
 			'organizer-group': {
 				eventOrganizer: {
+					required: true,
 					errorField: 'eventOrganizerError',
 					errorKeys: 'organizer'
 				}
 			},
 			'general-info-group': {
 				eventName: {
+					required: true,
 					errorField: 'eventNameError',
 					errorKeys: 'name'
 				},
 				eventDesc: {
+					required: true,
 					errorField: 'eventDescError',
 					errorKeys: 'desc'
 				}
 			},
 			'dates-group': {
 				eventTimeWindow: {
+					required: true,
 					errorField: 'eventTimeWindowError',
 					errorKeys: ['time_window_to', 'time_window_from', 'time_window']
 				}
@@ -244,7 +248,7 @@ export default {
 		},
 		pickThisWeek() {
 			this.applyDates(
-				dateFns.startOfWeek(today, {weekStartsOn: 1}),
+				dateFns.max(today, dateFns.startOfWeek(today, {weekStartsOn: 1})),
 				dateFns.endOfWeek(today, {weekStartsOn: 1})
 			);
 		},

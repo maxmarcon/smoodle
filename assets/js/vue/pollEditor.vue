@@ -3,6 +3,16 @@
 		message-bar(ref="errorBar" variant="danger")
 		b-modal(ref="pollSavedModal" hide-header ok-only :ok-title="$t('poll_editor.back_to_event')" @hidden="backToEvent")
 			p.my-4 {{ $t('poll_editor.poll_saved') }}
+		b-modal#dateRankerHelpModal(ok-only :title="$t('poll_editor.date_ranker_help_modal_title')")
+			i18n(path="poll_editor.date_ranker_help_modal_content" tag="p")
+				i.fas.fa-heart.text-success
+				i.fas.fa-thumbs-down.text-danger
+				i.fas.fas.fa-trash-alt
+		b-modal#weekdayRankerHelpModal(ok-only :title="$t('poll_editor.weekday_ranker_help_modal_title')")
+			i18n(path="poll_editor.weekday_ranker_help_modal_content" tag="p")
+				i.fas.fa-thumbs-down.text-danger
+				i.fas.fa-heart.text-success
+				i.fas.fa-thumbs-up.text-warning
 		b-modal#pollDeleteModal(
 			hide-header
 			@ok="deletePoll"
@@ -60,8 +70,14 @@
 					:visible="true"
 				)
 					b-card
-						p.small.text-muted {{ $t('poll_editor.weekday_ranker_help') }}
+						i18n.small.text-muted(path="poll_editor.weekday_ranker_help" tag="p")
+							i.fas.fa-heart.text-success
+							i.fas.fa-thumbs-up.text-warning
+							i.fas.fa-thumbs-down.text-danger
+							button.btn.btn-link.btn-sm(v-b-modal.weekdayRankerHelpModal="")
+								i.fas.fa-question-circle
 						ranker(:elements="pollWeekdayRanks")
+						.small.text-danger {{ pollWeekdayRanksError }}
 
 				b-btn#calendar-ranker-button.d-flex.btn-block.mt-2(
 					v-b-toggle.calendar-ranker=""
@@ -78,7 +94,12 @@
 					:visible="true"
 				)
 					b-card
-						p.small.text-muted.d-block.d-md-none {{ $t('poll_editor.dates_ranker_helper') }}
+						i18n.small.text-muted.d-block.d-md-none(path="poll_editor.date_ranker_helper" tag="p")
+							i.fas.fa-heart.text-success
+							i.fas.fa-thumbs-down.text-danger
+							button.btn.btn-link.btn-sm(v-b-modal.dateRankerHelpModal="")
+								i.fas.fa-question-circle
+
 						.row.justify-content-center
 							.col-md-6.text-center
 								.form-group
@@ -97,11 +118,17 @@
 										@input="newDate"
 										@dayclick="dayClicked"
 									)
+									.small.text-danger {{ pollDateRanksError }}
+
 
 							.col-md-3
 								.form-group
-									p.small.text-muted.d-none.d-md-block {{ $t('poll_editor.dates_ranker_helper') }}
-									.d-flex.justify-content-center
+									i18n.small.text-muted.d-none.d-md-block(path="poll_editor.date_ranker_helper" tag="p")
+										i.fas.fa-heart.text-success
+										i.fas.fa-thumbs-down.text-danger
+										button.btn.btn-link.btn-sm(v-b-modal.dateRankerHelpModal="")
+											i.fas.fa-question-circle
+									.d-flex.justify-content-center.align-items-center
 										.form-check
 											p-radio.p-icon.p-plain(name="selected_date_rank" :value="1" v-model="selected_date_rank" toggle)
 												i.icon.fas.fa-heart.text-success(slot="extra")
@@ -118,11 +145,6 @@
 												i.icon.far.fa-trash-alt(slot="off-extra")
 												label(slot="off-label")
 
-					//-v-calendar(
-						is-double-paned
-						:min-date="eventTimeWindowFrom"
-						:max-date="eventTimeWindowTo"
-						)
 
 			.card-footer
 				.row.justify-content-center
@@ -161,6 +183,7 @@ export default {
 				// the error fields and the error keys received by the back end
 				'participant-group': {
 					pollParticipant: {
+						required: true,
 						errorField: 'pollParticipantError',
 						errorKeys: 'participant'
 					}
@@ -169,6 +192,12 @@ export default {
 					pollWeekdayRanks: {
 						errorField: 'pollWeekdayRanksError',
 						errorKeys: 'preferences.weekday_ranks'
+					}
+				},
+				'calendar-ranker-group': {
+					pollDateRanks: {
+						errorField: 'pollDateRanksError',
+						errorKeys: 'date_ranks'
 					}
 				}
 			},
@@ -186,6 +215,8 @@ export default {
 			pollWeekdayRanks: null,
 			pollParticipant: null,
 			pollParticipantError: null,
+			pollWeekdayRanksError: null,
+			pollDateRanksError: null,
 			loaded: false,
 			selected_dates: null,
 			selected_date_rank: 1,
