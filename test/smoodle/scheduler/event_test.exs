@@ -10,7 +10,8 @@ defmodule Smoodle.Scheduler.EventTest do
 		time_window_from: "2118-01-10",
 		time_window_to: "2118-03-20",
 		scheduled_from: "2118-02-05 19:00:00",
-		scheduled_to: "2118-02-05 23:00:00"
+		scheduled_to: "2118-02-05 23:00:00",
+		email: "bot@fake.com"
 	}
 
 	@past_event %{
@@ -20,7 +21,8 @@ defmodule Smoodle.Scheduler.EventTest do
 		time_window_from: "1118-01-10",
 		time_window_to: "1118-03-20",
 		scheduled_from: "1118-02-05 19:00:00",
-		scheduled_to: "1118-02-05 23:00:00"
+		scheduled_to: "1118-02-05 23:00:00",
+		email: "bot@fake.com"
 	}
 
 	test "changeset with valid attrs" do
@@ -44,10 +46,10 @@ defmodule Smoodle.Scheduler.EventTest do
 		refute Map.has_key?(changeset.changes, :id)
 	end
 
-	test "changeset ignores owner_token" do
-		changeset = Event.changeset(%Event{}, Map.merge(@valid_attrs, %{owner_token: "sneaky_token"}))
+	test "changeset ignores secret" do
+		changeset = Event.changeset(%Event{}, Map.merge(@valid_attrs, %{secret: "sneaky_token"}))
 		assert changeset.valid?
-		refute Map.has_key?(changeset.changes, :owner_token)
+		refute Map.has_key?(changeset.changes, :secret)
 	end
 
 	test "changeset with name too long" do
@@ -63,6 +65,16 @@ defmodule Smoodle.Scheduler.EventTest do
 	test "changeset with description too long" do
 		changeset = Event.changeset(%Event{}, Map.replace!(@valid_attrs, :desc, String.pad_trailing("Yeah!", 251, "123")))
 		assert [desc: {_,  [count: 250, validation: :length, max: 250]}] = changeset.errors
+	end
+
+	test "changeset with invalid email" do
+		changeset = Event.changeset(%Event{}, Map.replace!(@valid_attrs, :email, "me@invaliddomain"))
+		assert [email: {_,  [validation: :format]}] = changeset.errors
+	end
+
+	test "changeset without email" do
+		changeset = Event.changeset(%Event{}, Map.delete(@valid_attrs, :email))
+		assert [email: {_,  [validation: :required]}] = changeset.errors
 	end
 
 	test "validate both time window ends must be defined" do

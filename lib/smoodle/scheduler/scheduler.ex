@@ -32,8 +32,8 @@ defmodule Smoodle.Scheduler do
 
   Raises if the Event does not exist or the token is wrong
   """
-  def get_event!(id, owner_token) do
-    Repo.get_by!(Event, id: id, owner_token: owner_token)
+  def get_event!(id, secret) do
+    Repo.get_by!(Event, id: id, secret: secret)
   end
 
 

@@ -16,7 +16,7 @@
 			.card-body
 				.row.justify-content-center(v-if="createdEvent")
 					.col-md-8.text-center
-						h5 {{ $t('event_editor.event_created', {eventName: createdEvent.name, eventOrganizer: createdEvent.organizer}) }}
+						h5 {{ $t('event_editor.event_created', {eventName: createdEvent.name, eventOrganizer: createdEvent.organizer, organizerEmail: createdEvent.email}) }}
 						p {{ $t('event_editor.share_link') }}
 						.input-group.border.border-success
 							input.form-control(:value="createdEvent.share_link" readonly @success="clipboard")
@@ -60,6 +60,18 @@
 									)
 									.invalid-feedback {{ eventOrganizerError }}
 
+							.form-group.row
+								label.col-md-3.col-form-label(for="organizerEmail") {{ $t('event_editor.event.organizer_email') }}
+								.col-md-9
+									small.form-text.text-muted {{ $t('event_editor.event.organizer_email_help') }}
+									input#organizerEmail.form-control(
+										v-model.trim="organizerEmail"
+										@change="localValidation"
+										@blur="localValidation"
+										:disabled="createdEvent"
+										:class="inputFieldClass('organizerEmail')"
+									)
+									.invalid-feedback {{ organizerEmailError }}
 
 					b-btn.btn-block.d-flex.mt-2(
 						v-b-toggle.general-info-group=""
@@ -149,10 +161,6 @@
 						)
 							i.fas.fa-question
 							| &nbsp; {{ $t('event_editor.poll_event') }}
-					.col-auto.mt-1
-						button.btn.btn-primary
-							i.fas.fa-gamepad
-							| &nbsp; {{ $t('event_editor.manage_event') }}
 
 </template>
 
@@ -174,6 +182,11 @@ export default {
 					required: true,
 					errorField: 'eventOrganizerError',
 					errorKeys: 'organizer'
+				},
+				organizerEmail: {
+					required: true,
+					errorField: 'organizerEmailError',
+					errorKeys: 'email'
 				}
 			},
 			'general-info-group': {
@@ -205,6 +218,8 @@ export default {
 		eventNameError: null,
 		eventOrganizer: null,
 		eventOrganizerError: null,
+		organizerEmail: null,
+		organizerEmailError: null,
 		eventDesc: null,
 		eventDescError: null,
 		eventTimeWindow: null,
@@ -232,7 +247,8 @@ export default {
 				desc: this.eventDesc,
 				organizer: this.eventOrganizer,
 				time_window_from: dateFns.format(this.eventTimeWindowFrom, 'YYYY-MM-DD'),
-				time_window_to: dateFns.format(this.eventTimeWindowTo, 'YYYY-MM-DD')
+				time_window_to: dateFns.format(this.eventTimeWindowTo, 'YYYY-MM-DD'),
+				email: this.organizerEmail
 			};
 		}
 	},

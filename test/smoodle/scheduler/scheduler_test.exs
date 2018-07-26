@@ -12,14 +12,16 @@ defmodule Smoodle.SchedulerTest do
     desc: "Yeah!",
     organizer: "The Hoff",
     time_window_from: "2117-03-01",
-    time_window_to: "2117-06-01"
+    time_window_to: "2117-06-01",
+    email: "bot1@fake.com"
   }
   @event_valid_attrs_2 %{
     name: "Breakfast",
     desc: "Mmmhhh!",
     organizer: "The Hoff",
     time_window_from: "2118-01-01",
-    time_window_to: "2118-06-01"
+    time_window_to: "2118-06-01",
+    email: "bot2@fake.com"
   }
 
   @event_update_attrs %{
@@ -53,13 +55,13 @@ defmodule Smoodle.SchedulerTest do
       assert event == event1
     end
 
-    test "get_event!/2 returns the event with given id and owner_token", context do
+    test "get_event!/2 returns the event with given id and secret", context do
       [event1 | _] = context[:events]
-      event = Repo.preload(Scheduler.get_event!(event1.id, event1.owner_token), :polls)
+      event = Repo.preload(Scheduler.get_event!(event1.id, event1.secret), :polls)
       assert event == event1
     end
 
-    test "get_event!/2 does not returns the event if the owner_token is wrong", context do
+    test "get_event!/2 does not returns the event if the secret is wrong", context do
       [event1 | _] = context[:events]
       assert_raise(Ecto.NoResultsError, fn -> Scheduler.get_event!(event1.id, "wrong token") end)
     end
@@ -70,7 +72,7 @@ defmodule Smoodle.SchedulerTest do
     test "create_event/2 with valid data creates an event" do
       assert {:ok, %Event{} = event} = Scheduler.create_event(@event_valid_attrs_1)
       assert Map.take(event, [:name, :desc]) == Map.take(@event_valid_attrs_1, [:name, :desc])
-      assert String.length(event.owner_token) == 32
+      assert String.length(event.secret) == 32
       assert Repo.preload(Scheduler.get_event!(event.id), :polls) == event
     end
 
@@ -103,10 +105,10 @@ defmodule Smoodle.SchedulerTest do
 
     test "update_event/2 with valid data cannot update the token", context do
       event = context[:event]
-      old_token = event.owner_token
-      assert {:ok, event} = Scheduler.update_event(event, Map.merge(@event_update_attrs, %{owner_token: "sneaky_token"}))
+      old_token = event.secret
+      assert {:ok, event} = Scheduler.update_event(event, Map.merge(@event_update_attrs, %{secret: "sneaky_token"}))
       assert event.name == @event_update_attrs.name
-      assert event.owner_token == old_token
+      assert event.secret == old_token
     end
 
     test "update_event/2 with valid data cannot update the id", context do

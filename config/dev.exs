@@ -56,3 +56,7 @@ config :smoodle, Smoodle.Repo,
   database: "smoodle_dev",
   hostname: "localhost",
   pool_size: 10
+
+config :smoodle, Smoodle.Mailer,
+  adapter: Bamboo.LocalAdapter
+

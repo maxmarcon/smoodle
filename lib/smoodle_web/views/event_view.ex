@@ -10,16 +10,24 @@ defmodule SmoodleWeb.EventView do
     %{data: render_one(event, EventView, "event.json")}
   end
 
-  def render("event.json", %{event: event = %{owner_token: _}}) do
+  def render("event.json", %{event: event = %{secret: _}}) do
     event
     |> Map.delete(:__meta__)
     |> Map.merge(%{
-      owner_link: page_url(SmoodleWeb.Endpoint, :event, event.id, owner_token: event.owner_token),
-      share_link: page_url(SmoodleWeb.Endpoint, :poll, event.id)
+      owner_link: owner_link(event),
+      share_link: share_link(event)
     })
   end
 
+  def owner_link(event) do
+    page_url(SmoodleWeb.Endpoint, :event, event.id, secret: event.secret)
+  end
+
+  def share_link(event) do
+    page_url(SmoodleWeb.Endpoint, :poll, event.id)
+  end
+
   def render("event.json", %{event: event}) do
-    Map.drop(event, [:__meta__, :polls])
+    Map.drop(event, [:__meta__, :polls, :email])
   end
 end

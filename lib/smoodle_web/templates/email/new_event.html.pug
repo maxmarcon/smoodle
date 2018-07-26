@@ -1,0 +1,8 @@
+html
+	head
+	body
+ 		p = gettext("You created a new event called \"%{event_name}\". This is your organizer link:", event_name: @event_name)
+ 		a(href=@owner_link) = @owner_link
+ 		p = gettext("Using this link you can manage the event. Enjoy!")
+ 		p
+ 			i = gettext("Sincerely, your Smoodle Team")

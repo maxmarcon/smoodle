@@ -8,7 +8,8 @@ defmodule SmoodleWeb.PollControllerTest do
     desc: "Yeah!",
     organizer: "The Hoff",
     time_window_from: "2117-03-01",
-    time_window_to: "2117-06-01"
+    time_window_to: "2117-06-01",
+    email: "bot@fake.com"
   }
 
   @poll_valid_attrs_1 %{
@@ -159,7 +160,7 @@ defmodule SmoodleWeb.PollControllerTest do
   	setup [:create_event, :create_polls]
 
   	test "fetches all polls for event if owner token is passed", %{conn: conn, event: event, polls: polls} do
-      conn = get conn, event_poll_path(conn, :index, event.id), %{owner_token: event.owner_token}
+      conn = get conn, event_poll_path(conn, :index, event.id), %{secret: event.secret}
       assert length(json_response(conn, 200)["data"]) == 2
       data = json_response(conn, 200)["data"]
       assert MapSet.new(for poll <- data, do: poll["id"]) == MapSet.new(for poll <- polls, do: poll.id)
@@ -167,7 +168,7 @@ defmodule SmoodleWeb.PollControllerTest do
 
   	test "does not fetch any polls for event if owner token is wrong", %{conn: conn, event: event} do
       assert_error_sent(:not_found, fn ->
-      	get conn, event_poll_path(conn, :index, event.id), %{owner_token: "wrong token"}
+      	get conn, event_poll_path(conn, :index, event.id), %{secret: "wrong token"}
       end)
   	end
 
@@ -200,7 +201,7 @@ defmodule SmoodleWeb.PollControllerTest do
       data = json_response(conn, 200)["data"]
       assert data["id"] == poll.id
       assert data["event"]
-      refute data["event"]["owner_token"]
+      refute data["event"]["secret"]
     end
   end
 

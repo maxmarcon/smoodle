@@ -10,17 +10,18 @@ defmodule Smoodle.Scheduler.Event do
   import Smoodle.Scheduler.Utils
 
   @primary_key {:id, :binary_id, autogenerate: true}
-  @owner_token_len 16
+  @secret_len 16
 
   schema "events" do
     field :name, :string
     field :organizer, :string
-    field :owner_token, :string
+    field :secret, :string
     field :time_window_from, :date
     field :time_window_to, :date
     field :scheduled_from, :naive_datetime
     field :scheduled_to, :naive_datetime
     field :desc, :string
+    field :email, :string
     has_many :polls, Poll
 
     timestamps(usec: false)
@@ -30,11 +31,13 @@ defmodule Smoodle.Scheduler.Event do
   def changeset(%Event{} = event, attrs) do
     event
     |> Repo.preload(:polls)
-    |> cast(attrs, [:name, :organizer, :time_window_from, :time_window_to, :scheduled_from, :scheduled_to, :desc])
-    |> validate_required([:name, :organizer, :desc, :time_window_from, :time_window_to])
+    |> cast(attrs, [:name, :organizer, :time_window_from, :time_window_to, :scheduled_from, :scheduled_to, :desc, :email])
+    |> validate_required([:name, :organizer, :desc, :email, :time_window_from, :time_window_to])
     |> validate_length(:name, max: 50)
     |> validate_length(:organizer, max: 50)
     |> validate_length(:desc, max: 250)
+    |> validate_format(:email, ~r/.+@.+\..+/)
+    |> validate_length(:email, max: 100)
     |> validate_window_defined([:scheduled_from, :scheduled_to], :scheduled)
     |> validate_window_consistent([:time_window_from, :time_window_to], :time_window, Date)
     |> validate_window_consistent([:scheduled_from, :scheduled_to], :scheduled)
@@ -45,7 +48,7 @@ defmodule Smoodle.Scheduler.Event do
 
   def changeset_insert(attrs) do
     changeset(%Event{}, attrs) |>
-    change(%{owner_token: SecureRandom.urlsafe_base64(@owner_token_len)})
+    change(%{secret: SecureRandom.urlsafe_base64(@secret_len)})
   end
 
   defp validate_window_defined(changeset, keys, error_key) do

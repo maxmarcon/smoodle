@@ -12,7 +12,8 @@ defmodule Smoodle.Scheduler.PollTest do
 		time_window_from: ~D[2118-01-10],
 		time_window_to: ~D[2118-03-20],
 		scheduled_from: ~N[2118-02-05 19:00:00],
-		scheduled_to: ~N[2118-02-05 23:00:00]
+		scheduled_to: ~N[2118-02-05 23:00:00],
+		email: "bot@fake.com"
 	}
 
 	@poll_attrs %{

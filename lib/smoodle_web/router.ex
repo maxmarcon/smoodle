@@ -35,6 +35,10 @@ defmodule SmoodleWeb.Router do
     resources "/polls", PollController, only: [:update, :delete, :show]
   end
 
+  if Mix.env == :dev do
+    forward "/sent_emails", Bamboo.EmailPreviewPlug
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", SmoodleWeb do
   #   pipe_through :api

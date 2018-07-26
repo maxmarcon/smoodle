@@ -7,8 +7,8 @@ defmodule SmoodleWeb.PollController do
 
   action_fallback SmoodleWeb.FallbackController
 
-	def index(conn, %{"event_id" => event_id, "owner_token" => owner_token}) do
-		event = Scheduler.get_event!(event_id, owner_token)
+	def index(conn, %{"event_id" => event_id, "secret" => secret}) do
+		event = Scheduler.get_event!(event_id, secret)
 
     polls = Repo.preload(Scheduler.list_polls(event), :date_ranks)
     render(conn, "index.json", polls: polls)

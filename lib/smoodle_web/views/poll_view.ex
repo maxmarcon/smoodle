@@ -18,7 +18,7 @@ defmodule SmoodleWeb.PollView do
     |> Map.update(:date_ranks, [], &render_many(&1, DateRankView, "date_rank.json"))
     |> Map.update(:event, nil, fn event ->
       if Ecto.assoc_loaded?(poll.event) do
-        render_one(Map.drop(event, [:polls, :owner_token]), EventView, "event.json")
+        render_one(Map.drop(event, [:polls, :secret]), EventView, "event.json")
       else
         nil
       end
