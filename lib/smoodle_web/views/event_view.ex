@@ -19,15 +19,15 @@ defmodule SmoodleWeb.EventView do
     })
   end
 
+  def render("event.json", %{event: event}) do
+    Map.drop(event, [:__meta__, :polls, :email])
+  end
+
   def owner_link(event) do
     page_url(SmoodleWeb.Endpoint, :event, event.id, secret: event.secret)
   end
 
   def share_link(event) do
-    page_url(SmoodleWeb.Endpoint, :poll, event.id)
-  end
-
-  def render("event.json", %{event: event}) do
-    Map.drop(event, [:__meta__, :polls, :email])
+    page_url(SmoodleWeb.Endpoint, :event, event.id)
   end
 end
