@@ -43,12 +43,24 @@ defmodule Smoodle.Scheduler.Event do
     |> validate_window_consistent([:scheduled_from, :scheduled_to], :scheduled)
     |> validate_is_the_future([:scheduled_from, :scheduled_to])
     |> validate_is_the_future([:time_window_from, :time_window_to], Date)
+    |> validate_window_not_too_large([:time_window_from, :time_window_to], 365, :time_window)
     |> trim_text_changes([:name, :organizer, :desc])
   end
 
   def changeset_insert(attrs) do
     changeset(%Event{}, attrs) |>
     change(%{secret: SecureRandom.urlsafe_base64(@secret_len)})
+  end
+
+  defp validate_window_not_too_large(changeset, keys, max_days, error_key) do
+    with [t1, t2] <- Enum.map(keys, &fetch_field(changeset, &1)) |> Enum.map(&elem(&1, 1)),
+      false <- Enum.any?([t1, t2], &is_nil/1),
+      true <- Date.diff(t2, t1) > max_days
+    do
+      add_error(changeset, error_key, dgettext("errors", "you cannot select a time window larger than %{max_days} days", max_days: max_days), validation: :time_interval_too_large)
+    else
+      _ -> changeset
+    end
   end
 
   defp validate_window_defined(changeset, keys, error_key) do

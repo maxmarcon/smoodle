@@ -100,6 +100,11 @@ defmodule Smoodle.Scheduler.EventTest do
 		assert [scheduled: {_, [validation: :inconsistent_interval]}] = changeset.errors
 	end
 
+	test "validate time window can't be too large" do
+		changeset = Event.changeset(%Event{}, Map.replace!(@valid_attrs, :time_window_to, "2119-01-11"))
+		assert [time_window: {_, [validation: :time_interval_too_large]}] = changeset.errors
+	end
+
 	test "validate events cannot be in the past" do
 		changeset = Event.changeset(%Event{}, @past_event)
 		assert {_, [validation: :in_the_past]} = changeset.errors[:scheduled_to]
