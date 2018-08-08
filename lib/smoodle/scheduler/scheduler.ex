@@ -150,4 +150,76 @@ defmodule Smoodle.Scheduler do
   def delete_poll(%Poll{} = poll) do
     Repo.delete(poll)
   end
+
+  def get_best_schedule(%Event{} = event, opts \\ [is_owner: false]) do
+    polls = Repo.all(Ecto.assoc(event, :polls)) |> Repo.preload(:date_ranks) |> Enum.map(&transform_poll_for_lookup/1)
+
+    Date.range(event.time_window_from, event.time_window_to)
+    |> Enum.map(fn date ->
+      Enum.reduce(polls, %{
+        date: date,
+        negative_rank: 0,
+        positive_rank: 0,
+        negative_participants: []
+      }, fn poll, acc ->
+        rank = compute_rank(poll, date)
+        Map.update!(acc, :negative_rank, fn value ->
+          if rank < 0 do
+            value + rank
+          else
+            value
+          end
+        end)
+        |> Map.update!(:positive_rank, fn value ->
+          if rank > 0 do
+            value + rank
+          else
+            value
+          end
+        end)
+        |> Map.update!(:negative_participants, fn participants ->
+          if opts[:is_owner] && rank < 0 do
+            [poll.participant | participants]
+          else
+            participants
+          end
+        end)
+      end)
+    end)
+    |> Enum.sort(fn d1, d2 ->
+      if d1.negative_rank != d2.negative_rank do
+        d1.negative_rank > d2.negative_rank
+      else
+        d1.positive_rank > d2.positive_rank
+      end
+    end)
+  end
+
+  defp compute_rank(%{} = poll, %Date{} = date) do
+    date_rank = case Enum.find(poll.date_ranks, fn {date_range, _} -> Enum.member?(date_range, date) end) do
+      {_, rank} -> rank
+      nil -> nil
+    end
+    weekday_rank = poll.weekday_ranks[Date.day_of_week(date)] || 0
+
+    date_rank || weekday_rank
+  end
+
+  defp transform_poll_for_lookup(%Poll{} = poll) do
+    poll
+    |> Map.from_struct
+    |> Map.update!(:date_ranks, &(
+      &1 |> Enum.map(fn
+        %{date_from: date_from, date_to: date_to, rank: rank} -> {Date.range(date_from, date_to), rank}
+      end)
+      |> Enum.sort
+    ))
+    |> Map.put(:weekday_ranks, case poll.preferences do
+        nil -> %{}
+        _ -> Enum.map(poll.preferences.weekday_ranks, fn
+            %{day: day, rank: rank} -> {day+1, rank}
+          end) |> Map.new
+    end)
+    |> Map.take([:date_ranks, :weekday_ranks, :participant])
+  end
 end

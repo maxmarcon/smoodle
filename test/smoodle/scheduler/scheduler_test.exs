@@ -143,7 +143,7 @@ defmodule Smoodle.SchedulerTest do
 
 
   @poll_valid_attrs_1 %{
-    participant: "Betty Davies"
+    participant: "Betty Davies",
   }
 
   @poll_valid_attrs_2 %{
@@ -169,6 +169,10 @@ defmodule Smoodle.SchedulerTest do
         %{
           day: 0,
           rank: 1.0
+        },
+        %{
+          day: 4,
+          rank: -1.0
         },
         %{
           day: 6,
@@ -396,6 +400,22 @@ defmodule Smoodle.SchedulerTest do
       {:ok, poll} = Scheduler.delete_poll(context[:poll])
       assert_raise Ecto.NoResultsError, fn -> Scheduler.get_poll!(poll.id) end
       assert 0 = Repo.one(from p in DateRank, select: count(p.id))
+    end
+  end
+
+  describe "when computing the best schedule" do
+    # TODO: write real tests here
+    setup do
+      {:ok, event} = Scheduler.create_event(@event_valid_attrs_1)
+      {:ok, poll1} = Scheduler.create_poll(event, @poll_valid_attrs_1)
+      {:ok, poll2} = Scheduler.create_poll(event, @poll_valid_attrs_2)
+      {:ok, poll3} = Scheduler.create_poll(event, @poll_valid_attrs_3)
+      %{event: event, polls: [poll2, poll3, poll1]}
+    end
+
+    test "get_best_schedule returns somethin", %{event: event} do
+      best_schedule = Scheduler.get_best_schedule(event)
+      for s <- best_schedule, do: IO.puts(inspect(s))
     end
   end
 end

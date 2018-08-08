@@ -32,6 +32,8 @@ defmodule SmoodleWeb.Router do
       resources "/polls", PollController, only: [:create, :index]
     end
 
+    get "/events/:id/schedule", EventController, :get_schedule
+
     resources "/polls", PollController, only: [:update, :delete, :show]
   end
 
