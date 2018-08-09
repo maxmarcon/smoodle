@@ -13,6 +13,7 @@ defmodule Smoodle.Repo.Migrations.CreateEvents do
   		add :scheduled_to, :naive_datetime
   		add :desc, :text
       add :email, :string
+      add :state, :string
 
   		timestamps()
   	end

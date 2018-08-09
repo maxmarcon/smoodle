@@ -20,6 +20,10 @@ defmodule Smoodle.Scheduler.PollTest do
 		participant: "Betty Davies"
 	}
 
+	def build_basic_poll(_) do
+		%{poll: %Poll{event: struct(Event, @event_attrs)}}
+	end
+
 	def build_weekday_ranks(_) do
 		%{weekday_ranks: Enum.map(0..6, fn d -> %{day: d, rank: Enum.random([-0.2, -0.1, 0.1, 0.2])} end)}
 	end
@@ -45,13 +49,15 @@ defmodule Smoodle.Scheduler.PollTest do
 		}
 	end
 
-	test "poll with basic data is valid" do
-		changeset = Poll.changeset(%Poll{}, @poll_attrs)
+	setup :build_basic_poll
+
+	test "poll with basic data is valid", %{poll: poll} do
+		changeset = Poll.changeset(poll, @poll_attrs)
 		assert changeset.valid?
 	end
 
-	test "poll is invalid without a participant" do
-		changeset = Poll.changeset(%Poll{}, Map.delete(@poll_attrs, :participant))
+	test "poll is invalid without a participant", %{poll: poll} do
+		changeset = Poll.changeset(poll, Map.delete(@poll_attrs, :participant))
 		refute changeset.valid?
 		assert [participant: {_, [validation: :required]}] = changeset.errors
 	end
@@ -60,14 +66,14 @@ defmodule Smoodle.Scheduler.PollTest do
 
 		setup :build_weekday_ranks
 
-		test "poll is valid ", context do
+		test "poll is valid ", %{poll: poll, weekday_ranks: weekday_ranks} do
 			changeset = Poll.changeset(
-				%Poll{},
+				poll,
 				Map.merge(
 					@poll_attrs,
 					%{
 						preferences: %{
-							weekday_ranks: context[:weekday_ranks]
+							weekday_ranks: weekday_ranks
 						}
 					}
 				)
@@ -80,14 +86,14 @@ defmodule Smoodle.Scheduler.PollTest do
 
 		setup :build_weekday_ranks
 
-		test "poll is invalid with invalid day", context do
+		test "poll is invalid with invalid day", %{poll: poll, weekday_ranks: weekday_ranks} do
 			changeset = Poll.changeset(
-				%Poll{},
+				poll,
 				Map.merge(
 					@poll_attrs,
 					%{
 						preferences: %{
-							weekday_ranks: List.replace_at(context[:weekday_ranks], 0, %{day: 7, rank: 0.1})
+							weekday_ranks: List.replace_at(weekday_ranks, 0, %{day: 7, rank: 0.1})
 						}
 					}
 				)
@@ -96,14 +102,14 @@ defmodule Smoodle.Scheduler.PollTest do
 			assert %{preferences: %{weekday_ranks: [%{day: _} | _]}} = traverse_errors(changeset, &(&1))
 		end
 
-		test "poll is invalid with invalid rank", context do
+		test "poll is invalid with invalid rank", %{poll: poll, weekday_ranks: weekday_ranks} do
 			changeset = Poll.changeset(
-				%Poll{},
+				poll,
 				Map.merge(
 					@poll_attrs,
 					%{
 						preferences: %{
-							weekday_ranks: List.replace_at(context[:weekday_ranks], 0, %{day: 0, rank: "bad"})
+							weekday_ranks: List.replace_at(weekday_ranks, 0, %{day: 0, rank: "bad"})
 						}
 					}
 				)
@@ -113,14 +119,14 @@ defmodule Smoodle.Scheduler.PollTest do
 			assert %{preferences: %{weekday_ranks: [%{rank: _} | _]}} = traverse_errors(changeset, &(&1))
 		end
 
-		test "poll is invalid with 0 weekday rank", context do
+		test "poll is invalid with 0 weekday rank", %{poll: poll, weekday_ranks: weekday_ranks} do
 			changeset = Poll.changeset(
-				%Poll{},
+				poll,
 				Map.merge(
 					@poll_attrs,
 					%{
 						preferences: %{
-							weekday_ranks: List.replace_at(context[:weekday_ranks], 0, %{day: 0, rank: 0.0})
+							weekday_ranks: List.replace_at(weekday_ranks, 0, %{day: 0, rank: 0.0})
 						}
 					}
 				)
@@ -130,14 +136,14 @@ defmodule Smoodle.Scheduler.PollTest do
 			assert %{preferences: %{weekday_ranks: [%{rank: [{_, validation: :must_be_nonzero}]} | _]}} = traverse_errors(changeset, &(&1))
 		end
 
-		test "poll is invalid if a weekday is ranked more than once", context do
+		test "poll is invalid if a weekday is ranked more than once", %{poll: poll, weekday_ranks: weekday_ranks} do
 			changeset = Poll.changeset(
-				%Poll{},
+				poll,
 				Map.merge(
 					@poll_attrs,
 					%{
 						preferences: %{
-							weekday_ranks: [%{day: 0, rank: 0.5} | context[:weekday_ranks]]
+							weekday_ranks: [%{day: 0, rank: 0.5} | weekday_ranks]
 						}
 					}
 				)
@@ -147,9 +153,9 @@ defmodule Smoodle.Scheduler.PollTest do
 			assert %{preferences: %{weekday_ranks: [{_, [validation: :weekday_ranked_twice]}]}} = traverse_errors(changeset, &(&1))
 		end
 
-		test "poll is invalid with bogus weekday ranks data" do
+		test "poll is invalid with bogus weekday ranks data", %{poll: poll} do
 			changeset = Poll.changeset(
-				%Poll{},
+				poll,
 				Map.merge(
 					@poll_attrs,
 					%{
@@ -170,13 +176,13 @@ defmodule Smoodle.Scheduler.PollTest do
 
 		setup [:create_date_ranks]
 
-		test "the poll is valid", context do
+		test "the poll is valid", %{poll: poll, date_ranks: date_ranks} do
 			changeset = Poll.changeset(
-				%Poll{},
+				poll,
 				Map.merge(
 					@poll_attrs,
 					%{
-						date_ranks: context[:date_ranks]
+						date_ranks: date_ranks
 					}
 				)
 			)
@@ -188,9 +194,9 @@ defmodule Smoodle.Scheduler.PollTest do
 
 		setup [:create_date_ranks]
 
-		test "the poll is invalid", context do
+		test "the poll is invalid", %{poll: poll, date_ranks: date_ranks} do
 			changeset = Poll.changeset(
-				%Poll{},
+				poll,
 				Map.merge(
 					@poll_attrs,
 					%{
@@ -200,7 +206,7 @@ defmodule Smoodle.Scheduler.PollTest do
 								date_to: ~D[2118-03-06],
 								rank: +4.0
 							}
-							| context[:date_ranks]
+							| date_ranks
 						]
 					}
 				)
@@ -215,9 +221,9 @@ defmodule Smoodle.Scheduler.PollTest do
 
 		setup [:create_date_ranks]
 
-		test "the poll is still invalid", context do
+		test "the poll is still invalid", %{poll: poll, date_ranks: date_ranks} do
 			changeset = Poll.changeset(
-				%Poll{},
+				poll,
 				Map.merge(
 					@poll_attrs,
 					%{
@@ -227,7 +233,7 @@ defmodule Smoodle.Scheduler.PollTest do
 								date_to: ~D[2118-03-06],
 								rank: +4.0
 							}
-							| context[:date_ranks]
+							| date_ranks
 						]
 					}
 				)
@@ -240,9 +246,9 @@ defmodule Smoodle.Scheduler.PollTest do
 
 	describe "with bogus date ranks" do
 
-		test "the poll is invalid" do
+		test "the poll is invalid", %{poll: poll} do
 
-			changeset = Poll.changeset(%Poll{}, Map.merge(@poll_attrs, %{date_ranks: "foo"}))
+			changeset = Poll.changeset(poll, Map.merge(@poll_attrs, %{date_ranks: "foo"}))
 
 			assert %{date_ranks: [{_, [type: {:array, :map}]}]} = traverse_errors(changeset, &(&1))
 			refute changeset.valid?
@@ -253,9 +259,9 @@ defmodule Smoodle.Scheduler.PollTest do
 
 		setup [:create_date_ranks]
 
-		test "the poll is invalid", context do
+		test "the poll is invalid", %{poll: poll, date_ranks: date_ranks} do
 
-			changeset = change(%Poll{})
+			changeset = change(poll)
 			|> put_assoc(:event, struct(Event, @event_attrs))
 			|> Poll.changeset(Map.merge(@poll_attrs,
 				%{date_ranks: [
@@ -264,7 +270,7 @@ defmodule Smoodle.Scheduler.PollTest do
 						date_to: ~D[2118-03-21],
 						rank: 1.0
 					}
-					| context[:date_ranks] ]
+					| date_ranks ]
 				}
 			))
 
@@ -273,16 +279,30 @@ defmodule Smoodle.Scheduler.PollTest do
 		end
 	end
 
+	describe "if the event is no longer open" do
+
+		test "the poll is invalid", %{poll: poll} do
+
+			poll = Map.update!(poll, :event, &(Map.put(&1, :state, "CLOSED")))
+
+			changeset = change(poll)
+			|> Poll.changeset(@poll_attrs)
+
+			refute changeset.valid?
+			assert %{event: [{_, [validation: :event_no_longer_open]}]} = traverse_errors(changeset, &(&1))
+		end
+	end
+
 	describe "with date ranks inside the event time window" do
 
 		setup [:create_date_ranks]
 
-		test "the poll is valid", context do
+		test "the poll is valid", %{poll: poll, date_ranks: date_ranks} do
 
-			changeset = change(%Poll{})
+			changeset = change(poll)
 			|> put_assoc(:event, struct(Event, @event_attrs))
 			|> Poll.changeset(Map.merge(@poll_attrs,
-				%{date_ranks: context[:date_ranks] }
+				%{date_ranks: date_ranks }
 			))
 
 			assert changeset.valid?

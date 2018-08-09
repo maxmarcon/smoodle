@@ -11,6 +11,7 @@ defmodule Smoodle.Scheduler.Event do
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @secret_len 16
+  @valid_states ["OPEN", "SCHEDULED", "CANCELED"]
 
   schema "events" do
     field :name, :string
@@ -22,16 +23,21 @@ defmodule Smoodle.Scheduler.Event do
     field :scheduled_to, :naive_datetime
     field :desc, :string
     field :email, :string
+    field :state, :string, default: "OPEN"
     has_many :polls, Poll
 
     timestamps(usec: false)
+  end
+
+  def is_open(%Event{} = event) do
+    event.state == "OPEN"
   end
 
   @doc false
   def changeset(%Event{} = event, attrs) do
     event
     |> Repo.preload(:polls)
-    |> cast(attrs, [:name, :organizer, :time_window_from, :time_window_to, :scheduled_from, :scheduled_to, :desc, :email])
+    |> cast(attrs, [:name, :organizer, :time_window_from, :time_window_to, :scheduled_from, :scheduled_to, :desc, :email, :state])
     |> validate_required([:name, :organizer, :desc, :email, :time_window_from, :time_window_to])
     |> validate_length(:name, max: 50)
     |> validate_length(:organizer, max: 50)
@@ -45,6 +51,17 @@ defmodule Smoodle.Scheduler.Event do
     |> validate_is_the_future([:time_window_from, :time_window_to], Date)
     |> validate_window_not_too_large([:time_window_from, :time_window_to], 365, :time_window)
     |> trim_text_changes([:name, :organizer, :desc])
+    |> check_consistency
+    |> validate_inclusion(:state, @valid_states)
+  end
+
+  def check_consistency(changeset) do
+    if get_change(changeset, :scheduled_from) && get_field(changeset, :state) != "SCHEDULED" ||
+      get_change(changeset, :state) == "SCHEDULED" && !get_change(changeset, :scheduled_from) do
+      add_error(changeset, :state, dgettext("errors", "inconsistent event state"), validation: :inconsistent_event_state)
+    else
+      changeset
+    end
   end
 
   def changeset_insert(attrs) do

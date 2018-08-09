@@ -25,6 +25,7 @@ defmodule Smoodle.Scheduler.Poll do
   def changeset(changeset, attrs) do
     changeset
     |> cast(attrs, [:participant, :event_id])
+    |> validate_event_open
     |> validate_required([:participant])
     |> cast_assoc(:date_ranks)
     |> cast_embed(:preferences, with: &preferences_changeset/2)
@@ -35,21 +36,26 @@ defmodule Smoodle.Scheduler.Poll do
     |> trim_text_changes([:participant])
   end
 
-  defp validate_date_ranks_within_event_time_window(changeset) do
-    with %Event{time_window_from: from, time_window_to: to} <- get_field(changeset, :event) do
-      if changeset
-        |> get_field(:date_ranks)
-        |> Enum.filter(&(!is_nil(&1.date_from) && !is_nil(&1.date_to)))
-        |> Enum.flat_map(&([&1.date_from, &1.date_to]))
-        |> Enum.all?(fn date ->
-          Enum.member?(Date.range(from, to), date)
-        end) do
-        changeset
-      else
-        add_error(changeset, :date_ranks, dgettext("errors", "dates cannot be outside of the event time_window"), validation: :date_ranks_outside_of_event_window)
-      end
+  defp validate_event_open(changeset) do
+    if Event.is_open(get_field(changeset, :event)) do
+      changeset
     else
-      _ -> changeset
+      add_error(changeset, :event, dgettext("errors", "event is no longer open"), validation: :event_no_longer_open)
+    end
+  end
+
+  defp validate_date_ranks_within_event_time_window(changeset) do
+    %Event{time_window_from: from, time_window_to: to} = get_field(changeset, :event)
+    if changeset
+      |> get_field(:date_ranks)
+      |> Enum.filter(&(!is_nil(&1.date_from) && !is_nil(&1.date_to)))
+      |> Enum.flat_map(&([&1.date_from, &1.date_to]))
+      |> Enum.all?(fn date ->
+        Enum.member?(Date.range(from, to), date)
+      end) do
+      changeset
+    else
+      add_error(changeset, :date_ranks, dgettext("errors", "dates cannot be outside of the event time_window"), validation: :date_ranks_outside_of_event_window)
     end
   end
 

@@ -11,6 +11,7 @@ defmodule Smoodle.Scheduler.EventTest do
 		time_window_to: "2118-03-20",
 		scheduled_from: "2118-02-05 19:00:00",
 		scheduled_to: "2118-02-05 23:00:00",
+		state: "SCHEDULED",
 		email: "bot@fake.com"
 	}
 
@@ -22,6 +23,7 @@ defmodule Smoodle.Scheduler.EventTest do
 		time_window_to: "1118-03-20",
 		scheduled_from: "1118-02-05 19:00:00",
 		scheduled_to: "1118-02-05 23:00:00",
+		state: "SCHEDULED",
 		email: "bot@fake.com"
 	}
 
@@ -77,6 +79,16 @@ defmodule Smoodle.Scheduler.EventTest do
 		assert [email: {_,  [validation: :required]}] = changeset.errors
 	end
 
+	test "changeset with invalid state" do
+		changeset = Event.changeset(%Event{}, Map.put(@valid_attrs, :state, "INVALID_STATE"))
+		assert [state: {_,  [validation: :inclusion]},  state: {_, [validation: :inconsistent_event_state]}] = changeset.errors
+	end
+
+	test "changeset with valid state" do
+		changeset = Event.changeset(%Event{}, Map.drop(Map.put(@valid_attrs, :state, "CANCELED"), [:scheduled_to, :scheduled_from]))
+		assert changeset.valid?
+	end
+
 	test "validate both time window ends must be defined" do
 		changeset = Event.changeset(%Event{}, Map.delete(@valid_attrs, :time_window_from))
 		assert [time_window_from: {_, [validation: :required]}] = changeset.errors
@@ -98,6 +110,11 @@ defmodule Smoodle.Scheduler.EventTest do
 	test "validate both scheduled ends must be consistent" do
 		changeset = Event.changeset(%Event{}, Map.replace!(@valid_attrs, :scheduled_to, "2118-02-05 18:00:01"))
 		assert [scheduled: {_, [validation: :inconsistent_interval]}] = changeset.errors
+	end
+
+	test "validate setting a scheduling for the event set the state to \"SCHEDULED\"" do
+		changeset = Event.changeset(%Event{}, @valid_attrs)
+		assert get_change(changeset, :state) == "SCHEDULED"
 	end
 
 	test "validate time window can't be too large" do

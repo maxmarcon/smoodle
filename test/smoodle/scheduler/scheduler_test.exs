@@ -27,7 +27,8 @@ defmodule Smoodle.SchedulerTest do
   @event_update_attrs %{
     name: "New name",
     scheduled_from: "2117-03-20 20:10:00",
-    scheduled_to: "2117-03-20 23:10:00"
+    scheduled_to: "2117-03-20 23:10:00",
+    state: "SCHEDULED"
   }
 
   @event_invalid_attrs %{
@@ -73,6 +74,7 @@ defmodule Smoodle.SchedulerTest do
       assert {:ok, %Event{} = event} = Scheduler.create_event(@event_valid_attrs_1)
       assert Map.take(event, [:name, :desc]) == Map.take(@event_valid_attrs_1, [:name, :desc])
       assert String.length(event.secret) == 32
+      assert event.state == "OPEN"
       assert Repo.preload(Scheduler.get_event!(event.id), :polls) == event
     end
 
@@ -93,14 +95,22 @@ defmodule Smoodle.SchedulerTest do
   describe "when updating events" do
 
     setup do
-      {:ok, event1} = Scheduler.create_event(@event_valid_attrs_1)
+      {:ok, event} = Scheduler.create_event(@event_valid_attrs_1)
+      {:ok, scheduled_event} = Scheduler.create_event(Map.merge(@event_valid_attrs_1,
+        %{
+          scheduled_from: "2117-03-20 20:10:00",
+          scheduled_to: "2117-03-20 23:10:00",
+          state: "SCHEDULED"
+        })
+      )
 
-      %{event: event1}
+      %{event: event, scheduled_event: scheduled_event}
     end
 
     test "update_event/2 with valid data updates the event", context do
       assert {:ok, event} = Scheduler.update_event(context[:event], @event_update_attrs)
       assert event.name == @event_update_attrs.name
+      assert event.state == "SCHEDULED"
     end
 
     test "update_event/2 with valid data cannot update the token", context do
@@ -233,18 +243,18 @@ defmodule Smoodle.SchedulerTest do
       {:ok, event} = Scheduler.create_event(@event_valid_attrs_1)
       {:ok, poll1} = Scheduler.create_poll(event, @poll_valid_attrs_1)
       {:ok, poll2} = Scheduler.create_poll(event, @poll_valid_attrs_2)
-      %{event: event, polls: [poll1, poll2]}
+      %{event: event, polls: Enum.map([poll1, poll2], &(Map.delete(&1, :event)))}
     end
 
     test "get_poll!/1 fetches a poll", context do
       [poll1 | _] = context[:polls]
-      poll = Scheduler.get_poll!(poll1.id)
+      poll = Map.delete(Scheduler.get_poll!(poll1.id), :event)
       assert poll == poll1
     end
 
     test "get_poll!/2 fetches a poll", context do
       [poll1 | _] = context[:polls]
-      poll = Scheduler.get_poll!(poll1.event_id, poll1.participant)
+      poll = Map.delete(Scheduler.get_poll!(poll1.event_id, poll1.participant), :event)
       assert poll == poll1
     end
 
@@ -254,7 +264,7 @@ defmodule Smoodle.SchedulerTest do
     end
 
     test "list_polls/1 fetches all polls for an event", context do
-      polls = Scheduler.list_polls(context[:event])
+      polls = Enum.map(Scheduler.list_polls(context[:event]), &(Map.delete(&1, :event)))
       assert MapSet.new(polls) == MapSet.new(context[:polls])
     end
   end
@@ -278,12 +288,6 @@ defmodule Smoodle.SchedulerTest do
     #  assert changeset.valid?
     #  assert 1 = Repo.one(from p in Poll, select: count(p.id))
     #end
-
-    test "create_poll/3 event without id", context do
-      assert_raise(Mariaex.Error, fn ->
-        Scheduler.create_poll(Map.delete(context[:event], :id), @poll_valid_attrs_1)
-      end)
-    end
 
     test "create_poll/3 with invalid data returns changeset with errors", context do
       assert {:error, changeset} = Scheduler.create_poll(context[:event], Map.delete(@poll_valid_attrs_2, :participant))

@@ -42,7 +42,8 @@ defmodule SmoodleWeb.EventControllerTest do
 
   @update_attrs %{
     scheduled_from: "2117-04-05 21:10:00",
-    scheduled_to: "2117-04-05 22:10:00"
+    scheduled_to: "2117-04-05 22:10:00",
+    state: "SCHEDULED"
   }
   @invalid_attrs %{
     name: "",
