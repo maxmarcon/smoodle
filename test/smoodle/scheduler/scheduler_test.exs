@@ -439,4 +439,16 @@ defmodule Smoodle.SchedulerTest do
       assert Enum.empty? best_schedule
     end
   end
+
+  describe "when computing the best schedule with no polls" do
+    setup do
+      {:ok, event} = Scheduler.create_event(@event_valid_attrs_1)
+      %{event: event}
+    end
+
+    test "get_best_schedule returns an empty list", %{event: event} do
+      best_schedule = Scheduler.get_best_schedule(event)
+      assert Enum.empty? best_schedule
+    end
+  end
 end

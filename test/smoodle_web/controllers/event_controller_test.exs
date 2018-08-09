@@ -185,4 +185,26 @@ defmodule SmoodleWeb.EventControllerTest do
       assert response(conn, 200)
     end
   end
+
+  describe "get_schedule" do
+    setup :create_event
+
+    test "returns the best schedule", %{conn: conn, event: event} do
+      conn = get conn, event_path(conn, :schedule, event)
+      data_response = json_response(conn, 200)
+      assert Map.has_key?(data_response, "data")
+    end
+
+    test "returns 404 if called with wrong secret", %{conn: conn, event: event} do
+      assert_error_sent(404, fn ->
+        get conn, event_path(conn, :schedule, event), %{secret: "wrong_secret"}
+      end)
+    end
+
+    test "returns the best schedule if called with the right token", %{conn: conn, event: event} do
+      conn = get conn, event_path(conn, :schedule, event), %{secret: event.secret}
+      data_response = json_response(conn, 200)
+      assert Map.has_key?(data_response, "data")
+    end
+  end
 end

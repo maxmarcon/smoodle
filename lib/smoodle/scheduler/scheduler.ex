@@ -160,7 +160,7 @@ defmodule Smoodle.Scheduler do
       _ -> event.time_window_from
     end
 
-    if Date.compare(start_date, event.time_window_to) == :lt do
+    if Date.compare(start_date, event.time_window_to) == :lt && Enum.any?(polls) do
       Date.range(start_date, event.time_window_to)
       |> Enum.map(fn date ->
         Enum.reduce(polls, %{

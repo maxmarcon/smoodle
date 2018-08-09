@@ -59,13 +59,13 @@ defmodule SmoodleWeb.EventController do
     end
   end
 
-  def get_schedule(conn, %{"id" => id, "secret" => secret}) do
+  def schedule(conn, %{"id" => id, "secret" => secret}) do
     event = Scheduler.get_event!(id, secret)
 
     render(conn, "schedule.json", %{schedule: Scheduler.get_best_schedule(event, is_owner: true)})
   end
 
-  def get_schedule(conn, %{"id" => id}) do
+  def schedule(conn, %{"id" => id}) do
     event = Scheduler.get_event!(id)
 
     render(conn, "schedule.json", %{schedule: Scheduler.get_best_schedule(event)})
