@@ -80,8 +80,13 @@ defmodule Smoodle.Scheduler.EventTest do
 	end
 
 	test "changeset with invalid state" do
-		changeset = Event.changeset(%Event{}, Map.put(@valid_attrs, :state, "INVALID_STATE"))
-		assert [state: {_,  [validation: :inclusion]},  state: {_, [validation: :inconsistent_event_state]}] = changeset.errors
+		changeset = Event.changeset(%Event{}, Map.drop(Map.put(@valid_attrs, :state, "INVALID_STATE"), [:scheduled_from, :scheduled_to]))
+		assert [state: {_,  [validation: :inclusion]}] = changeset.errors
+	end
+
+	test "changeset with inconsitent state" do
+		changeset = Event.changeset(%Event{}, Map.put(@valid_attrs, :state, "OPEN"))
+		assert [state: {_, [validation: :inconsistent_event_state]}] = changeset.errors
 	end
 
 	test "changeset with valid state" do
