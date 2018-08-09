@@ -152,47 +152,60 @@ defmodule Smoodle.Scheduler do
   end
 
   def get_best_schedule(%Event{} = event, opts \\ [is_owner: false]) do
-    polls = Repo.all(Ecto.assoc(event, :polls)) |> Repo.preload(:date_ranks) |> Enum.map(&transform_poll_for_lookup/1)
+    polls = Repo.all(Ecto.assoc(event, :polls)) |> Repo.preload(:date_ranks) |> Enum.map(&transorm_poll_for_ranking/1)
 
-    Date.range(event.time_window_from, event.time_window_to)
-    |> Enum.map(fn date ->
-      Enum.reduce(polls, %{
-        date: date,
-        negative_rank: 0,
-        positive_rank: 0,
-        negative_participants: []
-      }, fn poll, acc ->
-        rank = compute_rank(poll, date)
-        Map.update!(acc, :negative_rank, fn value ->
-          if rank < 0 do
-            value + rank
-          else
-            value
-          end
-        end)
-        |> Map.update!(:positive_rank, fn value ->
-          if rank > 0 do
-            value + rank
-          else
-            value
-          end
-        end)
-        |> Map.update!(:negative_participants, fn participants ->
-          if opts[:is_owner] && rank < 0 do
-            [poll.participant | participants]
-          else
-            participants
-          end
+    tomorrow = Date.add(Date.utc_today, 1)
+    start_date = case Date.compare(tomorrow, event.time_window_from) do
+      :gt -> tomorrow
+      _ -> event.time_window_from
+    end
+
+    if Date.compare(start_date, event.time_window_to) == :lt do
+      Date.range(start_date, event.time_window_to)
+      |> Enum.map(fn date ->
+        Enum.reduce(polls, %{
+          date: date,
+          negative_rank: 0,
+          positive_rank: 0,
+          negative_participants: []
+        }, fn poll, acc ->
+          rank = compute_rank(poll, date)
+          Map.update!(acc, :negative_rank, fn value ->
+            if rank < 0 do
+              value + rank
+            else
+              value
+            end
+          end)
+          |> Map.update!(:positive_rank, fn value ->
+            if rank > 0 do
+              value + rank
+            else
+              value
+            end
+          end)
+          |> Map.update!(:negative_participants, fn participants ->
+            if opts[:is_owner] && rank < 0 do
+              [poll.participant | participants]
+            else
+              participants
+            end
+          end)
         end)
       end)
-    end)
-    |> Enum.sort(fn d1, d2 ->
-      if d1.negative_rank != d2.negative_rank do
-        d1.negative_rank > d2.negative_rank
-      else
-        d1.positive_rank > d2.positive_rank
-      end
-    end)
+      |> Enum.sort(fn d1, d2 ->
+        cond do
+          d1.negative_rank != d2.negative_rank ->
+            d1.negative_rank > d2.negative_rank
+          d1.positive_rank != d2.positive_rank ->
+            d1.positive_rank > d2.positive_rank
+          true ->
+            Date.compare(d1.date, d2.date) != :gt
+        end
+      end)
+    else
+      []
+    end
   end
 
   defp compute_rank(%{} = poll, %Date{} = date) do
@@ -205,7 +218,7 @@ defmodule Smoodle.Scheduler do
     date_rank || weekday_rank
   end
 
-  defp transform_poll_for_lookup(%Poll{} = poll) do
+  defp transorm_poll_for_ranking(%Poll{} = poll) do
     poll
     |> Map.from_struct
     |> Map.update!(:date_ranks, &(

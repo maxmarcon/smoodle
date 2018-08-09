@@ -404,7 +404,6 @@ defmodule Smoodle.SchedulerTest do
   end
 
   describe "when computing the best schedule" do
-    # TODO: write real tests here
     setup do
       {:ok, event} = Scheduler.create_event(@event_valid_attrs_1)
       {:ok, poll1} = Scheduler.create_poll(event, @poll_valid_attrs_1)
@@ -413,9 +412,31 @@ defmodule Smoodle.SchedulerTest do
       %{event: event, polls: [poll2, poll3, poll1]}
     end
 
-    test "get_best_schedule returns somethin", %{event: event} do
+    test "get_best_schedule returns the best date at the head of the list", %{event: event} do
       best_schedule = Scheduler.get_best_schedule(event)
-      for s <- best_schedule, do: IO.puts(inspect(s))
+      [best_date | _] = best_schedule
+      assert %{date: ~D[2117-03-15], positive_rank: 2.0} = best_date # It's a Monday :-)
+    end
+
+    test "get_best_schedule returns one entry for each date in the event window", %{event: event} do
+      best_schedule = Scheduler.get_best_schedule(event)
+      assert Enum.map(Date.range(event.time_window_from, event.time_window_to), &(&1)) |> Enum.sort ==
+        Enum.map(best_schedule, fn %{date: date} -> date end) |> Enum.sort
+    end
+
+    test "get_best_schedule called from non-owner does not include participant names", %{event: event} do
+      best_schedule = Scheduler.get_best_schedule(event)
+      assert Enum.all?(best_schedule, &(Enum.empty?(&1.negative_participants)))
+    end
+
+    test "get_best_schedule called from owner does include participant names", %{event: event} do
+      best_schedule = Scheduler.get_best_schedule(event, is_owner: true)
+      assert Enum.any?(best_schedule, &(Enum.any?(&1.negative_participants)))
+    end
+
+    test "get_best_schedule for event returns empty list when time window is invalud", %{event: event} do
+      best_schedule = Scheduler.get_best_schedule(%{event | time_window_to: event.time_window_from, time_window_from: event.time_window_to}, is_owner: true)
+      assert Enum.empty? best_schedule
     end
   end
 end
