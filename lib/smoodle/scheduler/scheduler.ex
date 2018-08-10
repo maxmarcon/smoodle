@@ -161,52 +161,68 @@ defmodule Smoodle.Scheduler do
       _ -> event.time_window_from
     end
 
-    if Date.compare(start_date, event.time_window_to) == :lt && Enum.any?(polls) do
-      Date.range(start_date, event.time_window_to)
-      |> Enum.map(fn date ->
-        Enum.reduce(polls, %{
-          date: date,
-          negative_rank: 0,
-          positive_rank: 0,
-          negative_participants: []
-        }, fn poll, acc ->
-          rank = compute_rank(poll, date)
-          Map.update!(acc, :negative_rank, fn value ->
-            if rank < 0 do
-              value + rank
-            else
-              value
-            end
-          end)
-          |> Map.update!(:positive_rank, fn value ->
-            if rank > 0 do
-              value + rank
-            else
-              value
-            end
-          end)
-          |> Map.update!(:negative_participants, fn participants ->
-            if opts[:is_owner] && rank < 0 do
-              [poll.participant | participants]
-            else
-              participants
-            end
-          end)
+    %{
+      dates: Enum.map(
+        generate_date_ranking(start_date, event.time_window_to, polls),
+        fn date_entry ->
+          if opts[:is_owner] do
+            date_entry
+          else
+            Map.delete(date_entry, :negative_participants)
+          end
+      end),
+      participants: Enum.count(polls)
+    }
+  end
+
+  defp generate_date_ranking(start_date, end_date, polls) do
+    if Date.compare(start_date, end_date) == :lt && Enum.any?(polls) do
+      Date.range(start_date, end_date)
+        |> Enum.map(fn date ->
+          Enum.reduce(polls,
+            %{
+              date: date,
+              negative_rank: 0,
+              positive_rank: 0,
+              negative_participants: []
+            },
+            &reduce_polls_for_date/2
+          )
         end)
-      end)
-      |> Enum.sort(fn d1, d2 ->
-        cond do
-          d1.negative_rank != d2.negative_rank ->
-            d1.negative_rank > d2.negative_rank
-          d1.positive_rank != d2.positive_rank ->
-            d1.positive_rank > d2.positive_rank
-          true ->
-            Date.compare(d1.date, d2.date) != :gt
-        end
-      end)
+        |> Enum.sort(fn d1, d2 ->
+          cond do
+            d1.negative_rank != d2.negative_rank ->
+              d1.negative_rank > d2.negative_rank
+            d1.positive_rank != d2.positive_rank ->
+              d1.positive_rank > d2.positive_rank
+            true ->
+              Date.compare(d1.date, d2.date) != :gt
+          end
+        end)
     else
       []
     end
+  end
+
+  defp reduce_polls_for_date(poll, acc) do
+    rank = compute_rank(poll, acc.date)
+    Map.update!(acc, :negative_rank, fn value ->
+      if rank < 0 do
+        value + rank
+      else
+        value
+      end
+    end)
+    |> Map.update!(:positive_rank, fn value ->
+      if rank > 0 do
+        value + rank
+      else
+        value
+      end
+    end)
+    |> Map.update!(:negative_participants, fn participants ->
+      [poll.participant | participants]
+    end)
   end
 
   defp compute_rank(%{} = poll, %Date{} = date) do
