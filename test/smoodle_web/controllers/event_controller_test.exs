@@ -207,5 +207,11 @@ defmodule SmoodleWeb.EventControllerTest do
       data_response = json_response(conn, 200)
       assert Map.has_key?(data_response, "data")
     end
+
+    test "does not break if called with bogus limit", %{conn: conn, event: event} do
+      conn = get conn, event_path(conn, :schedule, event), %{limit: "bogus!"}
+      data_response = json_response(conn, 200)
+      assert Map.has_key?(data_response, "data")
+    end
   end
 end

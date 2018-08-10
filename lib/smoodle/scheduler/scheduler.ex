@@ -152,8 +152,11 @@ defmodule Smoodle.Scheduler do
     Repo.delete(poll)
   end
 
-  def get_best_schedule(%Event{} = event, opts \\ [is_owner: false]) do
+  def get_best_schedule(%Event{} = event, opts \\ []) do
     polls = Repo.all(Ecto.assoc(event, :polls)) |> Repo.preload(:date_ranks) |> Enum.map(&transorm_poll_for_ranking/1)
+
+    is_owner = opts[:is_owner]
+    limit = opts[:limit]
 
     tomorrow = Date.add(Date.utc_today, 1)
     start_date = case Date.compare(tomorrow, event.time_window_from) do
@@ -163,9 +166,9 @@ defmodule Smoodle.Scheduler do
 
     %{
       dates: Enum.map(
-        generate_date_ranking(start_date, event.time_window_to, polls),
+        generate_date_ranking(start_date, event.time_window_to, polls, limit),
         fn date_entry ->
-          if opts[:is_owner] do
+          if is_owner do
             date_entry
           else
             Map.delete(date_entry, :negative_participants)
@@ -175,7 +178,7 @@ defmodule Smoodle.Scheduler do
     }
   end
 
-  defp generate_date_ranking(start_date, end_date, polls) do
+  defp generate_date_ranking(start_date, end_date, polls, limit \\ nil) do
     if Date.compare(start_date, end_date) == :lt && Enum.any?(polls) do
       Date.range(start_date, end_date)
         |> Enum.map(fn date ->
@@ -199,8 +202,17 @@ defmodule Smoodle.Scheduler do
               Date.compare(d1.date, d2.date) != :gt
           end
         end)
+        |> shorten_ranking(limit)
     else
       []
+    end
+  end
+
+  defp shorten_ranking(ranking, limit) do
+    if limit do
+      Enum.take(ranking, limit)
+    else
+      ranking
     end
   end
 
@@ -221,7 +233,11 @@ defmodule Smoodle.Scheduler do
       end
     end)
     |> Map.update!(:negative_participants, fn participants ->
-      [poll.participant | participants]
+      if rank < 0 do
+        [poll.participant | participants]
+      else
+        participants
+      end
     end)
   end
 

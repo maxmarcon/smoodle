@@ -1,4 +1,4 @@
-defmodule Smoodle.Scheduler.Event do
+  defmodule Smoodle.Scheduler.Event do
   use Ecto.Schema
   require Integer
   import Ecto.Changeset
@@ -51,22 +51,23 @@ defmodule Smoodle.Scheduler.Event do
     |> validate_is_the_future([:time_window_from, :time_window_to], Date)
     |> validate_window_not_too_large([:time_window_from, :time_window_to], 365, :time_window)
     |> trim_text_changes([:name, :organizer, :desc])
-    |> check_consistency
+    |> validate_consistency
     |> validate_inclusion(:state, @valid_states)
   end
 
-  def check_consistency(changeset) do
-    if get_change(changeset, :scheduled_from) && get_field(changeset, :state) != "SCHEDULED" ||
-      get_change(changeset, :state) == "SCHEDULED" && !get_change(changeset, :scheduled_from) do
-      add_error(changeset, :state, dgettext("errors", "inconsistent event state"), validation: :inconsistent_event_state)
-    else
-      changeset
-    end
-  end
 
   def changeset_insert(attrs) do
     changeset(%Event{}, attrs) |>
     change(%{secret: SecureRandom.urlsafe_base64(@secret_len)})
+  end
+
+  defp validate_consistency(changeset) do
+    if get_field(changeset, :scheduled_from) && get_field(changeset, :state) != "SCHEDULED" ||
+      get_field(changeset, :state) == "SCHEDULED" && !(get_field(changeset, :scheduled_from) && get_field(changeset, :scheduled_from)) do
+      add_error(changeset, :state, dgettext("errors", "inconsistent event state"), validation: :inconsistent_event_state)
+    else
+      changeset
+    end
   end
 
   defp validate_window_not_too_large(changeset, keys, max_days, error_key) do

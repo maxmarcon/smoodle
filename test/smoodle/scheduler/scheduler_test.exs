@@ -443,9 +443,14 @@ defmodule Smoodle.SchedulerTest do
       assert Enum.any?(best_schedule.dates, &(Enum.any?(&1.negative_participants)))
     end
 
-    test "get_best_schedule for event returns empty list when time window is invalud", %{event: event} do
+    test "get_best_schedule for event returns empty list when time window is invalid", %{event: event} do
       best_schedule = Scheduler.get_best_schedule(%{event | time_window_to: event.time_window_from, time_window_from: event.time_window_to}, is_owner: true)
       assert Enum.empty? best_schedule.dates
+    end
+
+     test "get_best_schedule returns a shorten list when a limit is passed", %{event: event} do
+      best_schedule = Scheduler.get_best_schedule(event, limit: 1)
+      assert Enum.count(best_schedule.dates) == 1
     end
   end
 

@@ -59,15 +59,26 @@ defmodule SmoodleWeb.EventController do
     end
   end
 
-  def schedule(conn, %{"id" => id, "secret" => secret}) do
+  def schedule(conn, %{"id" => id, "secret" => secret} = params) do
     event = Scheduler.get_event!(id, secret)
 
-    render(conn, "schedule.json", %{schedule: Scheduler.get_best_schedule(event, is_owner: true)})
+    render(conn, "schedule.json", %{schedule: Scheduler.get_best_schedule(event, Keyword.merge(schedule_parse_params(params), is_owner: true))})
   end
 
-  def schedule(conn, %{"id" => id}) do
+  def schedule(conn, %{"id" => id} = params) do
     event = Scheduler.get_event!(id)
 
-    render(conn, "schedule.json", %{schedule: Scheduler.get_best_schedule(event)})
+    render(conn, "schedule.json", %{schedule: Scheduler.get_best_schedule(event, schedule_parse_params(params))})
   end
+
+  defp schedule_parse_params(params) do
+    limit = with {number, _} <- Integer.parse(params["limit"] || "") do
+      number
+    else
+      _ -> nil
+    end
+
+    [limit: limit]
+  end
+
 end
