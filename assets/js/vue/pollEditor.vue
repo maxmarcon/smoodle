@@ -167,7 +167,7 @@
 		)
 </template>
 <script>
-import { showToolTip, dotAccessObject, accordionGroupsMixin, fetchEventMixin, fetchPollMixin } from '../globals'
+import { showToolTip, dotAccessObject, accordionGroupsMixin, fetchEventMixin, fetchPollMixin, colorCodes} from '../globals'
 import dateFns from 'date-fns'
 
 export default {
@@ -347,7 +347,7 @@ export default {
 		backToEvent() {
 			this.$router.push({name: 'event', params: {eventId: this.computedEventId}});
 		},
-		colorForRank: (rank) => (rank > 0 ? '#28a745' : '#dc3545')
+		colorForRank: (rank) => (rank > 0 ? colorCodes.red : colorCodes.green)
 	},
 	computed: {
 		disabledDates() {

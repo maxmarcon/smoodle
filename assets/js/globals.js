@@ -220,3 +220,8 @@ export const timeWindowMixin = {
 	}
 }
 
+export const colorCodes = {
+	green: '#28a745',
+	red: '#dc3545',
+	yellow: '#ffc107'
+}

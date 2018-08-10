@@ -71,9 +71,13 @@ export default {
 			should_happen: "Should happen:",
 			create_poll: "Answer the poll",
 			update_poll: "Update your answer",
-			no_participants: "Nobody participated yet. As soon as there are some participants, the best dates for the event will appear here.",
-			welcome: "{organizer} has invited you to this event, which will happen on a day in the period {timeWindow}. Please answer a poll\
-								to enter your availability. You can also update your answer if you already entered one.",
+			no_participants: "Nobody participated yet. As soon as there are some participants, the best dates for the event will appear here. Be the first one to answer the poll!",
+			schedule_not_found: "We were unable to fetch the current schedule for this event",
+			welcome: "{organizer} has invited you to this event.",
+			event_open: "The event has not been scheduled yet. Below are the best candidate dates so far. If you haven't yet, please answer a poll\
+								to enter your availability",
+			event_canceled: "This event has been canceled",
+			event_scheduled: "{organizer} has scheduled this event to happen on {time}",
 			says: "says:",
 			update: {
 				title: "Update your answer",
@@ -81,9 +85,12 @@ export default {
 				how_to: "Enter the name you used to save your answer",
 				name_placeholder: "Enter your name here...",
 				poll_not_found: "No answer found under this name. Did you spell the name correctly?"
-			}
+			},
+			participants_for_date: "Everybody can make it! | {count} people cannot make it",
+			create_new_event: "Create a new event"
 		},
 		date_format: 'MM/DD/YYYY',
+		time_format: 'MM/DD/YYYY h:mm A',
 		week_days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
 		ranker: {
 			good: "Good",

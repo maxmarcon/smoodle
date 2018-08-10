@@ -14,137 +14,139 @@
 					:timeWindowTo="eventTimeWindowTo"
 				)
 			.card-body
-				.row.justify-content-center(v-if="createdEvent")
-					.col-md-8.text-center
-						h5 {{ $t('event_editor.event_created', {eventName: createdEvent.name, eventOrganizer: createdEvent.organizer, organizerEmail: createdEvent.email}) }}
-						p {{ $t('event_editor.share_link') }}
-						.input-group.border.border-success
-							input.form-control(:value="createdEvent.share_link" readonly @success="clipboard")
-							.input-group-append
-								button.btn.btn-sm.btn-outline-secondary(
-									v-clipboard:copy="createdEvent.share_link"
-									v-clipboard:success="clipboard"
-								)
-									span.fas.fa-clipboard
+				ul.list-group.list-group-flush(v-if="createdEvent")
+					li.list-group-item
+						.alert.alert-success
+							| {{ $t('event_editor.event_created', {eventName: createdEvent.name, eventOrganizer: createdEvent.organizer, organizerEmail: createdEvent.email}) }}
+					li.list-group-item
+						.alert.alert-info {{ $t('event_editor.share_link') }}
+						.row.justify-content-center
+							.col-auto
+								.input-group.border.border-success
+									input.form-control(:value="createdEvent.share_link" readonly @success="clipboard")
+									.input-group-append
+										button.btn.btn-sm.btn-outline-secondary(
+											v-clipboard:copy="createdEvent.share_link"
+											v-clipboard:success="clipboard"
+										)
+											span.fas.fa-clipboard
 
-				.row.justify-content-center(v-else)
-					.col-md-8.text-center
-						p
-							i.fas.fa-calendar-alt.fa-lg
-							| &nbsp; {{ $t('event_editor.welcome') }}
+				div(v-else)
+					.alert.alert-info
+						i.fas.fa-calendar-alt.fa-lg
+						| &nbsp; {{ $t('event_editor.welcome') }}
 
-				hr.mb-3
+					hr.mb-3
+					form(ref="form" @submit.prevent="" novalidate)
+						b-btn.btn-block.d-flex(
+							v-b-toggle.organizer-group=""
+							:variant="groupVariant('organizer-group')"
+						)
+							span.fas.fa-chevron-down(v-if="groupVisibility['organizer-group']")
+							span.fas.fa-chevron-up(v-else)
+							span.ml-2.mr-auto {{ $t('event_editor.organizer_group') }}
+							div(v-if="showGroupErrorIcon('organizer-group')").fas.fa-exclamation
+							div(v-else-if="showGroupOkIcon('organizer-group')").fas.fa-check
+						b-collapse#organizer-group(accordion="event-creation" v-model="groupVisibility['organizer-group']")
+							b-card
+								.form-group.row
+									label.col-md-3.col-form-label(for="eventOrganizer") {{ $t('event_editor.event.organizer') }}
+									.col-md-9
+										small.form-text.text-muted {{ $t('event_editor.event.organizer_help') }}
+										input#eventOrganizer.form-control(
+											v-model.trim="eventOrganizer"
+											@change="localValidation"
+											@blur="localValidation"
+											:disabled="createdEvent"
+											:class="inputFieldClass('eventOrganizer')"
+										)
+										.invalid-feedback {{ eventOrganizerError }}
 
-				form(ref="form" @submit.prevent="" novalidate)
-					b-btn.btn-block.d-flex(
-						v-b-toggle.organizer-group=""
-						:variant="groupVariant('organizer-group')"
-					)
-						span.fas.fa-chevron-down(v-if="groupVisibility['organizer-group']")
-						span.fas.fa-chevron-up(v-else)
-						span.ml-2.mr-auto {{ $t('event_editor.organizer_group') }}
-						div(v-if="showGroupErrorIcon('organizer-group')").fas.fa-exclamation
-						div(v-else-if="showGroupOkIcon('organizer-group')").fas.fa-check
-					b-collapse#organizer-group(accordion="event-creation" v-model="groupVisibility['organizer-group']")
-						b-card
-							.form-group.row
-								label.col-md-3.col-form-label(for="eventOrganizer") {{ $t('event_editor.event.organizer') }}
-								.col-md-9
-									small.form-text.text-muted {{ $t('event_editor.event.organizer_help') }}
-									input#eventOrganizer.form-control(
-										v-model.trim="eventOrganizer"
+								.form-group.row
+									label.col-md-3.col-form-label(for="organizerEmail") {{ $t('event_editor.event.organizer_email') }}
+									.col-md-9
+										small.form-text.text-muted {{ $t('event_editor.event.organizer_email_help') }}
+										input#organizerEmail.form-control(
+											v-model.trim="organizerEmail"
+											@change="localValidation"
+											@blur="localValidation"
+											:disabled="createdEvent"
+											:class="inputFieldClass('organizerEmail')"
+										)
+										.invalid-feedback {{ organizerEmailError }}
+
+						b-btn.btn-block.d-flex.mt-2(
+							v-b-toggle.general-info-group=""
+							:variant="groupVariant('general-info-group')"
+						)
+							span.fas.fa-chevron-down(v-if="groupVisibility['general-info-group']")
+							span.fas.fa-chevron-up(v-else)
+							span.ml-2.mr-auto {{ $t('event_editor.general_info_group') }}
+							div(v-if="showGroupErrorIcon('general-info-group')").fas.fa-exclamation
+							div(v-else-if="showGroupOkIcon('general-info-group')").fas.fa-check
+						b-collapse#general-info-group(
+							accordion="event-creation"
+							v-model="groupVisibility['general-info-group']"
+						)
+							b-card
+								.form-group.row
+									label.col-md-3.col-form-label(for="eventName") {{ $t('event_editor.event.name') }}
+									.col-md-9
+										small.form-text.text-muted {{ $t('event_editor.event.name_help') }}
+										input#eventName.form-control(v-model.trim="eventName" type="text"
+										:disabled="createdEvent"
 										@change="localValidation"
 										@blur="localValidation"
+										:class="inputFieldClass('eventName')"
+										)
+										.invalid-feedback {{ eventNameError }}
+								.form-group.row
+									label.col-md-3.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
+									.col-md-9
+										small.form-text.text-muted {{ $t('event_editor.event.desc_help') }}
+										textarea#eventDesc.form-control(v-model.trim="eventDesc"
 										:disabled="createdEvent"
-										:class="inputFieldClass('eventOrganizer')"
-									)
-									.invalid-feedback {{ eventOrganizerError }}
-
-							.form-group.row
-								label.col-md-3.col-form-label(for="organizerEmail") {{ $t('event_editor.event.organizer_email') }}
-								.col-md-9
-									small.form-text.text-muted {{ $t('event_editor.event.organizer_email_help') }}
-									input#organizerEmail.form-control(
-										v-model.trim="organizerEmail"
 										@change="localValidation"
 										@blur="localValidation"
-										:disabled="createdEvent"
-										:class="inputFieldClass('organizerEmail')"
-									)
-									.invalid-feedback {{ organizerEmailError }}
-
-					b-btn.btn-block.d-flex.mt-2(
-						v-b-toggle.general-info-group=""
-						:variant="groupVariant('general-info-group')"
-					)
-						span.fas.fa-chevron-down(v-if="groupVisibility['general-info-group']")
-						span.fas.fa-chevron-up(v-else)
-						span.ml-2.mr-auto {{ $t('event_editor.general_info_group') }}
-						div(v-if="showGroupErrorIcon('general-info-group')").fas.fa-exclamation
-						div(v-else-if="showGroupOkIcon('general-info-group')").fas.fa-check
-					b-collapse#general-info-group(
-						accordion="event-creation"
-						v-model="groupVisibility['general-info-group']"
-					)
-						b-card
-							.form-group.row
-								label.col-md-3.col-form-label(for="eventName") {{ $t('event_editor.event.name') }}
-								.col-md-9
-									small.form-text.text-muted {{ $t('event_editor.event.name_help') }}
-									input#eventName.form-control(v-model.trim="eventName" type="text"
-									:disabled="createdEvent"
-									@change="localValidation"
-									@blur="localValidation"
-									:class="inputFieldClass('eventName')"
-									)
-									.invalid-feedback {{ eventNameError }}
-							.form-group.row
-								label.col-md-3.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
-								.col-md-9
-									small.form-text.text-muted {{ $t('event_editor.event.desc_help') }}
-									textarea#eventDesc.form-control(v-model.trim="eventDesc"
-									:disabled="createdEvent"
-									@change="localValidation"
-									@blur="localValidation"
-									:class="inputFieldClass('eventDesc')"
-									)
-									.invalid-feedback {{ eventDescError }}
+										:class="inputFieldClass('eventDesc')"
+										)
+										.invalid-feedback {{ eventDescError }}
 
 
-					b-btn.btn-block.d-flex.mt-2(
-						v-b-toggle.dates-group=""
-						:variant="groupVariant('dates-group')"
-					)
-						span.fas.fa-chevron-down(v-if="groupVisibility['dates-group']")
-						span.fas.fa-chevron-up(v-else)
-						span.ml-2.mr-auto {{ $t('event_editor.dates_group') }}
-						div(v-if="showGroupErrorIcon('dates-group')").fas.fa-exclamation
-						div(v-else-if="showGroupOkIcon('dates-group')").fas.fa-check
-					b-collapse#dates-group(
-						accordion="event-creation"
-						v-model="groupVisibility['dates-group']"
-					)
-						b-card
-							.form-group.row
-								label.col-md-4.col-form-label(for="eventTimeWindow") {{ $t('event_editor.event.dates') }}
-								.col-md-4.mb-3
-									v-date-picker#eventTimeWindow(
-										mode="range"
-										v-model="eventTimeWindow"
-										:min-date="today"
-										:input-props="{readonly: true, placeholder: $t('event_editor.dates_placeholder'), class: [ 'form-control', inputFieldClass('eventTimeWindow') ]}"
-										:is-double-paned="true"
-										popover-visibility="focus"
-									)
-									//- invalid feedback won't work here because v-date-picker is not a form-control
-									.small.text-danger {{ eventTimeWindowError }}
+						b-btn.btn-block.d-flex.mt-2(
+							v-b-toggle.dates-group=""
+							:variant="groupVariant('dates-group')"
+						)
+							span.fas.fa-chevron-down(v-if="groupVisibility['dates-group']")
+							span.fas.fa-chevron-up(v-else)
+							span.ml-2.mr-auto {{ $t('event_editor.dates_group') }}
+							div(v-if="showGroupErrorIcon('dates-group')").fas.fa-exclamation
+							div(v-else-if="showGroupOkIcon('dates-group')").fas.fa-check
+						b-collapse#dates-group(
+							accordion="event-creation"
+							v-model="groupVisibility['dates-group']"
+						)
+							b-card
+								.form-group.row
+									label.col-md-4.col-form-label(for="eventTimeWindow") {{ $t('event_editor.event.dates') }}
+									.col-md-4.mb-3
+										v-date-picker#eventTimeWindow(
+											mode="range"
+											v-model="eventTimeWindow"
+											:min-date="today"
+											:input-props="{readonly: true, placeholder: $t('event_editor.dates_placeholder'), class: [ 'form-control', inputFieldClass('eventTimeWindow') ]}"
+											:is-double-paned="true"
+											popover-visibility="focus"
+										)
+										//- invalid feedback won't work here because v-date-picker is not a form-control
+										.small.text-danger {{ eventTimeWindowError }}
 
-								.col-md-auto
-									b-dropdown(:text="$t('event_editor.dates_quick_selection')" :disabled="createdEvent != null")
-										b-dropdown-item(v-if="showThisWeekButton" @click="pickThisWeek") {{ $t('event_editor.this_week') }}
-										b-dropdown-item(@click="pickNextWeek(); localValidation();") {{ $t('event_editor.next_week') }}
-										b-dropdown-item(@click="pickNextMonths(1); localValidation();") {{ $tc('event_editor.within_months') }}
-										b-dropdown-item(@click="pickNextMonths(3); localValidation();") {{ $tc('event_editor.within_months', 3, {count: 3}) }}
+									.col-md-auto
+										b-dropdown(:text="$t('event_editor.dates_quick_selection')" :disabled="createdEvent != null")
+											b-dropdown-item(v-if="showThisWeekButton" @click="pickThisWeek") {{ $t('event_editor.this_week') }}
+											b-dropdown-item(@click="pickNextWeek(); localValidation();") {{ $t('event_editor.next_week') }}
+											b-dropdown-item(@click="pickNextMonths(1); localValidation();") {{ $tc('event_editor.within_months') }}
+											b-dropdown-item(@click="pickNextMonths(3); localValidation();") {{ $tc('event_editor.within_months', 3, {count: 3}) }}
 
 			.card-footer
 				.row.justify-content-center(v-if="!createdEvent")
@@ -226,7 +228,7 @@ export default {
 		eventTimeWindowError: null,
 		today,
 		showThisWeekButton: (dateFns.getDay(today) > 0 && dateFns.getDay(today) < 4), // betewn Mon and Wed
-		createdEvent: null/* {
+		createdEvent: null/*{
 						id: 'd8763187-ed3d-4572-ae50-02d5cc874804',
 						name: "Dinner party",
 						organizer: "Max",
