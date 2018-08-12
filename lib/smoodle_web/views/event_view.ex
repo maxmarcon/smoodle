@@ -3,7 +3,7 @@ defmodule SmoodleWeb.EventView do
   alias SmoodleWeb.EventView
 
   def render("index.json", %{events: events}) do
-    %{data: render_many(events, EventView, "event.json")}
+    %{data: render_many(Enum.map(events, &(Map.delete(&1, :secret))), EventView, "event.json")}
   end
 
   def render("show.json", %{event: event}) do
@@ -12,7 +12,7 @@ defmodule SmoodleWeb.EventView do
 
   def render("event.json", %{event: event = %{secret: _}}) do
     event
-    |> Map.delete(:__meta__)
+    |> Map.drop([:__meta__, :polls])
     |> Map.merge(%{
       owner_link: owner_link(event),
       share_link: share_link(event)
@@ -20,7 +20,7 @@ defmodule SmoodleWeb.EventView do
   end
 
   def render("event.json", %{event: event}) do
-    Map.drop(event, [:__meta__, :polls, :email])
+    Map.drop(event, [:__meta__, :polls, :email, :secret])
   end
 
   def render("schedule.json", %{schedule: schedule}) do

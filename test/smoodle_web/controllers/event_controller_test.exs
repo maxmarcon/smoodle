@@ -36,7 +36,9 @@ defmodule SmoodleWeb.EventControllerTest do
       "name" => attr[:name],
       "desc" => attr[:desc],
       "time_window_from" => attr[:time_window_from],
-      "time_window_to" => attr[:time_window_to]
+      "time_window_to" => attr[:time_window_to],
+      "organizer" => attr[:organizer],
+      "email" => attr[:email]
     }
   end
 
@@ -85,20 +87,41 @@ defmodule SmoodleWeb.EventControllerTest do
     end
   end
 
+  describe "show" do
+    setup :create_event
+
+    test "returns 404 if called with the wrong secret", %{conn: conn, event: event} do
+      assert_error_sent(404, fn ->
+        get conn, event_path(conn, :show, event.id, %{secret: "wrong secret"})
+      end)
+    end
+
+    test "fetches the event when called with the right secret", %{conn: conn, event: event} do
+      conn = get conn, event_path(conn, :show, event.id, %{secret: event.secret})
+      data_response = json_response(conn, 200)["data"]
+      assert event.secret == data_response["secret"]
+      assert event.email == data_response["email"]
+      assert event.name == data_response["name"]
+      assert event.desc == data_response["desc"]
+      assert Date.to_string(event.time_window_from) == data_response["time_window_from"]
+      assert Date.to_string(event.time_window_to) == data_response["time_window_to"]
+    end
+  end
+
   describe "create event" do
     test "renders event when data is valid", %{conn: conn} do
       conn = post conn, event_path(conn, :create), event: @create_attrs_1
       data_response = json_response(conn, 201)["data"]
       assert %{"id" => id} = data_response
       assert Map.has_key?(data_response, "secret")
-      assert Map.has_key?(data_response, "email")
+      assert data_response["email"] == @create_attrs_1.email
 
       expected_data_response = Map.merge(%{"id" => id}, rest_repr(@create_attrs_1))
       assert MapSet.subset?(MapSet.new(expected_data_response), MapSet.new(data_response))
 
       conn = get conn, event_path(conn, :show, id)
       data_response = json_response(conn, 200)["data"]
-      assert MapSet.subset?(MapSet.new(expected_data_response), MapSet.new(data_response))
+      assert MapSet.subset?(MapSet.new(Map.delete(expected_data_response, "email")), MapSet.new(data_response))
       refute Map.has_key?(data_response, "secret")
       refute Map.has_key?(data_response, "email")
     end
@@ -142,14 +165,14 @@ defmodule SmoodleWeb.EventControllerTest do
       conn = put conn, event_path(conn, :update, event), event: Map.merge(@update_attrs, %{secret: event.secret})
       data_response = json_response(conn, 200)["data"]
       assert %{"id" => ^id} = data_response
-      refute Map.has_key?(data_response, "secret")
+      assert Map.has_key?(data_response, "secret")
 
       expected_data_response = Map.merge(%{"id" => id}, rest_repr(@create_attrs_1)) |> Map.merge(rest_repr(@update_attrs))
       assert MapSet.subset?(MapSet.new(expected_data_response), MapSet.new(data_response))
 
       conn = get conn, event_path(conn, :show, event.id)
       data_response = json_response(conn, 200)["data"]
-      assert MapSet.subset?(MapSet.new(Map.merge(%{"id" => id}, rest_repr(@create_attrs_1))), MapSet.new(data_response))
+      assert MapSet.subset?(MapSet.new(Map.delete(Map.merge(%{"id" => id}, rest_repr(@create_attrs_1)), "email")), MapSet.new(data_response))
       refute Map.has_key?(data_response, "secret")
       refute Map.has_key?(data_response, "email")
     end
@@ -159,9 +182,9 @@ defmodule SmoodleWeb.EventControllerTest do
       assert json_response(conn, 422)["errors"] != %{}
     end
 
-    test "renders errors when token is wrong", %{conn: conn, event: event} do
+    test "renders errors when secret is wrong", %{conn: conn, event: event} do
       assert_error_sent 404, fn ->
-        put conn, event_path(conn, :update, event), event: Map.merge(@update_attrs, %{secret: "wrong_token"})
+        put conn, event_path(conn, :update, event), event: Map.merge(@update_attrs, %{secret: "wrong_secret"})
       end
     end
 
@@ -178,9 +201,9 @@ defmodule SmoodleWeb.EventControllerTest do
       end
     end
 
-    test "does not delete and render error if token is wrong", %{conn: conn, event: event} do
+    test "does not delete and render error if secret is wrong", %{conn: conn, event: event} do
       assert_error_sent 404, fn ->
-        delete conn, event_path(conn, :delete, event), secret: "wrong token"
+        delete conn, event_path(conn, :delete, event), secret: "wrong secret"
       end
       conn = get conn, event_path(conn, :show, event)
       assert response(conn, 200)
@@ -202,7 +225,7 @@ defmodule SmoodleWeb.EventControllerTest do
       end)
     end
 
-    test "returns the best schedule if called with the right token", %{conn: conn, event: event} do
+    test "returns the best schedule if called with the right secret", %{conn: conn, event: event} do
       conn = get conn, event_path(conn, :schedule, event), %{secret: event.secret}
       data_response = json_response(conn, 200)
       assert Map.has_key?(data_response, "data")

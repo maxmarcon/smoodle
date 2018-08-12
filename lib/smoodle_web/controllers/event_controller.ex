@@ -9,7 +9,7 @@ defmodule SmoodleWeb.EventController do
 
   def index(conn, _params) do
     events = Scheduler.list_events()
-    render(conn, "index.json", events: Enum.map(events, &Map.drop(&1, [:secret, :polls])))
+    render(conn, "index.json", events: events)
   end
 
   #def create(_, %{"event" => event_params, "dry_run" => true} = params) do
@@ -38,16 +38,21 @@ defmodule SmoodleWeb.EventController do
     end
   end
 
+  def show(conn, %{"id" => id, "secret" => secret}) do
+    event = Scheduler.get_event!(id, secret)
+    render(conn, "show.json", event: event)
+  end
+
   def show(conn, %{"id" => id}) do
     event = Scheduler.get_event!(id)
-    render(conn, "show.json", event: Map.drop(event, [:secret, :polls]))
+    render(conn, "show.json", event: Map.delete(event, :secret))
   end
 
   def update(conn, %{"id" => id, "event" => event_params = %{"secret" => secret}}) do
     event = Scheduler.get_event!(id, secret)
 
     with {:ok, %Event{} = event} <- Scheduler.update_event(event, event_params) do
-      render(conn, "show.json", event: Map.delete(event, :secret))
+      render(conn, "show.json", event: event)
     end
   end
 
