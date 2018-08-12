@@ -167,11 +167,12 @@
 		)
 </template>
 <script>
-import { showToolTip, dotAccessObject, accordionGroupsMixin, fetchEventMixin, fetchPollMixin, colorCodes} from '../globals'
+import { showToolTip, dotAccessObject, accordionGroupsMixin,
+	fetchEventMixin, fetchPollMixin, colorCodes, eventHelpersMixin} from '../globals'
 import dateFns from 'date-fns'
 
 export default {
-	mixins: [accordionGroupsMixin, fetchEventMixin, fetchPollMixin],
+	mixins: [accordionGroupsMixin, fetchEventMixin, fetchPollMixin, eventHelpersMixin],
 	props: {
 		eventId: String,
 		pollId: String
@@ -347,7 +348,7 @@ export default {
 		backToEvent() {
 			this.$router.push({name: 'event', params: {eventId: this.computedEventId}});
 		},
-		colorForRank: (rank) => (rank > 0 ? colorCodes.red : colorCodes.green)
+		colorForRank: (rank) => (rank > 0 ? colorCodes.green : colorCodes.red)
 	},
 	computed: {
 		disabledDates() {
@@ -355,12 +356,6 @@ export default {
 		},
 		selectedDateRankColor() {
 			return this.colorForRank(this.selected_date_rank);
-		},
-		minDate() {
-			return dateFns.parse(this.eventTimeWindowFrom);
-		},
-		maxDate() {
-			return dateFns.parse(this.eventTimeWindowTo);
 		},
 		computedEventId() {
 			return (this.eventId ? this.eventId : this.eventIdFromPoll);

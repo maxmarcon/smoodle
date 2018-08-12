@@ -39,7 +39,7 @@
 						div(v-else-if="eventScheduleParticipants")
 							.alert.alert-info
 								i.fas.fa-calendar-check.fa-lg
-								| &nbsp; {{ $t('event_viewer.event_open') }}
+								| &nbsp; {{ $t('event_viewer.event_open', {participants: eventScheduleParticipants}) }}
 							.row.justify-content-center
 								.col-md-6.text-center
 									v-calendar(
@@ -85,13 +85,13 @@
 		)
 </template>
 <script>
-import { fetchEventMixin, timeWindowMixin, colorCodes } from '../globals'
+import { fetchEventMixin, timeWindowMixin, colorCodes, eventHelpersMixin } from '../globals'
 import dateFns from 'date-fns'
 
-const SCHEDULE_DATES_LIMIT = 5;
+const SCHEDULE_DATES_LIMIT = null;
 
 export default {
-	mixins: [fetchEventMixin, timeWindowMixin],
+	mixins: [fetchEventMixin, timeWindowMixin, eventHelpersMixin],
 	props: {
 		eventId: {
 			type: String,
@@ -137,24 +137,6 @@ export default {
 		]).then(function() { self.loaded = true });
 	},
 	computed: {
-		eventCanceled() {
-			return this.eventState == "CANCELED";
-		},
-		eventOpen() {
-			return this.eventState == "OPEN";
-		},
-		eventScheduled() {
-			return this.eventState == "SCHEDULED";
-		},
-		eventScheduledTime() {
-			return dateFns.format(this.eventScheduledFrom, this.$i18n.t('time_format'), {locale: this.$i18n.t('date_fns_locale')});
-		},
-		minDate() {
-			return dateFns.parse(this.eventTimeWindowFrom);
-		},
-		maxDate() {
-			return dateFns.parse(this.eventTimeWindowTo);
-		},
 		eventParticipants() {
 			if (this.eventSchedule) {
 				return this.eventSchedule.participants
@@ -163,26 +145,24 @@ export default {
 			}
 		},
 		scheduleCalendarAttributes() {
-			return Array.map(this.eventScheduleDates.slice(0, SCHEDULE_DATES_LIMIT), date_entry => ({
+			let limit = (SCHEDULE_DATES_LIMIT != null ? SCHEDULE_DATES_LIMIT : this.eventScheduleDates.length);
+			return this.eventScheduleDates.slice(0, limit).map((date_entry, index) => ({
 				dates: dateFns.parse(date_entry.date),
 				highlight: {
-					backgroundColor: this.colorForDate(date_entry)
+					backgroundColor: this.colorForDate(index)
 				},
 				popover: {
-					label: this.$i18n.tc('event_viewer.participants_for_date', -date_entry.negative_rank+1, {count: -date_entry.negative_rank})
+					label: this.$i18n.tc('event_viewer.participants_for_date', -date_entry.negative_rank, {count: -date_entry.negative_rank})
 				}
 			}));
 		}
 	},
 	methods: {
-		colorForDate(date_entry) {
-			let cant_make_it_count = -date_entry.negative_rank;
-			let fraction_cant_make_it = cant_make_it_count / this.eventParticipants;
-			let colorEntry = [[0.5, colorCodes.red], [0.0, colorCodes.yellow]].find(function(item) {
-				return fraction_cant_make_it > item[0];
-			});
-			return (colorEntry ? colorEntry[1] : colorCodes.green);
-		},
+		colorForDate: (index) => (
+			[[10, colorCodes.red], [5, colorCodes.yellow], [0, colorCodes.green]].find(function(item) {
+				return index >= item[0];
+			})[1]
+		),
 		fetchSchedule(eventId) {
 			let self = this;
 			return this.$http.get("/v1/events/" + eventId + "/schedule",

@@ -71,10 +71,10 @@ export default {
 			should_happen: "Should happen:",
 			create_poll: "Answer the poll",
 			update_poll: "Update your answer",
-			no_participants: "Nobody participated yet. As soon as there are some participants, the best dates for the event will appear here. Be the first one to answer the poll!",
+			no_participants: "The event has not been scheduled and nobody answered the poll yer. Be the first one to answer the poll!",
 			schedule_not_found: "We were unable to fetch the current schedule for this event",
 			welcome: "{organizer} has invited you to this event.",
-			event_open: "The event has not been scheduled yet. Below are the best candidate dates so far. If you haven't yet, please answer a poll\
+			event_open: "The event has not been scheduled yet. Below are the candidate dates so far, based on the answers from {participants} participants. The best dates are in green. If you haven't yet, please answer a poll\
 								to enter your availability",
 			event_canceled: "This event has been canceled",
 			event_scheduled: "{organizer} has scheduled this event to happen on {time}",
@@ -86,7 +86,7 @@ export default {
 				name_placeholder: "Enter your name here...",
 				poll_not_found: "No answer found under this name. Did you spell the name correctly?"
 			},
-			participants_for_date: "Everybody can make it! | {count} people cannot make it",
+			participants_for_date: "Everybody can make it! | {count} person can't make it | {count} people can't make it",
 			create_new_event: "Create a new event"
 		},
 		date_format: 'MM/DD/YYYY',

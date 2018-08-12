@@ -21,7 +21,7 @@
 					li.list-group-item
 						.alert.alert-info {{ $t('event_editor.share_link') }}
 						.row.justify-content-center
-							.col-auto
+							.col-md-8
 								.input-group.border.border-success
 									input.form-control(:value="createdEvent.share_link" readonly @success="clipboard")
 									.input-group-append
@@ -137,6 +137,7 @@
 											:input-props="{readonly: true, placeholder: $t('event_editor.dates_placeholder'), class: [ 'form-control', inputFieldClass('eventTimeWindow') ]}"
 											:is-double-paned="true"
 											popover-visibility="focus"
+											@input="localValidation"
 										)
 										//- invalid feedback won't work here because v-date-picker is not a form-control
 										.small.text-danger {{ eventTimeWindowError }}
@@ -228,11 +229,11 @@ export default {
 		eventTimeWindowError: null,
 		today,
 		showThisWeekButton: (dateFns.getDay(today) > 0 && dateFns.getDay(today) < 4), // betewn Mon and Wed
-		createdEvent: null/*{
+		createdEvent: null /*{
 						id: 'd8763187-ed3d-4572-ae50-02d5cc874804',
 						name: "Dinner party",
 						organizer: "Max",
-						share_link: "http://share",
+						share_link: "http://localhost:4000/event/967d9e9b-ad9f-4312-863f-c760a52db4e2",
 						owner_link: "http://share"
 					}*/
  	}),

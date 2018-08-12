@@ -220,6 +220,29 @@ export const timeWindowMixin = {
 	}
 }
 
+export const eventHelpersMixin = {
+	computed: {
+		eventCanceled() {
+			return this.eventState == "CANCELED";
+		},
+		eventOpen() {
+			return this.eventState == "OPEN";
+		},
+		eventScheduled() {
+			return this.eventState == "SCHEDULED";
+		},
+		eventScheduledTime() {
+			return dateFns.format(this.eventScheduledFrom, this.$i18n.t('time_format'), {locale: this.$i18n.t('date_fns_locale')});
+		},
+		minDate() {
+			return dateFns.parse(this.eventTimeWindowFrom);
+		},
+		maxDate() {
+			return dateFns.parse(this.eventTimeWindowTo);
+		}
+	}
+}
+
 export const colorCodes = {
 	green: '#28a745',
 	red: '#dc3545',
