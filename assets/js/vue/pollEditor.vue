@@ -14,14 +14,28 @@
 				i.fas.fa-heart.text-success
 				i.fas.fa-thumbs-up.text-warning
 		b-modal#pollDeleteModal(
-			hide-header
+			:title="$t('poll_editor.delete_poll')"
 			@ok="deletePoll"
 			:ok-title="$t('poll_editor.delete_poll')"
+			:cancel-title="$t('actions.cancel')"
 			ok-variant="danger"
 		)
-			p.my-4 {{ $t('poll_editor.really_delete') }}
-		b-modal(ref="pollDeletedModal" hide-header ok-only :ok-title="$t('poll_editor.back_to_event')" @hidden="backToEvent")
-			p.my-4 {{ $t('poll_editor.poll_deleted') }}
+			p {{ $t('poll_editor.really_delete') }}
+
+		b-modal(ref="pollDeletedModal"
+			:title="$t('poll_editor.delete_poll')"
+			ok-only
+			:ok-title="$t('poll_editor.back_to_event')"
+			@hidden="backToEvent"
+		)
+			p {{ $t('poll_editor.poll_deleted') }}
+
+		b-modal(ref="pollDeleteErrorModal"
+			:title="$t('errors.error')"
+			ok-only
+		)
+			p {{ $t('poll_editor.poll_delete_error') }}
+
 		.card(v-if="eventName")
 			.card-header
 				event-header(
@@ -342,7 +356,7 @@ export default {
 			.then(function() {
 				self.$refs.pollDeletedModal.show();
 			}, function() {
-				self.$refs.errorBar.show(self.$i18n.t('errors.network'));
+				self.$refs.pollDeleteErrorModal.show();
 			});
 		},
 		backToEvent() {

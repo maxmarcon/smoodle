@@ -54,6 +54,7 @@ export default {
 			really_delete: "Do you really want to delete your poll? This operation can't be undone",
 			back_to_event: "Back to the event",
 			poll_deleted: "Your poll has been deleted",
+			poll_delete_error: "An error has occurred, the poll could not be deleted",
 			dates_placeholder: "Select a time period",
 			date_ranker_helper: "Select specific date ranges that are good {0} or bad {1} for the event. This takes precedence over the preferences you expressed for the week days. {2}",
 			date_ranker_help_modal_title: "Adding and removing dates",
@@ -71,6 +72,7 @@ export default {
 			should_happen: "Should happen:",
 			create_poll: "Answer the poll",
 			update_poll: "Update your answer",
+			cancel_event: "Cancel event",
 			no_participants: "The event has not been scheduled and nobody answered the poll yer. Be the first one to answer the poll!",
 			schedule_not_found: "We were unable to fetch the current schedule for this event",
 			welcome: "{organizer} has invited you to this event.",
@@ -78,7 +80,7 @@ export default {
 								to enter your availability",
 			event_canceled: "This event has been canceled",
 			event_scheduled: "{organizer} has scheduled this event to happen on {time}",
-			says: "says:",
+			organizer_says: "{organizer} says:",
 			update: {
 				title: "Update your answer",
 				load: "Load your answer",
@@ -87,7 +89,10 @@ export default {
 				poll_not_found: "No answer found under this name. Did you spell the name correctly?"
 			},
 			participants_for_date: "Everybody can make it! | {count} person can't make it | {count} people can't make it",
-			create_new_event: "Create a new event"
+			create_new_event: "Create a new event",
+			really_cancel_event: "Are you sure you want to cancel the event?",
+			event_canceled_ok: "Event successfully canceled",
+			cancel_event_error: "An error has occurred, the event could not be canceled"
 		},
 		date_format: 'MM/DD/YYYY',
 		time_format: 'MM/DD/YYYY h:mm A',
@@ -101,7 +106,8 @@ export default {
 		errors: {
 			required_field: "Can't be blank",
 			network: "The server is not responding or cannot be reached. Please try again later.",
-			not_found: "The requested data could not be found on the server"
+			not_found: "The requested data could not be found on the server",
+			error: "Error"
 		},
 		event_header: {
 			by: "by {organizer}",

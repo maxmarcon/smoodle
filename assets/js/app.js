@@ -27,7 +27,7 @@ const router = new VueRouter({
 	  	path: '/event/:eventId',
 	  	name: 'event',
 	  	component: EventViewer,
-	  	props: true
+	  	props: (route) => Object.assign({secret: route.query.secret}, route.params)
 	  },
 	  {
 	  	path: '/event/:eventId/poll',

@@ -2,9 +2,9 @@
 	div
 		message-bar(ref="errorBar" variant="danger")
 		b-modal(ref="copiedToClipboardModal" hide-header ok-only)
-			p.my-4 {{ $t('event_editor.link_copied') }}
+			p {{ $t('event_editor.link_copied') }}
 		b-modal(ref="eventCreatedModal" hide-header ok-only)
-			p.my-4 {{ $t('event_editor.event_created_short') }}
+			p {{ $t('event_editor.event_created_short') }}
 		.card
 			.card-header
 				event-header(

@@ -4,6 +4,7 @@
 		b-modal#updateAnswerModal(
 			:title="$t('event_viewer.update.title')"
 			:ok-title="$t('event_viewer.update.load')"
+			:cancel-title="$t('actions.cancel')"
 			:ok-disabled="!pollParticipant"
 			@ok="loadPoll"
 		)
@@ -17,6 +18,26 @@
 				)
 				.invalid-feedback {{ pollParticipantError }}
 
+		b-modal#cancelEventModal(
+			:title="$t('event_viewer.cancel_event')"
+			:ok-title="$t('event_viewer.cancel_event')"
+			:cancel-title="$t('actions.cancel')"
+			@ok="cancelEvent"
+		)
+			p {{ $t('event_viewer.really_cancel_event') }}
+
+		b-modal(ref="eventCanceledModal"
+			:title="$t('event_viewer.cancel_event')"
+			ok-only
+			:ok-title="$t('event_viewer.event_canceled_ok')"
+		)
+
+		b-modal(ref="eventCancelErrorModal"
+			:title="$t('errors.error')"
+			ok-only
+		)
+			p {{ $t('event_viewer.cancel_event_error') }}
+
 		.card(v-if="eventName")
 			.card-header
 				event-header(
@@ -28,10 +49,10 @@
 			ul.list-group.list-group-flush
 				li.list-group-item
 					p
-						em.text-muted {{ eventOrganizer }} {{ $t('event_viewer.says') }} &nbsp;
+						em.text-muted {{ isOrganizer ? $t('event_viewer.description') : $t('event_viewer.organizer_says', {organizer: eventOrganizer}) }} &nbsp;
 						| {{ eventDesc }}
 				li.list-group-item
-					p.text-muted {{ $t('event_viewer.welcome', {organizer: eventOrganizer, timeWindow}) }}
+					p.text-muted(v-if="!isOrganizer") {{ $t('event_viewer.welcome', {organizer: eventOrganizer, timeWindow}) }}
 					div(v-if="eventOpen")
 						.alert.alert-danger(v-if="eventScheduleError")
 							i.fas.fa-exclamation-triangle.fa-lg
@@ -71,6 +92,10 @@
 						button.btn.btn-primary(v-b-modal.updateAnswerModal="")
 							i.fas.fa-edit
 							| &nbsp; {{ $t('event_viewer.update_poll') }}
+					.col-auto.mt-1(v-if="eventOpen && isOrganizer")
+						button.btn.btn-warning(v-b-modal.cancelEventModal="")
+							i.fas.fa-ban
+							| &nbsp; {{ $t('event_viewer.cancel_event') }}
 					.col-auto.mt-1(v-if="!eventOpen")
 						router-link.btn.btn-primary(
 							role="button"
@@ -97,12 +122,13 @@ export default {
 			type: String,
 			required: true
 		},
+		secret: String
 	},
 	data: () => ({
 		eventName: null,
 		eventOrganizer: null,
 		evendDesc: null,
-		eventStatus: null,
+		eventState: null,
 		eventTimeWindowFrom: null,
 		eventTimeWindowTo: null,
 		eventScheduledFrom: null,
@@ -118,14 +144,7 @@ export default {
 		Promise.all([
 			this.fetchEvent(this.eventId).then(function(eventData) {
 				if (eventData) {
-					self.eventName = eventData.name;
-					self.eventOrganizer = eventData.organizer;
-					self.eventDesc = eventData.desc;
-					self.eventTimeWindowFrom = eventData.time_window_from;
-					self.eventTimeWindowTo = eventData.time_window_to;
-					self.eventState = eventData.state;
-					self.eventScheduledFrom = eventData.scheduled_from;
-					self.eventScheduledTo = eventData.scheduled_to;
+					self.assignEventData(eventData);
 				}
 			}),
 			this.fetchSchedule(this.eventId).then(function(scheduleData) {
@@ -137,6 +156,9 @@ export default {
 		]).then(function() { self.loaded = true });
 	},
 	computed: {
+		isOrganizer() {
+			return this.secret;
+		},
 		eventParticipants() {
 			if (this.eventSchedule) {
 				return this.eventSchedule.participants
@@ -211,6 +233,32 @@ export default {
 					}
 				});
 			}
+		},
+		assignEventData(eventData) {
+			this.eventName = eventData.name;
+			this.eventOrganizer = eventData.organizer;
+			this.eventDesc = eventData.desc;
+			this.eventTimeWindowFrom = eventData.time_window_from;
+			this.eventTimeWindowTo = eventData.time_window_to;
+			this.eventState = eventData.state;
+			this.eventScheduledFrom = eventData.scheduled_from;
+			this.eventScheduledTo = eventData.scheduled_to;
+		},
+		cancelEvent() {
+			let self = this;
+			this.$http.patch("/v1/events/" + this.eventId,
+				{
+					event: { state: "CANCELED", secret: this.secret }
+				},
+				{
+					headers: { 'Accept-Language': this.$i18n.locale }
+				},
+			).then(function(result) {
+				self.assignEventData(result.data.data);
+				self.$refs.eventCanceledModal.show();
+			}, function(result) {
+				self.$refs.eventCancelErrorModal.show();
+			});
 		}
 	}
 }
