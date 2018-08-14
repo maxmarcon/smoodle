@@ -92,7 +92,10 @@ export default {
 			create_new_event: "Create a new event",
 			really_cancel_event: "Are you sure you want to cancel the event?",
 			event_canceled_ok: "Event successfully canceled",
-			cancel_event_error: "An error has occurred, the event could not be canceled"
+			cancel_event_error: "An error has occurred, the event could not be canceled",
+			open_event: 'Reopen the event',
+			event_opened_ok: 'The event has been reopened',
+			open_event_error: 'An error has occurred, the event could not be reopened'
 		},
 		date_format: 'MM/DD/YYYY',
 		time_format: 'MM/DD/YYYY h:mm A',

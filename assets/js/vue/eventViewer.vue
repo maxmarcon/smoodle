@@ -29,14 +29,27 @@
 		b-modal(ref="eventCanceledModal"
 			:title="$t('event_viewer.cancel_event')"
 			ok-only
-			:ok-title="$t('event_viewer.event_canceled_ok')"
 		)
+			p {{ $t('event_viewer.event_canceled_ok') }}
 
 		b-modal(ref="eventCancelErrorModal"
 			:title="$t('errors.error')"
 			ok-only
 		)
 			p {{ $t('event_viewer.cancel_event_error') }}
+
+		b-modal(ref="eventOpenedModal"
+			:title="$t('event_viewer.open_event')"
+			ok-only
+		)
+			p {{ $t('event_viewer.event_opened_ok') }}
+
+		b-modal(ref="eventOpenErrorModal"
+			:title="$t('errors.error')"
+			ok-only
+		)
+			p {{ $t('event_viewer.open_event_error') }}
+
 
 		.card(v-if="eventName")
 			.card-header
@@ -96,6 +109,10 @@
 						button.btn.btn-warning(v-b-modal.cancelEventModal="")
 							i.fas.fa-ban
 							| &nbsp; {{ $t('event_viewer.cancel_event') }}
+					.col-auto.mt-1(v-if="eventCanceled && isOrganizer")
+						button.btn.btn-warning(@click="openEvent")
+							i.fas.fa-ban
+							| &nbsp; {{ $t('event_viewer.open_event') }}
 					.col-auto.mt-1(v-if="!eventOpen")
 						router-link.btn.btn-primary(
 							role="button"
@@ -243,6 +260,22 @@ export default {
 			this.eventState = eventData.state;
 			this.eventScheduledFrom = eventData.scheduled_from;
 			this.eventScheduledTo = eventData.scheduled_to;
+		},
+		openEvent() {
+			let self = this;
+			this.$http.patch("/v1/events/" + this.eventId,
+				{
+					event: { state: "OPEN", secret: this.secret }
+				},
+				{
+					headers: { 'Accept-Language': this.$i18n.locale }
+				},
+			).then(function(result) {
+				self.assignEventData(result.data.data);
+				self.$refs.eventOpenedModal.show();
+			}, function(result) {
+				self.$refs.eventOpenErrorModal.show();
+			});
 		},
 		cancelEvent() {
 			let self = this;

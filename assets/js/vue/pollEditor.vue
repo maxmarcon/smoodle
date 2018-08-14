@@ -2,17 +2,20 @@
 	div
 		message-bar(ref="errorBar" variant="danger")
 		b-modal(ref="pollSavedModal" hide-header ok-only :ok-title="$t('poll_editor.back_to_event')" @hidden="backToEvent")
-			p.my-4 {{ $t('poll_editor.poll_saved') }}
+			p {{ $t('poll_editor.poll_saved') }}
+
 		b-modal#dateRankerHelpModal(ok-only :title="$t('poll_editor.date_ranker_help_modal_title')")
 			i18n(path="poll_editor.date_ranker_help_modal_content" tag="p")
 				i.fas.fa-heart.text-success
 				i.fas.fa-thumbs-down.text-danger
 				i.fas.fas.fa-trash-alt
+
 		b-modal#weekdayRankerHelpModal(ok-only :title="$t('poll_editor.weekday_ranker_help_modal_title')")
 			i18n(path="poll_editor.weekday_ranker_help_modal_content" tag="p")
 				i.fas.fa-thumbs-down.text-danger
 				i.fas.fa-heart.text-success
 				i.fas.fa-thumbs-up.text-warning
+
 		b-modal#pollDeleteModal(
 			:title="$t('poll_editor.delete_poll')"
 			@ok="deletePoll"
