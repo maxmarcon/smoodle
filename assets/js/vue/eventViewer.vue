@@ -53,7 +53,7 @@
 
 		.card(v-if="eventName")
 			.card-header
-				event-header(
+				event-header#event-header(
 					:name="eventName"
 					:organizer="eventOrganizer"
 					:timeWindowFrom="eventTimeWindowFrom"
@@ -64,6 +64,18 @@
 					p
 						em.text-muted {{ isOrganizer ? $t('event_viewer.description') : $t('event_viewer.organizer_says', {organizer: eventOrganizer}) }} &nbsp;
 						| {{ eventDesc }}
+				li.list-group-item(v-if="isOrganizer && eventOpen")
+					.form-group.row.justify-content-center
+						label.col-md-auto.col-form-label {{ $t('event_viewer.share_link') }}
+						.col-md
+							.input-group
+								input.form-control(:value="eventShareLink" readonly)
+								.input-group-append
+									button.btn.btn-sm.btn-outline-secondary(
+										v-clipboard:copy="eventShareLink"
+										v-clipboard:success="clipboard"
+									)
+										span.fas.fa-share-alt
 				li.list-group-item
 					p.text-muted(v-if="!isOrganizer") {{ $t('event_viewer.welcome', {organizer: eventOrganizer, timeWindow}) }}
 					div(v-if="eventOpen")
@@ -94,32 +106,26 @@
 
 			.card-footer
 				.row.justify-content-center
-					.col-auto.mt-1(v-if="eventOpen")
-						router-link.btn.btn-success(
-							role="button"
-							:to="{ name: 'new_poll', params: {eventId: eventId}}"
-						)
-							i.fas.fa-question
-							| &nbsp; {{ $t('event_viewer.create_poll') }}
-					.col-auto.mt-1(v-if="eventOpen")
-						button.btn.btn-primary(v-b-modal.updateAnswerModal="")
-							i.fas.fa-edit
-							| &nbsp; {{ $t('event_viewer.update_poll') }}
 					.col-auto.mt-1(v-if="eventOpen && isOrganizer")
 						button.btn.btn-warning(v-b-modal.cancelEventModal="")
 							i.fas.fa-ban
 							| &nbsp; {{ $t('event_viewer.cancel_event') }}
 					.col-auto.mt-1(v-if="eventCanceled && isOrganizer")
 						button.btn.btn-warning(@click="openEvent")
-							i.fas.fa-ban
+							i.fas.fa-undo
 							| &nbsp; {{ $t('event_viewer.open_event') }}
-					.col-auto.mt-1(v-if="!eventOpen")
-						router-link.btn.btn-primary(
+					.col-auto.mt-1(v-if="eventOpen && !isOrganizer")
+						router-link.btn.btn-success(
 							role="button"
-							:to="{name: 'new_event'}"
+							:to="{ name: 'new_poll', params: {eventId: eventId}}"
 						)
-							i.fas.fa-plus
-							| &nbsp; {{ $t('event_viewer.create_new_event') }}
+							i.fas.fa-question
+							| &nbsp; {{ $t('event_viewer.create_poll') }}
+					.col-auto.mt-1(v-if="eventOpen && !isOrganizer")
+						button.btn.btn-primary(v-b-modal.updateAnswerModal="")
+							i.fas.fa-edit
+							| &nbsp; {{ $t('event_viewer.update_poll') }}
+
 
 		error-page(
 			v-else-if="loaded"
@@ -146,6 +152,7 @@ export default {
 		eventOrganizer: null,
 		evendDesc: null,
 		eventState: null,
+		eventShareLink: null,
 		eventTimeWindowFrom: null,
 		eventTimeWindowTo: null,
 		eventScheduledFrom: null,
@@ -159,7 +166,7 @@ export default {
 	created() {
 		let self = this;
 		Promise.all([
-			this.fetchEvent(this.eventId).then(function(eventData) {
+			this.fetchEvent(this.eventId, this.secret).then(function(eventData) {
 				if (eventData) {
 					self.assignEventData(eventData);
 				}
@@ -260,6 +267,7 @@ export default {
 			this.eventState = eventData.state;
 			this.eventScheduledFrom = eventData.scheduled_from;
 			this.eventScheduledTo = eventData.scheduled_to;
+			this.eventShareLink = eventData.share_link;
 		},
 		openEvent() {
 			let self = this;
@@ -275,6 +283,8 @@ export default {
 				self.$refs.eventOpenedModal.show();
 			}, function(result) {
 				self.$refs.eventOpenErrorModal.show();
+			}).finally(function() {
+				self.$scrollTo('#event-header');
 			});
 		},
 		cancelEvent() {
@@ -291,7 +301,9 @@ export default {
 				self.$refs.eventCanceledModal.show();
 			}, function(result) {
 				self.$refs.eventCancelErrorModal.show();
-			});
+			}).finally(function() {
+				self.$scrollTo('#event-header');
+			})
 		}
 	}
 }

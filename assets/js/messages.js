@@ -32,7 +32,7 @@ export default {
 			event_created: "Congratulations {eventOrganizer}! Your event for \u201C{eventName}\u201E has been created.\
 			 An email has been sent to {organizerEmail}",
 			event_created_short: "Your event has been created",
-			share_link: "Now share the below link with your friends, so they can enter which dates work best for them:",
+			share_link: "Now share this link with your friends to invite them:",
 			manage_event: "Manage event",
 			create_event: "Create event",
 			poll_event: "Enter your availability",
@@ -73,7 +73,7 @@ export default {
 			create_poll: "Answer the poll",
 			update_poll: "Update your answer",
 			cancel_event: "Cancel event",
-			no_participants: "The event has not been scheduled and nobody answered the poll yer. Be the first one to answer the poll!",
+			no_participants: "The event has not been scheduled and nobody answered the poll yet. Be the first one to answer the poll!",
 			schedule_not_found: "We were unable to fetch the current schedule for this event",
 			welcome: "{organizer} has invited you to this event.",
 			event_open: "The event has not been scheduled yet. Below are the candidate dates so far, based on the answers from {participants} participants. The best dates are in green. If you haven't yet, please answer a poll\
@@ -95,7 +95,8 @@ export default {
 			cancel_event_error: "An error has occurred, the event could not be canceled",
 			open_event: 'Reopen the event',
 			event_opened_ok: 'The event has been reopened',
-			open_event_error: 'An error has occurred, the event could not be reopened'
+			open_event_error: 'An error has occurred, the event could not be reopened',
+			share_link: 'Share this link with participants:'
 		},
 		date_format: 'MM/DD/YYYY',
 		time_format: 'MM/DD/YYYY h:mm A',

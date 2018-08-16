@@ -9,6 +9,7 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import VueClipboard from 'vue-clipboard2'
 import VCalendar from 'v-calendar'
+import  VueScrollTo from 'vue-scrollto';
 const Vue = require('vue/dist/vue.common.js');
 // becaue ES module vue.esm.js does not fucking work!!!
 // import Vue from 'vue/dist/vue.esm.js'
@@ -79,6 +80,8 @@ Vue.use(BootstrapVue);
 Vue.use(VueAxios, axios);
 
 Vue.use(VueClipboard);
+
+Vue.use(VueScrollTo);
 
 Vue.use(VCalendar, {
 	locale: smoodle_locale

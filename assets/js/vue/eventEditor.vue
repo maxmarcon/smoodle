@@ -7,7 +7,7 @@
 			p {{ $t('event_editor.event_created_short') }}
 		.card
 			.card-header
-				event-header(
+				event-header#event-header(
 					:name="eventName"
 					:organizer="eventOrganizer"
 					:timeWindowFrom="eventTimeWindowFrom"
@@ -19,17 +19,17 @@
 						.alert.alert-success
 							| {{ $t('event_editor.event_created', {eventName: createdEvent.name, eventOrganizer: createdEvent.organizer, organizerEmail: createdEvent.email}) }}
 					li.list-group-item
-						.alert.alert-info {{ $t('event_editor.share_link') }}
 						.row.justify-content-center
-							.col-md-8
-								.input-group.border.border-success
-									input.form-control(:value="createdEvent.share_link" readonly @success="clipboard")
+							label.col-md-auto.col-form-label  {{ $t('event_editor.share_link') }}
+							.col-md
+								.input-group
+									input.form-control(:value="createdEvent.share_link" readonly)
 									.input-group-append
 										button.btn.btn-sm.btn-outline-secondary(
 											v-clipboard:copy="createdEvent.share_link"
 											v-clipboard:success="clipboard"
 										)
-											span.fas.fa-clipboard
+											span.fas.fa-share-alt
 
 				div(v-else)
 					.alert.alert-info
@@ -42,8 +42,8 @@
 							v-b-toggle.organizer-group=""
 							:variant="groupVariant('organizer-group')"
 						)
-							span.fas.fa-chevron-down(v-if="groupVisibility['organizer-group']")
-							span.fas.fa-chevron-up(v-else)
+							span.fas.fa-chevron-up(v-if="groupVisibility['organizer-group']")
+							span.fas.fa-chevron-down(v-else)
 							span.ml-2.mr-auto {{ $t('event_editor.organizer_group') }}
 							div(v-if="showGroupErrorIcon('organizer-group')").fas.fa-exclamation
 							div(v-else-if="showGroupOkIcon('organizer-group')").fas.fa-check
@@ -79,8 +79,8 @@
 							v-b-toggle.general-info-group=""
 							:variant="groupVariant('general-info-group')"
 						)
-							span.fas.fa-chevron-down(v-if="groupVisibility['general-info-group']")
-							span.fas.fa-chevron-up(v-else)
+							span.fas.fa-chevron-up(v-if="groupVisibility['general-info-group']")
+							span.fas.fa-chevron-down(v-else)
 							span.ml-2.mr-auto {{ $t('event_editor.general_info_group') }}
 							div(v-if="showGroupErrorIcon('general-info-group')").fas.fa-exclamation
 							div(v-else-if="showGroupOkIcon('general-info-group')").fas.fa-check
@@ -117,8 +117,8 @@
 							v-b-toggle.dates-group=""
 							:variant="groupVariant('dates-group')"
 						)
-							span.fas.fa-chevron-down(v-if="groupVisibility['dates-group']")
-							span.fas.fa-chevron-up(v-else)
+							span.fas.fa-chevron-up(v-if="groupVisibility['dates-group']")
+							span.fas.fa-chevron-down(v-else)
 							span.ml-2.mr-auto {{ $t('event_editor.dates_group') }}
 							div(v-if="showGroupErrorIcon('dates-group')").fas.fa-exclamation
 							div(v-else-if="showGroupOkIcon('dates-group')").fas.fa-check
@@ -160,10 +160,10 @@
 					.col-auto.mt-1
 						router-link.btn.btn-success(
 							role="button"
-							:to="{ name: 'poll', params: {eventId: createdEvent.id}}"
+							:to="{ name: 'event', params: {eventId: createdEvent.id}, query: {secret: createdEvent.secret}}"
 						)
 							i.fas.fa-question
-							| &nbsp; {{ $t('event_editor.poll_event') }}
+							| &nbsp; {{ $t('event_editor.manage_event') }}
 
 </template>
 
@@ -229,12 +229,14 @@ export default {
 		eventTimeWindowError: null,
 		today,
 		showThisWeekButton: (dateFns.getDay(today) > 0 && dateFns.getDay(today) < 4), // betewn Mon and Wed
-		createdEvent: null /*{
+		createdEvent: null/*{
 						id: 'd8763187-ed3d-4572-ae50-02d5cc874804',
 						name: "Dinner party",
 						organizer: "Max",
 						share_link: "http://localhost:4000/event/967d9e9b-ad9f-4312-863f-c760a52db4e2",
-						owner_link: "http://share"
+						owner_link: "http://share",
+						secret: "dasdas",
+						email: 'noname@nodomain.com'
 					}*/
  	}),
 	computed: {
@@ -256,7 +258,7 @@ export default {
 		}
 	},
 	methods: {
-		clipboard(e) {
+		clipboard() {
       this.$refs.copiedToClipboardModal.show();
 		},
 		applyDates(from, to) {
@@ -293,6 +295,7 @@ export default {
 				self.createdEvent = result.data.data;
 				self.collapseAllGroups();
 				self.$refs.eventCreatedModal.show();
+				self.$scrollTo('#event-header');
 			}, function(result) {
 				if (result.response && result.response.status == 422) {
 					self.setServerErrors(result.response.data.errors);

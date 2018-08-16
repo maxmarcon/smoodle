@@ -1,12 +1,15 @@
-div#app
-	//-nav.navbar.navbar-expand-lg.navbar-light.bg-light
-  //-		a.navbar-brand(href="#") Navbar
-	//-	div#navbarNavAltMarkup.collapse.navbar-collapse
-  //-  		div.navbar-nav
-  //-  			router-link.nav-item.nav-link(to="#{page_path @conn, :new_event, step: 1}" active-class="active")
-  //-  				= gettext("Event")
-  //-  			router-link.nav-item.nav-link(to="#{page_path @conn, :poll}" active-class="active")
-  //-  				= gettext("Poll")
+div#app(v-cloak)
+  b-navbar(toggleable="md" type="dark" variant="info")
+
+    b-navbar-brand(href="#") Smoodle
+
+    b-navbar-toggle(target="nav_collapse")
+
+    b-collapse#nav_collapse(is-nav="")
+      b-navbar-nav
+        b-nav-item(v-bind:to="{name: 'new_event'}")
+          i.fas.fa-plus-circle
+          | {{ $t("event_editor.title") }}
 
 	div
 	 	router-view

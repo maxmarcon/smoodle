@@ -162,17 +162,19 @@ export const accordionGroupsMixin = {
 					}
 				}
 			}
+			return groupShownBecauseOfErrors;
 		}
 	}
 }
 
 export const fetchEventMixin = {
 	methods: {
-		fetchEvent(eventId) {
+		fetchEvent(eventId, secret) {
 			let self = this;
 			return this.$http.get("/v1/events/" + eventId
 				,{
-					headers: { 'Accept-Language': this.$i18n.locale }
+					headers: { 'Accept-Language': this.$i18n.locale },
+					params: { secret: secret }
 				}).then(function(result) {
 					return result.data.data;
 				}, function(result) {

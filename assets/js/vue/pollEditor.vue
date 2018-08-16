@@ -52,8 +52,8 @@
 						v-b-toggle.organizer-group=""
 						:variant="groupVariant('participant-group')"
 					)
-						span.fas.fa-chevron-down(v-if="groupVisibility['participant-group']")
-						span.fas.fa-chevron-up(v-else)
+						span.fas.fa-chevron-up(v-if="groupVisibility['participant-group']")
+						span.fas.fa-chevron-down(v-else)
 						span.ml-2.mr-auto {{ $t('poll_editor.participant_group') }}
 						div(v-if="showGroupErrorIcon('participant-group')").fas.fa-exclamation
 						div(v-else-if="showGroupOkIcon('participant-group')").fas.fa-check
@@ -76,8 +76,8 @@
 					v-b-toggle.weekday-ranker=""
 					:variant="groupVariant('weekday-ranker-group')"
 				)
-					span.fas.fa-chevron-down(v-if="groupVisibility['weekday-ranker-group']")
-					span.fas.fa-chevron-up(v-else)
+					span.fas.fa-chevron-up(v-if="groupVisibility['weekday-ranker-group']")
+					span.fas.fa-chevron-down(v-else)
 					span.ml-2.mr-auto {{ $t('poll_editor.weekday_ranker_group') }}
 					div(v-if="showGroupErrorIcon('weekday-ranker-group')").fas.fa-exclamation
 					div(v-else-if="showGroupOkIcon('weekday-ranker-group')").fas.fa-check
@@ -100,8 +100,8 @@
 					v-b-toggle.calendar-ranker=""
 					:variant="groupVariant('calendar-ranker-group')"
 				)
-					span.fas.fa-chevron-down(v-if="groupVisibility['calendar-ranker-group']")
-					span.fas.fa-chevron-up(v-else)
+					span.fas.fa-chevron-up(v-if="groupVisibility['calendar-ranker-group']")
+					span.fas.fa-chevron-down(v-else)
 					span.ml-2.mr-auto {{ $t('poll_editor.calendar_ranker_group') }}
 					div(v-if="showGroupErrorIcon('calendar-ranker-group')").fas.fa-exclamation
 					div(v-else-if="showGroupOkIcon('calendar-ranker-group')").fas.fa-check
