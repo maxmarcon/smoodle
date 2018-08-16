@@ -18,6 +18,9 @@
 				)
 				.invalid-feedback {{ pollParticipantError }}
 
+		b-modal(ref="copiedToClipboardModal" hide-header ok-only)
+			p {{ $t('event_editor.link_copied') }}
+
 		b-modal#cancelEventModal(
 			:title="$t('event_viewer.cancel_event')"
 			:ok-title="$t('event_viewer.cancel_event')"
@@ -204,6 +207,9 @@ export default {
 		}
 	},
 	methods: {
+		clipboard() {
+      this.$refs.copiedToClipboardModal.show();
+		},
 		colorForDate: (index) => (
 			[[10, colorCodes.red], [5, colorCodes.yellow], [0, colorCodes.green]].find(function(item) {
 				return index >= item[0];
