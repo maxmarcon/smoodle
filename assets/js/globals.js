@@ -167,6 +167,12 @@ export const accordionGroupsMixin = {
 	}
 }
 
+export const scrollToTop = function() {
+	if (this.$scrollTo) {
+		return this.$scrollTo('#app');
+	}
+}
+
 export const fetchEventMixin = {
 	methods: {
 		fetchEvent(eventId, secret) {
@@ -178,6 +184,7 @@ export const fetchEventMixin = {
 				}).then(function(result) {
 					return result.data.data;
 				}, function(result) {
+					scrollToTop.call(self);
 					if (result.request.status == 404) {
 						self.$refs.errorBar.show(self.$i18n.t('errors.not_found'));
 					} else {
@@ -198,6 +205,7 @@ export const fetchPollMixin = {
 				}).then(function(result) {
 					return result.data.data;
 				}, function(result) {
+					scrollToTop.call(self);
 					if (result.request.status == 404) {
 						self.$refs.errorBar.show(self.$i18n.t('errors.not_found'));
 					} else {

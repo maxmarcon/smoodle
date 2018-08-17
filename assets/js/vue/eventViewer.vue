@@ -5,7 +5,8 @@
 			:title="$t('event_viewer.update.title')"
 			:ok-title="$t('event_viewer.update.load')"
 			:cancel-title="$t('actions.cancel')"
-			:ok-disabled="!pollParticipant"
+			:ok-disabled="!pollParticipant || requestOngoing"
+			:cancel-disabled="requestOngoing"
 			@ok="loadPoll"
 		)
 			p.form-text {{ $t('event_viewer.update.how_to') }}
@@ -110,11 +111,11 @@
 			.card-footer
 				.row.justify-content-center
 					.col-auto.mt-1(v-if="eventOpen && isOrganizer")
-						button.btn.btn-warning(v-b-modal.cancelEventModal="")
+						button.btn.btn-warning(v-b-modal.cancelEventModal="" :disabled="requestOngoing")
 							i.fas.fa-ban
 							| &nbsp; {{ $t('event_viewer.cancel_event') }}
 					.col-auto.mt-1(v-if="eventCanceled && isOrganizer")
-						button.btn.btn-warning(@click="openEvent")
+						button.btn.btn-warning(@click="openEvent" :disabled="requestOngoing")
 							i.fas.fa-undo
 							| &nbsp; {{ $t('event_viewer.open_event') }}
 					.col-auto.mt-1(v-if="eventOpen && !isOrganizer")
@@ -125,7 +126,7 @@
 							i.fas.fa-question
 							| &nbsp; {{ $t('event_viewer.create_poll') }}
 					.col-auto.mt-1(v-if="eventOpen && !isOrganizer")
-						button.btn.btn-primary(v-b-modal.updateAnswerModal="")
+						button.btn.btn-primary(v-b-modal.updateAnswerModal="" :disabled="requestOngoing")
 							i.fas.fa-edit
 							| &nbsp; {{ $t('event_viewer.update_poll') }}
 
@@ -136,7 +137,7 @@
 		)
 </template>
 <script>
-import { fetchEventMixin, timeWindowMixin, colorCodes, eventHelpersMixin } from '../globals'
+import { fetchEventMixin, timeWindowMixin, colorCodes, eventHelpersMixin, scrollToTop } from '../globals'
 import dateFns from 'date-fns'
 
 const SCHEDULE_DATES_LIMIT = null;
@@ -164,7 +165,8 @@ export default {
 		eventScheduleError: null,
 		pollParticipant: null,
 		pollParticipantError: null,
-		loaded: false
+		loaded: false,
+		requestOngoing: false
 	}),
 	created() {
 		let self = this;
@@ -207,6 +209,7 @@ export default {
 		}
 	},
 	methods: {
+		scrollToTop,
 		clipboard() {
       this.$refs.copiedToClipboardModal.show();
 		},
@@ -230,12 +233,14 @@ export default {
 					if (result.request.status == 404) {
 						self.eventScheduleError = self.$i18n.t('event_viewer.schedule_not_found');
 					} else {
+						self.scrollToTop();
 						self.$refs.errorBar.show(self.$i18n.t('errors.network'));
 					}
 			});
 		},
 		fetchPoll(participant) {
 			let self = this;
+			this.requestOngoing = true;
 			return this.$http.get("/v1/events/" + this.eventId + "/polls",
 				{
 					headers: { 'Accept-Language': this.$i18n.locale },
@@ -249,8 +254,10 @@ export default {
 					if (result.request.status == 404) {
 						self.pollParticipantError = self.$i18n.t('event_viewer.update.poll_not_found');
 					} else {
-						self.$refs.errorBar.show(self.$i18n.t('errors.network'));
+						self.pollParticipantError = self.$i18n.t('errors.network');
 					}
+			}).finally(function() {
+				self.requestOngoing = false;
 			});
 		},
 		loadPoll(bvEvt) {
@@ -277,6 +284,7 @@ export default {
 		},
 		openEvent() {
 			let self = this;
+			this.requestOngoing = true;
 			this.$http.patch("/v1/events/" + this.eventId,
 				{
 					event: { state: "OPEN", secret: this.secret }
@@ -290,11 +298,12 @@ export default {
 			}, function(result) {
 				self.$refs.eventOpenErrorModal.show();
 			}).finally(function() {
-				self.$scrollTo('#event-header');
+				self.requestOngoing = false;
 			});
 		},
 		cancelEvent() {
 			let self = this;
+			this.requestOngoing = true;
 			this.$http.patch("/v1/events/" + this.eventId,
 				{
 					event: { state: "CANCELED", secret: this.secret }
@@ -308,8 +317,8 @@ export default {
 			}, function(result) {
 				self.$refs.eventCancelErrorModal.show();
 			}).finally(function() {
-				self.$scrollTo('#event-header');
-			})
+				self.requestOngoing = false;
+			});
 		}
 	}
 }

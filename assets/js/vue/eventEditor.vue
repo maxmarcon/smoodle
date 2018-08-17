@@ -152,7 +152,7 @@
 			.card-footer
 				.row.justify-content-center(v-if="!createdEvent")
 					.col-auto
-						button.btn.btn-primary(@click="createEvent")
+						button.btn.btn-primary(@click="createEvent" :disabled="requestOngoing")
 							i.fas.fa-plus
 							| &nbsp; {{ $t('event_editor.create_event') }}
 
@@ -169,7 +169,7 @@
 
 <script>
 import dateFns from 'date-fns'
-import { accordionGroupsMixin } from '../globals'
+import { accordionGroupsMixin, scrollToTop } from '../globals'
 
 const today = new Date();
 const InvalidDate = 'Invalid Date';
@@ -227,6 +227,7 @@ export default {
 		eventDescError: null,
 		eventTimeWindow: null,
 		eventTimeWindowError: null,
+		requestOngoing: false,
 		today,
 		showThisWeekButton: (dateFns.getDay(today) > 0 && dateFns.getDay(today) < 4), // betewn Mon and Wed
 		createdEvent: null/*{
@@ -258,6 +259,7 @@ export default {
 		}
 	},
 	methods: {
+		scrollToTop,
 		clipboard() {
       this.$refs.copiedToClipboardModal.show();
 		},
@@ -285,6 +287,7 @@ export default {
 		},
 		createEvent() {
 			let self = this;
+			this.requestOngoing = true;
 			this.$http.post("/v1/events", {
 				event: self.eventData
 			}, {
@@ -296,16 +299,18 @@ export default {
 				self.collapseAllGroups();
 				self.$refs.eventCreatedModal.show();
 				self.$scrollTo('#event-header');
+				self.wasServerValidated = true;
 			}, function(result) {
 				if (result.response && result.response.status == 422) {
 					self.setServerErrors(result.response.data.errors);
+					self.wasServerValidated = true;
 				} else {
+					self.scrollToTop();
 					self.$refs.errorBar.show(self.$i18n.t('errors.network'));
 				}
+			}).finally(function() {
+				self.requestOngoing = false;
 			})
-			.finally(function() {
-				self.wasServerValidated = true;
-			});
 		}
 	}
 }

@@ -166,15 +166,15 @@
 			.card-footer
 				.row.justify-content-center
 					.col-auto.mt-1
-						button.btn.btn-primary(@click="savePoll")
+						button.btn.btn-primary(@click="savePoll" :disabled="requestOngoing")
 							i.fas.fa-save
 							| &nbsp; {{ $t('poll_editor.save_poll') }}
 					.col-auto.mt-1(v-if="pollId")
-						button.btn.btn-danger(v-b-modal.pollDeleteModal="")
+						button.btn.btn-danger(v-b-modal.pollDeleteModal="" :disabled="requestOngoing")
 							i.fas.fa-trash-alt
 							| &nbsp; {{ $t('poll_editor.delete_poll') }}
 					.col-auto.mt-1
-						button.btn.btn-secondary(@click="backToEvent")
+						button.btn.btn-secondary(@click="backToEvent" :disabled="requestOngoing")
 							i.fas.fa-ban
 							| &nbsp; {{ $t('actions.cancel') }}
 
@@ -185,7 +185,7 @@
 </template>
 <script>
 import { showToolTip, dotAccessObject, accordionGroupsMixin,
-	fetchEventMixin, fetchPollMixin, colorCodes, eventHelpersMixin} from '../globals'
+	fetchEventMixin, fetchPollMixin, colorCodes, eventHelpersMixin, scrollToTop} from '../globals'
 import dateFns from 'date-fns'
 
 export default {
@@ -235,6 +235,7 @@ export default {
 			pollParticipantError: null,
 			pollWeekdayRanksError: null,
 			pollDateRanksError: null,
+			requestOngoing: false,
 			loaded: false,
 			selected_dates: null,
 			selected_date_rank: 1,
@@ -266,6 +267,7 @@ export default {
 		}
 	},
 	methods: {
+		scrollToTop,
 		newDate(value) {
 			if (this.selected_date_rank && value) {
 				this.date_picker_attributes.push( // add current selection to the calendar attributes
@@ -330,6 +332,7 @@ export default {
 		},
 		savePoll() {
 			let self = this;
+			this.requestOngoing = true;
 			this.$http.request({
 				method: (this.pollId ? 'put' : 'post'),
 				url: (this.pollId ? '/v1/polls/' + this.pollId : '/v1/events/' + this.eventId + '/polls'),
@@ -342,24 +345,30 @@ export default {
 				self.setServerErrors();
 				self.collapseAllGroups();
 				self.$refs.pollSavedModal.show();
+				self.wasServerValidated = true;
 			}, function(result) {
 				if (result.response && result.response.status == 422) {
 					self.setServerErrors(result.response.data.errors);
+					self.wasServerValidated = true;
 				} else {
 					self.$refs.errorBar.show(self.$i18n.t('errors.network'));
+					self.scrollToTop();
 				}
 			})
 			.finally(function() {
-				self.wasServerValidated = true;
+				self.requestOngoing = false;
 			});
 		},
 		deletePoll() {
 			let self = this;
+			this.requestOngoing = true;
 			this.$http.delete('/v1/polls/' + this.pollId)
 			.then(function() {
 				self.$refs.pollDeletedModal.show();
 			}, function() {
 				self.$refs.pollDeleteErrorModal.show();
+			}).finally(function() {
+				self.requestOngoing = false;
 			});
 		},
 		backToEvent() {
