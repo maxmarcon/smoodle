@@ -109,8 +109,9 @@ export default {
 		date_fns_locale: date_fns_en,
 		errors: {
 			required_field: "Can't be blank",
-			network: "The server is not responding or cannot be reached. Please try again later.",
+			network: "The server is not responding or cannot be reached. Check your Internet connection.",
 			not_found: "The requested data could not be found on the server",
+			server: "The server reported an error",
 			error: "Error"
 		},
 		event_header: {

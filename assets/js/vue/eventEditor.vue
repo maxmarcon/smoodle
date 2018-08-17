@@ -169,13 +169,13 @@
 
 <script>
 import dateFns from 'date-fns'
-import { accordionGroupsMixin, scrollToTop } from '../globals'
+import { accordionGroupsMixin, scrollToTopMixin, restMixin } from '../globals'
 
 const today = new Date();
 const InvalidDate = 'Invalid Date';
 
 export default {
-	mixins: [accordionGroupsMixin],
+	mixins: [accordionGroupsMixin, restMixin, scrollToTopMixin],
 	data: () => ({
 		errorsMap: {
 			// maps, for each input group, the fields in the vue model to
@@ -259,7 +259,6 @@ export default {
 		}
 	},
 	methods: {
-		scrollToTop,
 		clipboard() {
       this.$refs.copiedToClipboardModal.show();
 		},
@@ -287,30 +286,26 @@ export default {
 		},
 		createEvent() {
 			let self = this;
-			this.requestOngoing = true;
-			this.$http.post("/v1/events", {
-				event: self.eventData
-			}, {
-				headers: { 'Accept-Language': this.$i18n.locale }
-			})
-			.then(function(result) {
+			this.restRequest("events", {
+				data: {
+					event: self.eventData
+				},
+				method: 'post'
+			}).then(function(result) {
 				self.setServerErrors();
 				self.createdEvent = result.data.data;
 				self.collapseAllGroups();
 				self.$refs.eventCreatedModal.show();
 				self.$scrollTo('#event-header');
 				self.wasServerValidated = true;
-			}, function(result) {
-				if (result.response && result.response.status == 422) {
-					self.setServerErrors(result.response.data.errors);
+			}, function(error) {
+				if (error.response && error.response.status == 422) {
+					self.setServerErrors(error.response.data.errors);
 					self.wasServerValidated = true;
 				} else {
-					self.scrollToTop();
-					self.$refs.errorBar.show(self.$i18n.t('errors.network'));
+					throw error;
 				}
-			}).finally(function() {
-				self.requestOngoing = false;
-			})
+			});
 		}
 	}
 }

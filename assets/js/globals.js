@@ -167,50 +167,53 @@ export const accordionGroupsMixin = {
 	}
 }
 
-export const scrollToTop = function() {
-	if (this.$scrollTo) {
-		return this.$scrollTo('#app');
-	}
-}
-
-export const fetchEventMixin = {
+export const scrollToTopMixin = {
 	methods: {
-		fetchEvent(eventId, secret) {
-			let self = this;
-			return this.$http.get("/v1/events/" + eventId
-				,{
-					headers: { 'Accept-Language': this.$i18n.locale },
-					params: { secret: secret }
-				}).then(function(result) {
-					return result.data.data;
-				}, function(result) {
-					scrollToTop.call(self);
-					if (result.request.status == 404) {
-						self.$refs.errorBar.show(self.$i18n.t('errors.not_found'));
-					} else {
-						self.$refs.errorBar.show(self.$i18n.t('errors.network'));
-					}
-			});
+		scrollToTop() {
+			if (this.$scrollTo) {
+				return this.$scrollTo('#app');
+			}
 		}
 	}
 }
 
-export const fetchPollMixin = {
+export const restMixin = {
+	data() {
+		return {
+			requestOngoing: false,
+			apiVersion: 'v1'
+		};
+	},
 	methods: {
-		fetchPoll(pollId) {
+		restRequest(path, config, scrollToTop = true) {
 			let self = this;
-			return this.$http.get("/v1/polls/" + pollId
-				,{
-					headers: { 'Accept-Language': this.$i18n.locale }
-				}).then(function(result) {
-					return result.data.data;
-				}, function(result) {
-					scrollToTop.call(self);
-					if (result.request.status == 404) {
-						self.$refs.errorBar.show(self.$i18n.t('errors.not_found'));
-					} else {
-						self.$refs.errorBar.show(self.$i18n.t('errors.network'));
+			self.requestOngoing = true;
+			return this.$http.request(
+				Object.assign({
+					url: [null, this.apiVersion, path].join('/'),
+					headers: {
+						'Accept-Language': this.$i18n.locale
 					}
+				}, config)
+			).catch(function(error) {
+				if (error.response) {
+					if (error.response.status == 404) {
+						self.$refs.errorBar.show(self.$i18n.t('errors.not_found'));
+					} else if (error.response.status != 422) {
+						self.$refs.errorBar.show(self.$i18n.t('errors.server'));
+					}
+				} else if (error.request) {
+					self.$refs.errorBar.show(self.$i18n.t('errors.network'));
+				} else {
+					console.log(error);
+					scrollToTop = false;
+				}
+				if (self.$scrollTo && scrollToTop) {
+					self.$scrollTo('#app');
+				}
+				throw error;
+			}).finally(function() {
+				self.requestOngoing = false;
 			});
 		}
 	}

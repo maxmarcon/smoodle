@@ -7,7 +7,11 @@ div#app(v-cloak)
 
     b-collapse#nav_collapse(is-nav="")
       b-navbar-nav
-        b-nav-item(v-bind:to="{name: 'new_event'}")
+        b-nav-item(
+          v-bind:to="{name: 'new_event'}"
+          v-bind:active="$route.name == 'new_event'"
+          v-bind:disabled="$route.name == 'new_event'"
+        )
           i.fas.fa-plus-circle
           | {{ $t("event_editor.title") }}
 

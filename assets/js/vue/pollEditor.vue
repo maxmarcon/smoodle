@@ -21,6 +21,7 @@
 			@ok="deletePoll"
 			:ok-title="$t('poll_editor.delete_poll')"
 			:cancel-title="$t('actions.cancel')"
+			:ok-disabled="requestOngoing"
 			ok-variant="danger"
 		)
 			p {{ $t('poll_editor.really_delete') }}
@@ -184,12 +185,12 @@
 		)
 </template>
 <script>
-import { showToolTip, dotAccessObject, accordionGroupsMixin,
-	fetchEventMixin, fetchPollMixin, colorCodes, eventHelpersMixin, scrollToTop} from '../globals'
+import { showToolTip, accordionGroupsMixin,
+	restMixin, colorCodes, eventHelpersMixin, scrollToTopMixin} from '../globals'
 import dateFns from 'date-fns'
 
 export default {
-	mixins: [accordionGroupsMixin, fetchEventMixin, fetchPollMixin, eventHelpersMixin],
+	mixins: [accordionGroupsMixin, restMixin, scrollToTopMixin, eventHelpersMixin],
 	props: {
 		eventId: String,
 		pollId: String
@@ -224,7 +225,6 @@ export default {
 				'weekday-ranker-group': false,
 				'calendar-ranker-group': false
 			},
-			showToolTip,
 			eventName: null,
 			eventOrganizer: null,
 			evendDesc: null,
@@ -246,19 +246,17 @@ export default {
 	created() {
 		let self = this;
 		if (this.eventId) {
-			this.fetchEvent(this.eventId).then(function(event) {
-				if (event) {
-					self.assignEventData(event);
-					self.assignPollData(null);
-				}
+			this.restRequest(['events', this.eventId].join('/'))
+			.then(function(response) {
+				self.assignEventData(response.data.data);
+				self.assignPollData(null);
 				self.loaded = true;
 			});
 		} else {
-			this.fetchPoll(this.pollId).then(function(poll) {
-				if (poll) {
-					self.assignEventData(poll.event);
-					self.assignPollData(poll);
-				}
+			this.restRequest(['polls', this.pollId].join('/'))
+			.then(function(response) {
+				self.assignEventData(response.data.data.event);
+				self.assignPollData(response.data.data);
 				self.loaded = true;
 			});
 			this.groupVisibility['participant-group'] = false;
@@ -267,7 +265,6 @@ export default {
 		}
 	},
 	methods: {
-		scrollToTop,
 		newDate(value) {
 			if (this.selected_date_rank && value) {
 				this.date_picker_attributes.push( // add current selection to the calendar attributes
@@ -332,16 +329,15 @@ export default {
 		},
 		savePoll() {
 			let self = this;
-			this.requestOngoing = true;
-			this.$http.request({
-				method: (this.pollId ? 'put' : 'post'),
-				url: (this.pollId ? '/v1/polls/' + this.pollId : '/v1/events/' + this.eventId + '/polls'),
-				data: {
-					poll: this.pollData
-				},
-				headers: { 'Accept-Language': this.$i18n.locale }
-			})
-			.then(function(result) {
+			this.restRequest(
+				(this.pollId ? ['polls', this.pollId].join('/') : ['events', this.eventId, 'polls'].join('/')),
+				{
+					method: (this.pollId ? 'put' : 'post'),
+					data: {
+						poll: this.pollData
+					}
+				}
+			).then(function(result) {
 				self.setServerErrors();
 				self.collapseAllGroups();
 				self.$refs.pollSavedModal.show();
@@ -351,24 +347,18 @@ export default {
 					self.setServerErrors(result.response.data.errors);
 					self.wasServerValidated = true;
 				} else {
-					self.$refs.errorBar.show(self.$i18n.t('errors.network'));
-					self.scrollToTop();
+					throw error;
 				}
-			})
-			.finally(function() {
-				self.requestOngoing = false;
 			});
 		},
 		deletePoll() {
 			let self = this;
-			this.requestOngoing = true;
-			this.$http.delete('/v1/polls/' + this.pollId)
+			this.restRequest(['polls', this.pollId].join('/'), { method: 'delete'})
 			.then(function() {
 				self.$refs.pollDeletedModal.show();
-			}, function() {
+			}, function(error) {
 				self.$refs.pollDeleteErrorModal.show();
-			}).finally(function() {
-				self.requestOngoing = false;
+				throw error;
 			});
 		},
 		backToEvent() {

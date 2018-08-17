@@ -137,13 +137,13 @@
 		)
 </template>
 <script>
-import { fetchEventMixin, timeWindowMixin, colorCodes, eventHelpersMixin, scrollToTop } from '../globals'
+import { timeWindowMixin, colorCodes, eventHelpersMixin, scrollToTopMixin, restMixin } from '../globals'
 import dateFns from 'date-fns'
 
 const SCHEDULE_DATES_LIMIT = null;
 
 export default {
-	mixins: [fetchEventMixin, timeWindowMixin, eventHelpersMixin],
+	mixins: [restMixin, timeWindowMixin, eventHelpersMixin, scrollToTopMixin],
 	props: {
 		eventId: {
 			type: String,
@@ -171,16 +171,13 @@ export default {
 	created() {
 		let self = this;
 		Promise.all([
-			this.fetchEvent(this.eventId, this.secret).then(function(eventData) {
-				if (eventData) {
-					self.assignEventData(eventData);
-				}
+			this.restRequest(['events', this.eventId].join('/'), { params: {secret: this.secret} }).then(function(result) {
+				self.assignEventData(result.data.data);
 			}),
-			this.fetchSchedule(this.eventId).then(function(scheduleData) {
-				if (scheduleData) {
-					self.eventScheduleDates = scheduleData.dates;
-					self.eventScheduleParticipants = scheduleData.participants;
-				}
+			this.restRequest(['events', this.eventId, 'schedule'].join('/'),
+				{ params: {limit: SCHEDULE_DATES_LIMIT } }).then(function(result) {
+				self.eventScheduleDates = result.data.data.dates;
+				self.eventScheduleParticipants = result.data.data.participants;
 			})
 		]).then(function() { self.loaded = true });
 	},
@@ -209,7 +206,6 @@ export default {
 		}
 	},
 	methods: {
-		scrollToTop,
 		clipboard() {
       this.$refs.copiedToClipboardModal.show();
 		},
@@ -218,55 +214,22 @@ export default {
 				return index >= item[0];
 			})[1]
 		),
-		fetchSchedule(eventId) {
-			let self = this;
-			return this.$http.get("/v1/events/" + eventId + "/schedule",
-				{
-					headers: { 'Accept-Language': this.$i18n.locale },
-					params: {
-						limit: SCHEDULE_DATES_LIMIT
-					}
-				}).then(function(result) {
-					self.eventScheduleError = null;
-					return result.data.data;
-				}, function(result) {
-					if (result.request.status == 404) {
-						self.eventScheduleError = self.$i18n.t('event_viewer.schedule_not_found');
-					} else {
-						self.scrollToTop();
-						self.$refs.errorBar.show(self.$i18n.t('errors.network'));
-					}
-			});
-		},
-		fetchPoll(participant) {
-			let self = this;
-			this.requestOngoing = true;
-			return this.$http.get("/v1/events/" + this.eventId + "/polls",
-				{
-					headers: { 'Accept-Language': this.$i18n.locale },
-					params: {
-						participant
-					}
-				}).then(function(result) {
-					self.pollParticipantError = null;
-					return result.data.data;
-				}, function(result) {
-					if (result.request.status == 404) {
-						self.pollParticipantError = self.$i18n.t('event_viewer.update.poll_not_found');
-					} else {
-						self.pollParticipantError = self.$i18n.t('errors.network');
-					}
-			}).finally(function() {
-				self.requestOngoing = false;
-			});
-		},
 		loadPoll(bvEvt) {
 			bvEvt.preventDefault();
 			let self = this;
 			if (this.pollParticipant) {
-				this.fetchPoll(this.pollParticipant).then(function(poll) {
-					if (poll) {
-						self.$router.push({name: 'edit_poll', params: {pollId: poll.id}});
+				this.restRequest(['events', this.eventId, 'polls'].join('/'), {
+					params: {
+						participant: this.pollParticipant
+					}
+				}).then(function(result) {
+					self.pollParticipantError = null
+					self.$router.push({name: 'edit_poll', params: {pollId: result.data.data.id}});
+				}, function(error) {
+					if (error.response && error.response.status == 404) {
+						self.pollParticipantError = self.$i18n.t('event_viewer.update.poll_not_found');
+					} else {
+						throw error;
 					}
 				});
 			}
@@ -284,40 +247,32 @@ export default {
 		},
 		openEvent() {
 			let self = this;
-			this.requestOngoing = true;
-			this.$http.patch("/v1/events/" + this.eventId,
-				{
+			this.restRequest(['events', this.eventId].join('/'), {
+				method: 'patch',
+				data: {
 					event: { state: "OPEN", secret: this.secret }
-				},
-				{
-					headers: { 'Accept-Language': this.$i18n.locale }
-				},
-			).then(function(result) {
+				}
+			}).then(function(result) {
 				self.assignEventData(result.data.data);
 				self.$refs.eventOpenedModal.show();
-			}, function(result) {
+			}, function(error) {
 				self.$refs.eventOpenErrorModal.show();
-			}).finally(function() {
-				self.requestOngoing = false;
+				throw error;
 			});
 		},
 		cancelEvent() {
 			let self = this;
-			this.requestOngoing = true;
-			this.$http.patch("/v1/events/" + this.eventId,
-				{
+			this.restRequest(['events', this.eventId].join('/'), {
+				method: 'patch',
+				data: {
 					event: { state: "CANCELED", secret: this.secret }
-				},
-				{
-					headers: { 'Accept-Language': this.$i18n.locale }
-				},
-			).then(function(result) {
+				}
+			}).then(function(result) {
 				self.assignEventData(result.data.data);
 				self.$refs.eventCanceledModal.show();
-			}, function(result) {
+			}, function(error) {
 				self.$refs.eventCancelErrorModal.show();
-			}).finally(function() {
-				self.requestOngoing = false;
+				throw error;
 			});
 		}
 	}
