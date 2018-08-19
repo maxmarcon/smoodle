@@ -10,9 +10,10 @@ import VueAxios from 'vue-axios'
 import VueClipboard from 'vue-clipboard2'
 import VCalendar from 'v-calendar'
 import  VueScrollTo from 'vue-scrollto';
-const Vue = require('vue/dist/vue.common.js');
-// becaue ES module vue.esm.js does not fucking work!!!
-// import Vue from 'vue/dist/vue.esm.js'
+const Vue = require('vue/dist/vue.runtime.js');
+//import Vue from 'vue/dist/vue.runtime.esm';
+// becaue ES module vue.esm.js does not fucking work!!! It might be a problem with brunch
+// as it does not translate the "export default Vue" statement at the end of the file into CommonJS
 // ...
 
 Vue.use(VueRouter);
@@ -87,9 +88,11 @@ Vue.use(VCalendar, {
 	locale: smoodle_locale
 });
 
+import rootVue from './vue/root.vue'
 const app = new Vue({
 	i18n,
- 	router
+ 	router,
+	render: h => h(rootVue)
 }).$mount('#app');
 
 

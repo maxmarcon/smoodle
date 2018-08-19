@@ -63,9 +63,5 @@ exports.config = {
     autoRequire: {
       "js/bundle.js": ["js/app"]
     }
-  },
-
-  npm: {
-    enabled: true
   }
 };
