@@ -171,7 +171,7 @@ defmodule Smoodle.Scheduler do
           if is_owner do
             date_entry
           else
-            Map.delete(date_entry, :negative_participants)
+            Map.drop(date_entry, [:negative_participants, :positive_participants])
           end
       end),
       participants: if is_owner do
@@ -191,7 +191,8 @@ defmodule Smoodle.Scheduler do
               date: date,
               negative_rank: 0,
               positive_rank: 0,
-              negative_participants: []
+              negative_participants: [],
+              positive_participants: []
             },
             &reduce_polls_for_date/2
           )
@@ -238,6 +239,13 @@ defmodule Smoodle.Scheduler do
     end)
     |> Map.update!(:negative_participants, fn participants ->
       if rank < 0 do
+        [poll.participant | participants]
+      else
+        participants
+      end
+    end)
+    |> Map.update!(:positive_participants, fn participants ->
+      if rank > 0 do
         [poll.participant | participants]
       else
         participants
