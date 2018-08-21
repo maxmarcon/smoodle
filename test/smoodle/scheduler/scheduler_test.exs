@@ -436,11 +436,13 @@ defmodule Smoodle.SchedulerTest do
     test "get_best_schedule called from non-owner does not include participant names", %{event: event} do
       best_schedule = Scheduler.get_best_schedule(event)
       assert Enum.all?(best_schedule.dates, &(!Map.has_key?(&1, :negative_participants)))
+      assert is_integer(best_schedule.participants)
     end
 
-    test "get_best_schedule called from owner does include participant names", %{event: event} do
+    test "get_best_schedule called from owner does include participant names", %{event: event, polls: polls} do
       best_schedule = Scheduler.get_best_schedule(event, is_owner: true)
       assert Enum.any?(best_schedule.dates, &(Enum.any?(&1.negative_participants)))
+      assert Enum.sort(best_schedule.participants) == Enum.map(polls, &(Map.get(&1, :participant))) |> Enum.sort
     end
 
     test "get_best_schedule for event returns empty list when time window is invalid", %{event: event} do

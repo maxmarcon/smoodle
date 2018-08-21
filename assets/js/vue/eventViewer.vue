@@ -175,7 +175,7 @@ export default {
 				self.assignEventData(result.data.data);
 			}),
 			this.restRequest(['events', this.eventId, 'schedule'].join('/'),
-				{ params: {limit: SCHEDULE_DATES_LIMIT } }).then(function(result) {
+				{ params: {limit: SCHEDULE_DATES_LIMIT, secret: this.secret } }).then(function(result) {
 				self.eventScheduleDates = result.data.data.dates;
 				self.eventScheduleParticipants = result.data.data.participants;
 			})

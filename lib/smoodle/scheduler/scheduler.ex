@@ -174,7 +174,11 @@ defmodule Smoodle.Scheduler do
             Map.delete(date_entry, :negative_participants)
           end
       end),
-      participants: Enum.count(polls)
+      participants: if is_owner do
+          Enum.map(polls, &(Map.get(&1, :participant)))
+        else
+          Enum.count(polls)
+        end
     }
   end
 
