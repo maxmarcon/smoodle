@@ -21,6 +21,8 @@ defmodule Smoodle.Scheduler.Poll do
     timestamps(usec: false)
   end
 
+  @max_date_ranks 100
+
   @doc false
   def changeset(changeset, attrs) do
     changeset
@@ -31,6 +33,7 @@ defmodule Smoodle.Scheduler.Poll do
     |> cast_embed(:preferences, with: &preferences_changeset/2)
     |> validate_no_overlapping_date_ranks
     |> validate_date_ranks_within_event_time_window
+    |> validate_length(:date_ranks, max: 100)
     |> assoc_constraint(:event)
     |> unique_constraint(:participant, name: :polls_event_id_participant_index)
     |> trim_text_changes([:participant])
