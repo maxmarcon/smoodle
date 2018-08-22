@@ -46,7 +46,7 @@ export default {
 				participant_help: "Tell the organizer who you are..."
 			},
 			weekday_ranker_group: "How is your typical week?",
-			weekday_ranker_help: "Specify which days of your typical week are good {0}, just fine {1}, or bad {2} for the event. You can add exception for specific dates later. {3}",
+			weekday_ranker_help: "Specify which days of your typical week are good {good}, just fine {ok}, or bad {bad} for the event. You can add exception for specific dates later. {help}.",
 			calendar_ranker_group: "Select specific dates",
 			save_poll: "Save poll",
 			delete_poll: "Delete poll",
@@ -56,15 +56,15 @@ export default {
 			poll_deleted: "Your poll has been deleted",
 			poll_delete_error: "An error has occurred, the poll could not be deleted",
 			dates_placeholder: "Select a time period",
-			date_ranker_helper: "Select specific date ranges that are good {0} or bad {1} for the event. This takes precedence over the preferences you expressed for the week days. {2}",
+			date_ranker_helper: "Select specific date ranges that are good {good} or bad {bad} for the event. This takes precedence over the preferences you expressed for the week days. {help}.",
 			date_ranker_help_modal_title: "Adding and removing dates",
-			date_ranker_help_modal_content: "First choose whether you are adding dates that are good {0} or bad {1}.\
+			date_ranker_help_modal_content: "First choose whether you are adding dates that are good {good} or bad {bad}.\
 			Then, to add a date range, click on the first date, then on the second one. To select a single date, click twice on it.\
-			To remove dates, first select {2} and then click on them.",
+			To remove dates, first select {trash} and then click on them.",
 			weekday_ranker_help_modal_title: "Preferences for the days of the week",
 			weekday_ranker_help_modal_content: "Give us an idea of your typical week. For example, \
-			you might go to the gym every Wednesday and might want to mark it with {0}. On the other hand, a Friday might be a good day for this event\
-			and you might want to mark it with {1}. Other days might be just ok, and you can leave them as {2}."
+			you might go to the gym every Wednesday and might want to mark it with {good}. On the other hand, a Friday might be a good day for this event\
+			and you might want to mark it with {ok}. Other days might be just ok, and you can leave them as {bad}."
 		},
 		event_viewer: {
 			organizer: "Organizer:",
@@ -73,12 +73,15 @@ export default {
 			create_poll: "Answer the poll",
 			update_poll: "Update your answer",
 			cancel_event: "Cancel event",
-			no_participants: "The event has not been scheduled and nobody answered the poll yet. Be the first one to answer the poll!",
+			no_participants: "{icon} The event has not been scheduled and nobody answered the poll yet. Be the first one to answer the poll!",
+			no_participants_organizer: "{icon} The event has not been scheduled and nobody answered the poll yet. Tell your invitees to answer the poll!",
 			schedule_not_found: "We were unable to fetch the current schedule for this event",
 			welcome: "{organizer} has invited you to this event.",
-			event_open: "The event has not been scheduled yet. Below are the candidate dates so far, based on the answers from {participants} participants. The best dates are in green. If you haven't yet, please answer a poll\
+			event_open: "{calendar_icon} The event has not been scheduled yet. Below are the candidate dates so far, based on the answers from {participants} participants. If you haven't yet, please answer a poll\
 								to enter your availability",
+			event_open_organizer: "{calendar_icon} You haven't scheduled the event yet. Below are the candidate dates so far, based on the answers from {participants}.",
 			event_canceled: "This event has been canceled",
+			event_canceled_organizer: "You canceled this event",
 			event_scheduled: "{organizer} has scheduled this event to happen on {time}",
 			organizer_says: "{organizer} says:",
 			update: {
@@ -96,7 +99,9 @@ export default {
 			open_event: 'Reopen the event',
 			event_opened_ok: 'The event has been reopened',
 			open_event_error: 'An error has occurred, the event could not be reopened',
-			share_link: 'Share this link with participants:'
+			share_link: 'Share this link with participants:',
+			nof_participants: "{participants} participants",
+			current_participants: "Current participants:"
 		},
 		date_format: 'MM/DD/YYYY',
 		time_format: 'MM/DD/YYYY h:mm A',
@@ -120,7 +125,8 @@ export default {
 			no_dates: "No dates yet"
 		},
 		actions: {
-			cancel: "Cancel"
+			cancel: "Cancel",
+			tell_me_more: "Tell me more"
 		}
 	},
 

@@ -54,6 +54,12 @@
 		)
 			p {{ $t('event_viewer.open_event_error') }}
 
+		b-modal#participantListModal(
+			:title="$t('event_viewer.current_participants')"
+			ok-only
+		)
+			p {{ eventScheduleParticipants && eventScheduleParticipants.join(', ') + '.' }}
+
 
 		.card(v-if="eventName")
 			.card-header
@@ -86,10 +92,15 @@
 						.alert.alert-danger(v-if="eventScheduleError")
 							i.fas.fa-exclamation-triangle.fa-lg
 							| &nbsp; {{ eventScheduleError }}
-						div(v-else-if="eventScheduleParticipants")
+						div(v-else-if="eventScheduleParticipantsCount")
 							.alert.alert-info
-								i.fas.fa-calendar-check.fa-lg
-								| &nbsp; {{ $t('event_viewer.event_open', {participants: eventScheduleParticipants}) }}
+								i18n(path="event_viewer.event_open_organizer" v-if="isOrganizer")
+									i.fas.fa-calendar-check.fa-lg(place="calendar_icon")
+									a(href="#" place="participants" v-b-modal.participantListModal="")
+										| {{ $t('event_viewer.nof_participants', {participants: eventScheduleParticipantsCount}) }}
+
+								i18n(path="event_viewer.event_open" :places="{participants: eventScheduleParticipantsCount}" v-else)
+									i.fas.fa-calendar-check.fa-lg(place="calendar_icon")
 							.row.justify-content-center
 								.col-md-6.text-center
 									v-calendar(
@@ -99,14 +110,16 @@
 										:is-double-paned="true"
 									)
 						div(v-else-if="loaded").alert.alert-primary(v-else)
-							i.fas.fa-meh-rolling-eyes.fa-lg
-							| &nbsp; {{ $t('event_viewer.no_participants') }}
+							i18n(path="event_viewer.no_participants_organizer" v-if="isOrganizer")
+								i.fas.fa-grin-beam-sweat.fa-lg(place="icon")
+							i18n(path="event_viewer.no_participants" v-else)
+								i.fas.fa-trophy.fa-lg(place="icon")
 					.alert.alert-success(v-else-if="eventScheduled")
 						i.fas.fa-handshake.fa-lg
 						| &nbsp;  {{ $t('event_viewer.event_scheduled', {time: eventScheduledTime, organizer: eventOrganizer}) }}
 					.alert.alert-warning(v-else-if="eventCanceled")
 						i.fas.fa-ban.fa-lg
-						| &nbsp; {{ $t('event_viewer.event_canceled') }}
+						| &nbsp; {{ $t(isOrganizer ? 'event_viewer.event_canceled_organizer' : 'event_viewer.event_canceled') }}
 
 			.card-footer
 				.row.justify-content-center
@@ -161,7 +174,8 @@ export default {
 		eventTimeWindowTo: null,
 		eventScheduledFrom: null,
 		eventScheduleDates: [],
-		eventScheduleParticipants: 0,
+		eventScheduleParticipantsCount: 0,
+		eventScheduleParticipants: [],
 		eventScheduleError: null,
 		pollParticipant: null,
 		pollParticipantError: null,
@@ -178,19 +192,13 @@ export default {
 				{ params: {limit: SCHEDULE_DATES_LIMIT, secret: this.secret } }).then(function(result) {
 				self.eventScheduleDates = result.data.data.dates;
 				self.eventScheduleParticipants = result.data.data.participants;
+				self.eventScheduleParticipantsCount = result.data.data.participants_count;
 			})
 		]).then(function() { self.loaded = true });
 	},
 	computed: {
 		isOrganizer() {
 			return this.secret;
-		},
-		eventParticipants() {
-			if (this.eventSchedule) {
-				return this.eventSchedule.participants
-			} else {
-				return 0;
-			}
 		},
 		scheduleCalendarAttributes() {
 			let limit = (SCHEDULE_DATES_LIMIT != null ? SCHEDULE_DATES_LIMIT : this.eventScheduleDates.length);

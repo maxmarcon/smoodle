@@ -6,15 +6,15 @@
 
 		b-modal#dateRankerHelpModal(ok-only :title="$t('poll_editor.date_ranker_help_modal_title')")
 			i18n(path="poll_editor.date_ranker_help_modal_content" tag="p")
-				i.fas.fa-heart.text-success
-				i.fas.fa-thumbs-down.text-danger
-				i.fas.fas.fa-trash-alt
+				i.fas.fa-heart.text-success(place="good")
+				i.fas.fa-thumbs-down.text-danger(place="bad")
+				i.fas.fas.fa-trash-alt(place="trash")
 
 		b-modal#weekdayRankerHelpModal(ok-only :title="$t('poll_editor.weekday_ranker_help_modal_title')")
 			i18n(path="poll_editor.weekday_ranker_help_modal_content" tag="p")
-				i.fas.fa-thumbs-down.text-danger
-				i.fas.fa-heart.text-success
-				i.fas.fa-thumbs-up.text-warning
+				i.fas.fa-thumbs-down.text-danger(place="good")
+				i.fas.fa-heart.text-success(place="ok")
+				i.fas.fa-thumbs-up.text-warning(place="bad")
 
 		b-modal#pollDeleteModal(
 			:title="$t('poll_editor.delete_poll')"
@@ -89,11 +89,10 @@
 				)
 					b-card
 						i18n.small.text-muted(path="poll_editor.weekday_ranker_help" tag="p")
-							i.fas.fa-heart.text-success
-							i.fas.fa-thumbs-up.text-warning
-							i.fas.fa-thumbs-down.text-danger
-							button.btn.btn-link.btn-sm(v-b-modal.weekdayRankerHelpModal="")
-								i.fas.fa-question-circle
+							i.fas.fa-heart.text-success(place="good")
+							i.fas.fa-thumbs-up.text-warning(place="ok")
+							i.fas.fa-thumbs-down.text-danger(place="bad")
+							a(v-b-modal.weekdayRankerHelpModal="" place="help" href="#") {{ $t('actions.tell_me_more')}}
 						ranker(:elements="pollWeekdayRanks")
 						.small.text-danger {{ pollWeekdayRanksError }}
 
@@ -113,10 +112,9 @@
 				)
 					b-card
 						i18n.small.text-muted.d-block.d-md-none(path="poll_editor.date_ranker_helper" tag="p")
-							i.fas.fa-heart.text-success
-							i.fas.fa-thumbs-down.text-danger
-							button.btn.btn-link.btn-sm(v-b-modal.dateRankerHelpModal="")
-								i.fas.fa-question-circle
+							i.fas.fa-heart.text-success(place="good")
+							i.fas.fa-thumbs-down.text-danger(place="bad")
+							a(v-b-modal.dateRankerHelpModal="" place="help" href="#") {{ $t('actions.tell_me_more') }}
 
 						.row.justify-content-center
 							.col-md-6.text-center
@@ -142,10 +140,10 @@
 							.col-md-3
 								.form-group
 									i18n.small.text-muted.d-none.d-md-block(path="poll_editor.date_ranker_helper" tag="p")
-										i.fas.fa-heart.text-success
-										i.fas.fa-thumbs-down.text-danger
-										button.btn.btn-link.btn-sm(v-b-modal.dateRankerHelpModal="")
-											i.fas.fa-question-circle
+										i.fas.fa-heart.text-success(place="good")
+										i.fas.fa-thumbs-down.text-danger(place="bad")
+										a(v-b-modal.dateRankerHelpModal="" place="help" href="#") {{ $t('actions.tell_me_more') }}
+
 									.d-flex.justify-content-center.align-items-center
 										.form-check
 											p-radio.p-icon.p-plain(name="selected_date_rank" :value="1" v-model="selected_date_rank" toggle)
