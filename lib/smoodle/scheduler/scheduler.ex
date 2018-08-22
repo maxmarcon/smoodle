@@ -177,8 +177,9 @@ defmodule Smoodle.Scheduler do
       participants: if is_owner do
           Enum.map(polls, &(Map.get(&1, :participant)))
         else
-          Enum.count(polls)
-        end
+          []
+        end,
+      participants_count: Enum.count(polls)
     }
   end
 

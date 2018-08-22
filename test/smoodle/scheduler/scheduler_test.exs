@@ -422,7 +422,6 @@ defmodule Smoodle.SchedulerTest do
         participants: participants,
         dates: dates
       } = best_schedule
-      assert participants == Enum.count(polls)
       [best_date | _] = dates
       assert %{date: ~D[2117-03-15], positive_rank: 2.0} = best_date # It's a Monday :-)
     end
@@ -433,11 +432,16 @@ defmodule Smoodle.SchedulerTest do
         Enum.map(best_schedule.dates, fn %{date: date} -> date end) |> Enum.sort
     end
 
+    test "get_best_schedule returns the number of participants", %{event: event, polls: polls} do
+      best_schedule = Scheduler.get_best_schedule(event)
+      assert best_schedule.participants_count == Enum.count(polls)
+    end
+
     test "get_best_schedule called from non-owner does not include participant names", %{event: event} do
       best_schedule = Scheduler.get_best_schedule(event)
       assert Enum.all?(best_schedule.dates, &(!Map.has_key?(&1, :negative_participants)))
       assert Enum.all?(best_schedule.dates, &(!Map.has_key?(&1, :positive_participants)))
-      assert is_integer(best_schedule.participants)
+      assert Enum.empty?(best_schedule.participants)
     end
 
     test "get_best_schedule called from owner does include participant names", %{event: event, polls: polls} do
@@ -466,7 +470,7 @@ defmodule Smoodle.SchedulerTest do
 
     test "get_best_schedule returns an empty list", %{event: event} do
       best_schedule = Scheduler.get_best_schedule(event)
-      assert best_schedule.participants == 0
+      assert best_schedule.participants_count == 0
       assert Enum.empty? best_schedule.dates
     end
   end
