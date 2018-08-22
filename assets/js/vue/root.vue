@@ -13,7 +13,7 @@ div
 					v-bind:disabled="$route.name == 'new_event'"
 			  )
 					i.fas.fa-plus-circle
-					| {{ $t("event_editor.title") }}
+					| &nbsp; {{ $t("event_editor.title") }}
 
 	div
 		router-view
