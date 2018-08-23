@@ -75,6 +75,9 @@
 						em.text-muted {{ isOrganizer ? $t('event_viewer.description') : $t('event_viewer.organizer_says', {organizer: eventOrganizer}) }} &nbsp;
 						| {{ eventDesc }}
 				li.list-group-item(v-if="isOrganizer && eventOpen")
+					.alert.alert-success
+						i.fas.fa-gamepad
+						| &nbsp; {{ $t('event_viewer.welcome_organizer', {organizer: eventOrganizer}) }}
 					.form-group.row.justify-content-center
 						label.col-md-auto.col-form-label {{ $t('event_viewer.share_link') }}
 						.col-md
@@ -87,7 +90,9 @@
 									)
 										span.fas.fa-share-alt
 				li.list-group-item
-					p.text-muted(v-if="!isOrganizer") {{ $t('event_viewer.welcome', {organizer: eventOrganizer, timeWindow}) }}
+					.alert.alert-success(v-if="!isOrganizer")
+						i.fas.fa-share-alt
+						| &nbsp; {{ $t('event_viewer.welcome', {organizer: eventOrganizer}) }}
 					div(v-if="eventOpen")
 						.alert.alert-danger(v-if="eventScheduleError")
 							i.fas.fa-exclamation-triangle.fa-lg

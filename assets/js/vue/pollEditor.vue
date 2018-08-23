@@ -49,28 +49,35 @@
 					:timeWindowTo="eventTimeWindowTo"
 				)
 			.card-body
-				b-btn.btn-block.d-flex(
-						v-b-toggle.organizer-group=""
-						:variant="groupVariant('participant-group')"
-					)
-						span.fas.fa-chevron-up(v-if="groupVisibility['participant-group']")
-						span.fas.fa-chevron-down(v-else)
-						span.ml-2.mr-auto {{ $t('poll_editor.participant_group') }}
-						div(v-if="showGroupErrorIcon('participant-group')").fas.fa-exclamation
-						div(v-else-if="showGroupOkIcon('participant-group')").fas.fa-check
-				b-collapse#organizer-group(accordion="poll-editor" v-model="groupVisibility['participant-group']")
-						b-card
-							.form-group.row
-								label.col-md-3.col-form-label(for="pollParticipant") {{ $t('poll_editor.poll.participant') }}
-								.col-md-9
-									small.form-text.text-muted {{ $t('poll_editor.poll.participant_help') }}
-									input#pollParticipant.form-control(
-										v-model.trim="pollParticipant"
-										@change="localValidation"
-										@blur="localValidation"
-										:class="inputFieldClass('pollParticipant')"
-									)
-									.invalid-feedback {{ pollParticipantError }}
+				.alert.alert-info(v-if="pollId")
+					i.fas.fa-edit
+					| &nbsp; {{ $t('poll_editor.welcome', {participant: pollParticipant}) }}
+				.alert.alert-info(v-else)
+					i.fas.fa-edit
+					| &nbsp; {{ $t('poll_editor.welcome_new_participant') }}
+				div(v-if="eventId")
+					b-btn.btn-block.d-flex(
+							v-b-toggle.organizer-group=""
+							:variant="groupVariant('participant-group')"
+						)
+							span.fas.fa-chevron-up(v-if="groupVisibility['participant-group']")
+							span.fas.fa-chevron-down(v-else)
+							span.ml-2.mr-auto {{ $t('poll_editor.participant_group') }}
+							div(v-if="showGroupErrorIcon('participant-group')").fas.fa-exclamation
+							div(v-else-if="showGroupOkIcon('participant-group')").fas.fa-check
+					b-collapse#organizer-group(accordion="poll-editor" v-model="groupVisibility['participant-group']")
+							b-card
+								.form-group.row
+									label.col-md-3.col-form-label(for="pollParticipant") {{ $t('poll_editor.poll.participant') }}
+									.col-md-9
+										small.form-text.text-muted {{ $t('poll_editor.poll.participant_help') }}
+										input#pollParticipant.form-control(
+											v-model.trim="pollParticipant"
+											@change="localValidation"
+											@blur="localValidation"
+											:class="inputFieldClass('pollParticipant')"
+										)
+										.invalid-feedback {{ pollParticipantError }}
 
 
 				b-btn#weekday-ranker-button.d-flex.btn-block.mt-2(
@@ -111,12 +118,14 @@
 					:visible="true"
 				)
 					b-card
-						i18n.small.text-muted.d-block.d-md-none(path="poll_editor.date_ranker_helper" tag="p")
-							i.fas.fa-heart.text-success(place="good")
-							i.fas.fa-thumbs-down.text-danger(place="bad")
-							a(v-b-modal.dateRankerHelpModal="" place="help" href="#") {{ $t('actions.tell_me_more') }}
-
 						.row.justify-content-center
+							.col-md-3.order-md-last
+								.form-group
+									i18n.small.text-muted(path="poll_editor.date_ranker_helper" tag="p")
+										i.fas.fa-heart.text-success(place="good")
+										i.fas.fa-thumbs-down.text-danger(place="bad")
+										a(v-b-modal.dateRankerHelpModal="" place="help" href="#") {{ $t('actions.tell_me_more') }}
+
 							.col-md-6.text-center
 								.form-group
 									v-date-picker(
@@ -136,15 +145,7 @@
 									)
 									.small.text-danger {{ pollDateRanksError }}
 
-
-							.col-md-3
-								.form-group
-									i18n.small.text-muted.d-none.d-md-block(path="poll_editor.date_ranker_helper" tag="p")
-										i.fas.fa-heart.text-success(place="good")
-										i.fas.fa-thumbs-down.text-danger(place="bad")
-										a(v-b-modal.dateRankerHelpModal="" place="help" href="#") {{ $t('actions.tell_me_more') }}
-
-									.d-flex.justify-content-center.align-items-center
+								.d-flex.justify-content-center.align-items-center
 										.form-check
 											p-radio.p-icon.p-plain(name="selected_date_rank" :value="1" v-model="selected_date_rank" toggle)
 												i.icon.fas.fa-heart.text-success(slot="extra")
@@ -160,6 +161,7 @@
 												i.icon.fas.fa-trash-alt(slot="extra")
 												i.icon.far.fa-trash-alt(slot="off-extra")
 												label(slot="off-label")
+
 
 
 			.card-footer

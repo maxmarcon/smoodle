@@ -39,6 +39,8 @@ export default {
 			dates_placeholder: "Select a date range"
 		},
 		poll_editor: {
+			welcome: "Hey {participant}, here you can update your poll for ths event.",
+			welcome_new_participant: "Here you can enter your availabiliy for this event.",
 			title: "Poll for \u201C{eventName}\u201E",
 			participant_group: "Who are you?",
 			poll: {
@@ -77,6 +79,7 @@ export default {
 			no_participants_organizer: "{icon} The event has not been scheduled and nobody answered the poll yet. Tell your invitees to answer the poll!",
 			schedule_not_found: "We were unable to fetch the current schedule for this event",
 			welcome: "{organizer} has invited you to this event.",
+			welcome_organizer: "Hey {organizer}! Here you can manage your event.",
 			event_open: "{calendar_icon} The event has not been scheduled yet. Below are the candidate dates so far, based on the answers from {participants} participants. If you haven't yet, please answer a poll\
 								to enter your availability",
 			event_open_organizer: "{calendar_icon} You haven't scheduled the event yet. Below are the candidate dates so far, based on the answers from {participants}.",
