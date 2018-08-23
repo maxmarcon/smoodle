@@ -139,6 +139,9 @@
 										:tint-color="selectedDateRankColor"
 										:is-linked="true"
 										:show-caps="true"
+										popover-visibility="hidden"
+										:disabled-attribute="disabledAttribute"
+										:drag-attribute="dragAttribute"
 										:disabled-dates="disabledDates"
 										@input="newDate"
 										@dayclick="dayClicked"
@@ -240,8 +243,20 @@ export default {
 			selected_dates: null,
 			selected_date_rank: 1,
 			date_picker_attributes: [],
-			date_picker_attributes_key: 0
-		}
+			date_picker_attributes_key: 0,
+			dragAttribute: {
+				popover: {
+					visibility: 'hidden'
+				}
+			},
+			disabledAttribute: {
+				contentStyle: {
+						color: colorCodes.red,
+						opacity: 0.5,
+						cursor: 'default'
+					}
+				}
+			}
 	},
 	created() {
 		let self = this;
