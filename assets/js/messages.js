@@ -94,7 +94,6 @@ export default {
 				name_placeholder: "Enter your name here...",
 				poll_not_found: "No answer found under this name. Did you spell the name correctly?"
 			},
-			participants_for_date: "Everybody can make it! | {count} person can't make it | {count} people can't make it",
 			create_new_event: "Create a new event",
 			really_cancel_event: "Are you sure you want to cancel the event?",
 			event_canceled_ok: "Event successfully canceled",
@@ -104,7 +103,11 @@ export default {
 			open_event_error: 'An error has occurred, the event could not be reopened',
 			share_link: 'Share this link with participants:',
 			nof_participants: "{participants} participants",
-			current_participants: "Current participants:"
+			current_participants: "Current participants:",
+			negative_participants_for_date: "Everybody can make it | {count} person can't make it | {count} people can't make it",
+			positive_participants_for_date: "Everybody can make it | {count} person prefers this date | {count} people prefer this date",
+			positive_participants_list_date: "{participants} likes this date | {participants} like this date",
+			negative_participants_list_date: "{participants} can't make it | {participants} can't make it"
 		},
 		date_format: 'MM/DD/YYYY',
 		time_format: 'MM/DD/YYYY h:mm A',

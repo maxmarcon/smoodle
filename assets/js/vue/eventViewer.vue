@@ -54,7 +54,7 @@
 		)
 			p {{ $t('event_viewer.open_event_error') }}
 
-		b-modal#participantListModal(
+		b-modal#participantsListModal(
 			:title="$t('event_viewer.current_participants')"
 			ok-only
 		)
@@ -101,7 +101,7 @@
 							.alert.alert-info
 								i18n(path="event_viewer.event_open_organizer" v-if="isOrganizer")
 									i.fas.fa-calendar-check.fa-lg(place="calendar_icon")
-									a(href="#" place="participants" v-b-modal.participantListModal="")
+									a(href="#" place="participants" v-b-modal.participantsListModal="")
 										| {{ $t('event_viewer.nof_participants', {participants: eventScheduleParticipantsCount}) }}
 
 								i18n(path="event_viewer.event_open" :places="{participants: eventScheduleParticipantsCount}" v-else)
@@ -113,7 +113,9 @@
 										:min-date="minDate"
 										:max-date="maxDate"
 										:is-double-paned="true"
+										:theme-styles="{dayCellNotInMonth: {opacity: 0}}"
 									)
+
 						div(v-else-if="loaded").alert.alert-primary(v-else)
 							i18n(path="event_viewer.no_participants_organizer" v-if="isOrganizer")
 								i.fas.fa-grin-beam-sweat.fa-lg(place="icon")
@@ -206,27 +208,58 @@ export default {
 			return this.secret;
 		},
 		scheduleCalendarAttributes() {
+			let scheduleDates = this.eventScheduleDates.length;
+			let minNegativeRank;
+			let maxPositiveRank;
+			if (scheduleDates > 0) {
+				minNegativeRank = this.eventScheduleDates[scheduleDates-1].negative_rank;
+				maxPositiveRank = this.eventScheduleDates[0].positive_rank;
+			}
 			let limit = (SCHEDULE_DATES_LIMIT != null ? SCHEDULE_DATES_LIMIT : this.eventScheduleDates.length);
 			return this.eventScheduleDates.slice(0, limit).map((date_entry, index) => ({
 				dates: dateFns.parse(date_entry.date),
 				highlight: {
-					backgroundColor: this.colorForDate(index)
+					backgroundColor: (date_entry.negative_rank < 0 ? colorCodes.red : colorCodes.green),
+					opacity: this.opacityForDate(date_entry, minNegativeRank, maxPositiveRank)
 				},
 				popover: {
-					label: this.$i18n.tc('event_viewer.participants_for_date', -date_entry.negative_rank, {count: -date_entry.negative_rank})
-				}
+					label: this.labelForDate
+				},
+				customData: date_entry
 			}));
 		}
 	},
 	methods: {
+		opacityForDate(date_entry, minNegativeRank, maxPositiveRank) {
+			return (date_entry.negative_rank < 0
+				? date_entry.negative_rank / minNegativeRank
+				: Math.max(date_entry.positive_rank, 0.5) / maxPositiveRank);
+		},
+		labelForDate(attribute) {
+			let date_entry = attribute.customData;
+			let label = null;
+			if (date_entry.negative_rank < 0) {
+				if (this.isOrganizer) {
+					label = this.$i18n.tc('event_viewer.negative_participants_list_date', date_entry.negative_participants.length,
+						{participants: date_entry.negative_participants.join(', ')} );
+				} else {
+					label = this.$i18n.tc('event_viewer.negative_participants_for_date', -date_entry.negative_rank,
+						{count: -date_entry.negative_rank});
+				}
+			} else {
+				if (this.isOrganizer && date_entry.positive_rank > 0) {
+					label = this.$i18n.tc('event_viewer.positive_participants_list_date', date_entry.positive_participants.length,
+						{participants: date_entry.positive_participants.join(', ')} );
+				} else {
+					label = this.$i18n.tc('event_viewer.positive_participants_for_date', date_entry.positive_rank,
+						{count: date_entry.positive_rank});
+				}
+			}
+			return label;
+		},
 		clipboard() {
       this.$refs.copiedToClipboardModal.show();
 		},
-		colorForDate: (index) => (
-			[[10, colorCodes.red], [5, colorCodes.yellow], [0, colorCodes.green]].find(function(item) {
-				return index >= item[0];
-			})[1]
-		),
 		loadPoll(bvEvt) {
 			bvEvt.preventDefault();
 			let self = this;
