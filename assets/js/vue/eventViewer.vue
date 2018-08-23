@@ -60,6 +60,11 @@
 		)
 			p {{ eventScheduleParticipants && eventScheduleParticipants.join(', ') + '.' }}
 
+		b-modal#scheduleEventModal(
+			:title="$t('event_viewer.schedule_event')"
+			:ok-title="$t('event_viewer.schedule_event')"
+			:cancel-title="$t('actions.cancel')"
+		)
 
 		.card(v-if="eventName")
 			.card-header
@@ -108,7 +113,19 @@
 									i.fas.fa-calendar-check.fa-lg(place="calendar_icon")
 							.row.justify-content-center
 								.col-md-6.text-center
+									v-date-picker(
+										v-if="isOrganizer"
+										mode="single"
+										v-model="selected_date"
+										:attributes="scheduleCalendarAttributes"
+										:is-inline="true"
+										:min-date="minDate"
+										:max-date="maxDate"
+										:is-double-paned="true"
+										:theme-styles="{dayCellNotInMonth: {opacity: 0}}"
+									)
 									v-calendar(
+										v-else
 										:attributes="scheduleCalendarAttributes"
 										:min-date="minDate"
 										:max-date="maxDate"
@@ -130,6 +147,10 @@
 
 			.card-footer
 				.row.justify-content-center
+					.col-auto.mt-1(v-if="eventOpen && isOrganizer")
+						button.btn.btn-primary(v-b-modal.scheduleEventModal="" :disabled="requestOngoing || !selected_date")
+							i.fas.fa-clock
+							| &nbsp; {{ $t('event_viewer.schedule_event') }}
 					.col-auto.mt-1(v-if="eventOpen && isOrganizer")
 						button.btn.btn-warning(v-b-modal.cancelEventModal="" :disabled="requestOngoing")
 							i.fas.fa-ban
@@ -187,7 +208,8 @@ export default {
 		pollParticipant: null,
 		pollParticipantError: null,
 		loaded: false,
-		requestOngoing: false
+		requestOngoing: false,
+		selected_date: null
 	}),
 	created() {
 		let self = this;
