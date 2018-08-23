@@ -91,15 +91,20 @@
     end
   end
 
+  @doc """
+    Using fetch_change and not fetch_field here because we still need to be able
+    to update events whose time_window_from is in the past. Example: event has not been
+    scheduled yet, but the current date already lies within the time window
+  """
   defp validate_is_the_future(changeset, keys, t \\ NaiveDateTime) do
-    Enum.reduce(keys, changeset, fn(key, changeset) ->
-      {_, date_or_time} = fetch_field(changeset, key)
-      today = case t do
-        NaiveDateTime -> NaiveDateTime.utc_now
-        Date -> Date.utc_today
-      end
+    today = case t do
+      NaiveDateTime -> NaiveDateTime.utc_now
+      Date -> Date.utc_today
+    end
 
-      with %{} <- date_or_time,
+    Enum.reduce(keys, changeset, fn(key, changeset) ->
+      with {_, date_or_time} <- fetch_change(changeset, key),
+        %{} <- date_or_time,
         :gt <- t.compare(today, date_or_time)
       do
         add_error(changeset, key, dgettext("errors", "you cannot schedule an event in the past"), validation: :in_the_past)
