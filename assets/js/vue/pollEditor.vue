@@ -129,13 +129,13 @@
 							.col-md-6.text-center
 								.form-group
 									v-date-picker(
-										:mode="(selected_date_rank ? 'range' : 'single')"
-										v-model="selected_dates"
+										:mode="(selectedDateRank ? 'range' : 'single')"
+										v-model="selectedDates"
 										:min-date="minDate"
 										:max-date="maxDate"
 										:is-inline="true"
 										:is-double-paned="true"
-										:attributes="date_picker_attributes"
+										:attributes="datePickerAttributes"
 										:tint-color="selectedDateRankColor"
 										:is-linked="true"
 										:show-caps="true"
@@ -150,17 +150,17 @@
 
 								.d-flex.justify-content-center.align-items-center
 										.form-check
-											p-radio.p-icon.p-plain(name="selected_date_rank" :value="1" v-model="selected_date_rank" toggle)
+											p-radio.p-icon.p-plain(name="selectedDateRank" :value="1" v-model="selectedDateRank" toggle)
 												i.icon.fas.fa-heart.text-success(slot="extra")
 												i.icon.far.fa-heart(slot="off-extra")
 												label(slot="off-label")
 										.form-check
-											p-radio.p-icon.p-plain(name="selected_date_rank" :value="-1" v-model="selected_date_rank" toggle)
+											p-radio.p-icon.p-plain(name="selectedDateRank" :value="-1" v-model="selectedDateRank" toggle)
 												i.icon.fas.fa-thumbs-down.text-danger(slot="extra")
 												i.icon.far.fa-thumbs-down(slot="off-extra")
 												label(slot="off-label")
 										.form-check
-											p-radio.p-icon.p-plain(name="selected_date_rank" :value="0" v-model="selected_date_rank" toggle)
+											p-radio.p-icon.p-plain(name="selectedDateRank" :value="0" v-model="selectedDateRank" toggle)
 												i.icon.fas.fa-trash-alt(slot="extra")
 												i.icon.far.fa-trash-alt(slot="off-extra")
 												label(slot="off-label")
@@ -240,10 +240,10 @@ export default {
 			pollDateRanksError: null,
 			requestOngoing: false,
 			loaded: false,
-			selected_dates: null,
-			selected_date_rank: 1,
-			date_picker_attributes: [],
-			date_picker_attributes_key: 0,
+			selectedDates: null,
+			selectedDateRank: 1,
+			datePickerAttributes: [],
+			datePickerAttributesKey: 0,
 			dragAttribute: {
 				popover: {
 					visibility: 'hidden'
@@ -280,30 +280,33 @@ export default {
 		}
 	},
 	methods: {
+		clearSelectedDates() {
+			this.selectedDates = null;
+		},
 		newDate(value) {
-			if (this.selected_date_rank && value) {
-				this.date_picker_attributes.push( // add current selection to the calendar attributes
+			if (this.selectedDateRank && value) {
+				this.datePickerAttributes.push( // add current selection to the calendar attributes
 					{
-						key: ++this.date_picker_attributes_key,
+						key: ++this.datePickerAttributesKey,
 						dates: value,
 						bar: {
 							backgroundColor: this.selectedDateRankColor
 						},
 						customData: {
-							rank: this.selected_date_rank
+							rank: this.selectedDateRank
 						}
 					}
 				);
 			}
-			this.selected_dates = null; // disable current selection
+			this.clearSelectedDates();
 		},
 		dayClicked(day) {
-			if (!this.selected_date_rank) {
+			if (!this.selectedDateRank) {
 				let self = this;
 				day.attributes.forEach(attr => {
-					let index = self.date_picker_attributes.findIndex(el => el.key == attr.key);
+					let index = self.datePickerAttributes.findIndex(el => el.key == attr.key);
 					if (index > -1) {
-						self.date_picker_attributes.splice(index, 1);
+						self.datePickerAttributes.splice(index, 1);
 					}
 				});
 			}
@@ -327,8 +330,8 @@ export default {
 						el.rank = rank.rank;
 					}
 				});
-				this.date_picker_attributes = poll.date_ranks.map(date_rank => ({
-					key: ++self.date_picker_attributes_key,
+				this.datePickerAttributes = poll.date_ranks.map(date_rank => ({
+					key: ++self.datePickerAttributesKey,
 					dates: {
 						start: date_rank.date_from,
 						end: date_rank.date_to
@@ -383,10 +386,10 @@ export default {
 	},
 	computed: {
 		disabledDates() {
-			return this.date_picker_attributes.map(attr => attr.dates);
+			return this.datePickerAttributes.map(attr => attr.dates);
 		},
 		selectedDateRankColor() {
-			return this.colorForRank(this.selected_date_rank);
+			return this.colorForRank(this.selectedDateRank);
 		},
 		computedEventId() {
 			return (this.eventId ? this.eventId : this.eventIdFromPoll);
@@ -400,7 +403,7 @@ export default {
 				preferences: {
 					weekday_ranks: this.pollWeekdayRanks.filter(weekday_rank => weekday_rank.rank) // exclude 0 ranks
 				},
-				date_ranks: this.date_picker_attributes.map(attr => ({
+				date_ranks: this.datePickerAttributes.map(attr => ({
 					date_from: dateFns.format(attr.dates.start, 'YYYY-MM-DD'),
 					date_to: dateFns.format(attr.dates.end, 'YYYY-MM-DD'),
 					rank: attr.customData.rank

@@ -116,13 +116,14 @@
 									v-date-picker(
 										v-if="isOrganizer"
 										mode="single"
-										v-model="selected_date"
+										v-model="selectedDate"
 										:attributes="scheduleCalendarAttributes"
 										:is-inline="true"
 										:min-date="minDate"
 										:max-date="maxDate"
 										:is-double-paned="true"
 										:theme-styles="{dayCellNotInMonth: {opacity: 0}}"
+										:select-attribute="selectedAttribute"
 									)
 									v-calendar(
 										v-else
@@ -148,7 +149,7 @@
 			.card-footer
 				.row.justify-content-center
 					.col-auto.mt-1(v-if="eventOpen && isOrganizer")
-						button.btn.btn-primary(v-b-modal.scheduleEventModal="" :disabled="requestOngoing || !selected_date")
+						button.btn.btn-primary(v-b-modal.scheduleEventModal="" :disabled="requestOngoing || !selectedDate")
 							i.fas.fa-clock
 							| &nbsp; {{ $t('event_viewer.schedule_event') }}
 					.col-auto.mt-1(v-if="eventOpen && isOrganizer")
@@ -209,7 +210,14 @@ export default {
 		pollParticipantError: null,
 		loaded: false,
 		requestOngoing: false,
-		selected_date: null
+		selectedDate: null,
+		selectedAttribute: {
+			contentStyle: {
+			},
+			popover: {
+				visibility: 'hidden'
+			}
+		}
 	}),
 	created() {
 		let self = this;
