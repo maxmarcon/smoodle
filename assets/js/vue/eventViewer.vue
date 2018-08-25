@@ -212,8 +212,12 @@ export default {
 		requestOngoing: false,
 		selectedDate: null,
 		selectedAttribute: {
-			contentStyle: {
-			},
+			contentStyle: () => ({
+				backgroundColor: colorCodes.white,
+				border: '3px solid ' + colorCodes.green,
+				color: 'black',
+				opacity: 1
+			}),
 			popover: {
 				visibility: 'hidden'
 			}

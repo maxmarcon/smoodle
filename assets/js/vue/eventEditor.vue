@@ -136,6 +136,7 @@
 											:min-date="today"
 											:input-props="{readonly: true, placeholder: $t('event_editor.dates_placeholder'), class: [ 'form-control', inputFieldClass('eventTimeWindow') ]}"
 											:is-double-paned="true"
+											:show-caps="true"
 											popover-visibility="focus"
 											@input="localValidation"
 										)
@@ -252,8 +253,8 @@ export default {
 				name: this.eventName,
 				desc: this.eventDesc,
 				organizer: this.eventOrganizer,
-				time_window_from: dateFns.format(this.eventTimeWindowFrom, 'YYYY-MM-DD'),
-				time_window_to: dateFns.format(this.eventTimeWindowTo, 'YYYY-MM-DD'),
+				time_window_from: this.eventTimeWindowFrom && dateFns.format(this.eventTimeWindowFrom, 'YYYY-MM-DD'),
+				time_window_to: this.eventTimeWindowTo && dateFns.format(this.eventTimeWindowTo, 'YYYY-MM-DD'),
 				email: this.organizerEmail
 			};
 		}

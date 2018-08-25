@@ -259,5 +259,7 @@ export const eventHelpersMixin = {
 export const colorCodes = {
 	green: '#28a745',
 	red: '#dc3545',
-	yellow: '#ffc107'
+	yellow: '#ffc107',
+	white: '#ffffff',
+	black: '#000000'
 }
