@@ -9,6 +9,12 @@
   alias Smoodle.Scheduler.Poll
   import Smoodle.Scheduler.Utils
 
+  defimpl String.Chars, for: Smoodle.Scheduler.Event do
+    def to_string(event) do
+      "id:#{event.id} name:#{event.name} organizer:#{event.organizer}"
+    end
+  end
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @secret_len 16
   @valid_states ["OPEN", "SCHEDULED", "CANCELED"]
@@ -103,7 +109,7 @@
     end
 
     Enum.reduce(keys, changeset, fn(key, changeset) ->
-      with {_, date_or_time} <- fetch_change(changeset, key),
+      with {:ok, date_or_time} <- fetch_change(changeset, key),
         %{} <- date_or_time,
         :gt <- t.compare(today, date_or_time)
       do

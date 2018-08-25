@@ -5,6 +5,8 @@ defmodule SmoodleWeb.EventController do
   alias Smoodle.Scheduler.Event
   alias Smoodle.Mailer
   alias SmoodleWeb.Email
+
+  require Logger
   action_fallback SmoodleWeb.FallbackController
 
   def index(conn, _params) do
@@ -30,6 +32,8 @@ defmodule SmoodleWeb.EventController do
     with {:ok, %Event{} = event} <- Scheduler.create_event(event_params) do
       Email.new_event_email(event)
       |> Mailer.deliver_later
+
+      Logger.info "Created new event #{event}"
 
       conn
       |> put_status(:created)
