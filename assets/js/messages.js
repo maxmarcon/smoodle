@@ -108,7 +108,9 @@ export default {
 			positive_participants_for_date: "Everybody can make it | {count} person prefers this date | {count} people prefer this date",
 			positive_participants_list_date: "{participants} likes this date | {participants} like this date",
 			negative_participants_list_date: "{participants} can't make it | {participants} can't make it",
-			schedule_event: "Schedule event"
+			schedule_event: "Schedule event",
+			warning_bad_date: "Warning! {participants} person can't make it on this date | Warning! {participants} people cannot make it on this date",
+			select_time: "Select a time for the event:"
 		},
 		date_format: 'MM/DD/YYYY',
 		time_format: 'MM/DD/YYYY h:mm A',

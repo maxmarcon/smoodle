@@ -158,9 +158,8 @@ defmodule Smoodle.Scheduler do
     is_owner = opts[:is_owner]
     limit = opts[:limit]
 
-    tomorrow = Date.add(Date.utc_today, 1)
-    start_date = case Date.compare(tomorrow, event.time_window_from) do
-      :gt -> tomorrow
+    start_date = case Date.compare(Date.utc_today, event.time_window_from) do
+      :gt -> Date.utc_today
       _ -> event.time_window_from
     end
 

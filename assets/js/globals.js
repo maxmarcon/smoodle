@@ -248,7 +248,7 @@ export const eventHelpersMixin = {
 			return dateFns.format(this.eventScheduledFrom, this.$i18n.t('time_format'), {locale: this.$i18n.t('date_fns_locale')});
 		},
 		minDate() {
-			return dateFns.parse(this.eventTimeWindowFrom);
+			return dateFns.max(dateFns.parse(this.eventTimeWindowFrom), new Date());
 		},
 		maxDate() {
 			return dateFns.parse(this.eventTimeWindowTo);
@@ -260,6 +260,7 @@ export const colorCodes = {
 	green: '#28a745',
 	red: '#dc3545',
 	yellow: '#ffc107',
-	white: '#ffffff',
-	black: '#000000'
+	white: '#f8f9fa',
+	black: '#000000',
+	info: '#17a2b8'
 }

@@ -2,6 +2,7 @@
 import EventEditor from './vue/eventEditor.vue'
 import PollEditor from './vue/pollEditor.vue'
 import EventViewer from './vue/eventViewer.vue'
+import datePicker from 'vue-bootstrap-datetimepicker';
 import VueRouter from 'vue-router'
 import VueI18n from 'vue-i18n'
 import BootstrapVue from 'bootstrap-vue'
@@ -87,6 +88,8 @@ Vue.use(VueScrollTo);
 Vue.use(VCalendar, {
 	locale: smoodle_locale
 });
+
+Vue.use(datePicker);
 
 import rootVue from './vue/root.vue'
 const app = new Vue({

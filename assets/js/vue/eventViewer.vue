@@ -64,7 +64,17 @@
 			:title="$t('event_viewer.schedule_event')"
 			:ok-title="$t('event_viewer.schedule_event')"
 			:cancel-title="$t('actions.cancel')"
+			@ok="scheduleEvent"
 		)
+			.alert.alert-danger(v-if="selectedDateAttribute && selectedDateAttribute.customData.negative_rank < 0")
+				| {{ $tc('event_viewer.warning_bad_date', -selectedDateAttribute.customData.negative_rank, {participants: -selectedDateAttribute.customData.negative_rank}) }}
+			.d-flex.justify-content-center
+				label {{ $t('event_viewer.select_time') }}
+			.d-flex.justify-content-center
+				date-picker(
+					v-model="selectedTime"
+					:config="{format: 'HH:mm', inline: true}"
+				)
 
 		.card(v-if="eventName")
 			.card-header
@@ -124,6 +134,7 @@
 										:is-double-paned="true"
 										:theme-styles="{dayCellNotInMonth: {opacity: 0}}"
 										:select-attribute="selectedAttribute"
+										@dayclick="dayClicked"
 									)
 									v-calendar(
 										v-else
@@ -211,13 +222,15 @@ export default {
 		loaded: false,
 		requestOngoing: false,
 		selectedDate: null,
+		selectedTime: "19:30",
+		selectedDateAttribute: null,
 		selectedAttribute: {
-			contentStyle: () => ({
+			/*contentStyle: () => ({
 				backgroundColor: colorCodes.white,
-				border: '3px solid ' + colorCodes.green,
+				border: '3px solid ' + colorCodes.info,
 				color: 'black',
 				opacity: 1
-			}),
+			}),*/
 			popover: {
 				visibility: 'hidden'
 			}
@@ -264,6 +277,9 @@ export default {
 		}
 	},
 	methods: {
+		dayClicked({attributes}) {
+			this.selectedDateAttribute = (attributes.length > 0 ? attributes[0] : null);
+		},
 		opacityForDate(date_entry, minNegativeRank, maxPositiveRank) {
 			return (date_entry.negative_rank < 0
 				? date_entry.negative_rank / minNegativeRank
@@ -354,6 +370,11 @@ export default {
 				self.$refs.eventCancelErrorModal.show();
 				throw error;
 			});
+		},
+		scheduleEvent() {
+			let [hours, minutes] = this.selectedTime.split(':');
+			this.selectedDate = dateFns.setHours(this.selectedDate, hours);
+			this.selectedDate = dateFns.setMinutes(this.selectedDate, minutes);
 		}
 	}
 }

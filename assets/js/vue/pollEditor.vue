@@ -301,7 +301,7 @@ export default {
 			this.clearSelectedDates();
 		},
 		dayClicked(day) {
-			if (!this.selectedDateRank) {
+			if (!this.selectedDateRank) { // we are deleting dates
 				let self = this;
 				day.attributes.forEach(attr => {
 					let index = self.datePickerAttributes.findIndex(el => el.key == attr.key);
