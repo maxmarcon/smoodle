@@ -1,8 +1,8 @@
 <template lang="pug">
 	div
 		.d-flex.justify-content-between
-			h5.card-title {{ name || $t('event_header.no_name') }}
-			small {{ organizer ? $t('event_header.by', {organizer: organizer}) : '' }}
+			h5.card-title {{ eventName || $t('event_header.no_name') }}
+			small {{ eventOrganizer ? $t('event_header.by', {organizer: eventOrganizer }) : '' }}
 		.d-flex.justify-content-between
 			h6.card-subtitle {{ stateDesc }}
 </template>
@@ -12,8 +12,8 @@ import { eventHelpersMixin } from '../globals'
 export default {
 	mixins: [eventHelpersMixin],
 	props: {
-		name: String,
-		organizer: String,
+		eventName: String,
+		eventOrganizer: String,
 		eventTimeWindowFrom: [String, Date],
 		eventTimeWindowTo: [String, Date],
 		eventScheduledFrom: [String, Date],

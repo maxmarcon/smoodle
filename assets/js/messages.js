@@ -85,8 +85,8 @@ export default {
 			event_open_organizer: "{calendar_icon} You haven't scheduled the event yet. Below are the candidate dates so far, based on the answers from {participants}.",
 			event_canceled: "This event has been canceled",
 			event_canceled_organizer: "You canceled this event",
-			event_scheduled: "{organizer} has scheduled this event to happen on {time}",
-			event_scheduled_organizer: "You have scheduled this event to happen on {time}",
+			event_scheduled: "{organizer} has scheduled this event to happen on: {datetime}",
+			event_scheduled_organizer: "You have scheduled this event to happen on: {datetime}",
 			organizer_says: "{organizer} says:",
 			update: {
 				title: "Update your answer",

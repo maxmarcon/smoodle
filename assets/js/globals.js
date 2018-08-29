@@ -178,12 +178,10 @@ export const scrollToTopMixin = {
 }
 
 export const restMixin = {
-	data() {
-		return {
-			requestOngoing: false,
-			apiVersion: 'v1'
-		};
-	},
+	data: () => ({
+		requestOngoing: false,
+		apiVersion: 'v1'
+	}),
 	methods: {
 		restRequest(path, config) {
 			config = Object.assign({
@@ -226,6 +224,48 @@ export const restMixin = {
 			}).finally(function() {
 				self.requestOngoing = false;
 			});
+		}
+	}
+}
+
+export const eventDataMixin = {
+	data: () => ({
+		eventName: null,
+		eventOrganizer: null,
+		evendDesc: null,
+		eventState: null,
+		eventShareLink: null,
+		eventTimeWindowFrom: null,
+		eventTimeWindowTo: null,
+		eventScheduledFrom: null,
+		eventScheduledTo: null
+	}),
+	methods: {
+		assignEventData(eventData) {
+			this.eventName = eventData.name;
+			this.eventOrganizer = eventData.organizer;
+			this.eventDesc = eventData.desc;
+			this.eventTimeWindowFrom = eventData.time_window_from;
+			this.eventTimeWindowTo = eventData.time_window_to;
+			this.eventState = eventData.state;
+			this.eventScheduledFrom = eventData.scheduled_from;
+			this.eventScheduledTo = eventData.scheduled_to;
+			this.eventShareLink = eventData.share_link;
+		}
+	},
+	computed: {
+		eventData() {
+			return {
+				eventName: this.eventName,
+				eventOrganizer: this.eventOrganizer,
+				eventDesc: this.eventDesc,
+				eventTimeWindowFrom: this.eventTimeWindowFrom,
+				eventTimeWindowTo: this.eventTimeWindowTo,
+				eventState: this.eventState,
+				eventScheduledFrom: this.eventScheduledFrom,
+				eventScheduledTo: this.eventScheduledTo,
+				eventShareLink: this.eventShareLink
+			}
 		}
 	}
 }

@@ -40,14 +40,10 @@
 		)
 			p {{ $t('poll_editor.poll_delete_error') }}
 
-		.card(v-if="eventName")
+		.card(v-if="eventOpen")
 			.card-header
 				event-header(
-					:name="eventName"
-					:organizer="eventOrganizer"
-					:eventTimeWindowFrom="eventTimeWindowFrom"
-					:eventTimeWindowTo="eventTimeWindowTo"
-					eventState="OPEN"
+					v-bind="eventData"
 				)
 			.card-body
 				.alert.alert-info(v-if="pollId")
@@ -190,11 +186,11 @@
 </template>
 <script>
 import { showToolTip, accordionGroupsMixin,
-	restMixin, colorCodes, eventHelpersMixin, scrollToTopMixin} from '../globals'
+	restMixin, colorCodes, eventHelpersMixin, eventDataMixin, scrollToTopMixin} from '../globals'
 import dateFns from 'date-fns'
 
 export default {
-	mixins: [accordionGroupsMixin, restMixin, scrollToTopMixin, eventHelpersMixin],
+	mixins: [accordionGroupsMixin, restMixin, scrollToTopMixin, eventHelpersMixin, eventDataMixin],
 	props: {
 		eventId: String,
 		pollId: String
@@ -229,11 +225,6 @@ export default {
 				'weekday-ranker-group': false,
 				'calendar-ranker-group': false
 			},
-			eventName: null,
-			eventOrganizer: null,
-			evendDesc: null,
-			eventTimeWindowFrom: null,
-			eventTimeWindowTo: null,
 			pollWeekdayRanks: null,
 			pollParticipant: null,
 			pollParticipantError: null,
@@ -266,15 +257,15 @@ export default {
 			.then(function(response) {
 				self.assignEventData(response.data.data);
 				self.assignPollData(null);
-				self.loaded = true;
-			});
+			})
+			.finally(function() { self.loaded = true; });
 		} else {
 			this.restRequest(['polls', this.pollId].join('/'))
 			.then(function(response) {
 				self.assignEventData(response.data.data.event);
 				self.assignPollData(response.data.data);
-				self.loaded = true;
-			});
+			})
+			.finally(function() { self.loaded = true; });
 			this.groupVisibility['participant-group'] = false;
 			this.groupVisibility['weekday-ranker-group'] = false;
 			this.groupVisibility['calendar-ranker-group'] = true;
@@ -311,13 +302,6 @@ export default {
 					}
 				});
 			}
-		},
-		assignEventData(eventData) {
-			this.eventName = eventData.name;
-			this.eventOrganizer = eventData.organizer;
-			this.eventDesc = eventData.desc;
-			this.eventTimeWindowFrom = eventData.time_window_from;
-			this.eventTimeWindowTo = eventData.time_window_to;
 		},
 		assignPollData(poll) {
 			this.pollWeekdayRanks = this.initialWeeklyRanks;

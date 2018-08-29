@@ -8,8 +8,8 @@
 		.card
 			.card-header
 				event-header#event-header(
-					:name="eventName"
-					:organizer="eventOrganizer"
+					:eventName="eventName"
+					:eventOrganizer="eventOrganizer"
 					:eventTimeWindowFrom="eventTimeWindowFrom"
 					:eventTimeWindowTo="eventTimeWindowTo"
 					eventState="OPEN"

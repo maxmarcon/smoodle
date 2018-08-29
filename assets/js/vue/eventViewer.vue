@@ -84,7 +84,7 @@
 			:title="$t('event_viewer.schedule_event')"
 			ok-only
 		)
-			p {{ $t('event_viewer.event_scheduled') }}
+			p {{ $t('event_viewer.event_scheduled_organizer', {datetime: eventScheduledDateTime}) }}
 
 		b-modal(ref="scheduleEventErrorModal"
 			:title="$t('errors.error')"
@@ -95,13 +95,7 @@
 		.card(v-if="eventName")
 			.card-header(:class="eventBackgroundClass")
 				event-header#event-header(
-					:name="eventName"
-					:organizer="eventOrganizer"
-					:eventTimeWindowFrom="eventTimeWindowFrom"
-					:eventTimeWindowTo="eventTimeWindowTo"
-					:eventScheduledFrom="eventScheduledFrom"
-					:eventScheduledTo="eventScheduledTo"
-					:eventState="eventState"
+					v-bind="eventData"
 				)
 			ul.list-group.list-group-flush
 				li.list-group-item
@@ -170,7 +164,7 @@
 								i.fas.fa-trophy.fa-lg(place="icon")
 					.alert.alert-success(v-else-if="eventScheduled")
 						i.fas.fa-handshake.fa-lg
-						| &nbsp; {{ $t(isOrganizer ? 'event_viewer.event_scheduled_organizer' : 'event_viewer.event_scheduled', {time: eventScheduledDateTime, organizer: eventOrganizer}) }}
+						| &nbsp; {{ $t(isOrganizer ? 'event_viewer.event_scheduled_organizer' : 'event_viewer.event_scheduled', {datetime: eventScheduledDateTime, organizer: eventOrganizer}) }}
 					.alert.alert-warning(v-else-if="eventCanceled")
 						i.fas.fa-ban.fa-lg
 						| &nbsp; {{ $t(isOrganizer ? 'event_viewer.event_canceled_organizer' : 'event_viewer.event_canceled') }}
@@ -208,13 +202,13 @@
 		)
 </template>
 <script>
-import { colorCodes, eventHelpersMixin, scrollToTopMixin, restMixin } from '../globals'
+import { colorCodes, eventHelpersMixin, eventDataMixin, scrollToTopMixin, restMixin } from '../globals'
 import dateFns from 'date-fns'
 
 const SCHEDULE_DATES_LIMIT = null;
 
 export default {
-	mixins: [restMixin, eventHelpersMixin, scrollToTopMixin],
+	mixins: [restMixin, eventHelpersMixin, eventDataMixin, scrollToTopMixin],
 	props: {
 		eventId: {
 			type: String,
@@ -223,15 +217,6 @@ export default {
 		secret: String
 	},
 	data: () => ({
-		eventName: null,
-		eventOrganizer: null,
-		evendDesc: null,
-		eventState: null,
-		eventShareLink: null,
-		eventTimeWindowFrom: null,
-		eventTimeWindowTo: null,
-		eventScheduledFrom: null,
-		eventScheduledTo: null,
 		eventScheduleDates: [],
 		eventScheduleParticipantsCount: 0,
 		eventScheduleParticipants: [],
@@ -264,7 +249,7 @@ export default {
 				self.eventScheduleParticipants = result.data.data.participants;
 				self.eventScheduleParticipantsCount = result.data.data.participants_count;
 			})
-		]).then(function() { self.loaded = true });
+		]).finally(function() { self.loaded = true });
 	},
 	computed: {
 		isOrganizer() {
@@ -345,17 +330,6 @@ export default {
 					}
 				});
 			}
-		},
-		assignEventData(eventData) {
-			this.eventName = eventData.name;
-			this.eventOrganizer = eventData.organizer;
-			this.eventDesc = eventData.desc;
-			this.eventTimeWindowFrom = eventData.time_window_from;
-			this.eventTimeWindowTo = eventData.time_window_to;
-			this.eventState = eventData.state;
-			this.eventScheduledFrom = eventData.scheduled_from;
-			this.eventScheduledTo = eventData.scheduled_to;
-			this.eventShareLink = eventData.share_link;
 		},
 		openEvent() {
 			let self = this;
