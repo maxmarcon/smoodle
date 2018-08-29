@@ -10,8 +10,9 @@
 				event-header#event-header(
 					:name="eventName"
 					:organizer="eventOrganizer"
-					:timeWindowFrom="eventTimeWindowFrom"
-					:timeWindowTo="eventTimeWindowTo"
+					:eventTimeWindowFrom="eventTimeWindowFrom"
+					:eventTimeWindowTo="eventTimeWindowTo"
+					eventState="OPEN"
 				)
 			.card-body
 				ul.list-group.list-group-flush(v-if="createdEvent")
@@ -163,7 +164,7 @@
 							role="button"
 							:to="{ name: 'event', params: {eventId: createdEvent.id}, query: {secret: createdEvent.secret}}"
 						)
-							i.fas.fa-question
+							i.fas.fa-key
 							| &nbsp; {{ $t('event_editor.manage_event') }}
 
 </template>

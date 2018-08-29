@@ -185,31 +185,42 @@ export const restMixin = {
 		};
 	},
 	methods: {
-		restRequest(path, config, scrollToTop = true) {
+		restRequest(path, config) {
+			config = Object.assign({
+				url: [null, this.apiVersion, path].join('/'),
+				headers: {
+					'Accept-Language': this.$i18n.locale
+				},
+				showErrors: true,
+				ignoreErrorCodes: [422]
+			}, config);
+
+			let scrollToTop = false;
 			let self = this;
 			self.requestOngoing = true;
 			return this.$http.request(
-				Object.assign({
-					url: [null, this.apiVersion, path].join('/'),
-					headers: {
-						'Accept-Language': this.$i18n.locale
-					}
-				}, config)
+				config
 			).catch(function(error) {
-				if (error.response) {
-					if (error.response.status == 404) {
-						self.$refs.errorBar.show(self.$i18n.t('errors.not_found'));
-					} else if (error.response.status != 422) {
-						self.$refs.errorBar.show(self.$i18n.t('errors.server'));
+				if (config.showErrors) {
+					if (error.response) {
+						if (!config.ignoreErrorCodes.includes(error.response.status)) {
+							if (error.response.status == 404) {
+								self.$refs.errorBar.show(self.$i18n.t('errors.not_found'));
+							} else {
+								self.$refs.errorBar.show(self.$i18n.t('errors.server', {code: error.response.status}));
+							}
+							scrollToTop = true;
+						}
+					} else if (error.request) {
+						self.$refs.errorBar.show(self.$i18n.t('errors.network'));
+						scrollToTop = true;
+					} else {
+						self.$refs.errorBar.show(self.$i18n.t('errors.generic', {message: error.message}));
+						scrollToTop = true;
 					}
-				} else if (error.request) {
-					self.$refs.errorBar.show(self.$i18n.t('errors.network'));
-				} else {
-					console.log(error);
-					scrollToTop = false;
-				}
-				if (self.$scrollTo && scrollToTop) {
-					self.$scrollTo('#app');
+					if (self.$scrollTo && scrollToTop) {
+						self.$scrollTo('#app');
+					}
 				}
 				throw error;
 			}).finally(function() {
@@ -219,22 +230,25 @@ export const restMixin = {
 	}
 }
 
-export const timeWindowMixin = {
+export const eventHelpersMixin = {
 	computed: {
-		timeWindow() {
-			let from = this.timeWindowFrom || this.eventTimeWindowFrom;
-			let to = this.timeWindowTo || this.eventTimeWindowTo;
+		eventTimeWindow() {
+			let from = this.eventTimeWindowFrom;
+			let to = this.eventTimeWindowTo;
+
 			if (from && to) {
 				return dateFns.format(from, this.$i18n.t('date_format'), {locale: this.$i18n.t('date_fns_locale')})
 				 + " - " +
 				 dateFns.format(to, this.$i18n.t('date_format'), {locale: this.$i18n.t('date_fns_locale')});
 			}
-		}
-	}
-}
+		},
+		eventScheduledDateTime() {
+			let time = this.eventScheduledFrom;
 
-export const eventHelpersMixin = {
-	computed: {
+			if (time) {
+				return dateFns.format(time, this.$i18n.t('datetime_format'), {locale: this.$i18n.t('date_fns_locale')});
+			}
+		},
 		eventCanceled() {
 			return this.eventState == "CANCELED";
 		},
@@ -252,6 +266,15 @@ export const eventHelpersMixin = {
 		},
 		maxDate() {
 			return dateFns.parse(this.eventTimeWindowTo);
+		},
+		eventBackgroundClass() {
+			if (this.eventOpen) {
+				return 'bg-light';
+			} else if (this.eventScheduled) {
+				return 'bg-success';
+			} else {
+				return 'bg-warning';
+			}
 		}
 	}
 }

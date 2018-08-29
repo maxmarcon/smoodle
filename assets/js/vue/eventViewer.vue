@@ -9,8 +9,8 @@
 			:cancel-disabled="requestOngoing"
 			@ok="loadPoll"
 		)
-			p.form-text {{ $t('event_viewer.update.how_to') }}
 			.form-group
+				label(for="pollParticipant") {{ $t('event_viewer.update.how_to') }}
 				input#pollParticipant.form-control(
 					v-model.trim="pollParticipant"
 					:class="{'is-invalid': pollParticipantError}"
@@ -64,34 +64,53 @@
 			:title="$t('event_viewer.schedule_event')"
 			:ok-title="$t('event_viewer.schedule_event')"
 			:cancel-title="$t('actions.cancel')"
+			:ok-disabled="requestOngoing"
 			@ok="scheduleEvent"
 		)
 			.alert.alert-danger(v-if="selectedDateAttribute && selectedDateAttribute.customData.negative_rank < 0")
 				| {{ $tc('event_viewer.warning_bad_date', -selectedDateAttribute.customData.negative_rank, {participants: -selectedDateAttribute.customData.negative_rank}) }}
-			.d-flex.justify-content-center
-				label {{ $t('event_viewer.select_time') }}
-			.d-flex.justify-content-center
-				date-picker(
-					v-model="selectedTime"
-					:config="{format: 'HH:mm', inline: true}"
-				)
+			.container
+				.row.justify-content-center
+					.col-6
+						.form-group
+							label(for="timePicker") {{ $t('event_viewer.select_time') }}
+							date-picker#timePicker(
+								v-model="selectedTime"
+								:config="timePickerOptions"
+							)
+
+		b-modal#scheduledEventModal(
+			ref="scheduledEventModal"
+			:title="$t('event_viewer.schedule_event')"
+			ok-only
+		)
+			p {{ $t('event_viewer.event_scheduled') }}
+
+		b-modal(ref="scheduleEventErrorModal"
+			:title="$t('errors.error')"
+			ok-only
+		)
+			p {{ $t('event_viewer.schedule_event_error') }}
 
 		.card(v-if="eventName")
-			.card-header
+			.card-header(:class="eventBackgroundClass")
 				event-header#event-header(
 					:name="eventName"
 					:organizer="eventOrganizer"
-					:timeWindowFrom="eventTimeWindowFrom"
-					:timeWindowTo="eventTimeWindowTo"
+					:eventTimeWindowFrom="eventTimeWindowFrom"
+					:eventTimeWindowTo="eventTimeWindowTo"
+					:eventScheduledFrom="eventScheduledFrom"
+					:eventScheduledTo="eventScheduledTo"
+					:eventState="eventState"
 				)
 			ul.list-group.list-group-flush
 				li.list-group-item
 					p
 						em.text-muted {{ isOrganizer ? $t('event_viewer.description') : $t('event_viewer.organizer_says', {organizer: eventOrganizer}) }} &nbsp;
 						| {{ eventDesc }}
-				li.list-group-item(v-if="isOrganizer && eventOpen")
+				li.list-group-item(v-if="isOrganizer && !eventCanceled")
 					.alert.alert-success
-						i.fas.fa-gamepad
+						i.fas.fa-key
 						| &nbsp; {{ $t('event_viewer.welcome_organizer', {organizer: eventOrganizer}) }}
 					.form-group.row.justify-content-center
 						label.col-md-auto.col-form-label {{ $t('event_viewer.share_link') }}
@@ -133,7 +152,6 @@
 										:max-date="maxDate"
 										:is-double-paned="true"
 										:theme-styles="{dayCellNotInMonth: {opacity: 0}}"
-										:select-attribute="selectedAttribute"
 										@dayclick="dayClicked"
 									)
 									v-calendar(
@@ -152,12 +170,12 @@
 								i.fas.fa-trophy.fa-lg(place="icon")
 					.alert.alert-success(v-else-if="eventScheduled")
 						i.fas.fa-handshake.fa-lg
-						| &nbsp;  {{ $t('event_viewer.event_scheduled', {time: eventScheduledTime, organizer: eventOrganizer}) }}
+						| &nbsp; {{ $t(isOrganizer ? 'event_viewer.event_scheduled_organizer' : 'event_viewer.event_scheduled', {time: eventScheduledDateTime, organizer: eventOrganizer}) }}
 					.alert.alert-warning(v-else-if="eventCanceled")
 						i.fas.fa-ban.fa-lg
 						| &nbsp; {{ $t(isOrganizer ? 'event_viewer.event_canceled_organizer' : 'event_viewer.event_canceled') }}
 
-			.card-footer
+			.card-footer(v-if="eventOpen || isOrganizer")
 				.row.justify-content-center
 					.col-auto.mt-1(v-if="eventOpen && isOrganizer")
 						button.btn.btn-primary(v-b-modal.scheduleEventModal="" :disabled="requestOngoing || !selectedDate")
@@ -167,7 +185,7 @@
 						button.btn.btn-warning(v-b-modal.cancelEventModal="" :disabled="requestOngoing")
 							i.fas.fa-ban
 							| &nbsp; {{ $t('event_viewer.cancel_event') }}
-					.col-auto.mt-1(v-if="eventCanceled && isOrganizer")
+					.col-auto.mt-1(v-if="!eventOpen && isOrganizer")
 						button.btn.btn-warning(@click="openEvent" :disabled="requestOngoing")
 							i.fas.fa-undo
 							| &nbsp; {{ $t('event_viewer.open_event') }}
@@ -190,13 +208,13 @@
 		)
 </template>
 <script>
-import { timeWindowMixin, colorCodes, eventHelpersMixin, scrollToTopMixin, restMixin } from '../globals'
+import { colorCodes, eventHelpersMixin, scrollToTopMixin, restMixin } from '../globals'
 import dateFns from 'date-fns'
 
 const SCHEDULE_DATES_LIMIT = null;
 
 export default {
-	mixins: [restMixin, timeWindowMixin, eventHelpersMixin, scrollToTopMixin],
+	mixins: [restMixin, eventHelpersMixin, scrollToTopMixin],
 	props: {
 		eventId: {
 			type: String,
@@ -213,6 +231,7 @@ export default {
 		eventTimeWindowFrom: null,
 		eventTimeWindowTo: null,
 		eventScheduledFrom: null,
+		eventScheduledTo: null,
 		eventScheduleDates: [],
 		eventScheduleParticipantsCount: 0,
 		eventScheduleParticipants: [],
@@ -224,15 +243,12 @@ export default {
 		selectedDate: null,
 		selectedTime: "19:30",
 		selectedDateAttribute: null,
-		selectedAttribute: {
-			/*contentStyle: () => ({
-				backgroundColor: colorCodes.white,
-				border: '3px solid ' + colorCodes.info,
-				color: 'black',
-				opacity: 1
-			}),*/
-			popover: {
-				visibility: 'hidden'
+		timePickerOptions: {
+			format: 'HH:mm',
+			inline: true,
+			icons: {
+				up: "fas fa-sort-up fa-2x",
+				down: "fas fa-sort-down fa-2x"
 			}
 		}
 	}),
@@ -346,7 +362,12 @@ export default {
 			this.restRequest(['events', this.eventId].join('/'), {
 				method: 'patch',
 				data: {
-					event: { state: "OPEN", secret: this.secret }
+					event: {
+						state: "OPEN",
+						secret: this.secret,
+						scheduled_from: null,
+						scheduled_to: null
+					}
 				}
 			}).then(function(result) {
 				self.assignEventData(result.data.data);
@@ -373,8 +394,32 @@ export default {
 		},
 		scheduleEvent() {
 			let [hours, minutes] = this.selectedTime.split(':');
-			this.selectedDate = dateFns.setHours(this.selectedDate, hours);
-			this.selectedDate = dateFns.setMinutes(this.selectedDate, minutes);
+			this.selectedDate = dateFns.setHours(
+				dateFns.setMinutes(this.selectedDate, minutes),
+				hours
+			);
+
+			let self = this;
+			this.restRequest(['events', this.eventId].join('/'), {
+				method: 'patch',
+				data: {
+					event: {
+						state: 'SCHEDULED',
+						secret: this.secret,
+						scheduled_from: dateFns.format(this.selectedDate, 'YYYY-MM-DD HH:mm:ss'),
+						scheduled_to: dateFns.format(
+							dateFns.addHours(this.selectedDate, 6),
+							'YYYY-MM-DD HH:mm:ss'
+						)
+					}
+				}
+			}).then(function(result) {
+				self.assignEventData(result.data.data);
+				self.$refs.scheduledEventModal.show();
+			}, function(error) {
+				self.$refs.scheduleEventErrorModal.show();
+				throw error;
+			});
 		}
 	}
 }

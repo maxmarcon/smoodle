@@ -2,20 +2,38 @@
 	div
 		.d-flex.justify-content-between
 			h5.card-title {{ name || $t('event_header.no_name') }}
-			small.text-muted {{ organizer ? $t('event_header.by', {organizer: organizer}) : '' }}
+			small {{ organizer ? $t('event_header.by', {organizer: organizer}) : '' }}
 		.d-flex.justify-content-between
-			h6.card-subtitle.text-muted {{ timeWindow || $t('event_header.no_dates') }}
+			h6.card-subtitle {{ stateDesc }}
 </template>
 <script>
-import { timeWindowMixin } from '../globals'
+import { eventHelpersMixin } from '../globals'
 
 export default {
-	mixins: [timeWindowMixin],
+	mixins: [eventHelpersMixin],
 	props: {
 		name: String,
 		organizer: String,
-		timeWindowFrom: [String, Date],
-		timeWindowTo: [String, Date]
+		eventTimeWindowFrom: [String, Date],
+		eventTimeWindowTo: [String, Date],
+		eventScheduledFrom: [String, Date],
+		eventScheduledTo: [String, Date],
+		eventState: String
+	},
+	computed: {
+		stateDesc() {
+			if (this.eventOpen) {
+				if (this.eventTimeWindow) {
+					return this.$i18n.t('event_header.open', {dates: this.eventTimeWindow});
+				} else {
+					return this.$i18n.t('event_header.no_dates');
+				}
+			} else if (this.eventScheduled) {
+				return this.$i18n.t('event_header.scheduled', {time: this.eventScheduledDateTime});
+			} else {
+				return this.$i18n.t('event_header.canceled');
+			}
+		}
 	}
 }
 

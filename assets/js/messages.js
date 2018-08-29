@@ -86,6 +86,7 @@ export default {
 			event_canceled: "This event has been canceled",
 			event_canceled_organizer: "You canceled this event",
 			event_scheduled: "{organizer} has scheduled this event to happen on {time}",
+			event_scheduled_organizer: "You have scheduled this event to happen on {time}",
 			organizer_says: "{organizer} says:",
 			update: {
 				title: "Update your answer",
@@ -109,11 +110,13 @@ export default {
 			positive_participants_list_date: "{participants} likes this date | {participants} like this date",
 			negative_participants_list_date: "{participants} can't make it | {participants} can't make it",
 			schedule_event: "Schedule event",
+			schedule_event_error: "An error has occurred, the event could not be scheduled",
 			warning_bad_date: "Warning! {participants} person can't make it on this date | Warning! {participants} people cannot make it on this date",
 			select_time: "Select a time for the event:"
 		},
 		date_format: 'MM/DD/YYYY',
-		time_format: 'MM/DD/YYYY h:mm A',
+		datetime_format: 'MM/DD/YYYY h:mm A',
+		time_format: 'h:mm A',
 		week_days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
 		ranker: {
 			good: "Good",
@@ -124,14 +127,18 @@ export default {
 		errors: {
 			required_field: "Can't be blank",
 			network: "The server is not responding or cannot be reached. Check your Internet connection.",
+			generic: "An error occurred while trying to contact the server: {message}",
 			not_found: "The requested data could not be found on the server",
-			server: "The server reported an error",
+			server: "The server reported a {code} error",
 			error: "Error"
 		},
 		event_header: {
 			by: "by {organizer}",
 			no_name: "No event name yet",
-			no_dates: "No dates yet"
+			no_dates: "No dates yet",
+			scheduled: "Happening on {time}",
+			open: "Sometime in {dates}",
+			canceled: "Event canceled"
 		},
 		actions: {
 			cancel: "Cancel",
@@ -159,6 +166,7 @@ export default {
 			step: "Schritt {step} von {lastStep}"
 		},
 		date_format: 'DD.MM.YYYY',
+		time_format: 'MM/DD/YYYY h:mm A',
 		week_days: ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'],
 		date_fns_locale: date_fns_de
 	},

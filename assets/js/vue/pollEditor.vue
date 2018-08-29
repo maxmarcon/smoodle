@@ -45,8 +45,9 @@
 				event-header(
 					:name="eventName"
 					:organizer="eventOrganizer"
-					:timeWindowFrom="eventTimeWindowFrom"
-					:timeWindowTo="eventTimeWindowTo"
+					:eventTimeWindowFrom="eventTimeWindowFrom"
+					:eventTimeWindowTo="eventTimeWindowTo"
+					eventState="OPEN"
 				)
 			.card-body
 				.alert.alert-info(v-if="pollId")
