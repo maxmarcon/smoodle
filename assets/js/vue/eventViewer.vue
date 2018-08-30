@@ -69,15 +69,15 @@
 		)
 			.alert.alert-danger(v-if="selectedDateAttribute && selectedDateAttribute.customData.negative_rank < 0")
 				| {{ $tc('event_viewer.warning_bad_date', -selectedDateAttribute.customData.negative_rank, {participants: -selectedDateAttribute.customData.negative_rank}) }}
-			.container
-				.row.justify-content-center
-					.col-6
-						.form-group
-							label(for="timePicker") {{ $t('event_viewer.select_time') }}
-							date-picker#timePicker(
-								v-model="selectedTime"
-								:config="timePickerOptions"
-							)
+			.alert.alert-info {{ $t('event_viewer.about_to_schedule', {date: selectedDateFormatted}) }}
+
+			.text-center
+				label(for="timePicker") {{ $t('event_viewer.select_time') }}
+			.d-flex.justify-content-center
+				date-picker#timePicker(
+					v-model="selectedTime"
+					:config="timePickerOptions"
+				)
 
 		b-modal#scheduledEventModal(
 			ref="scheduledEventModal"
@@ -135,27 +135,37 @@
 								i18n(path="event_viewer.event_open" :places="{participants: eventScheduleParticipantsCount}" v-else)
 									i.fas.fa-calendar-check.fa-lg(place="calendar_icon")
 							.row.justify-content-center
+								.col-md-3.order-md-last
+									.form-group
+										i18n.small.text-muted(
+											:path="isOrganizer ? 'event_viewer.date_selection_help_organizer' : 'event_viewer.date_selection_help'"
+											tag="p"
+										)
+											span.text-success(place="best") {{ $t('event_viewer.best') }}
+											span.text-danger(place="worst") {{ $t('event_viewer.worst') }}
+
 								.col-md-6.text-center
-									v-date-picker(
-										v-if="isOrganizer"
-										mode="single"
-										v-model="selectedDate"
-										:attributes="scheduleCalendarAttributes"
-										:is-inline="true"
-										:min-date="minDate"
-										:max-date="maxDate"
-										:is-double-paned="true"
-										:theme-styles="{dayCellNotInMonth: {opacity: 0}}"
-										@dayclick="dayClicked"
-									)
-									v-calendar(
-										v-else
-										:attributes="scheduleCalendarAttributes"
-										:min-date="minDate"
-										:max-date="maxDate"
-										:is-double-paned="true"
-										:theme-styles="{dayCellNotInMonth: {opacity: 0}}"
-									)
+									.form-group
+										v-date-picker(
+											v-if="isOrganizer"
+											mode="single"
+											v-model="selectedDate"
+											:attributes="scheduleCalendarAttributes"
+											:is-inline="true"
+											:min-date="minDate"
+											:max-date="maxDate"
+											:is-double-paned="true"
+											:theme-styles="{dayCellNotInMonth: {opacity: 0}}"
+											@dayclick="dayClicked"
+										)
+										v-calendar(
+											v-else
+											:attributes="scheduleCalendarAttributes"
+											:min-date="minDate"
+											:max-date="maxDate"
+											:is-double-paned="true"
+											:theme-styles="{dayCellNotInMonth: {opacity: 0}}"
+										)
 
 						div(v-else-if="loaded").alert.alert-primary(v-else)
 							i18n(path="event_viewer.no_participants_organizer" v-if="isOrganizer")
@@ -275,6 +285,9 @@ export default {
 				},
 				customData: date_entry
 			}));
+		},
+		selectedDateFormatted() {
+			return dateFns.format(this.selectedDate, this.$i18n.t('date_format'), {locale: this.$i18n.t('date_fns_locale')});
 		}
 	},
 	methods: {

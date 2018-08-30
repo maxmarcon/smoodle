@@ -66,7 +66,8 @@ export default {
 			weekday_ranker_help_modal_title: "Preferences for the days of the week",
 			weekday_ranker_help_modal_content: "Give us an idea of your typical week. For example, \
 			you might go to the gym every Wednesday and might want to mark it with {good}. On the other hand, a Friday might be a good day for this event\
-			and you might want to mark it with {ok}. Other days might be just ok, and you can leave them as {bad}."
+			and you might want to mark it with {ok}. Other days might be just ok, and you can leave them as {bad}.",
+			event_no_longer_open: "The event is no longer open."
 		},
 		event_viewer: {
 			organizer: "Organizer:",
@@ -110,9 +111,14 @@ export default {
 			positive_participants_list_date: "{participants} likes this date | {participants} like this date",
 			negative_participants_list_date: "{participants} can't make it | {participants} can't make it",
 			schedule_event: "Schedule event",
+			about_to_schedule: "You are about to schedule the event to happen on {date}",
 			schedule_event_error: "An error has occurred, the event could not be scheduled",
 			warning_bad_date: "Warning! {participants} person can't make it on this date | Warning! {participants} people cannot make it on this date",
-			select_time: "Select a time for the event:"
+			select_time: "Finally, select a time for the event:",
+			date_selection_help: "Dates are ranked from {best} to {worst}. Click or hover on a date to see how many can make it on that day.",
+			date_selection_help_organizer: "Dates are ranked from {best} to {worst}. Click or hover on a date to see who can make it on that day. To schedule the event, select a date first.",
+			best: "best",
+			worst: "worst"
 		},
 		date_format: 'MM/DD/YYYY',
 		datetime_format: 'MM/DD/YYYY h:mm A',

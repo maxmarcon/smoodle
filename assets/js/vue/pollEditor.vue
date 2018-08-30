@@ -40,7 +40,14 @@
 		)
 			p {{ $t('poll_editor.poll_delete_error') }}
 
-		.card(v-if="eventOpen")
+		b-modal(ref="eventNoLongerOpenModal"
+			:title="$t('poll_editor.event_no_longer_open')"
+			:ok-title="$t('poll_editor.back_to_event')"
+			ok-only
+			@ok="backToEvent"
+		)
+
+		.card(v-if="eventName")
 			.card-header
 				event-header(
 					v-bind="eventData"
@@ -52,6 +59,8 @@
 				.alert.alert-info(v-else)
 					i.fas.fa-edit
 					| &nbsp; {{ $t('poll_editor.welcome_new_participant') }}
+				.small.text-danger {{ eventError }}
+
 				div(v-if="eventId")
 					b-btn.btn-block.d-flex(
 							v-b-toggle.organizer-group=""
@@ -200,6 +209,10 @@ export default {
 			errorsMap: {
 				// maps, for each input group, the fields in the vue model to
 				// the error fields and the error keys received by the back end
+				'general': {
+					errorField: 'eventError',
+					errorKeys: 'event'
+				},
 				'participant-group': {
 					pollParticipant: {
 						required: true,
@@ -225,6 +238,7 @@ export default {
 				'weekday-ranker-group': false,
 				'calendar-ranker-group': false
 			},
+			eventError: null,
 			pollWeekdayRanks: null,
 			pollParticipant: null,
 			pollParticipantError: null,
@@ -258,6 +272,7 @@ export default {
 				self.assignEventData(response.data.data);
 				self.assignPollData(null);
 			})
+			.then(self.checkEventOpen)
 			.finally(function() { self.loaded = true; });
 		} else {
 			this.restRequest(['polls', this.pollId].join('/'))
@@ -265,6 +280,7 @@ export default {
 				self.assignEventData(response.data.data.event);
 				self.assignPollData(response.data.data);
 			})
+			.then(self.checkEventOpen)
 			.finally(function() { self.loaded = true; });
 			this.groupVisibility['participant-group'] = false;
 			this.groupVisibility['weekday-ranker-group'] = false;
@@ -272,6 +288,11 @@ export default {
 		}
 	},
 	methods: {
+		checkEventOpen() {
+			if (!this.eventOpen) {
+				this.$refs.eventNoLongerOpenModal.show();
+			}
+		},
 		clearSelectedDates() {
 			this.selectedDates = null;
 		},
@@ -341,13 +362,18 @@ export default {
 					}
 				}
 			).then(function(result) {
-				self.setServerErrors();
 				self.collapseAllGroups();
+				self.setServerErrors();
 				self.$refs.pollSavedModal.show();
 				self.wasServerValidated = true;
-			}, function(result) {
-				if (result.response && result.response.status == 422) {
-					self.setServerErrors(result.response.data.errors);
+			}, function(error) {
+				if (error.response && error.response.status == 422) {
+					self.setServerErrors(error.response.data.errors);
+					if (self.eventError) {
+						// not really checking for the errror, but so far this is the only possible
+						// cause for a global error
+						self.$refs.eventNoLongerOpenModal.show();
+					}
 					self.wasServerValidated = true;
 				} else {
 					throw error;

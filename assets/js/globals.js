@@ -147,18 +147,26 @@ export const accordionGroupsMixin = {
 			}
 		},
 		setServerErrors(errors={}) {
+			function setErrorField(fieldMap, errors) {
+				let errorKeys = fieldMap.errorKeys;
+				let errorField = fieldMap.errorField;
+				errorKeys = errorKeys instanceof Array ? errorKeys : [errorKeys];
+				let key_with_error = errorKeys.find(key => dotAccessObject(errors, key));
+				this[errorField] = (key_with_error ? stringifyServerError(dotAccessObject(errors, key_with_error)) : null);
+				return key_with_error;
+			}
+
 			let groupShownBecauseOfErrors = null;
 			for (let group in this.errorsMap) {
-				let fieldMap = this.errorsMap[group];
-				for (let field in fieldMap) {
-					let errorKeys = fieldMap[field].errorKeys;
-					let errorField = fieldMap[field].errorField;
-					errorKeys = errorKeys instanceof Array ? errorKeys : [errorKeys];
-					let key_with_error = errorKeys.find(key => dotAccessObject(errors, key));
-					this[errorField] = (key_with_error ? stringifyServerError(dotAccessObject(errors, key_with_error)) : null);
-					if (key_with_error && !groupShownBecauseOfErrors) {
-						this.groupVisibility[group] = true;
-						groupShownBecauseOfErrors = group;
+				if (group == 'general') {
+					setErrorField.call(this, this.errorsMap[group], errors);
+				} else {
+					let fieldMap = this.errorsMap[group];
+					for (let field in fieldMap) {
+						if (setErrorField.call(this, fieldMap[field], errors) && !groupShownBecauseOfErrors) {
+							this.groupVisibility[group] = true;
+							groupShownBecauseOfErrors = group;
+						}
 					}
 				}
 			}
