@@ -152,6 +152,7 @@
 											v-model="selectedDate"
 											:attributes="scheduleCalendarAttributes"
 											:is-inline="true"
+											:is-linked="true"
 											:min-date="minDate"
 											:max-date="maxDate"
 											:is-double-paned="true"
@@ -160,6 +161,7 @@
 										)
 										v-calendar(
 											v-else
+											:is-linked="true"
 											:attributes="scheduleCalendarAttributes"
 											:min-date="minDate"
 											:max-date="maxDate"
