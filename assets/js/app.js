@@ -22,24 +22,30 @@ const router = new VueRouter({
 	mode: 'history',
 	routes: [
 	  {
-	  	path: '/new_event',
+	  	path: '/events/new',
 	  	name: 'new_event',
 	  	component: EventEditor
 	  },
 	  {
-	  	path: '/event/:eventId',
+	  	path: '/events/:eventId/edit',
+	  	name: 'edit_event',
+	  	component: EventEditor,
+	  	props: (route) => Object.assign({secret: route.query.secret}, route.params)
+	  },
+	  {
+	  	path: '/events/:eventId',
 	  	name: 'event',
 	  	component: EventViewer,
 	  	props: (route) => Object.assign({secret: route.query.secret}, route.params)
 	  },
 	  {
-	  	path: '/event/:eventId/poll',
+	  	path: '/events/:eventId/polls/new',
 	  	name: 'new_poll',
 	  	component: PollEditor,
 			props: true
 	  },
 	  {
-	  	path: '/poll/:pollId',
+	  	path: '/polls/:pollId/edit',
 	  	name: 'edit_poll',
 	  	component: PollEditor,
 			props: true

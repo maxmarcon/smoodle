@@ -19,10 +19,11 @@ defmodule SmoodleWeb.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :welcome
-    get "/new_event", PageController, :new_event
-    get "/event/:event_id/poll", PageController, :poll
-    get "/event/:event_id", PageController, :event
-    get "/poll/:poll_id", PageController, :poll
+    get "/events/new", PageController, :event_new
+    get "/events/:event_id/edit", PageController, :event_edit
+    get "/events/:event_id/polls/new", PageController, :poll
+    get "/events/:event_id", PageController, :event
+    get "/polls/:poll_id/edit", PageController, :poll
   end
 
   scope "/v1", SmoodleWeb do
