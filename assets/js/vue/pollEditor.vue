@@ -41,11 +41,12 @@
 			p {{ $t('poll_editor.poll_delete_error') }}
 
 		b-modal(ref="eventNoLongerOpenModal"
-			:title="$t('poll_editor.event_no_longer_open')"
+			hide-header
 			:ok-title="$t('poll_editor.back_to_event')"
 			ok-only
 			@ok="backToEvent"
 		)
+			p {{ $t('poll_editor.event_no_longer_open') }}
 
 		.card(v-if="eventName")
 			.card-header
@@ -135,7 +136,7 @@
 							.col-md-6.text-center
 								.form-group
 									v-date-picker(
-										:mode="(selectedDateRank ? 'range' : 'single')"
+										:mode="(selectedDateRank && rangeModeSelected ? 'range' : 'single')"
 										v-model="selectedDates"
 										:min-date="minDate"
 										:max-date="maxDate"
@@ -170,6 +171,9 @@
 												i.icon.fas.fa-trash-alt(slot="extra")
 												i.icon.far.fa-trash-alt(slot="off-extra")
 												label(slot="off-label")
+										.form-check
+											p-check.p-switch.p-fill(v-model="rangeModeSelected" :disabled="!selectedDateRank")
+											| &nbsp; {{ $t('poll_editor.range') }}
 
 
 
@@ -248,6 +252,7 @@ export default {
 			loaded: false,
 			selectedDates: null,
 			selectedDateRank: 1,
+			rangeModeSelected: false,
 			datePickerAttributes: [],
 			datePickerAttributesKey: 0,
 			dragAttribute: {
@@ -415,8 +420,8 @@ export default {
 					weekday_ranks: this.pollWeekdayRanks.filter(weekday_rank => weekday_rank.rank) // exclude 0 ranks
 				},
 				date_ranks: this.datePickerAttributes.map(attr => ({
-					date_from: dateFns.format(attr.dates.start, 'YYYY-MM-DD'),
-					date_to: dateFns.format(attr.dates.end, 'YYYY-MM-DD'),
+					date_from: dateFns.format(attr.dates instanceof Date ? attr.dates : attr.dates.start, 'YYYY-MM-DD'),
+					date_to: dateFns.format(attr.dates instanceof Date ? attr.dates : attr.dates.end, 'YYYY-MM-DD'),
 					rank: attr.customData.rank
 				}))
 			}

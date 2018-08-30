@@ -6,7 +6,8 @@ export default {
 	en: {
 		event_editor: {
 			title: 'New event',
-			welcome: 'Hello! Here you can create a new event and share it with participants',
+			welcome: 'Hello! Here you can create a new event and share it with participants.',
+			welcome_again: 'Hello {organizer}! You can edit your event details here.',
 			event: {
 				name: "Event title",
 				name_help: "Enter a name for your event",
@@ -36,7 +37,10 @@ export default {
 			manage_event: "Manage event",
 			create_event: "Create event",
 			poll_event: "Enter your availability",
-			dates_placeholder: "Select a date range"
+			dates_placeholder: "Select a date range",
+			back_to_event: "Back to the event",
+			update_event: "Update event",
+			event_updated: "The event details have been updated"
 		},
 		poll_editor: {
 			welcome: "Hey {participant}, here you can update your poll for ths event.",
@@ -61,13 +65,14 @@ export default {
 			date_ranker_helper: "Select specific date ranges that are good {good} or bad {bad} for the event. This takes precedence over the preferences you expressed for the week days. {help}.",
 			date_ranker_help_modal_title: "Adding and removing dates",
 			date_ranker_help_modal_content: "First choose whether you are adding dates that are good {good} or bad {bad}.\
-			Then, to add a date range, click on the first date, then on the second one. To select a single date, click twice on it.\
+			Then add the dates, either as single dates or date ranges.\
 			To remove dates, first select {trash} and then click on them.",
 			weekday_ranker_help_modal_title: "Preferences for the days of the week",
 			weekday_ranker_help_modal_content: "Give us an idea of your typical week. For example, \
 			you might go to the gym every Wednesday and might want to mark it with {good}. On the other hand, a Friday might be a good day for this event\
 			and you might want to mark it with {ok}. Other days might be just ok, and you can leave them as {bad}.",
-			event_no_longer_open: "The event is no longer open."
+			event_no_longer_open: "The event is no longer open.",
+			range: "Range"
 		},
 		event_viewer: {
 			organizer: "Organizer:",
@@ -118,7 +123,8 @@ export default {
 			date_selection_help: "Dates are ranked from {best} to {worst}. Click or hover on a date to see how many can make it on that day.",
 			date_selection_help_organizer: "Dates are ranked from {best} to {worst}. Click or hover on a date to see who can make it on that day. To schedule the event, select a date first.",
 			best: "best",
-			worst: "worst"
+			worst: "worst",
+			edit_event: "Edit event"
 		},
 		date_format: 'MM/DD/YYYY',
 		datetime_format: 'MM/DD/YYYY h:mm A',

@@ -240,6 +240,7 @@ export const eventDataMixin = {
 	data: () => ({
 		eventName: null,
 		eventOrganizer: null,
+		eventOrganizerEmail: null,
 		evendDesc: null,
 		eventState: null,
 		eventShareLink: null,
@@ -252,12 +253,13 @@ export const eventDataMixin = {
 		assignEventData(eventData) {
 			this.eventName = eventData.name;
 			this.eventOrganizer = eventData.organizer;
+			this.eventOrganizerEmail = eventData.email;
 			this.eventDesc = eventData.desc;
-			this.eventTimeWindowFrom = eventData.time_window_from;
-			this.eventTimeWindowTo = eventData.time_window_to;
+			this.eventTimeWindowFrom = dateFns.parse(eventData.time_window_from);
+			this.eventTimeWindowTo = dateFns.parse(eventData.time_window_to);
 			this.eventState = eventData.state;
-			this.eventScheduledFrom = eventData.scheduled_from;
-			this.eventScheduledTo = eventData.scheduled_to;
+			this.eventScheduledFrom = dateFns.parse(eventData.scheduled_from);
+			this.eventScheduledTo = dateFns.parse(eventData.scheduled_to);
 			this.eventShareLink = eventData.share_link;
 		}
 	},
@@ -266,6 +268,7 @@ export const eventDataMixin = {
 			return {
 				eventName: this.eventName,
 				eventOrganizer: this.eventOrganizer,
+				eventOrganizerEmail: this.eventOrganizerEmail,
 				eventDesc: this.eventDesc,
 				eventTimeWindowFrom: this.eventTimeWindowFrom,
 				eventTimeWindowTo: this.eventTimeWindowTo,
@@ -310,7 +313,7 @@ export const eventHelpersMixin = {
 			return dateFns.format(this.eventScheduledFrom, this.$i18n.t('time_format'), {locale: this.$i18n.t('date_fns_locale')});
 		},
 		minDate() {
-			return dateFns.max(dateFns.parse(this.eventTimeWindowFrom), new Date());
+			return dateFns.max(dateFns.parse(this.eventTimeWindowFrom), dateFns.startOfTomorrow());
 		},
 		maxDate() {
 			return dateFns.parse(this.eventTimeWindowTo);

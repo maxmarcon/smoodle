@@ -186,6 +186,13 @@
 							i.fas.fa-clock
 							| &nbsp; {{ $t('event_viewer.schedule_event') }}
 					.col-auto.mt-1(v-if="eventOpen && isOrganizer")
+						router-link.btn.btn-success(
+							role="button"
+							:to="{ name: 'edit_event', params: {eventId: eventId, secret: secret} }"
+						)
+							i.fas.fa-edit
+							| &nbsp; {{ $t('event_viewer.edit_event') }}
+					.col-auto.mt-1(v-if="eventOpen && isOrganizer")
 						button.btn.btn-warning(v-b-modal.cancelEventModal="" :disabled="requestOngoing")
 							i.fas.fa-ban
 							| &nbsp; {{ $t('event_viewer.cancel_event') }}
