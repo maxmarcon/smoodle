@@ -12,9 +12,9 @@
 
 		b-modal#weekdayRankerHelpModal(ok-only :title="$t('poll_editor.weekday_ranker_help_modal_title')")
 			i18n(path="poll_editor.weekday_ranker_help_modal_content" tag="p")
-				i.fas.fa-thumbs-down.text-danger(place="good")
-				i.fas.fa-heart.text-success(place="ok")
-				i.fas.fa-thumbs-up.text-warning(place="bad")
+				i.fas.fa-thumbs-up.text-success(place="good")
+				i.fas.fa-circle.text-warning(place="ok")
+				i.fas.fa-thumbs-down.text-danger(place="bad")
 
 		b-modal#pollDeleteModal(
 			:title="$t('poll_editor.delete_poll')"
@@ -103,8 +103,8 @@
 				)
 					b-card
 						i18n.small.text-muted(path="poll_editor.weekday_ranker_help" tag="p")
-							i.fas.fa-heart.text-success(place="good")
-							i.fas.fa-thumbs-up.text-warning(place="ok")
+							i.fas.fa-thumbs-up.text-success(place="good")
+							i.fas.fa-circle.text-warning(place="ok")
 							i.fas.fa-thumbs-down.text-danger(place="bad")
 							a(v-b-modal.weekdayRankerHelpModal="" place="help" href="#") {{ $t('actions.tell_me_more')}}
 						ranker(:elements="pollWeekdayRanks")

@@ -8,6 +8,12 @@ defmodule Smoodle.Scheduler.Poll do
   import SmoodleWeb.Gettext
   import Smoodle.Scheduler.Utils
 
+  defimpl String.Chars, for: Smoodle.Scheduler.Poll do
+    def to_string(poll) do
+      "id:#{poll.id} participant:#{poll.participant} event_id:#{poll.event_id}"
+    end
+  end
+
   @primary_key {:id, :binary_id, autogenerate: true}
 
   schema "polls" do
