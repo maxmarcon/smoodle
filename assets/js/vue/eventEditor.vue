@@ -176,7 +176,7 @@
 					.col-auto.mt-1
 						router-link.btn.btn-success(
 							role="button"
-							:to="{ name: 'event', params: {eventId: createdEvent.id}, query: {secret: createdEvent.secret}}"
+							:to="{ name: 'event', params: {eventId: createdEvent.id, secret: createdEvent.secret}}"
 						)
 							i.fas.fa-key
 							| &nbsp; {{ $t('event_editor.manage_event') }}

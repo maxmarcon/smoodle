@@ -28,7 +28,7 @@ defmodule SmoodleWeb.EventView do
   end
 
   def owner_link(event) do
-    page_url(SmoodleWeb.Endpoint, :event, event.id, secret: event.secret)
+    page_url(SmoodleWeb.Endpoint, :event, event.id, s: event.secret)
   end
 
   def share_link(event) do

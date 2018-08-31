@@ -16,7 +16,7 @@
   end
 
   @primary_key {:id, :binary_id, autogenerate: true}
-  @secret_len 16
+  @secret_len 8
   @valid_states ["OPEN", "SCHEDULED", "CANCELED"]
 
   schema "events" do

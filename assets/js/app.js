@@ -30,13 +30,13 @@ const router = new VueRouter({
 	  	path: '/events/:eventId/edit',
 	  	name: 'edit_event',
 	  	component: EventEditor,
-	  	props: (route) => Object.assign({secret: route.query.secret}, route.params)
+	  	props: (route) => Object.assign({secret: route.query.s}, route.params)
 	  },
 	  {
 	  	path: '/events/:eventId',
 	  	name: 'event',
 	  	component: EventViewer,
-	  	props: (route) => Object.assign({secret: route.query.secret}, route.params)
+	  	props: (route) => Object.assign({secret: route.query.s}, route.params)
 	  },
 	  {
 	  	path: '/events/:eventId/polls/new',
