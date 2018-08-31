@@ -276,7 +276,19 @@ export const eventDataMixin = {
 				eventScheduledFrom: this.eventScheduledFrom,
 				eventScheduledTo: this.eventScheduledTo,
 				eventShareLink: this.eventShareLink
-			}
+			};
+		},
+		eventDataForRequest() {
+			let data = {
+				name: this.eventName,
+				desc: this.eventDesc,
+				organizer: this.eventOrganizer,
+				time_window_from: this.eventTimeWindowFrom && dateFns.format(this.eventTimeWindowFrom, 'YYYY-MM-DD'),
+				time_window_to: this.eventTimeWindowTo && dateFns.format(this.eventTimeWindowTo, 'YYYY-MM-DD'),
+				email: this.eventOrganizerEmail
+			};
+			Object.keys(data).forEach((k) => data[k] == null && delete data[k]);
+			return data;
 		}
 	}
 }
@@ -317,6 +329,9 @@ export const eventHelpersMixin = {
 		},
 		maxDate() {
 			return dateFns.parse(this.eventTimeWindowTo);
+		},
+		differentMonths() {
+			return dateFns.differenceInCalendarMonths(this.maxDate, this.minDate) > 0;
 		},
 		eventBackgroundClass() {
 			if (this.eventOpen) {

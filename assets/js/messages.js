@@ -4,6 +4,7 @@ import date_fns_it from 'date-fns/locale/it'
 
 export default {
 	en: {
+		app_name: "Lets meet!",
 		event_editor: {
 			title: 'New event',
 			welcome: 'Hello! Here you can create a new event and share it with participants.',

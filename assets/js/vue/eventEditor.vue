@@ -7,7 +7,7 @@
 			p {{ $t('event_editor.event_created_short') }}
 		b-modal(ref="eventUpdatedModal" hide-header ok-only :ok-title="$t('event_editor.back_to_event')" @ok="backToEvent")
 			p {{ $t('event_editor.event_updated') }}
-		.card(v-if="(eventId && eventOrganizerEmail) || !eventId")
+		.card(v-if="!eventId || loadedSuccessfully")
 			.card-header
 				event-header#event-header(
 					:eventName="eventName"
@@ -144,6 +144,7 @@
 										mode="range"
 										:is-linked="true"
 										v-model="eventTimeWindow"
+										nav-visibility="hidden"
 										:min-date="today"
 										:input-props="{readonly: true, placeholder: $t('event_editor.dates_placeholder'), class: [ 'form-control', inputFieldClass('eventTimeWindow') ]}"
 										:is-double-paned="true"
@@ -164,10 +165,10 @@
 			.card-footer
 				.row.justify-content-center(v-if="!createdEvent")
 					.col-auto
-						button.btn.btn-primary(v-if="!eventId" @click="createEvent" :disabled="requestOngoing")
+						button.btn.btn-primary(v-if="!eventId" @click="saveEvent" :disabled="requestOngoing")
 							i.fas.fa-plus
 							| &nbsp; {{ $t('event_editor.create_event') }}
-						button.btn.btn-primary(v-else @click="updateEvent" :disabled="requestOngoing")
+						button.btn.btn-primary(v-else @click="saveEvent" :disabled="requestOngoing")
 							i.fas.fa-save
 							| &nbsp; {{ $t('event_editor.update_event') }}
 
@@ -252,6 +253,7 @@ export default {
 		eventTimeWindowError: null,
 		requestOngoing: false,
 		today,
+		loadedSuccessfully: false,
 		loaded: false,
 		showThisWeekButton: (dateFns.getDay(today) > 0 && dateFns.getDay(today) < 4), // betewn Mon and Wed
 		createdEvent: null/*{
@@ -270,21 +272,10 @@ export default {
 	 		this.restRequest(['events', this.eventId].join('/'), { params: {secret: this.secret} }).then(function(result) {
 				self.assignEventData(result.data.data);
 				self.applyDates(self.eventTimeWindowFrom, self.eventTimeWindowTo, true);
-			}).finally(function() { self.loaded = true; });
+				self.loadedSuccessfully = true;
+			}).finally(function() { self.loaded = true; })
 	 	}
  	},
-	computed: {
-		eventData() {
-			return {
-				name: this.eventName,
-				desc: this.eventDesc,
-				organizer: this.eventOrganizer,
-				time_window_from: this.eventTimeWindowFrom && dateFns.format(this.eventTimeWindowFrom, 'YYYY-MM-DD'),
-				time_window_to: this.eventTimeWindowTo && dateFns.format(this.eventTimeWindowTo, 'YYYY-MM-DD'),
-				email: this.eventOrganizerEmail
-			};
-		}
-	},
 	methods: {
 		datesSelected() {
 			this.eventTimeWindowFrom = this.eventTimeWindow.start;
@@ -319,42 +310,32 @@ export default {
 		pickNextMonths(months) {
 			this.applyDates(today, dateFns.addMonths(today,months));
 		},
-		createEvent() {
+		saveEvent() {
 			let self = this;
-			this.restRequest("events", {
-				data: {
-					event: self.eventData
-				},
-				method: 'post'
+			let dataForRequest = self.eventDataForRequest;
+			if (self.eventId) {
+				/// updating, let us not resent email or organizer
+				delete dataForRequest['organizer'];
+				delete dataForRequest['email'];
+			}
+			this.restRequest(
+				(this.eventId ? ["events", this.eventId].join('/') : "events"),
+				{
+					data: {
+						event: Object.assign(dataForRequest, {secret: this.secret})
+					},
+					method: (this.eventId ? 'patch' : 'post')
 			}).then(function(result) {
 				self.setServerErrors();
-				self.createdEvent = result.data.data;
 				self.collapseAllGroups();
-				self.$refs.eventCreatedModal.show();
 				self.$scrollTo('#event-header');
 				self.wasServerValidated = true;
-			}, function(error) {
-				if (error.response && error.response.status == 422) {
-					self.setServerErrors(error.response.data.errors);
-					self.wasServerValidated = true;
+				if (self.eventId) {
+					self.$refs.eventUpdatedModal.show();
 				} else {
-					throw error;
+					self.createdEvent = result.data.data;
+					self.$refs.eventCreatedModal.show();
 				}
-			});
-		},
-		updateEvent() {
-			let self = this;
-			this.restRequest(["events", this.eventId].join('/'), {
-				data: {
-					event: Object.assign(self.eventData, {secret: this.secret})
-				},
-				method: 'put'
-			}).then(function(result) {
-				self.setServerErrors();
-				self.collapseAllGroups();
-				self.$refs.eventUpdatedModal.show();
-				self.$scrollTo('#event-header');
-				self.wasServerValidated = true;
 			}, function(error) {
 				if (error.response && error.response.status == 422) {
 					self.setServerErrors(error.response.data.errors);

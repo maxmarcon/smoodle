@@ -14,7 +14,6 @@ config :smoodle, SmoodleWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "ynroQex1w7fNFgveammM2ftc9P4nvcOBJerr3w9leuhyI1/xajKt4Xi6da5afMeb",
   render_errors: [view: SmoodleWeb.ErrorView, accepts: ~w(html json), layout: {SmoodleWeb.LayoutView, "error.html"}],
-
   pubsub: [name: Smoodle.PubSub,
            adapter: Phoenix.PubSub.PG2]
 

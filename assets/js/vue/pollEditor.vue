@@ -48,7 +48,7 @@
 		)
 			p {{ $t('poll_editor.event_no_longer_open') }}
 
-		.card(v-if="eventName")
+		.card(v-if="loadedSuccessfully")
 			.card-header
 				event-header(
 					v-bind="eventData"
@@ -138,10 +138,11 @@
 									v-date-picker(
 										:mode="(selectedDateRank && rangeModeSelected ? 'range' : 'single')"
 										v-model="selectedDates"
+										nav-visibility="hidden"
 										:min-date="minDate"
 										:max-date="maxDate"
 										:is-inline="true"
-										:is-double-paned="true"
+										:is-double-paned="differentMonths"
 										:attributes="datePickerAttributes"
 										:tint-color="selectedDateRankColor"
 										:is-linked="true"
@@ -173,7 +174,7 @@
 												label(slot="off-label")
 										.form-check
 											p-check.p-switch.p-fill(v-model="rangeModeSelected" :disabled="!selectedDateRank")
-											| &nbsp; {{ $t('poll_editor.range') }}
+												span {{ $t('poll_editor.range') }}
 
 
 
@@ -250,6 +251,7 @@ export default {
 			pollDateRanksError: null,
 			requestOngoing: false,
 			loaded: false,
+			loadedSuccessfully: false,
 			selectedDates: null,
 			selectedDateRank: 1,
 			rangeModeSelected: false,
@@ -276,16 +278,18 @@ export default {
 			.then(function(response) {
 				self.assignEventData(response.data.data);
 				self.assignPollData(null);
+				self.checkEventOpen();
+				self.loadedSuccessfully = true;
 			})
-			.then(self.checkEventOpen)
 			.finally(function() { self.loaded = true; });
 		} else {
 			this.restRequest(['polls', this.pollId].join('/'))
 			.then(function(response) {
 				self.assignEventData(response.data.data.event);
 				self.assignPollData(response.data.data);
+				self.checkEventOpen();
+				self.loadedSuccessfully = true;
 			})
-			.then(self.checkEventOpen)
 			.finally(function() { self.loaded = true; });
 			this.groupVisibility['participant-group'] = false;
 			this.groupVisibility['weekday-ranker-group'] = false;
@@ -331,6 +335,16 @@ export default {
 		},
 		assignPollData(poll) {
 			this.pollWeekdayRanks = this.initialWeeklyRanks;
+			// this is to prevent date ranks that were entered when the event
+			// had a larger time window (which was then shrunk by the organizer)
+			// to show up
+			let excludeDates = [{
+					start: null,
+					end: dateFns.subDays(this.minDate, 1)
+				}, {
+					start: dateFns.addDays(this.maxDate, 1),
+					end: null
+			}];
 			if (poll) {
 				this.eventIdFromPoll = poll.event_id;
 				this.pollParticipant = poll.participant;
@@ -347,6 +361,7 @@ export default {
 						start: date_rank.date_from,
 						end: date_rank.date_to
 					},
+					excludeDates,
 					bar: {
 						backgroundColor: self.colorForRank(date_rank.rank)
 					},
@@ -363,7 +378,7 @@ export default {
 				{
 					method: (this.pollId ? 'put' : 'post'),
 					data: {
-						poll: this.pollData
+						poll: this.pollDataForRequest
 					}
 				}
 			).then(function(result) {
@@ -413,7 +428,7 @@ export default {
 		initialWeeklyRanks() {
 			return this.$i18n.t('week_days').map((day, index) => ({day: index, name: day, rank: 0}));
 		},
-		pollData() {
+		pollDataForRequest() {
 			return {
 				participant: this.pollParticipant,
 				preferences: {

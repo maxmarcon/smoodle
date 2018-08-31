@@ -1,7 +1,7 @@
 <template lang="pug">
 div
 	b-navbar(toggleable="md" type="dark" variant="info")
-		b-navbar-brand(href="#") Smoodle
+		b-navbar-brand(href="#") {{ $t('app_name') }}
 
 		b-navbar-toggle(target="nav_collapse")
 

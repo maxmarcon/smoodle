@@ -6,7 +6,7 @@ html(lang="en")
     meta(content="width=device-width, initial-scale=1" name="viewport")
     meta(content="" name="description")
     meta(content="" name="author")
-    title Phoenix
+    title = gettext "Lets meet!"
     link(rel="stylesheet" href=static_path(@conn, "/css/bundle.css"))
     = if @view_template == "app.html" do
       script =raw("var smoodle_locale = '#{Gettext.get_locale(SmoodleWeb.Gettext)}'")

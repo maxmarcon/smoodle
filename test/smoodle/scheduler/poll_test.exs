@@ -259,6 +259,7 @@ defmodule Smoodle.Scheduler.PollTest do
 
 		setup [:create_date_ranks]
 
+		@tag :skip
 		test "the poll is invalid", %{poll: poll, date_ranks: date_ranks} do
 
 			changeset = change(poll)

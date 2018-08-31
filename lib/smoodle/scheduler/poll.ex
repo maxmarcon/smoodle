@@ -32,7 +32,8 @@ defmodule Smoodle.Scheduler.Poll do
     |> cast_assoc(:date_ranks)
     |> cast_embed(:preferences, with: &preferences_changeset/2)
     |> validate_no_overlapping_date_ranks
-    |> validate_date_ranks_within_event_time_window
+    # removed to allow organizer to change event window without invalidating existing polls
+    #|> validate_date_ranks_within_event_time_window
     |> validate_length(:date_ranks, max: 100)
     |> assoc_constraint(:event)
     |> unique_constraint(:participant, name: :polls_event_id_participant_index)
@@ -58,7 +59,7 @@ defmodule Smoodle.Scheduler.Poll do
       end) do
       changeset
     else
-      add_error(changeset, :date_ranks, dgettext("errors", "dates cannot be outside of the event time_window"), validation: :date_ranks_outside_of_event_window)
+      add_error(changeset, :date_ranks, dgettext("errors", "dates cannot be outside of the event time window"), validation: :date_ranks_outside_of_event_window)
     end
   end
 

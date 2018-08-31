@@ -92,7 +92,7 @@
 		)
 			p {{ $t('event_viewer.schedule_event_error') }}
 
-		.card(v-if="eventName")
+		.card(v-if="loadedSuccessfully")
 			.card-header(:class="eventBackgroundClass")
 				event-header#event-header(
 					v-bind="eventData"
@@ -155,17 +155,19 @@
 											:is-linked="true"
 											:min-date="minDate"
 											:max-date="maxDate"
-											:is-double-paned="true"
+											:is-double-paned="differentMonths"
+											nav-visibility="hidden"
 											:theme-styles="{dayCellNotInMonth: {opacity: 0}}"
 											@dayclick="dayClicked"
 										)
 										v-calendar(
 											v-else
 											:is-linked="true"
+											nav-visibility="hidden"
 											:attributes="scheduleCalendarAttributes"
 											:min-date="minDate"
 											:max-date="maxDate"
-											:is-double-paned="true"
+											:is-double-paned="differentMonths"
 											:theme-styles="{dayCellNotInMonth: {opacity: 0}}"
 										)
 
@@ -243,6 +245,7 @@ export default {
 		pollParticipant: null,
 		pollParticipantError: null,
 		loaded: false,
+		loadedSuccessfully: false,
 		requestOngoing: false,
 		selectedDate: null,
 		selectedTime: "19:30",
@@ -268,7 +271,9 @@ export default {
 				self.eventScheduleParticipants = result.data.data.participants;
 				self.eventScheduleParticipantsCount = result.data.data.participants_count;
 			})
-		]).finally(function() { self.loaded = true });
+		])
+		.then(function() { self.loadedSuccessfully = true; })
+		.finally(function() { self.loaded = true });
 	},
 	computed: {
 		isOrganizer() {
