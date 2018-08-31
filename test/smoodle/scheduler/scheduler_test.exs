@@ -416,10 +416,9 @@ defmodule Smoodle.SchedulerTest do
       %{event: event, polls: [poll2, poll3, poll1]}
     end
 
-    test "get_best_schedule returns the best date at the head of the list", %{event: event, polls: polls} do
+    test "get_best_schedule returns the best date at the head of the list", %{event: event} do
       best_schedule = Scheduler.get_best_schedule(event)
       assert %{
-        participants: participants,
         dates: dates
       } = best_schedule
       [best_date | _] = dates

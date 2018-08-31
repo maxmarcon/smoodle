@@ -37,6 +37,7 @@ defmodule Smoodle.Mixfile do
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 3.2"},
       {:mariaex, ">= 0.0.0"},
+      {:postgrex, "~> 0.11"},
       {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},

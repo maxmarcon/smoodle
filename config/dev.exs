@@ -50,7 +50,13 @@ config :phoenix, :stacktrace_depth, 20
 
 # Configure your database
 config :smoodle, Smoodle.Repo,
-  adapter: Ecto.Adapters.MySQL,
+#  adapter: Ecto.Adapters.MySQL,
+#  username: "homestead",
+#  password: "secret",
+#  database: "smoodle_dev",
+#  hostname: "localhost",
+#  pool_size: 10
+  adapter: Ecto.Adapters.Postgres,
   username: "homestead",
   password: "secret",
   database: "smoodle_dev",

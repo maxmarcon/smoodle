@@ -5,7 +5,7 @@ defmodule Smoodle.Repo.Migrations.CreatePolls do
     create table(:polls, primary_key: false) do
       add :id, :uuid, primary_key: true
       add :participant, :string, null: false
-      add :preferences, :json
+      add :preferences, :map
       add :event_id, references(:events, on_delete: :delete_all, on_update: :update_all, type: :uuid), null: false
 
       timestamps()
