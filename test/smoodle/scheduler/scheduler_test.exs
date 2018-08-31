@@ -73,7 +73,7 @@ defmodule Smoodle.SchedulerTest do
     test "create_event/2 with valid data creates an event" do
       assert {:ok, %Event{} = event} = Scheduler.create_event(@event_valid_attrs_1)
       assert Map.take(event, [:name, :desc]) == Map.take(@event_valid_attrs_1, [:name, :desc])
-      assert String.length(event.secret) == 32
+      assert String.length(event.secret) == 16
       assert event.state == "OPEN"
       assert Repo.preload(Scheduler.get_event!(event.id), :polls) == event
     end

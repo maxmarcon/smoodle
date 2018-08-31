@@ -70,6 +70,7 @@ defmodule SmoodleWeb.EventControllerTest do
   describe "index" do
     setup :create_events
 
+    @tag :skip
     test "lists all events", %{conn: conn, events: events} do
       conn = get conn, event_path(conn, :index)
       assert length(json_response(conn, 200)["data"]) == 2

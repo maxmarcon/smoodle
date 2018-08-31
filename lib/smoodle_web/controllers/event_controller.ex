@@ -9,10 +9,10 @@ defmodule SmoodleWeb.EventController do
   require Logger
   action_fallback SmoodleWeb.FallbackController
 
-  def index(conn, _params) do
-    events = Scheduler.list_events()
-    render(conn, "index.json", events: events)
-  end
+  #def index(conn, _params) do
+  #  events = Scheduler.list_events()
+  #  render(conn, "index.json", events: events)
+  #end
 
   #def create(_, %{"event" => event_params, "dry_run" => true} = params) do
   #  case Scheduler.create_event(event_params, dry_run: true) do
@@ -33,7 +33,7 @@ defmodule SmoodleWeb.EventController do
       Email.new_event_email(event)
       |> Mailer.deliver_later
 
-      Logger.info "Created new event #{event}"
+      Logger.info "Created event: #{event}"
 
       conn
       |> put_status(:created)
@@ -56,6 +56,7 @@ defmodule SmoodleWeb.EventController do
     event = Scheduler.get_event!(id, secret)
 
     with {:ok, %Event{} = event} <- Scheduler.update_event(event, event_params) do
+      Logger.info "Updated event: #{event}"
       render(conn, "show.json", event: event)
     end
   end
@@ -63,7 +64,8 @@ defmodule SmoodleWeb.EventController do
   def delete(conn, %{"id" => id, "secret" => secret}) do
     event = Scheduler.get_event!(id, secret)
 
-    with {:ok, %Event{}} <- Scheduler.delete_event(event) do
+    with {:ok, %Event{} = event} <- Scheduler.delete_event(event) do
+      Logger.info "Deleted event: #{event}"
       send_resp(conn, :no_content, "")
     end
   end
