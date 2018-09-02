@@ -13,7 +13,8 @@ defmodule Smoodle.SchedulerTest do
     organizer: "The Hoff",
     time_window_from: "2117-03-01",
     time_window_to: "2117-06-01",
-    email: "bot1@fake.com"
+    email: "bot1@fake.com",
+    email_confirmation: "bot1@fake.com"
   }
   @event_valid_attrs_2 %{
     name: "Breakfast",
@@ -21,7 +22,8 @@ defmodule Smoodle.SchedulerTest do
     organizer: "The Hoff",
     time_window_from: "2118-01-01",
     time_window_to: "2118-06-01",
-    email: "bot2@fake.com"
+    email: "bot2@fake.com",
+    email_confirmation: "bot2@fake.com"
   }
 
   @event_update_attrs %{

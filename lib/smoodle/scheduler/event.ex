@@ -50,6 +50,7 @@
     |> validate_length(:desc, max: 250)
     |> validate_format(:email, ~r/.+@.+\..+/)
     |> validate_length(:email, max: 100)
+    |> validate_email_confirmation
     |> validate_window_defined([:scheduled_from, :scheduled_to], :scheduled)
     |> validate_window_consistent([:time_window_from, :time_window_to], :time_window, Date)
     |> validate_window_consistent([:scheduled_from, :scheduled_to], :scheduled)
@@ -65,6 +66,14 @@
   def changeset_insert(attrs) do
     changeset(%Event{}, attrs) |>
     change(%{secret: SecureRandom.urlsafe_base64(@secret_len)})
+  end
+
+  defp validate_email_confirmation(changeset) do
+    with {:ok, _} <- fetch_change(changeset, :email) do
+      validate_confirmation(changeset, :email, required: true)
+    else
+      _ -> changeset
+    end
   end
 
   defp validate_consistency(changeset) do

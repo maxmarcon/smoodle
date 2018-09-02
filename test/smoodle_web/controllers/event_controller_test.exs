@@ -11,7 +11,8 @@ defmodule SmoodleWeb.EventControllerTest do
     organizer: "The Hoff",
     time_window_from: "2117-03-01",
     time_window_to: "2117-06-01",
-    email: "bot@fake.com"
+    email: "bot@fake.com",
+    email_confirmation: "bot@fake.com"
   }
   @create_attrs_2 %{
     name: "Dinner",
@@ -19,7 +20,8 @@ defmodule SmoodleWeb.EventControllerTest do
     organizer: "The Hoff",
     time_window_from: "2117-04-01",
     time_window_to: "2117-08-20",
-    email: "bot@fake.com"
+    email: "bot@fake.com",
+    email_confirmation: "bot@fake.com"
   }
 
   defp rest_repr(%{ scheduled_from: scheduled_from, scheduled_to: scheduled_to }) do

@@ -10,7 +10,7 @@ export default {
 			welcome: 'Hello! Here you can create a new event and share it with participants.',
 			welcome_again: 'Hello {organizer}! You can edit your event details here.',
 			event: {
-				name: "Event title",
+				name: "Give the event a name",
 				name_help: "Enter a name for your event",
 				desc: "What is going to happen?",
 				desc_help: "Describe the event",
@@ -18,7 +18,8 @@ export default {
 				organizer: "Who are you?",
 				organizer_help: "Let your friends know who invitied them...",
 				organizer_email: "Please enter your email",
-				organizer_email_help: "We will use this email to send you a private link that you can use to manage the event"
+				organizer_email_help: "We will use this email to send you a private link that you can use to manage the event",
+				organizer_email_confirmation_help: "Please confirm your email here. Even the best make mistakes sometimes..."
 			},
 			general_info_group: 'What kind of event is it?',
 			dates_group: 'How soon should it happen?',
@@ -143,7 +144,8 @@ export default {
 			generic: "An error occurred while trying to contact the server: {message}",
 			not_found: "The requested data could not be found on the server",
 			server: "The server reported a {code} error",
-			error: "Error"
+			error: "Error",
+			confirmation_required: "Doesn't match..."
 		},
 		event_header: {
 			by: "by {organizer}",

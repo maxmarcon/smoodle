@@ -85,14 +85,36 @@ export const accordionGroupsMixin = {
 		wasLocalValidated: false
 	}),
 	methods: {
+		clearErrorFields() {
+			let self = this;
+			Object.values(this.errorsMap).forEach(function(fieldMap) {
+				for (let field in fieldMap) {
+					let fieldMapObj = fieldMap[field];
+					self[fieldMapObj.errorField] = null;
+				}
+			});
+		},
 		localValidation() {
-			self = this;
+			let self = this;
+			this.clearErrorFields();
 			Object.values(this.errorsMap).forEach(function(fieldMap) {
 				for (let field in fieldMap) {
 					let fieldMapObj = fieldMap[field];
 					let errorField = fieldMapObj.errorField;
+					if (self[errorField]) {
+						// was already set, don't overwrite
+						return;
+					}
+
 					if (fieldMapObj.required) {
-						self[errorField] = self[field] ? null : self.$i18n.t('errors.required_field');
+						self[errorField] = (self[field] ? null : self.$i18n.t('errors.required_field'));
+					}
+					if (fieldMapObj.confirmation) {
+						let confirmation_field = field + "_confirmation";
+						let confirmation_error_field = errorField + "_confirmation";
+						self[confirmation_error_field] = (
+							self[field] == self[confirmation_field] ? null : self.$i18n.t('errors.confirmation_required', {field: field})
+						);
 					}
 				}
 			});
@@ -229,6 +251,7 @@ export const eventDataMixin = {
 		eventName: null,
 		eventOrganizer: null,
 		eventOrganizerEmail: null,
+		eventOrganizerEmail_confirmation: null,
 		evendDesc: null,
 		eventState: null,
 		eventShareLink: null,
@@ -273,7 +296,8 @@ export const eventDataMixin = {
 				organizer: this.eventOrganizer,
 				time_window_from: this.eventTimeWindowFrom && dateFns.format(this.eventTimeWindowFrom, 'YYYY-MM-DD'),
 				time_window_to: this.eventTimeWindowTo && dateFns.format(this.eventTimeWindowTo, 'YYYY-MM-DD'),
-				email: this.eventOrganizerEmail
+				email: this.eventOrganizerEmail,
+				email_confirmation: this.eventOrganizerEmail_confirmation
 			};
 			Object.keys(data).forEach((k) => data[k] == null && delete data[k]);
 			return data;

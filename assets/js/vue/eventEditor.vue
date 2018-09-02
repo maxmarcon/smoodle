@@ -85,6 +85,17 @@
 									)
 									.invalid-feedback {{ eventOrganizerEmailError }}
 
+									small.form-text.text-muted {{ $t('event_editor.event.organizer_email_confirmation_help') }}
+									input#eventOrganizerEmailConfirmation.form-control(
+										v-model.trim="eventOrganizerEmail_confirmation"
+										@change="localValidation"
+										@blur="localValidation"
+										:disabled="createdEvent"
+										:class="inputFieldClass('eventOrganizerEmail_confirmation')"
+									)
+									.invalid-feedback {{ eventOrganizerEmailError_confirmation }}
+
+
 					b-btn.btn-block.d-flex.mt-2(
 						v-b-toggle.general-info-group=""
 						:variant="groupVariant('general-info-group')"
@@ -212,8 +223,14 @@ export default {
 				},
 				eventOrganizerEmail: {
 					required: true,
+					confirmation: true,
 					errorField: 'eventOrganizerEmailError',
 					errorKeys: 'email'
+				},
+				eventOrganizerEmail_confirmation: {
+					required: true,
+					errorField: 'eventOrganizerEmailError_confirmation',
+					errorKeys: 'email_confirmation'
 				}
 			},
 			'general-info-group': {
@@ -247,6 +264,8 @@ export default {
 		eventOrganizerError: null,
 		eventOrganizerEmail: null,
 		eventOrganizerEmailError: null,
+		eventOrganizerEmail_confirmation: null,
+		eventOrganizerEmailError_confirmation: null,
 		eventDesc: null,
 		eventDescError: null,
 		eventTimeWindow: null,

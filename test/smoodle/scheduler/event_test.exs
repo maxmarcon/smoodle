@@ -12,7 +12,8 @@ defmodule Smoodle.Scheduler.EventTest do
 		scheduled_from: "2118-02-05 19:00:00",
 		scheduled_to: "2118-02-05 23:00:00",
 		state: "SCHEDULED",
-		email: "bot@fake.com"
+		email: "bot@fake.com",
+		email_confirmation: "bot@fake.com"
 	}
 
 	@past_event %{
@@ -24,7 +25,8 @@ defmodule Smoodle.Scheduler.EventTest do
 		scheduled_from: "1118-02-05 19:00:00",
 		scheduled_to: "1118-02-05 23:00:00",
 		state: "SCHEDULED",
-		email: "bot@fake.com"
+		email: "bot@fake.com",
+		email_confirmation: "bot@fake.com"
 	}
 
 	test "changeset with valid attrs" do
@@ -70,13 +72,23 @@ defmodule Smoodle.Scheduler.EventTest do
 	end
 
 	test "changeset with invalid email" do
-		changeset = Event.changeset(%Event{}, Map.replace!(@valid_attrs, :email, "me@invaliddomain"))
+		changeset = Event.changeset(%Event{}, Map.replace!(@valid_attrs, :email, "me@invaliddomain") |> Map.replace(:email_confirmation, "me@invaliddomain"))
 		assert [email: {_,  [validation: :format]}] = changeset.errors
 	end
 
 	test "changeset without email" do
 		changeset = Event.changeset(%Event{}, Map.delete(@valid_attrs, :email))
-		assert [email: {_,  [validation: :required]}] = changeset.errors
+		assert Enum.any?(changeset.errors, &(match?({:email, {_,  [validation: :required]}}, &1)))
+	end
+
+	test "changeset without email confirmation" do
+		changeset = Event.changeset(%Event{}, Map.delete(@valid_attrs, :email_confirmation))
+		assert Enum.any?(changeset.errors, &(match?({:email_confirmation, {_,  [validation: :required]}}, &1)))
+	end
+
+	test "changeset with wrong email confirmation" do
+		changeset = Event.changeset(%Event{}, Map.replace!(@valid_attrs, :email_confirmation, "different@email.com"))
+		assert Enum.any?(changeset.errors, &(match?({:email_confirmation, {_,  [validation: :confirmation]}}, &1)))
 	end
 
 	test "changeset with invalid state" do

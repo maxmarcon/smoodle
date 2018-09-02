@@ -9,7 +9,8 @@ defmodule SmoodleWeb.PollControllerTest do
     organizer: "The Hoff",
     time_window_from: "2117-03-01",
     time_window_to: "2117-06-01",
-    email: "bot@fake.com"
+    email: "bot@fake.com",
+    email_confirmation: "bot@fake.com"
   }
 
   @poll_valid_attrs_1 %{
