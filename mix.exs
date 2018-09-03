@@ -20,7 +20,8 @@ defmodule Smoodle.Mixfile do
   def application do
     [
       mod: {Smoodle.Application, []},
-      extra_applications: [:logger, :runtime_tools, :dotenv, :bamboo]
+      extra_applications: [:logger, :runtime_tools, :dotenv, :bamboo],
+      included_applications: [:expug, :parse_trans]
     ]
   end
 
@@ -48,6 +49,7 @@ defmodule Smoodle.Mixfile do
       {:dotenv, "~> 3.0.0"},
       {:bamboo, "~> 0.7.0"},
       {:bamboo_mailjet, "~> 0.0.1"},
+      {:distillery, "~> 1.0.0"},
       {:mock, "~> 0.3.0", only: :test}
     ]
   end

@@ -15,11 +15,25 @@ use Mix.Config
 # which you typically run after static files are built.
 config :smoodle, SmoodleWeb.Endpoint,
   load_from_system_env: true,
-  url: [host: "example.com", port: 80],
-  cache_static_manifest: "priv/static/cache_manifest.json"
+  url: [host: "go.lets-meet.app", port: 80],
+  cache_static_manifest: "priv/static/cache_manifest.json",
+  secret_key_base: "${SECRET_KEY_BASE}",
+  server: true
 
 # Do not print debug messages in production
 config :logger, level: :info
+
+config :smoodle, Smoodle.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  url: "${DATABASE_URL}",
+  database: "",
+  ssl: true,
+  pool_size: 1 # Free tier db only allows 1 connection
+
+config :smoodle, Smoodle.Mailer,
+  adapter: Bamboo.MailjetAdapter,
+  api_key: "${MAILJET_API_KEY}",
+  api_private_key: "${MAILJET_API_PRIVATE_KEY}"
 
 # ## SSL Support
 #
@@ -61,4 +75,4 @@ config :logger, level: :info
 
 # Finally import the config/prod.secret.exs
 # which should be versioned separately.
-import_config "prod.secret.exs"
+#import_config "prod.secret.exs"
