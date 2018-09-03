@@ -1,10 +1,11 @@
 html
 	head
 	body
+		p = gettext("Hello %{event_organizer},", event_organizer: @event_organizer)
  		p = gettext("You created a new event called \"%{event_name}\". This is the link you should share with the event participants:", event_name: @event_name)
  		a(href=@share_link) = @share_link
  		p = gettext("And this is the link you can use to manage your event:")
  		a(href=@owner_link) = gettext("Click me but do not share me")
  		p = gettext("You should keep this link to yourself and not share it with anyone else. Enjoy!")
  		p
- 			i = gettext("Sincerely, your Smoodle Team")
+ 			i = gettext("Sincerely, your LetsMeet! bot")
