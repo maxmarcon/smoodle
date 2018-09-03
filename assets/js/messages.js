@@ -144,6 +144,7 @@ export default {
 			generic: "An error occurred while trying to contact the server: {message}",
 			not_found: "The requested data could not be found on the server",
 			server: "The server reported a {code} error",
+			unprocessable_entity: "Ops! The data you entered contains some errors, or something is missing. Please double check.",
 			error: "Error",
 			confirmation_required: "Doesn't match..."
 		},

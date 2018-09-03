@@ -189,7 +189,7 @@ export const scrollToTopMixin = {
 	methods: {
 		scrollToTop() {
 			if (this.$scrollTo) {
-				return this.$scrollTo('#app');
+				return this.$scrollTo('main');
 			}
 		}
 	}
@@ -208,7 +208,7 @@ export const restMixin = {
 					'Accept-Language': this.$i18n.locale
 				},
 				showErrors: true,
-				ignoreErrorCodes: [422]
+				ignoreErrorCodes: []
 			}, config);
 
 			let scrollToTop = false;
@@ -220,7 +220,9 @@ export const restMixin = {
 				if (config.showErrors) {
 					if (error.response) {
 						if (!config.ignoreErrorCodes.includes(error.response.status)) {
-							if (error.response.status == 404) {
+							if (error.response.status == 422) {
+								self.$refs.errorBar.show(self.$i18n.t('errors.unprocessable_entity'));
+							} else if (error.response.status == 404) {
 								self.$refs.errorBar.show(self.$i18n.t('errors.not_found'));
 							} else {
 								self.$refs.errorBar.show(self.$i18n.t('errors.server', {code: error.response.status}));
@@ -234,8 +236,8 @@ export const restMixin = {
 						self.$refs.errorBar.show(self.$i18n.t('errors.generic', {message: error.message}));
 						scrollToTop = true;
 					}
-					if (self.$scrollTo && scrollToTop) {
-						self.$scrollTo('#app');
+					if (self.scrollToTop && scrollToTop) {
+						self.scrollToTop();
 					}
 				}
 				throw error;
