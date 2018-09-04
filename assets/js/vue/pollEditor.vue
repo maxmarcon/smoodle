@@ -49,7 +49,7 @@
 			p {{ $t('poll_editor.event_no_longer_open') }}
 
 		.card(v-if="loadedSuccessfully")
-			.card-header
+			.card-header(:class="eventBackgroundClass")
 				event-header(
 					v-bind="eventData"
 				)

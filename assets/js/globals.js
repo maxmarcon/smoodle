@@ -363,9 +363,9 @@ export const eventHelpersMixin = {
 			if (this.eventOpen) {
 				return 'bg-light';
 			} else if (this.eventScheduled) {
-				return 'bg-success';
+				return 'alert-success';
 			} else {
-				return 'bg-warning';
+				return 'alert-warning';
 			}
 		}
 	}
