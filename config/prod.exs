@@ -15,7 +15,7 @@ use Mix.Config
 # which you typically run after static files are built.
 config :smoodle, SmoodleWeb.Endpoint,
   load_from_system_env: true,
-  url: [host: "go.lets-meet.app", port: 80],
+  url: [host: "go.lets-meet.app", scheme: "https"],
   cache_static_manifest: "priv/static/cache_manifest.json",
   secret_key_base: "${SECRET_KEY_BASE}",
   server: true
