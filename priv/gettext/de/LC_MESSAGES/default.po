@@ -12,56 +12,56 @@ msgstr ""
 "Plural-Forms: nplurals=2\n"
 
 #, elixir-format
-#: lib/smoodle_web/templates/page/welcome.html.pug:4
-msgid "Welcome to Smoodle!"
-msgstr "Willkommen bei Smoodle!"
-
-#, elixir-format
-#: lib/smoodle_web/templates/page/welcome.html.pug:11
-msgid "Just tell Smoodle what you would like to schedule and (roughly) when, and let it do the rest"
-msgstr ""
-
-#, elixir-format
-#: lib/smoodle_web/templates/page/welcome.html.pug:9
-msgid "No need to choose dates or time slots"
-msgstr ""
-
-#, elixir-format
-#: lib/smoodle_web/templates/page/welcome.html.pug:17
-msgid "No need to pick one date yourself"
-msgstr ""
-
-#, elixir-format
-#: lib/smoodle_web/templates/page/welcome.html.pug:13
-msgid "No need to run around asking people"
-msgstr ""
-
-#, elixir-format
-#: lib/smoodle_web/templates/page/welcome.html.pug:25
+#: lib/smoodle_web/templates/page/welcome.html.pug:12
 msgid "Schedule an event now"
 msgstr "Jetzt ein Event planen"
 
 #, elixir-format
+#: lib/smoodle_web/templates/email/new_event.html.pug:7
+msgid "And this is the link you can use to manage your event:"
+msgstr ""
+
+#, elixir-format
+#: lib/smoodle_web/templates/email/new_event.html.pug:8
+msgid "Click me but do not share me"
+msgstr ""
+
+#, elixir-format
+#: lib/smoodle_web/templates/email/new_event.html.pug:5
+msgid "You created a new event called \"%{event_name}\". This is the link you should share with the event participants:"
+msgstr ""
+
+#, elixir-format
+#: lib/smoodle_web/templates/email/new_event.html.pug:9
+msgid "You should keep this link to yourself and not share it with anyone else. Enjoy!"
+msgstr ""
+
+#, elixir-format
+#: lib/smoodle_web/email.ex:11
+msgid "Your new event: %{event_name}"
+msgstr ""
+
+#, elixir-format
+#: lib/smoodle_web/templates/email/new_event.html.pug:4
+msgid "Hello %{event_organizer},"
+msgstr ""
+
+#, elixir-format
+#: lib/smoodle_web/templates/layout/app.html.pug:9
+msgid "Lets meet!"
+msgstr ""
+
+#, elixir-format, fuzzy
 #: lib/smoodle_web/templates/page/welcome.html.pug:6
-msgid "Smoodle is a smart scheduling app that allows you to schedule your events super easily"
+msgid "Lets meet! is a smart scheduling app that allows you to schedule your events easily"
 msgstr ""
 
 #, elixir-format
-#: lib/smoodle_web/templates/page/welcome.html.pug:15
-msgid "Smoodle will ask them for you (even multiple times) and collect the answer"
+#: lib/smoodle_web/templates/email/new_event.html.pug:11
+msgid "Sincerely, your LetsMeet! bot"
 msgstr ""
 
 #, elixir-format
-#: lib/smoodle_web/templates/page/welcome.html.pug:19
-msgid "Smoodle will automatically compute the date that works best for everyone"
-msgstr ""
-
-#, elixir-format
-#: lib/smoodle_web/templates/page/app.html.pug:7
-msgid "Event"
-msgstr ""
-
-#, elixir-format
-#: lib/smoodle_web/templates/page/app.html.pug:9
-msgid "Poll"
+#: lib/smoodle_web/templates/page/welcome.html.pug:4
+msgid "Welcome to Lets meet!"
 msgstr ""
