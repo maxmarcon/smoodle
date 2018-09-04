@@ -11,6 +11,7 @@ import VueAxios from 'vue-axios'
 import VueClipboard from 'vue-clipboard2'
 import VCalendar from 'v-calendar'
 import VueScrollTo from 'vue-scrollto';
+import VueLoading from 'vue-loading-overlay';
 const Vue = require('vue/dist/vue.runtime.js');
 //import Vue from 'vue/dist/vue.runtime.esm';
 // becaue ES module vue.esm.js does not fucking work!!! It might be a problem with brunch
@@ -90,6 +91,8 @@ Vue.use(VueAxios, axios);
 Vue.use(VueClipboard);
 
 Vue.use(VueScrollTo);
+
+Vue.use(VueLoading);
 
 Vue.use(VCalendar, {
 	locale: smoodle_locale

@@ -208,12 +208,20 @@ export const restMixin = {
 					'Accept-Language': this.$i18n.locale
 				},
 				showErrors: true,
-				ignoreErrorCodes: []
+				ignoreErrorCodes: [],
+				spinnerDelay: 1000
 			}, config);
 
-			let scrollToTop = false;
 			let self = this;
-			self.requestOngoing = true;
+
+			let scrollToTop = false;
+			let loader = null;
+			let timeout = setTimeout(function() {
+				loader = self.$loading.show();
+			}, config.spinnerDelay);
+
+			this.requestOngoing = true;
+
 			return this.$http.request(
 				config
 			).catch(function(error) {
@@ -242,6 +250,10 @@ export const restMixin = {
 				}
 				throw error;
 			}).finally(function() {
+				clearTimeout(timeout);
+				if (loader) {
+					loader.hide();
+				}
 				self.requestOngoing = false;
 			});
 		}
