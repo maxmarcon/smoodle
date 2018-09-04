@@ -1,26 +1,13 @@
 .container
   .jumbotron
     h1.display-4
-      = gettext "Welcome to Smoodle!"
+      = gettext "Welcome to Lets meet!"
     p.lead
-      = gettext "Smoodle is a smart scheduling app that allows you to schedule your events super easily"
-    hr
-    h3
-      = gettext "No need to choose dates or time slots"
-    p.lead
-      = gettext "Just tell Smoodle what you would like to schedule and (roughly) when, and let it do the rest"
-    h3
-      = gettext "No need to run around asking people"
-    p.lead
-      = gettext "Smoodle will ask them for you (even multiple times) and collect the answer"
-    h3
-      = gettext "No need to pick one date yourself"
-    p.lead
-      = gettext "Smoodle will automatically compute the date that works best for everyone"
+      = gettext "Lets meet! is a smart scheduling app that allows you to schedule your events easily"
 
 .container
   .row.justify-content-center
     .col-4
-      a.btn.btn-lg.btn-primary(role="button" href="#{page_path @conn, :new_event, step: 1}")
+      a.btn.btn-lg.btn-primary(role="button" href="#{page_path @conn, :event_new}")
         = gettext "Schedule an event now"
 
