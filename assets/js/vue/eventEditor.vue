@@ -182,6 +182,10 @@
 						button.btn.btn-primary(v-else @click="saveEvent" :disabled="requestOngoing")
 							i.fas.fa-save
 							| &nbsp; {{ $t('event_editor.update_event') }}
+					.col-auto(v-if="eventId")
+						button.btn.btn-secondary(@click="backToEvent" :disabled="requestOngoing")
+							i.fas.fa-ban
+							| &nbsp; {{ $t('actions.cancel') }}
 
 				.row.justify-content-center(v-else)
 					.col-auto.mt-1
@@ -287,13 +291,17 @@ export default {
  	}),
  	created() {
  		if (this.eventId) {
- 			let self = this;
-	 		this.restRequest(['events', this.eventId].join('/'), { params: {secret: this.secret} }).then(function(result) {
-				self.assignEventData(result.data.data);
-				self.applyDates(self.eventTimeWindowFrom, self.eventTimeWindowTo, true);
-				self.loadedSuccessfully = true;
-			}).finally(function() { self.loaded = true; })
-	 	}
+ 			if (this.secret) {
+	 			let self = this;
+		 		this.restRequest(['events', this.eventId].join('/'), { params: {secret: this.secret} }).then(function(result) {
+					self.assignEventData(result.data.data);
+					self.applyDates(self.eventTimeWindowFrom, self.eventTimeWindowTo, true);
+					self.loadedSuccessfully = true;
+				}).finally(function() { self.loaded = true; })
+			} else {
+				this.loaded = true;
+			}
+		}
  	},
 	methods: {
 		datesSelected() {
