@@ -262,6 +262,7 @@ export default {
 			'dates-group': false,
 			'organizer-group': true
 		},
+		eventError: null,
 		eventName: null,
 		eventNameError: null,
 		eventOrganizer: null,
@@ -351,7 +352,10 @@ export default {
 					data: {
 						event: Object.assign(dataForRequest, {secret: this.secret})
 					},
-					method: (this.eventId ? 'patch' : 'post')
+					method: (this.eventId ? 'patch' : 'post'),
+					errorCodeMessages: {
+						429: this.$i18n.t('event_editor.too_many_requests_error', {email: dataForRequest['email']})
+					}
 			}).then(function(result) {
 				self.setServerErrors();
 				self.collapseAllGroups();

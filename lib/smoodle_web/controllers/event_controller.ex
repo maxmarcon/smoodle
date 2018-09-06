@@ -5,6 +5,7 @@ defmodule SmoodleWeb.EventController do
   alias Smoodle.Scheduler.Event
   alias Smoodle.Mailer
   alias SmoodleWeb.Email
+  alias Smoodle.Repo
 
   require Logger
   action_fallback SmoodleWeb.FallbackController
@@ -27,14 +28,18 @@ defmodule SmoodleWeb.EventController do
   #    end
   #  end
   #end
-
   def create(conn, %{"event" => event_params}) do
-    with {:ok, %Event{} = event} <- Scheduler.create_event(event_params) do
-      Email.new_event_email(event)
-      |> Mailer.deliver_later
-
-      Logger.info "Created event: #{event}"
-
+    with {:ok, event} <- Repo.transaction(fn ->
+      with {:ok, %Event{} = event} <- Scheduler.create_event(event_params),
+        {:ok, _} <- Email.new_event_email(event) |> Mailer.deliver_with_rate_limit(event.email)
+      do
+        event
+      else
+        {:error, error} -> Repo.rollback(error)
+        :error -> Repo.rollback(:too_many_requests)
+      end
+    end)
+    do
       conn
       |> put_status(:created)
       |> put_resp_header("location", event_path(conn, :show, event))

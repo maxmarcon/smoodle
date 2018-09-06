@@ -10,9 +10,13 @@ defmodule Smoodle.Application do
       # Start the Ecto repository
       {Smoodle.Repo, []},
       # Start the endpoint when the application starts
-      {SmoodleWeb.Endpoint, []}
+      {SmoodleWeb.Endpoint, []},
       # Start your own worker by calling: Smoodle.Worker.start_link(arg1, arg2, arg3)
       # worker(Smoodle.Worker, [arg1, arg2, arg3]),
+      %{
+        id: Cachex,
+        start: {Cachex, :start_link, [:mailer_cache, []]}
+      }
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

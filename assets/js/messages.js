@@ -42,7 +42,8 @@ export default {
 			dates_placeholder: "Select a date range",
 			back_to_event: "Back to the event",
 			update_event: "Update event",
-			event_updated: "The event details have been updated"
+			event_updated: "The event details have been updated",
+			too_many_requests_error: "You have created too many events for {email}. Take a short break..."
 		},
 		poll_editor: {
 			welcome: "Hey {participant}, here you can update your poll for ths event.",

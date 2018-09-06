@@ -49,6 +49,7 @@ defmodule Smoodle.Mixfile do
       {:dotenv, "~> 3.0.0"},
       {:bamboo, "~> 0.7.0"},
       {:bamboo_mailjet, "~> 0.0.1"},
+      {:cachex, "~> 3.0"},
       {:distillery, "~> 1.0.0"},
       {:mock, "~> 0.3.0", only: :test}
     ]

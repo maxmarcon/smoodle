@@ -6,7 +6,7 @@ defmodule SmoodleWeb.Email do
 
 	def new_event_email(event) do
 		new_email()
-		|> to({event.organizer, event.email})
+		|> to(event.email)
 		|> from(@from_address)
 		|> subject(gettext("Your new event: %{event_name}", event_name: event.name))
 		|> assign(:owner_link, SmoodleWeb.EventView.owner_link(event))

@@ -16,9 +16,11 @@ defmodule SmoodleWeb.FallbackController do
     send_resp(conn, :ok, "")
   end
 
-  def call(conn, {:error, :not_found}) do
+  def call(conn, {:error, reason_atom}) do
+    code = Plug.Conn.Status.code(reason_atom)
+
     conn
-    |> put_status(:not_found)
-    |> render(SmoodleWeb.ErrorView, "404.json", %{reason: %{message: "Not found"}})
+    |> put_status(reason_atom)
+    |> render(SmoodleWeb.ErrorView, "#{code}.json", %{reason: %{message: Plug.Conn.Status.reason_phrase(code)}})
   end
 end

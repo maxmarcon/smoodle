@@ -9,7 +9,7 @@ export function dotAccessObject(obj, deep_key) {
 	keys.every(function(key) {
 		if (obj.hasOwnProperty(key)) {
 			obj = obj[key]
-			if (!obj instanceof Object || obj instanceof Array) {
+			if (!(obj instanceof Object) || obj instanceof Array) {
 				retval = obj
 				return false;
 			}
@@ -209,6 +209,7 @@ export const restMixin = {
 				},
 				showErrors: true,
 				ignoreErrorCodes: [],
+				errorCodeMessages: {},
 				spinnerDelay: 1000
 			}, config);
 
@@ -228,12 +229,17 @@ export const restMixin = {
 				if (config.showErrors) {
 					if (error.response) {
 						if (!config.ignoreErrorCodes.includes(error.response.status)) {
-							if (error.response.status == 422) {
-								self.$refs.errorBar.show(self.$i18n.t('errors.unprocessable_entity'));
-							} else if (error.response.status == 404) {
-								self.$refs.errorBar.show(self.$i18n.t('errors.not_found'));
+							let specificErrorCode = config.errorCodeMessages[error.response.status];
+							if (specificErrorCode) {
+								self.$refs.errorBar.show(specificErrorCode);
 							} else {
-								self.$refs.errorBar.show(self.$i18n.t('errors.server', {code: error.response.status}));
+								if (error.response.status == 422) {
+									self.$refs.errorBar.show(self.$i18n.t('errors.unprocessable_entity'));
+								} else if (error.response.status == 404) {
+									self.$refs.errorBar.show(self.$i18n.t('errors.not_found'));
+								} else {
+									self.$refs.errorBar.show(self.$i18n.t('errors.server', {code: error.response.status}));
+								}
 							}
 							scrollToTop = true;
 						}

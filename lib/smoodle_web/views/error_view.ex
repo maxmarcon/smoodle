@@ -7,8 +7,8 @@ defmodule SmoodleWeb.ErrorView do
     %{status: status, message: message}
   end
 
-  def render(<<status::binary-size(3), ".html">>, %{reason: %{message: message}}) 
-  when status not in @statuses_with_own_pages do 
+  def render(<<status::binary-size(3), ".html">>, %{reason: %{message: message}})
+  when status not in @statuses_with_own_pages do
     render("generic.html", %{message: message, status: status})
   end
 
