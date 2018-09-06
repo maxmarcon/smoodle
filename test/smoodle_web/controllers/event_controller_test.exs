@@ -5,6 +5,9 @@ defmodule SmoodleWeb.EventControllerTest do
   alias Smoodle.Scheduler
   alias Smoodle.Scheduler.Event
 
+  import Ecto.Query
+  alias Smoodle.Repo
+
   @create_attrs_1 %{
     name: "Party",
     desc: "Yeah!",
@@ -112,6 +115,11 @@ defmodule SmoodleWeb.EventControllerTest do
   end
 
   describe "create event" do
+    setup do
+      Cachex.reset(:mailer_cache)
+      :ok
+    end
+
     test "renders event when data is valid", %{conn: conn} do
       conn = post conn, event_path(conn, :create), event: @create_attrs_1
       data_response = json_response(conn, 201)["data"]
@@ -143,6 +151,22 @@ defmodule SmoodleWeb.EventControllerTest do
 
       assert email.html_body =~ data_response["owner_link"]
       assert_delivered_email(email)
+    end
+
+    test "if too many emails were sent, no email is sent and event creation is rolled back", %{conn: conn} do
+      Cachex.reset(:mailer_cache)
+      {max_emails, bucket_duration} = Application.get_env(:smoodle, Smoodle.Mailer)[:rate_limit]
+
+      for n <- 0..max_emails-1 do
+        conn = post conn, event_path(conn, :create), event: @create_attrs_1
+        json_response(conn, 201)
+      end
+
+      event_count = Repo.one(from e in Event, select: count(e.id))
+      assert event_count == max_emails
+      conn = post conn, event_path(conn, :create), event: @create_attrs_1
+      json_response(conn, 429)
+      assert event_count == max_emails
     end
 
    # test "returns empty ok response when validating valid data", %{conn: conn} do

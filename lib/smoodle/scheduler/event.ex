@@ -1,4 +1,4 @@
-  defmodule Smoodle.Scheduler.Event do
+defmodule Smoodle.Scheduler.Event do
   use Ecto.Schema
   require Integer
   import Ecto.Changeset

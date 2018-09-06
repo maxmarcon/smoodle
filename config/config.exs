@@ -29,6 +29,9 @@ config :logger, :console,
 config :phoenix, :template_engines,
     pug:  PhoenixExpug.Engine
 
+config :smoodle, Smoodle.Mailer,
+  rate_limit: {30, 3600}
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"
