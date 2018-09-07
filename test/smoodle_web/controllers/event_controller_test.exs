@@ -154,7 +154,6 @@ defmodule SmoodleWeb.EventControllerTest do
     end
 
     test "if too many emails were sent, no email is sent and event creation is rolled back", %{conn: conn} do
-      Cachex.reset(:mailer_cache)
       {max_emails, bucket_duration} = Application.get_env(:smoodle, Smoodle.Mailer)[:rate_limit]
 
       for n <- 0..max_emails-1 do
@@ -164,6 +163,7 @@ defmodule SmoodleWeb.EventControllerTest do
 
       event_count = Repo.one(from e in Event, select: count(e.id))
       assert event_count == max_emails
+
       conn = post conn, event_path(conn, :create), event: @create_attrs_1
       json_response(conn, 429)
       assert event_count == max_emails
