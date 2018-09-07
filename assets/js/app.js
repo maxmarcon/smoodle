@@ -2,6 +2,7 @@
 import EventEditor from './vue/eventEditor.vue'
 import PollEditor from './vue/pollEditor.vue'
 import EventViewer from './vue/eventViewer.vue'
+import Home from './vue/home.vue'
 import datePicker from 'vue-bootstrap-datetimepicker';
 import VueRouter from 'vue-router'
 import VueI18n from 'vue-i18n'
@@ -22,6 +23,11 @@ Vue.use(VueRouter);
 const router = new VueRouter({
 	mode: 'history',
 	routes: [
+		{
+			path: '/home',
+			name: 'home',
+			component: Home
+		},
 	  {
 	  	path: '/events/new',
 	  	name: 'new_event',

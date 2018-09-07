@@ -7,9 +7,12 @@
 	.card-footer
 		slot
 			.text-center
-				button.btn.btn-secondary
-					i.fas.fa-ban
-					| &nbsp; Back home but there is none yet...
+				router-link.btn.btn-secondary(
+					role="button"
+					:to="{name: 'home'}"
+				)
+					i.fas.fa-home
+					| &nbsp; {{ $t('actions.back_home') }}
 </template>
 <script>
 export default {

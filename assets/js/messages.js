@@ -159,7 +159,8 @@ export default {
 		},
 		actions: {
 			cancel: "Cancel",
-			tell_me_more: "Tell me more"
+			tell_me_more: "Tell me more",
+			back_home: "Back home"
 		}
 	},
 
