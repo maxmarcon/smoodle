@@ -115,7 +115,7 @@ defmodule SmoodleWeb.EventControllerTest do
 
   describe "create event" do
     setup do
-      Cachex.reset(:mailer_cache)
+      Smoodle.Mailer.reset_counters()
       :ok
     end
 
@@ -153,7 +153,7 @@ defmodule SmoodleWeb.EventControllerTest do
     end
 
     test "if too many emails were sent, no email is sent and event creation is rolled back", %{conn: conn} do
-      {max_emails, _} = Application.get_env(:smoodle, Smoodle.Mailer)[:rate_limit]
+      max_emails = Smoodle.Mailer.max_emails()
 
       for _ <- 0..max_emails-1 do
         conn = post conn, event_path(conn, :create), event: @create_attrs_1
