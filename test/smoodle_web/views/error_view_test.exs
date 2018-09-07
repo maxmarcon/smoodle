@@ -5,7 +5,7 @@ defmodule SmoodleWeb.ErrorViewTest do
   import Phoenix.View
 
   test "renders 404.html" do
-    assert render_to_string(SmoodleWeb.ErrorView, "404.html", []) =~ 
+    assert render_to_string(SmoodleWeb.ErrorView, "404.html", []) =~
       "Sorry, the page you are looking for does not exist"
   end
 
@@ -24,5 +24,12 @@ defmodule SmoodleWeb.ErrorViewTest do
   test "render any other without message" do
     assert render_to_string(SmoodleWeb.ErrorView, "505.html", %{}) =~
            "The server experienced an internal error"
+  end
+
+  test "render errors as JSON" do
+    error_msg = "Not found"
+    error_status = 404
+    assert render(SmoodleWeb.ErrorView, Integer.to_string(error_status) <> ".json", %{reason: %{message: error_msg}})
+      == %{status: error_status, message: error_msg}
   end
 end

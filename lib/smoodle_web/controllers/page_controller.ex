@@ -2,7 +2,7 @@ defmodule SmoodleWeb.PageController do
   use SmoodleWeb, :controller
 
   def app(conn, _params) do
-  	render conn, "app.html"
+  	render conn, :app
   end
 
   def home(conn, params), do: app(conn, params)
