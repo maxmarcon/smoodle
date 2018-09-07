@@ -5,6 +5,11 @@
 # is restricted to this project.
 use Mix.Config
 
+# This is in order to retrieve the environment from
+# the distillery build, inside which Mix is not available
+config :smoodle,
+  env: Mix.env
+
 # General application configuration
 config :smoodle,
   ecto_repos: [Smoodle.Repo]

@@ -75,7 +75,6 @@ defmodule SmoodleWeb.EventControllerTest do
   describe "index" do
     setup :create_events
 
-    @tag :skip
     test "lists all events", %{conn: conn, events: events} do
       conn = get conn, event_path(conn, :index)
       assert length(json_response(conn, 200)["data"]) == 2
@@ -154,9 +153,9 @@ defmodule SmoodleWeb.EventControllerTest do
     end
 
     test "if too many emails were sent, no email is sent and event creation is rolled back", %{conn: conn} do
-      {max_emails, bucket_duration} = Application.get_env(:smoodle, Smoodle.Mailer)[:rate_limit]
+      {max_emails, _} = Application.get_env(:smoodle, Smoodle.Mailer)[:rate_limit]
 
-      for n <- 0..max_emails-1 do
+      for _ <- 0..max_emails-1 do
         conn = post conn, event_path(conn, :create), event: @create_attrs_1
         json_response(conn, 201)
       end
