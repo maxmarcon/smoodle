@@ -192,7 +192,7 @@
 					.col-auto.mt-1(v-if="eventOpen && isOrganizer")
 						router-link.btn.btn-success(
 							role="button"
-							:to="{ name: 'edit_event', params: {eventId: eventId, secret: secret} }"
+							:to="{ name: 'edit_event', params: {eventId: eventId, secret: secret}, query: {s: secret} }"
 						)
 							i.fas.fa-edit
 							| &nbsp; {{ $t('event_viewer.edit_event') }}

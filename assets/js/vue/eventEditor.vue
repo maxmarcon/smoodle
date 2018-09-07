@@ -191,7 +191,7 @@
 					.col-auto.mt-1
 						router-link.btn.btn-success(
 							role="button"
-							:to="{ name: 'event', params: {eventId: createdEvent.id, secret: createdEvent.secret}}"
+							:to="{ name: 'event', params: {eventId: createdEvent.id, secret: createdEvent.secret}, query: {s: createdEvent.secret}}"
 						)
 							i.fas.fa-key
 							| &nbsp; {{ $t('event_editor.manage_event') }}
@@ -377,7 +377,7 @@ export default {
 			});
 		},
 		backToEvent() {
-			this.$router.push({name: 'event', params: {eventId: this.eventId, secret: this.secret}});
+			this.$router.push({name: 'event', params: {eventId: this.eventId, secret: this.secret}, query: {s: this.secret}});
 		}
 	}
 }
