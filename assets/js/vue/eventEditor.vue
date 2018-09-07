@@ -353,9 +353,7 @@ export default {
 						event: Object.assign(dataForRequest, {secret: this.secret})
 					},
 					method: (this.eventId ? 'patch' : 'post'),
-					errorCodeMessages: {
-						429: this.$i18n.t('event_editor.too_many_requests_error', {email: dataForRequest['email']})
-					}
+					ignoreErrorCodes: [429]
 			}).then(function(result) {
 				self.setServerErrors();
 				self.collapseAllGroups();
@@ -368,9 +366,14 @@ export default {
 					self.$refs.eventCreatedModal.show();
 				}
 			}, function(error) {
-				if (error.response && error.response.status == 422) {
-					self.setServerErrors(error.response.data.errors);
-					self.wasServerValidated = true;
+				if (error.response) {
+					if (error.response.status == 422) {
+						self.setServerErrors(error.response.data.errors);
+						self.wasServerValidated = true;
+					} else if (error.response.status == 429) {
+						self.$refs.errorBar.show(self.$i18n.t('event_editor.too_many_requests_error', {email: dataForRequest["email"]}));
+						self.scrollToTop();
+					}
 				} else {
 					throw error;
 				}

@@ -209,7 +209,10 @@ export const restMixin = {
 				},
 				showErrors: true,
 				ignoreErrorCodes: [],
-				errorCodeMessages: {},
+				errorCodeMessages: {
+					422: this.$i18n.t('errors.unprocessable_entity'),
+					404: this.$i18n.t('errors.not_found')
+				},
 				spinnerDelay: 1000
 			}, config);
 
@@ -229,18 +232,8 @@ export const restMixin = {
 				if (config.showErrors) {
 					if (error.response) {
 						if (!config.ignoreErrorCodes.includes(error.response.status)) {
-							let specificErrorCode = config.errorCodeMessages[error.response.status];
-							if (specificErrorCode) {
-								self.$refs.errorBar.show(specificErrorCode);
-							} else {
-								if (error.response.status == 422) {
-									self.$refs.errorBar.show(self.$i18n.t('errors.unprocessable_entity'));
-								} else if (error.response.status == 404) {
-									self.$refs.errorBar.show(self.$i18n.t('errors.not_found'));
-								} else {
-									self.$refs.errorBar.show(self.$i18n.t('errors.server', {code: error.response.status}));
-								}
-							}
+							let message = config.errorCodeMessages[error.response.status] || self.$i18n.t('errors.server', {code: error.response.status});
+							self.$refs.errorBar.show(message);
 							scrollToTop = true;
 						}
 					} else if (error.request) {

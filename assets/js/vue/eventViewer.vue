@@ -171,7 +171,7 @@
 											:theme-styles="{dayCellNotInMonth: {opacity: 0}}"
 										)
 
-						div(v-else-if="loaded").alert.alert-primary(v-else)
+						div.alert.alert-primary(v-else v-else-if="loaded")
 							i18n(path="event_viewer.no_participants_organizer" v-if="isOrganizer")
 								i.fas.fa-grin-beam-sweat.fa-lg(place="icon")
 							i18n(path="event_viewer.no_participants" v-else)
