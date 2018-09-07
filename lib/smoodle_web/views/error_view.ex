@@ -4,6 +4,10 @@ defmodule SmoodleWeb.ErrorView do
   @statuses_with_own_pages ["404", "500"]
 
   def render(<<status::binary-size(3), ".json">>, %{reason: %{message: message}}) do
+    status = case Integer.parse(status) do
+      {numeric_status, _} -> numeric_status
+      _ -> status
+    end
     %{status: status, message: message}
   end
 

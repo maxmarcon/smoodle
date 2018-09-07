@@ -13,7 +13,7 @@ defmodule Smoodle.Mailer do
 
 		{:ok, counter} = Cachex.incr(@cache, cache_key)
 		if counter == 1 do
-			Cachex.expire(@cache, cache_key, bucket_duration*1000)
+			{:ok, _} = Cachex.expire(@cache, cache_key, bucket_duration*1000)
 		end
 
 		if counter > max_emails do

@@ -40,6 +40,7 @@ defmodule SmoodleWeb.EventController do
       end
     end)
     do
+      Logger.info "Created event: #{event}"
       conn
       |> put_status(:created)
       |> put_resp_header("location", event_path(conn, :show, event))

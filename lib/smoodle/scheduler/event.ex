@@ -11,7 +11,7 @@ defmodule Smoodle.Scheduler.Event do
 
   defimpl String.Chars, for: Smoodle.Scheduler.Event do
     def to_string(event) do
-      "id:#{event.id} name:#{event.name} organizer:#{event.organizer}"
+      "id:#{event.id} name:\"#{event.name}\" organizer:\"#{event.organizer}\" state:#{event.state}"
     end
   end
 
