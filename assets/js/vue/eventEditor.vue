@@ -162,12 +162,17 @@
 										:show-caps="true"
 										popover-visibility="focus"
 										@input="datesSelected"
+										popover-direction="top"
 									)
 									//- invalid feedback won't work here because v-date-picker is not a form-control
 									.small.text-danger {{ eventTimeWindowError }}
 
 								.col-md-auto
-									b-dropdown(:text="$t('event_editor.dates_quick_selection')" :disabled="createdEvent != null")
+									b-dropdown(
+										:text="$t('event_editor.dates_quick_selection')"
+										:disabled="createdEvent != null"
+										:dropup="true"
+									)
 										b-dropdown-item(v-if="showThisWeekButton" @click="pickThisWeek") {{ $t('event_editor.this_week') }}
 										b-dropdown-item(@click="pickNextWeek(); localValidation();") {{ $t('event_editor.next_week') }}
 										b-dropdown-item(@click="pickNextMonths(1); localValidation();") {{ $tc('event_editor.within_months') }}

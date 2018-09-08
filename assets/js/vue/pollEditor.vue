@@ -199,7 +199,7 @@
 		)
 </template>
 <script>
-import { showToolTip, accordionGroupsMixin,
+import { accordionGroupsMixin,
 	restMixin, colorCodes, eventHelpersMixin, eventDataMixin, scrollToTopMixin} from '../globals'
 import dateFns from 'date-fns'
 
