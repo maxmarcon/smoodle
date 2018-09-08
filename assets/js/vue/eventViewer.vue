@@ -112,11 +112,16 @@
 							.input-group
 								input.form-control(:value="eventShareLink" readonly)
 								.input-group-append
+									a.btn.bdn-sm.btn-outline-secondary(
+										target="_blank"
+										:href="whatsAppMessageURL(eventShareLink)"
+									)
+										span.fab.fa-lg.fa-whatsapp
 									button.btn.btn-sm.btn-outline-secondary(
 										v-clipboard:copy="eventShareLink"
 										v-clipboard:success="clipboard"
 									)
-										span.fas.fa-share-alt
+										span.fas.fa-lg.fa-share-alt
 				li.list-group-item
 					.alert.alert-success(v-if="!isOrganizer")
 						i.fas.fa-share-alt
@@ -223,13 +228,13 @@
 		)
 </template>
 <script>
-import { colorCodes, eventHelpersMixin, eventDataMixin, scrollToTopMixin, restMixin } from '../globals'
+import { colorCodes, eventHelpersMixin, eventDataMixin, scrollToTopMixin, restMixin, whatsAppHelpersMixin} from '../globals'
 import dateFns from 'date-fns'
 
 const SCHEDULE_DATES_LIMIT = null;
 
 export default {
-	mixins: [restMixin, eventHelpersMixin, eventDataMixin, scrollToTopMixin],
+	mixins: [restMixin, eventHelpersMixin, eventDataMixin, scrollToTopMixin, whatsAppHelpersMixin],
 	props: {
 		eventId: {
 			type: String,

@@ -27,11 +27,16 @@
 							.input-group
 								input.form-control(:value="createdEvent.share_link" readonly)
 								.input-group-append
+									a.btn.bdn-sm.btn-outline-secondary(
+										target="_blank"
+										:href="whatsAppMessageURL(createdEvent.share_link)"
+									)
+										span.fab.fa-lg.fa-whatsapp
 									button.btn.btn-sm.btn-outline-secondary(
 										v-clipboard:copy="createdEvent.share_link"
 										v-clipboard:success="clipboard"
 									)
-										span.fas.fa-share-alt
+										span.fas.fa-lg.fa-share-alt
 
 			.card-body(v-else)
 				.alert.alert-info(v-if="eventId")
@@ -209,13 +214,13 @@
 
 <script>
 import dateFns from 'date-fns'
-import { accordionGroupsMixin, scrollToTopMixin, restMixin, eventDataMixin } from '../globals'
+import { accordionGroupsMixin, scrollToTopMixin, restMixin, eventDataMixin, whatsAppHelpersMixin } from '../globals'
 
 const today = new Date();
 const InvalidDate = 'Invalid Date';
 
 export default {
-	mixins: [accordionGroupsMixin, restMixin, scrollToTopMixin, eventDataMixin],
+	mixins: [accordionGroupsMixin, restMixin, scrollToTopMixin, eventDataMixin, whatsAppHelpersMixin],
 	props: {
 		eventId: String,
 		secret: String

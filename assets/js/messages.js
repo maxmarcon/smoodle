@@ -143,12 +143,12 @@ export default {
 			},
 			step2: {
 				title: '{step} : Let your friends decide',
-				part1: 'They can say if a date is {good}, {indifferent}, or {bad} for them.',
+				part1: 'Your friends can say if a date is {good}, {indifferent}, or {bad} for them.',
 				part2: 'They can select weekdays or specific dates, even whole time periods.'
 			},
 			step3: {
 				title: '{step} : Manage the event',
-				part1: 'As an organizer, you always have a clear overview your friends decisions.',
+				part1: 'As an organizer, you always have a clear overview of your friends decisions.',
 				part2: '{good} and {bad} dates are cleary visible on the calendar.',
 				part3: 'When you are ready, pick a date, schedule the event and let your crowd now!'
 			},

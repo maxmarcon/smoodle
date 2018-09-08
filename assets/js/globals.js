@@ -363,6 +363,12 @@ export const eventHelpersMixin = {
 	}
 }
 
+export const whatsAppHelpersMixin = {
+	methods: {
+		whatsAppMessageURL: (link) => 'https://wa.me/?text=' + encodeURIComponent(link)
+	}
+};
+
 export const colorCodes = {
 	green: '#28a745',
 	red: '#dc3545',
