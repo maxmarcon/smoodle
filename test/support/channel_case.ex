@@ -25,13 +25,13 @@ defmodule SmoodleWeb.ChannelCase do
     end
   end
 
-
   setup tags do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Smoodle.Repo)
+
     unless tags[:async] do
       Ecto.Adapters.SQL.Sandbox.mode(Smoodle.Repo, {:shared, self()})
     end
+
     :ok
   end
-
 end

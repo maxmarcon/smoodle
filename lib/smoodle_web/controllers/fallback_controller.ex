@@ -21,6 +21,8 @@ defmodule SmoodleWeb.FallbackController do
 
     conn
     |> put_status(reason_atom)
-    |> render(SmoodleWeb.ErrorView, "#{code}.json", %{reason: %{message: Plug.Conn.Status.reason_phrase(code)}})
+    |> render(SmoodleWeb.ErrorView, "#{code}.json", %{
+      reason: %{message: Plug.Conn.Status.reason_phrase(code)}
+    })
   end
 end

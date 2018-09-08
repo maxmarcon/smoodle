@@ -6,30 +6,34 @@ defmodule SmoodleWeb.ErrorViewTest do
 
   test "renders 404.html" do
     assert render_to_string(SmoodleWeb.ErrorView, "404.html", []) =~
-      "Sorry, the page you are looking for does not exist"
+             "Sorry, the page you are looking for does not exist"
   end
 
   test "render 500.html" do
     assert render_to_string(SmoodleWeb.ErrorView, "500.html", []) =~
-      "The server experienced an internal error"
+             "The server experienced an internal error"
   end
 
   test "render any other with message" do
     error_msg = "An error occurred"
     error_status = "505"
-    assert render_to_string(SmoodleWeb.ErrorView, error_status <> ".html", %{reason: %{message: error_msg}}) =~
-           "#{error_status} #{error_msg}"
+
+    assert render_to_string(SmoodleWeb.ErrorView, error_status <> ".html", %{
+             reason: %{message: error_msg}
+           }) =~ "#{error_status} #{error_msg}"
   end
 
   test "render any other without message" do
     assert render_to_string(SmoodleWeb.ErrorView, "505.html", %{}) =~
-           "The server experienced an internal error"
+             "The server experienced an internal error"
   end
 
   test "render errors as JSON" do
     error_msg = "Not found"
     error_status = 404
-    assert render(SmoodleWeb.ErrorView, Integer.to_string(error_status) <> ".json", %{reason: %{message: error_msg}})
-      == %{status: error_status, message: error_msg}
+
+    assert render(SmoodleWeb.ErrorView, Integer.to_string(error_status) <> ".json", %{
+             reason: %{message: error_msg}
+           }) == %{status: error_status, message: error_msg}
   end
 end

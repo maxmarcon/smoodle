@@ -39,7 +39,6 @@ defmodule Smoodle.SchedulerTest do
   }
 
   describe "when retrieving events" do
-
     setup do
       {:ok, event1} = Scheduler.create_event(@event_valid_attrs_1)
       {:ok, event2} = Scheduler.create_event(@event_valid_attrs_2)
@@ -71,7 +70,6 @@ defmodule Smoodle.SchedulerTest do
   end
 
   describe "when creating an event" do
-
     test "create_event/2 with valid data creates an event" do
       assert {:ok, %Event{} = event} = Scheduler.create_event(@event_valid_attrs_1)
       assert Map.take(event, [:name, :desc]) == Map.take(@event_valid_attrs_1, [:name, :desc])
@@ -80,31 +78,32 @@ defmodule Smoodle.SchedulerTest do
       assert Repo.preload(Scheduler.get_event!(event.id), :polls) == event
     end
 
-    #test "create_event/2 with valid data for validation does not create an event and returns valid changeset" do
+    # test "create_event/2 with valid data for validation does not create an event and returns valid changeset" do
     #  assert %{valid?: true} = Scheduler.create_event(@event_valid_attrs_1, dry_run: true)
     #  assert Scheduler.list_events() == []
-    #end
+    # end
 
     test "create_event/2 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Scheduler.create_event(@event_invalid_attrs)
     end
 
-    #test "create_event/2 with invalid data for validation returns invalid changeset" do
+    # test "create_event/2 with invalid data for validation returns invalid changeset" do
     #  assert %Ecto.Changeset{valid?: false} = Scheduler.create_event(@event_invalid_attrs, dry_run: true)
-    #end
+    # end
   end
 
   describe "when updating events" do
-
     setup do
       {:ok, event} = Scheduler.create_event(@event_valid_attrs_1)
-      {:ok, scheduled_event} = Scheduler.create_event(Map.merge(@event_valid_attrs_1,
-        %{
-          scheduled_from: "2117-03-20 20:10:00",
-          scheduled_to: "2117-03-20 23:10:00",
-          state: "SCHEDULED"
-        })
-      )
+
+      {:ok, scheduled_event} =
+        Scheduler.create_event(
+          Map.merge(@event_valid_attrs_1, %{
+            scheduled_from: "2117-03-20 20:10:00",
+            scheduled_to: "2117-03-20 23:10:00",
+            state: "SCHEDULED"
+          })
+        )
 
       %{event: event, scheduled_event: scheduled_event}
     end
@@ -118,7 +117,13 @@ defmodule Smoodle.SchedulerTest do
     test "update_event/2 with valid data cannot update the token", context do
       event = context[:event]
       old_token = event.secret
-      assert {:ok, event} = Scheduler.update_event(event, Map.merge(@event_update_attrs, %{secret: "sneaky_token"}))
+
+      assert {:ok, event} =
+               Scheduler.update_event(
+                 event,
+                 Map.merge(@event_update_attrs, %{secret: "sneaky_token"})
+               )
+
       assert event.name == @event_update_attrs.name
       assert event.secret == old_token
     end
@@ -126,7 +131,10 @@ defmodule Smoodle.SchedulerTest do
     test "update_event/2 with valid data cannot update the id", context do
       event = context[:event]
       old_id = event.id
-      assert {:ok, event} = Scheduler.update_event(event, Map.merge(@event_update_attrs, %{id: "sneaky_id"}))
+
+      assert {:ok, event} =
+               Scheduler.update_event(event, Map.merge(@event_update_attrs, %{id: "sneaky_id"}))
+
       assert event.name == @event_update_attrs.name
       assert event.id == old_id
     end
@@ -139,7 +147,6 @@ defmodule Smoodle.SchedulerTest do
   end
 
   describe "when deleting an event" do
-
     setup do
       {:ok, event1} = Scheduler.create_event(@event_valid_attrs_1)
 
@@ -153,9 +160,8 @@ defmodule Smoodle.SchedulerTest do
     end
   end
 
-
   @poll_valid_attrs_1 %{
-    participant: "Betty Davies",
+    participant: "Betty Davies"
   }
 
   @poll_valid_attrs_2 %{
@@ -240,12 +246,11 @@ defmodule Smoodle.SchedulerTest do
   ]
 
   describe "when retrieving polls" do
-
     setup do
       {:ok, event} = Scheduler.create_event(@event_valid_attrs_1)
       {:ok, poll1} = Scheduler.create_poll(event, @poll_valid_attrs_1)
       {:ok, poll2} = Scheduler.create_poll(event, @poll_valid_attrs_2)
-      %{event: event, polls: Enum.map([poll1, poll2], &(Map.delete(&1, :event)))}
+      %{event: event, polls: Enum.map([poll1, poll2], &Map.delete(&1, :event))}
     end
 
     test "get_poll!/1 fetches a poll", context do
@@ -262,17 +267,19 @@ defmodule Smoodle.SchedulerTest do
 
     test "get_poll!/2 does not fetch a poll if the participant is wrong", context do
       [poll1 | _] = context[:polls]
-      assert_raise(Ecto.NoResultsError, fn -> Scheduler.get_poll!(poll1.event_id, "wrong participant") end)
+
+      assert_raise(Ecto.NoResultsError, fn ->
+        Scheduler.get_poll!(poll1.event_id, "wrong participant")
+      end)
     end
 
     test "list_polls/1 fetches all polls for an event", context do
-      polls = Enum.map(Scheduler.list_polls(context[:event]), &(Map.delete(&1, :event)))
+      polls = Enum.map(Scheduler.list_polls(context[:event]), &Map.delete(&1, :event))
       assert MapSet.new(polls) == MapSet.new(context[:polls])
     end
   end
 
   describe "when creating a poll" do
-
     setup do
       {:ok, event} = Scheduler.create_event(@event_valid_attrs_1)
       {:ok, poll} = Scheduler.create_poll(event, %{participant: "John Wayne"})
@@ -285,22 +292,27 @@ defmodule Smoodle.SchedulerTest do
       assert poll.event_id == context[:event].id
     end
 
-    #test "create_poll/3 valid data for dry run does not create poll and returns valid changeset", context do
+    # test "create_poll/3 valid data for dry run does not create poll and returns valid changeset", context do
     #  assert changeset = Scheduler.create_poll(context[:event], @poll_valid_attrs_1, dry_run: true)
     #  assert changeset.valid?
     #  assert 1 = Repo.one(from p in Poll, select: count(p.id))
-    #end
+    # end
 
     test "create_poll/3 with invalid data returns changeset with errors", context do
-      assert {:error, changeset} = Scheduler.create_poll(context[:event], Map.delete(@poll_valid_attrs_2, :participant))
-      assert %{participant: [{_, validation: :required}]} = traverse_errors(changeset, &(&1))
+      assert {:error, changeset} =
+               Scheduler.create_poll(
+                 context[:event],
+                 Map.delete(@poll_valid_attrs_2, :participant)
+               )
+
+      assert %{participant: [{_, validation: :required}]} = traverse_errors(changeset, & &1)
     end
 
-    #test "create_poll/3 with invalid data for dry run returns changeset with errors", context do
+    # test "create_poll/3 with invalid data for dry run returns changeset with errors", context do
     #  changeset = Scheduler.create_poll(context[:event], Map.delete(@poll_valid_attrs_2, :participant), dry_run: true)
     #  refute changeset.valid?
     #  assert %{participant: [{_, validation: :required}]} = traverse_errors(changeset, &(&1))
-    #end
+    # end
 
     test "create_poll/3 with weekday ranks", context do
       assert {:ok, poll = %Poll{}} = Scheduler.create_poll(context[:event], @poll_valid_attrs_2)
@@ -309,33 +321,38 @@ defmodule Smoodle.SchedulerTest do
 
     test "create_poll/3 poll with date ranks", context do
       assert {:ok, poll = %Poll{}} = Scheduler.create_poll(context[:event], @poll_valid_attrs_3)
-      expected_date_ranks = Enum.map(@poll_valid_attrs_3[:date_ranks], fn dr_attr ->
-        %{
-          date_from: dr_attr.date_from,
-          date_to: dr_attr.date_to,
-          rank: dr_attr.rank
-        }
-      end)
-      assert ^expected_date_ranks = Enum.map(poll.date_ranks, fn dr_attr ->
-        %{
-          date_from: Date.to_string(dr_attr.date_from),
-          date_to: Date.to_string(dr_attr.date_to),
-          rank: dr_attr.rank
-        }
-      end)
+
+      expected_date_ranks =
+        Enum.map(@poll_valid_attrs_3[:date_ranks], fn dr_attr ->
+          %{
+            date_from: dr_attr.date_from,
+            date_to: dr_attr.date_to,
+            rank: dr_attr.rank
+          }
+        end)
+
+      assert ^expected_date_ranks =
+               Enum.map(poll.date_ranks, fn dr_attr ->
+                 %{
+                   date_from: Date.to_string(dr_attr.date_from),
+                   date_to: Date.to_string(dr_attr.date_to),
+                   rank: dr_attr.rank
+                 }
+               end)
     end
 
     test "create_poll/3 with the same event and participant as another one", context do
-      assert {:error, changeset} = Scheduler.create_poll(
-        context[:event],
-        Map.replace!(@poll_valid_attrs_1, :participant, context[:poll].participant)
-      )
-      assert %{participant: [{_, _}]} = traverse_errors(changeset, &(&1))
+      assert {:error, changeset} =
+               Scheduler.create_poll(
+                 context[:event],
+                 Map.replace!(@poll_valid_attrs_1, :participant, context[:poll].participant)
+               )
+
+      assert %{participant: [{_, _}]} = traverse_errors(changeset, & &1)
     end
   end
 
   describe "when updating a poll" do
-
     setup do
       {:ok, event} = Scheduler.create_event(@event_valid_attrs_1)
       {:ok, poll} = Scheduler.create_poll(event, @poll_valid_attrs_3)
@@ -347,55 +364,60 @@ defmodule Smoodle.SchedulerTest do
       assert %{participant: "Mike"} = poll
     end
 
-    #test "update_poll/3 with invalid data for dry run does not update the poll and returns invalid changeset", context do
+    # test "update_poll/3 with invalid data for dry run does not update the poll and returns invalid changeset", context do
     #  changeset = Scheduler.update_poll(context[:poll], %{participant: 1}, dry_run: true)
     #  refute changeset.valid?
     #  assert %{participant: [{_, [type: :string, validation: :cast]}]} = traverse_errors(changeset, &(&1))
-    #end
+    # end
 
     test "update_poll/3 with weekday_ranks", context do
-      assert {:ok, poll = %Poll{}} = Scheduler.update_poll(context[:poll],
-        %{preferences: %{ weekday_ranks: @new_weekday_ranks } }
-      )
+      assert {:ok, poll = %Poll{}} =
+               Scheduler.update_poll(context[:poll], %{
+                 preferences: %{weekday_ranks: @new_weekday_ranks}
+               })
+
       assert @new_weekday_ranks = poll.preferences.weekday_ranks
       assert Enum.count(@new_weekday_ranks) == Enum.count(poll.preferences.weekday_ranks)
     end
 
-    #test "update_poll/3 valid data for dry run does not update the poll and returns valid changeset", context do
+    # test "update_poll/3 valid data for dry run does not update the poll and returns valid changeset", context do
     #  changeset = Scheduler.update_poll(context[:poll], %{participant: "Mike"}, dry_run: true)
     #  assert changeset.valid?
     #  assert context[:poll].participant == Repo.get!(Poll, context[:poll].id).participant
-    #end
+    # end
 
     test "update_poll/3 with invalid data returns changeset with errors", context do
       assert {:error, changeset} = Scheduler.update_poll(context[:poll], %{participant: 1})
       refute changeset.valid?
-      assert %{participant: [{_, [type: :string, validation: :cast]}]} = traverse_errors(changeset, &(&1))
+
+      assert %{participant: [{_, [type: :string, validation: :cast]}]} =
+               traverse_errors(changeset, & &1)
     end
 
-    #test "update_poll/3 with invalid data returns error changeset", context do
+    # test "update_poll/3 with invalid data returns error changeset", context do
     #  changeset = Scheduler.update_poll(context[:poll], %{participant: 1}, dry_run: true)
     #  refute changeset.valid?
     #  assert %{participant: [{_, [type: :string, validation: :cast]}]} = traverse_errors(changeset, &(&1))
-    #end
+    # end
 
     test "update_poll/3 with date ranks", context do
-      assert {:ok, poll = %Poll{}} = Scheduler.update_poll(context[:poll],
-        %{date_ranks: @new_date_ranks}
-      )
-      assert @new_date_ranks = Enum.map(poll.date_ranks, fn dr_attr ->
-        %{
-          date_from: Date.to_string(dr_attr.date_from),
-          date_to: Date.to_string(dr_attr.date_to),
-          rank: dr_attr.rank
-        }
-      end)
-      assert Enum.count(@new_date_ranks) == Repo.one(from p in DateRank, select: count(p.id))
+      assert {:ok, poll = %Poll{}} =
+               Scheduler.update_poll(context[:poll], %{date_ranks: @new_date_ranks})
+
+      assert @new_date_ranks =
+               Enum.map(poll.date_ranks, fn dr_attr ->
+                 %{
+                   date_from: Date.to_string(dr_attr.date_from),
+                   date_to: Date.to_string(dr_attr.date_to),
+                   rank: dr_attr.rank
+                 }
+               end)
+
+      assert Enum.count(@new_date_ranks) == Repo.one(from(p in DateRank, select: count(p.id)))
     end
   end
 
   describe "when deleting a poll" do
-
     setup do
       {:ok, event} = Scheduler.create_event(@event_valid_attrs_1)
       {:ok, poll} = Scheduler.create_poll(event, @poll_valid_attrs_3)
@@ -405,7 +427,7 @@ defmodule Smoodle.SchedulerTest do
     test "delete_poll/3 works", context do
       {:ok, poll} = Scheduler.delete_poll(context[:poll])
       assert_raise Ecto.NoResultsError, fn -> Scheduler.get_poll!(poll.id) end
-      assert 0 = Repo.one(from p in DateRank, select: count(p.id))
+      assert 0 = Repo.one(from(p in DateRank, select: count(p.id)))
     end
   end
 
@@ -420,17 +442,22 @@ defmodule Smoodle.SchedulerTest do
 
     test "get_best_schedule returns the best date at the head of the list", %{event: event} do
       best_schedule = Scheduler.get_best_schedule(event)
+
       assert %{
-        dates: dates
-      } = best_schedule
+               dates: dates
+             } = best_schedule
+
       [best_date | _] = dates
-      assert %{date: ~D[2117-03-15], positive_rank: 2.0} = best_date # It's a Monday :-)
+      # It's a Monday :-)
+      assert %{date: ~D[2117-03-15], positive_rank: 2.0} = best_date
     end
 
     test "get_best_schedule returns one entry for each date in the event window", %{event: event} do
       best_schedule = Scheduler.get_best_schedule(event)
-      assert Enum.map(Date.range(event.time_window_from, event.time_window_to), &(&1)) |> Enum.sort ==
-        Enum.map(best_schedule.dates, fn %{date: date} -> date end) |> Enum.sort
+
+      assert Enum.map(Date.range(event.time_window_from, event.time_window_to), & &1)
+             |> Enum.sort() ==
+               Enum.map(best_schedule.dates, fn %{date: date} -> date end) |> Enum.sort()
     end
 
     test "get_best_schedule returns the number of participants", %{event: event, polls: polls} do
@@ -438,26 +465,44 @@ defmodule Smoodle.SchedulerTest do
       assert best_schedule.participants_count == Enum.count(polls)
     end
 
-    test "get_best_schedule called from non-owner does not include participant names", %{event: event} do
+    test "get_best_schedule called from non-owner does not include participant names", %{
+      event: event
+    } do
       best_schedule = Scheduler.get_best_schedule(event)
       assert Enum.all?(best_schedule.dates, &(!Map.has_key?(&1, :negative_participants)))
       assert Enum.all?(best_schedule.dates, &(!Map.has_key?(&1, :positive_participants)))
       assert Enum.empty?(best_schedule.participants)
     end
 
-    test "get_best_schedule called from owner does include participant names", %{event: event, polls: polls} do
+    test "get_best_schedule called from owner does include participant names", %{
+      event: event,
+      polls: polls
+    } do
       best_schedule = Scheduler.get_best_schedule(event, is_owner: true)
-      assert Enum.any?(best_schedule.dates, &(Enum.any?(&1.negative_participants)))
-      assert Enum.any?(best_schedule.dates, &(Enum.any?(&1.positive_participants)))
-      assert Enum.sort(best_schedule.participants) == Enum.map(polls, &(Map.get(&1, :participant))) |> Enum.sort
+      assert Enum.any?(best_schedule.dates, &Enum.any?(&1.negative_participants))
+      assert Enum.any?(best_schedule.dates, &Enum.any?(&1.positive_participants))
+
+      assert Enum.sort(best_schedule.participants) ==
+               Enum.map(polls, &Map.get(&1, :participant)) |> Enum.sort()
     end
 
-    test "get_best_schedule for event returns empty list when time window is invalid", %{event: event} do
-      best_schedule = Scheduler.get_best_schedule(%{event | time_window_to: event.time_window_from, time_window_from: event.time_window_to}, is_owner: true)
-      assert Enum.empty? best_schedule.dates
+    test "get_best_schedule for event returns empty list when time window is invalid", %{
+      event: event
+    } do
+      best_schedule =
+        Scheduler.get_best_schedule(
+          %{
+            event
+            | time_window_to: event.time_window_from,
+              time_window_from: event.time_window_to
+          },
+          is_owner: true
+        )
+
+      assert Enum.empty?(best_schedule.dates)
     end
 
-     test "get_best_schedule returns a shorten list when a limit is passed", %{event: event} do
+    test "get_best_schedule returns a shorten list when a limit is passed", %{event: event} do
       best_schedule = Scheduler.get_best_schedule(event, limit: 1)
       assert Enum.count(best_schedule.dates) == 1
     end
@@ -472,7 +517,7 @@ defmodule Smoodle.SchedulerTest do
     test "get_best_schedule returns an empty list", %{event: event} do
       best_schedule = Scheduler.get_best_schedule(event)
       assert best_schedule.participants_count == 0
-      assert Enum.empty? best_schedule.dates
+      assert Enum.empty?(best_schedule.dates)
     end
   end
 end

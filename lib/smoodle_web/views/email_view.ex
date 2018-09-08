@@ -1,3 +1,3 @@
 defmodule SmoodleWeb.EmailView do
-	use SmoodleWeb, :view
+  use SmoodleWeb, :view
 end

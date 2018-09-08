@@ -28,8 +28,9 @@ defmodule SmoodleWeb do
 
   def view do
     quote do
-      use Phoenix.View, root: "lib/smoodle_web/templates",
-                        namespace: SmoodleWeb
+      use Phoenix.View,
+        root: "lib/smoodle_web/templates",
+        namespace: SmoodleWeb
 
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_flash: 2, view_module: 1]

@@ -3,7 +3,7 @@ defmodule SmoodleWeb.EventView do
   alias SmoodleWeb.EventView
 
   def render("index.json", %{events: events}) do
-    %{data: render_many(Enum.map(events, &(Map.delete(&1, :secret))), EventView, "event.json")}
+    %{data: render_many(Enum.map(events, &Map.delete(&1, :secret)), EventView, "event.json")}
   end
 
   def render("show.json", %{event: event}) do

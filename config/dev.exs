@@ -11,8 +11,14 @@ config :smoodle, SmoodleWeb.Endpoint,
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
-  watchers: [node: ["node_modules/brunch/bin/brunch", "watch", "--stdin",
-                    cd: Path.expand("../assets", __DIR__)]]
+  watchers: [
+    node: [
+      "node_modules/brunch/bin/brunch",
+      "watch",
+      "--stdin",
+      cd: Path.expand("../assets", __DIR__)
+    ]
+  ]
 
 # ## SSL Support
 #
@@ -57,6 +63,4 @@ config :smoodle, Smoodle.Repo,
   hostname: "localhost",
   pool_size: 10
 
-config :smoodle, Smoodle.Mailer,
-  adapter: Bamboo.LocalAdapter
-
+config :smoodle, Smoodle.Mailer, adapter: Bamboo.LocalAdapter

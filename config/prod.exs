@@ -28,7 +28,8 @@ config :smoodle, Smoodle.Repo,
   url: "${DATABASE_URL}",
   database: "",
   ssl: true,
-  pool_size: 1 # Free tier db only allows 1 connection
+  # Free tier db only allows 1 connection
+  pool_size: 1
 
 config :smoodle, Smoodle.Mailer,
   adapter: Bamboo.MailjetAdapter,
@@ -75,4 +76,4 @@ config :smoodle, Smoodle.Mailer,
 
 # Finally import the config/prod.secret.exs
 # which should be versioned separately.
-#import_config "prod.secret.exs"
+# import_config "prod.secret.exs"

@@ -6,10 +6,10 @@ defmodule SmoodleWeb.PollController do
   alias Smoodle.Scheduler.Poll
   alias Smoodle.Repo
 
-  action_fallback SmoodleWeb.FallbackController
+  action_fallback(SmoodleWeb.FallbackController)
 
-	def index(conn, %{"event_id" => event_id, "secret" => secret}) do
-		event = Scheduler.get_event!(event_id, secret)
+  def index(conn, %{"event_id" => event_id, "secret" => secret}) do
+    event = Scheduler.get_event!(event_id, secret)
 
     polls = Repo.preload(Scheduler.list_polls(event), :date_ranks)
     render(conn, "index.json", polls: polls)
@@ -21,22 +21,23 @@ defmodule SmoodleWeb.PollController do
   end
 
   def create(conn, %{"event_id" => event_id, "poll" => poll_params}) do
-		event = Scheduler.get_event!(event_id)
+    event = Scheduler.get_event!(event_id)
 
-		with {:ok, poll = %Poll{}} <- Scheduler.create_poll(event, poll_params) do
-      Logger.info "Created poll: #{poll}"
-		  conn
-       |> put_status(:created)
-       |> put_resp_header("location", event_path(conn, :show, poll))
-       # need to preload date_ranks for the case when the poll_params don't include any date ranks
-       |> render("show.json", poll: Repo.preload(poll, :date_ranks))
+    with {:ok, poll = %Poll{}} <- Scheduler.create_poll(event, poll_params) do
+      Logger.info("Created poll: #{poll}")
+      # need to preload date_ranks for the case when the poll_params don't include any date ranks
+      conn
+      |> put_status(:created)
+      |> put_resp_header("location", event_path(conn, :show, poll))
+      |> render("show.json", poll: Repo.preload(poll, :date_ranks))
     end
-	end
+  end
 
-	def show(conn, %{"id" => id}) do
-    poll = Scheduler.get_poll!(id)
-    |> Repo.preload(:date_ranks)
-    |> Repo.preload(:event)
+  def show(conn, %{"id" => id}) do
+    poll =
+      Scheduler.get_poll!(id)
+      |> Repo.preload(:date_ranks)
+      |> Repo.preload(:event)
 
     render(conn, "show.json", poll: poll)
   end
@@ -45,7 +46,7 @@ defmodule SmoodleWeb.PollController do
     poll = Scheduler.get_poll!(id)
 
     with {:ok, %Poll{} = poll} <- Scheduler.update_poll(poll, poll_params) do
-      Logger.info "Updated poll: #{poll}"
+      Logger.info("Updated poll: #{poll}")
       render(conn, "show.json", poll: poll)
     end
   end
@@ -54,7 +55,7 @@ defmodule SmoodleWeb.PollController do
     poll = Scheduler.get_poll!(id)
 
     with {:ok, %Poll{} = poll} <- Scheduler.delete_poll(poll) do
-      Logger.info "Deleted poll: #{poll}"
+      Logger.info("Deleted poll: #{poll}")
       send_resp(conn, :no_content, "")
     end
   end

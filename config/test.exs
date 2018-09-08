@@ -18,5 +18,4 @@ config :smoodle, Smoodle.Repo,
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
 
-config :smoodle, Smoodle.Mailer,
-  adapter: Bamboo.TestAdapter
+config :smoodle, Smoodle.Mailer, adapter: Bamboo.TestAdapter

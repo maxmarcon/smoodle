@@ -4,7 +4,7 @@ defmodule SmoodleWeb.PageControllerTest do
   import Phoenix.View
 
   @app_paths [
-  	"/home",
+    "/home",
     "/events/new",
     "/events/:event_id/edit",
     "/events/:event_id/polls/new",
@@ -13,10 +13,10 @@ defmodule SmoodleWeb.PageControllerTest do
   ]
 
   test "app pages are rendered", %{conn: conn} do
-  	for path <- @app_paths do
-  		conn = get conn, path
-  		assert html_response(conn, :ok) =~ render_to_string(SmoodleWeb.PageView, "app.html", [])
-  	end
+    for path <- @app_paths do
+      conn = get(conn, path)
+      assert html_response(conn, :ok) =~ render_to_string(SmoodleWeb.PageView, "app.html", [])
+    end
   end
 
   test "/ is redirected to the home page", %{conn: conn} do

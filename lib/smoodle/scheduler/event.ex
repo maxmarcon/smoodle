@@ -20,17 +20,17 @@ defmodule Smoodle.Scheduler.Event do
   @valid_states ["OPEN", "SCHEDULED", "CANCELED"]
 
   schema "events" do
-    field :name, :string
-    field :organizer, :string
-    field :secret, :string
-    field :time_window_from, :date
-    field :time_window_to, :date
-    field :scheduled_from, :naive_datetime
-    field :scheduled_to, :naive_datetime
-    field :desc, :string
-    field :email, :string
-    field :state, :string, default: "OPEN"
-    has_many :polls, Poll
+    field(:name, :string)
+    field(:organizer, :string)
+    field(:secret, :string)
+    field(:time_window_from, :date)
+    field(:time_window_to, :date)
+    field(:scheduled_from, :naive_datetime)
+    field(:scheduled_to, :naive_datetime)
+    field(:desc, :string)
+    field(:email, :string)
+    field(:state, :string, default: "OPEN")
+    has_many(:polls, Poll)
 
     timestamps(usec: false)
   end
@@ -43,7 +43,17 @@ defmodule Smoodle.Scheduler.Event do
   def changeset(%Event{} = event, attrs) do
     event
     |> Repo.preload(:polls)
-    |> cast(attrs, [:name, :organizer, :time_window_from, :time_window_to, :scheduled_from, :scheduled_to, :desc, :email, :state])
+    |> cast(attrs, [
+      :name,
+      :organizer,
+      :time_window_from,
+      :time_window_to,
+      :scheduled_from,
+      :scheduled_to,
+      :desc,
+      :email,
+      :state
+    ])
     |> validate_required([:name, :organizer, :desc, :email, :time_window_from, :time_window_to])
     |> validate_length(:name, max: 50)
     |> validate_length(:organizer, max: 50)
@@ -62,10 +72,9 @@ defmodule Smoodle.Scheduler.Event do
     |> validate_inclusion(:state, @valid_states)
   end
 
-
   def changeset_insert(attrs) do
-    changeset(%Event{}, attrs) |>
-    change(%{secret: SecureRandom.urlsafe_base64(@secret_len)})
+    changeset(%Event{}, attrs)
+    |> change(%{secret: SecureRandom.urlsafe_base64(@secret_len)})
   end
 
   defp validate_email_confirmation(changeset) do
@@ -77,9 +86,15 @@ defmodule Smoodle.Scheduler.Event do
   end
 
   defp validate_consistency(changeset) do
-    if get_field(changeset, :scheduled_from) && get_field(changeset, :state) != "SCHEDULED" ||
-      get_field(changeset, :state) == "SCHEDULED" && !(get_field(changeset, :scheduled_from) && get_field(changeset, :scheduled_from)) do
-      add_error(changeset, :state, dgettext("errors", "inconsistent event state"), validation: :inconsistent_event_state)
+    if (get_field(changeset, :scheduled_from) && get_field(changeset, :state) != "SCHEDULED") ||
+         (get_field(changeset, :state) == "SCHEDULED" &&
+            !(get_field(changeset, :scheduled_from) && get_field(changeset, :scheduled_from))) do
+      add_error(
+        changeset,
+        :state,
+        dgettext("errors", "inconsistent event state"),
+        validation: :inconsistent_event_state
+      )
     else
       changeset
     end
@@ -87,10 +102,18 @@ defmodule Smoodle.Scheduler.Event do
 
   defp validate_window_not_too_large(changeset, keys, max_days, error_key) do
     with [t1, t2] <- Enum.map(keys, &fetch_field(changeset, &1)) |> Enum.map(&elem(&1, 1)),
-      false <- Enum.any?([t1, t2], &is_nil/1),
-      true <- Date.diff(t2, t1) > max_days
-    do
-      add_error(changeset, error_key, dgettext("errors", "you cannot select a time window larger than %{max_days} days", max_days: max_days), validation: :time_interval_too_large)
+         false <- Enum.any?([t1, t2], &is_nil/1),
+         true <- Date.diff(t2, t1) > max_days do
+      add_error(
+        changeset,
+        error_key,
+        dgettext(
+          "errors",
+          "you cannot select a time window larger than %{max_days} days",
+          max_days: max_days
+        ),
+        validation: :time_interval_too_large
+      )
     else
       _ -> changeset
     end
@@ -98,9 +121,14 @@ defmodule Smoodle.Scheduler.Event do
 
   defp validate_window_defined(changeset, keys, error_key) do
     if Enum.map(keys, &fetch_field(changeset, &1))
-      |> Enum.count(&is_nil(elem(&1, 1)))
-      |> Integer.is_odd do
-      add_error(changeset, error_key, dgettext("errors", "both ends must be defined or none"), validation: :only_one_end_defined)
+       |> Enum.count(&is_nil(elem(&1, 1)))
+       |> Integer.is_odd() do
+      add_error(
+        changeset,
+        error_key,
+        dgettext("errors", "both ends must be defined or none"),
+        validation: :only_one_end_defined
+      )
     else
       changeset
     end
@@ -112,17 +140,22 @@ defmodule Smoodle.Scheduler.Event do
     scheduled yet, but the current date already lies within the time window
   """
   defp validate_is_the_future(changeset, keys, t \\ NaiveDateTime) do
-    today = case t do
-      NaiveDateTime -> NaiveDateTime.utc_now
-      Date -> Date.utc_today
-    end
+    today =
+      case t do
+        NaiveDateTime -> NaiveDateTime.utc_now()
+        Date -> Date.utc_today()
+      end
 
-    Enum.reduce(keys, changeset, fn(key, changeset) ->
+    Enum.reduce(keys, changeset, fn key, changeset ->
       with {:ok, date_or_time} <- fetch_change(changeset, key),
-        %{} <- date_or_time,
-        :gt <- t.compare(today, date_or_time)
-      do
-        add_error(changeset, key, dgettext("errors", "you cannot schedule an event in the past"), validation: :in_the_past)
+           %{} <- date_or_time,
+           :gt <- t.compare(today, date_or_time) do
+        add_error(
+          changeset,
+          key,
+          dgettext("errors", "you cannot schedule an event in the past"),
+          validation: :in_the_past
+        )
       else
         _ -> changeset
       end

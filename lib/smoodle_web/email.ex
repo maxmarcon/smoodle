@@ -1,18 +1,18 @@
 defmodule SmoodleWeb.Email do
-	use Bamboo.Phoenix, view: SmoodleWeb.EmailView
+  use Bamboo.Phoenix, view: SmoodleWeb.EmailView
   import SmoodleWeb.Gettext
 
-	@from_address {"Your LetsMeet! Bot", "noreply@lets-meet.app"}
+  @from_address {"Your LetsMeet! Bot", "noreply@lets-meet.app"}
 
-	def new_event_email(event) do
-		new_email()
-		|> to(event.email)
-		|> from(@from_address)
-		|> subject(gettext("Your new event: %{event_name}", event_name: event.name))
-		|> assign(:owner_link, SmoodleWeb.EventView.owner_link(event))
-		|> assign(:share_link, SmoodleWeb.EventView.share_link(event))
-		|> assign(:event_organizer, event.organizer)
-		|> assign(:event_name, event.name)
-		|> render("new_event.html")
-	end
+  def new_event_email(event) do
+    new_email()
+    |> to(event.email)
+    |> from(@from_address)
+    |> subject(gettext("Your new event: %{event_name}", event_name: event.name))
+    |> assign(:owner_link, SmoodleWeb.EventView.owner_link(event))
+    |> assign(:share_link, SmoodleWeb.EventView.share_link(event))
+    |> assign(:event_organizer, event.organizer)
+    |> assign(:event_name, event.name)
+    |> render("new_event.html")
+  end
 end
