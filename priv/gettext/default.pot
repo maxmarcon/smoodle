@@ -11,11 +11,6 @@ msgid ""
 msgstr ""
 
 #, elixir-format
-#: lib/smoodle_web/templates/page/welcome.html.pug:12
-msgid "Schedule an event now"
-msgstr ""
-
-#, elixir-format
 #: lib/smoodle_web/templates/email/new_event.html.pug:7
 msgid "And this is the link you can use to manage your event:"
 msgstr ""
@@ -51,16 +46,6 @@ msgid "Lets meet!"
 msgstr ""
 
 #, elixir-format
-#: lib/smoodle_web/templates/page/welcome.html.pug:6
-msgid "Lets meet! is a smart scheduling app that allows you to schedule your events easily"
-msgstr ""
-
-#, elixir-format
 #: lib/smoodle_web/templates/email/new_event.html.pug:11
 msgid "Sincerely, your LetsMeet! bot"
-msgstr ""
-
-#, elixir-format
-#: lib/smoodle_web/templates/page/welcome.html.pug:4
-msgid "Welcome to Lets meet!"
 msgstr ""
