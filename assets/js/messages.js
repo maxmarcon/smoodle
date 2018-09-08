@@ -129,6 +129,35 @@ export default {
 			worst: "worst",
 			edit_event: "Edit event"
 		},
+		home: {
+			title: 'Gathering made easy',
+			subtitle_1: '{app_name} helps you find the best date for the events in your social circle',
+			subtitle_2: 'No account needed. We only require your email to send you a link',
+			step: 'Step {step}',
+			how_it_works: 'Nail your event in 3 easy steps:',
+			step1: {
+				title: '{step} : Create the event',
+				part1: 'Describe your event.',
+				part2: 'Select the time period suitable for the event.',
+				part3: 'Finally, invite with friends by sharing a Web link.'
+			},
+			step2: {
+				title: '{step} : Let your friends decide',
+				part1: 'They can say if a date is {good}, {indifferent}, or {bad} for them.',
+				part2: 'They can select weekdays or specific dates, even whole time periods.'
+			},
+			step3: {
+				title: '{step} : Manage the event',
+				part1: 'As an organizer, you always have a clear overview your friends decisions.',
+				part2: '{good} and {bad} dates are cleary visible on the calendar.',
+				part3: 'When you are ready, pick a date, schedule the event and let your crowd now!'
+			},
+			create_new_event: 'Create an event now!',
+			good: 'good',
+			good_upper: 'Good',
+			indifferent: 'indifferent',
+			bad: 'bad'
+		},
 		date_format: 'MM/DD/YYYY',
 		datetime_format: 'MM/DD/YYYY h:mm A',
 		time_format: 'h:mm A',

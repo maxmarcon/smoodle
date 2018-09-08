@@ -9,7 +9,7 @@ export function dotAccessObject(obj, deep_key) {
 	keys.every(function(key) {
 		if (obj.hasOwnProperty(key)) {
 			obj = obj[key]
-			if (!(obj instanceof Object) || obj instanceof Array) {
+			if (!(obj instanceof Object) || (obj instanceof Array)) {
 				retval = obj
 				return false;
 			}
@@ -53,20 +53,6 @@ class LocalStorageProxy {
 }
 
 export const localStorageProxy = new LocalStorageProxy();
-
-export function showToolTip(name) {
-	if (localStorageProxy.available) {
-		let status = localStorageProxy.getItem(name);
-		if (status) {
-			return false;
-		} else {
-			localStorageProxy.setItem(name, "shown");
-			return true;
-		}
-	} else {
-		return false;
-	}
-}
 
 export function stringifyServerError(error) {
 	if (error instanceof Array) {
@@ -315,6 +301,13 @@ export const eventDataMixin = {
 			Object.keys(data).forEach((k) => data[k] == null && delete data[k]);
 			return data;
 		}
+	}
+}
+
+const IMAGE_PATH = "/images";
+export const imageHelpersMixin = {
+	methods: {
+		fullPath: (path) => [IMAGE_PATH, path.replace(/^\//, '').replace(/\/{2,}/g, '/')].join('/')
 	}
 }
 
