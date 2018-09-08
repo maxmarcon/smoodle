@@ -45,7 +45,7 @@
 								li.list-group-item.text-muted
 									i18n(path="home.step2.part1" tag="em")
 										span.text-success(place="good") {{ $tc('home.good', 1) }}
-										span.text-warning(place="indifferent") {{ $tc('home.indifferent', ) }}
+										span.text-warning(place="indifferent") {{ $tc('home.indifferent', 1) }}
 										span.text-danger(place="bad") {{ $tc('home.bad', 1) }}
 								li.list-group-item.text-muted
 									em {{ $t('home.step2.part2') }}
