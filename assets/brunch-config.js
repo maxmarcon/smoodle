@@ -56,7 +56,8 @@ exports.config = {
       presets: ['env']
     },
     copycat: {
-      webfonts: ['node_modules/@fortawesome/fontawesome-free/webfonts']
+      webfonts: ['node_modules/@fortawesome/fontawesome-free/webfonts'],
+      images: ['images']
     }
   },
 
