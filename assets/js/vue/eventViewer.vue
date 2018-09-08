@@ -135,7 +135,7 @@
 								i18n(path="event_viewer.event_open_organizer" v-if="isOrganizer")
 									i.fas.fa-calendar-check.fa-lg(place="calendar_icon")
 									a(href="#" place="participants" v-b-modal.participantsListModal="")
-										| {{ $t('event_viewer.nof_participants', {participants: eventScheduleParticipantsCount}) }}
+										| {{ $tc('event_viewer.nof_participants', eventScheduleParticipantsCount, {participants: eventScheduleParticipantsCount}) }}
 
 								i18n(path="event_viewer.event_open" :places="{participants: eventScheduleParticipantsCount}" v-else)
 									i.fas.fa-calendar-check.fa-lg(place="calendar_icon")

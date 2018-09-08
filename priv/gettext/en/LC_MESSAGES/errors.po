@@ -97,51 +97,51 @@ msgid "must be equal to %{number}"
 msgstr ""
 
 #, elixir-format
-#: lib/smoodle/scheduler/event.ex:125
+#: lib/smoodle/scheduler/event.ex:156
 msgid "you cannot schedule an event in the past"
 msgstr ""
 
 #, elixir-format
-#: lib/smoodle/scheduler/event.ex:103
+#: lib/smoodle/scheduler/event.ex:129
 msgid "both ends must be defined or none"
 msgstr ""
 
 #, elixir-format
-#: lib/smoodle/scheduler/utils.ex:39
+#: lib/smoodle/scheduler/utils.ex:41
 msgid "the right side of the window must happen later than the left one"
 msgstr ""
 
 #, elixir-format
-#: lib/smoodle/scheduler/poll.ex:82
+#: lib/smoodle/scheduler/poll.ex:100
 msgid "dates cannot overlap"
 msgstr ""
 
 #, elixir-format
-#: lib/smoodle/scheduler/poll.ex:53
+#: lib/smoodle/scheduler/poll.ex:58
 msgid "event is no longer open"
 msgstr ""
 
 #, elixir-format
-#: lib/smoodle/scheduler/event.ex:82
+#: lib/smoodle/scheduler/event.ex:95
 msgid "inconsistent event state"
 msgstr ""
 
 #, elixir-format
-#: lib/smoodle/scheduler/utils.ex:95
+#: lib/smoodle/scheduler/utils.ex:102
 msgid "must be different than zero"
 msgstr ""
 
 #, elixir-format
-#: lib/smoodle/scheduler/poll.ex:99
+#: lib/smoodle/scheduler/poll.ex:122
 msgid "you can only rank a weekday once"
 msgstr ""
 
 #, elixir-format
-#: lib/smoodle/scheduler/event.ex:93
+#: lib/smoodle/scheduler/event.ex:110
 msgid "you cannot select a time window larger than %{max_days} days"
 msgstr ""
 
 #, elixir-format
-#: lib/smoodle/scheduler/poll.ex:68
+#: lib/smoodle/scheduler/poll.ex:79
 msgid "dates cannot be outside of the event time window"
 msgstr ""

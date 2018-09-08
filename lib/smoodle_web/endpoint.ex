@@ -12,7 +12,7 @@ defmodule SmoodleWeb.Endpoint do
     at: "/",
     from: :smoodle,
     gzip: false,
-    only: ~w(css fonts webfonts images js favicon.ico robots.txt)
+    only: ~w(css fonts webfonts flags images js favicon.ico robots.txt)
   )
 
   # Code reloading can be explicitly enabled under the

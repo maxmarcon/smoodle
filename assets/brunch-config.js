@@ -57,7 +57,8 @@ exports.config = {
     },
     copycat: {
       webfonts: ['node_modules/@fortawesome/fontawesome-free/webfonts'],
-      images: ['images']
+      images: ['images'],
+      flags: ['node_modules/flag-icon-css/flags']
     }
   },
 

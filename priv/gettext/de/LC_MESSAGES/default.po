@@ -14,32 +14,32 @@ msgstr ""
 #, elixir-format
 #: lib/smoodle_web/templates/email/new_event.html.pug:7
 msgid "And this is the link you can use to manage your event:"
-msgstr ""
+msgstr "Das ist der Link, den du benutzen kannst, um dein Event zu verwalten:"
 
 #, elixir-format
 #: lib/smoodle_web/templates/email/new_event.html.pug:8
 msgid "Click me but do not share me"
-msgstr ""
+msgstr "Klick auf mich aber teil mich nicht."
 
 #, elixir-format
 #: lib/smoodle_web/templates/email/new_event.html.pug:5
 msgid "You created a new event called \"%{event_name}\". This is the link you should share with the event participants:"
-msgstr ""
+msgstr "Du hast ein neues Event mit Namen \"%{event_name}\" gestartet. Das ist der Link, den du mit deinen Gästen teilen solltest, um sie einzuladen:"
 
 #, elixir-format
 #: lib/smoodle_web/templates/email/new_event.html.pug:9
 msgid "You should keep this link to yourself and not share it with anyone else. Enjoy!"
-msgstr ""
+msgstr "Du solltest diesen Link für dich behalten und mit niemand anders teilen."
 
 #, elixir-format
 #: lib/smoodle_web/email.ex:11
 msgid "Your new event: %{event_name}"
-msgstr ""
+msgstr "Dein neues event: %{event_name}"
 
 #, elixir-format
 #: lib/smoodle_web/templates/email/new_event.html.pug:4
 msgid "Hello %{event_organizer},"
-msgstr ""
+msgstr "Hallo %{event_organizer}"
 
 #, elixir-format
 #: lib/smoodle_web/templates/layout/app.html.pug:9
@@ -49,4 +49,4 @@ msgstr ""
 #, elixir-format
 #: lib/smoodle_web/templates/email/new_event.html.pug:11
 msgid "Sincerely, your LetsMeet! bot"
-msgstr ""
+msgstr "Schöne Grüße von deinem LetsMeet! Bot"

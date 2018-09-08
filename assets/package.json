@@ -23,6 +23,7 @@
     "copycat-brunch": "^1.1.0",
     "date-fns": "^1.29.0",
     "dotenv": "^6.0.0",
+    "flag-icon-css": "^3.0.0",
     "jquery": "^3.3.1",
     "pc-bootstrap4-datetimepicker": "^4.17.50",
     "popper.js": "^1.14.4",

@@ -44,9 +44,9 @@
 									i.icon.fas.fa-thumbs-down.fa-2x.text-danger
 								li.list-group-item.text-muted
 									i18n(path="home.step2.part1" tag="em")
-										span.text-success(place="good") {{ $t('home.good') }}
-										span.text-warning(place="indifferent") {{ $t('home.indifferent') }}
-										span.text-danger(place="bad") {{ $t('home.bad') }}
+										span.text-success(place="good") {{ $tc('home.good', 1) }}
+										span.text-warning(place="indifferent") {{ $tc('home.indifferent', ) }}
+										span.text-danger(place="bad") {{ $tc('home.bad', 1) }}
 								li.list-group-item.text-muted
 									em {{ $t('home.step2.part2') }}
 
@@ -62,8 +62,8 @@
 									img.img-fluid.w-75.border.border-success.rounded(:src="fullPath('event_overview_calendar.png')")
 								li.list-group-item
 									i18n(path="home.step3.part2" tag="em")
-										span.text-success(place="good") {{ $t('home.good_upper') }}
-										span.text-danger(place="bad") {{ $t('home.bad') }}
+										span.text-success(place="good") {{ $tc('home.good_upper', 2) }}
+										span.text-danger(place="bad") {{ $tc('home.bad', 2) }}
 								li.list-group-item
 									em {{ $t('home.step3.part3') }}
 
