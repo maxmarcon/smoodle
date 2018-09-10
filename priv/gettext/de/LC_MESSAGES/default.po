@@ -24,12 +24,12 @@ msgstr "Klick mich aber teil mich nicht."
 #, elixir-format
 #: lib/smoodle_web/templates/email/new_event.html.pug:5
 msgid "You created a new event called \"%{event_name}\". This is the link you should share with the event participants:"
-msgstr "Du hast ein neues Event mit Namen \"%{event_name}\" geplant. Dies ist der Link, den du mit deinen Gästen teilen sollst, um sie einzuladen:"
+msgstr "Du hast ein neues Event mit Namen \"%{event_name}\" geplant. Dies ist der Link, den du mit deinen Gästen teilen solltest, um sie einzuladen:"
 
 #, elixir-format
 #: lib/smoodle_web/templates/email/new_event.html.pug:9
 msgid "You should keep this link to yourself and not share it with anyone else. Enjoy!"
-msgstr "Du sollst diesen Link für dich behalten und mit niemand teilen."
+msgstr "Du solltest diesen Link für dich behalten und mit niemand teilen."
 
 #, elixir-format
 #: lib/smoodle_web/email.ex:11
