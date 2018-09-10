@@ -157,7 +157,15 @@ export default {
 		date_format: 'MM/DD/YYYY',
 		datetime_format: 'MM/DD/YYYY h:mm A',
 		time_format: 'h:mm A',
-		week_days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+		week_days: {
+			mo: 'Monday',
+			tu: 'Tuesday',
+			we: 'Wednesday',
+			th: 'Thursday',
+			fr: 'Friday',
+			sa: 'Saturday',
+			su: 'Sunday'
+		},
 		ranker: {
 			good: "Good",
 			ok: "Ok",
@@ -342,7 +350,15 @@ export default {
 		date_format: 'DD/MM/YYYY',
 		datetime_format: 'DD/MM/YYYY hh:mm',
 		time_format: 'hh:mm',
-		week_days: ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'],
+		week_days: {
+			mo: 'Montag',
+			tu: 'Dienstag',
+			we: 'Mittwoch',
+			th: 'Donnerstag',
+			fr: 'Freitag',
+			sa: 'Samstag',
+			su: 'Sonntag'
+		},
 		ranker: {
 			good: "Gut",
 			ok: "Ok",

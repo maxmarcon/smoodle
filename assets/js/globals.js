@@ -96,8 +96,8 @@ export const accordionGroupsMixin = {
 						self[errorField] = (self[field] ? null : self.$i18n.t('errors.required_field'));
 					}
 					if (fieldMapObj.confirmation) {
-						let confirmation_field = field + "_confirmation";
-						let confirmation_error_field = errorField + "_confirmation";
+						let confirmation_field = `${field}_confirmation`;
+						let confirmation_error_field = `${errorField}_confirmation`;
 						self[confirmation_error_field] = (
 							self[field] == self[confirmation_field] ? null : self.$i18n.t('errors.confirmation_required', {field: field})
 						);
@@ -365,7 +365,7 @@ export const eventHelpersMixin = {
 
 export const whatsAppHelpersMixin = {
 	methods: {
-		whatsAppMessageURL: (link) => 'https://wa.me/?text=' + encodeURIComponent(link)
+		whatsAppMessageURL: (link) => `https://wa.me/?text=${encodeURIComponent(link)}`
 	}
 };
 

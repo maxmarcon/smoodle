@@ -426,7 +426,7 @@ export default {
 			return (this.eventId ? this.eventId : this.eventIdFromPoll);
 		},
 		initialWeeklyRanks() {
-			return this.$i18n.t('week_days').map((day, index) => ({day: index, name: day, rank: 0}));
+			return Object.keys(this.$i18n.t('week_days')).map((code, index) => ({day: index, name: `week_days.${code}`, rank: 0}));
 		},
 		pollDataForRequest() {
 			return {
