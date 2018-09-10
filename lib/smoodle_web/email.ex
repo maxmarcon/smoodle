@@ -2,7 +2,7 @@ defmodule SmoodleWeb.Email do
   use Bamboo.Phoenix, view: SmoodleWeb.EmailView
   import SmoodleWeb.Gettext
 
-  @from_address {"Your LetsMeet! Bot", "noreply@lets-meet.app"}
+  @from_address {gettext("Your LetsMeet! Bot"), "noreply@lets-meet.app"}
 
   def new_event_email(event) do
     new_email()

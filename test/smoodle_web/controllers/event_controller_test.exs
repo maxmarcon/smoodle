@@ -178,6 +178,7 @@ defmodule SmoodleWeb.EventControllerTest do
 
       conn = post(conn, event_path(conn, :create), event: @create_attrs_1)
       json_response(conn, 429)
+
       assert event_count == max_emails
     end
 

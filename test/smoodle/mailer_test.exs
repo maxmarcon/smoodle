@@ -1,5 +1,7 @@
 defmodule Smoodle.MailerTest do
   use ExUnit.Case
+  use Bamboo.Test
+
   import Smoodle.Mailer
 
   setup do
@@ -18,9 +20,11 @@ defmodule Smoodle.MailerTest do
 
     assert {:ok, ttl} = Cachex.ttl(cache_name, email.to)
     assert ttl <= time_bucket_msec
+
+    assert_delivered_email(email)
   end
 
-  test "mailer sends up to the number of emails" do
+  test "mailer sends only up to the maximum number of emails in the bucket and sends again after the cache key as expired" do
     email = %Bamboo.Email{
       to: "to@google.com",
       from: "from@google.com",
@@ -29,24 +33,27 @@ defmodule Smoodle.MailerTest do
 
     for _ <- 0..(max_emails - 1) do
       assert {:ok, _} = deliver_with_rate_limit(email, email.to)
+      assert_delivered_email(email)
     end
-  end
 
-  test "mailer can send again after key is expired" do
     email = %Bamboo.Email{
       to: "to@google.com",
       from: "from@google.com",
       subject: "nothing"
     }
-
-    for _ <- 0..(max_emails - 1) do
-      assert {:ok, _} = deliver_with_rate_limit(email, email.to)
-    end
 
     assert :error = deliver_with_rate_limit(email, email.to)
+    refute_delivered_email(email)
 
-    Cachex.expire(:mailer_cache, email.to, -1)
+    Smoodle.Mailer.reset_counters()
+
+    email = %Bamboo.Email{
+      to: "to@google.com",
+      from: "from@google.com",
+      subject: "nothing"
+    }
 
     assert {:ok, _} = deliver_with_rate_limit(email, email.to)
+    assert_delivered_email(email)
   end
 end

@@ -16,7 +16,7 @@ defmodule SmoodleWeb.FallbackController do
     send_resp(conn, :ok, "")
   end
 
-  def call(conn, {:error, reason_atom}) do
+  def call(conn, {:error, reason_atom}) when is_atom(reason_atom) do
     code = Plug.Conn.Status.code(reason_atom)
 
     conn
