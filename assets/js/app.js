@@ -13,6 +13,8 @@ import VueClipboard from 'vue-clipboard2'
 import VCalendar from 'v-calendar'
 import VueScrollTo from 'vue-scrollto';
 import VueLoading from 'vue-loading-overlay';
+import rootVue from './vue/root.vue'
+
 const Vue = require('vue/dist/vue.runtime.js');
 //import Vue from 'vue/dist/vue.runtime.esm';
 // becaue ES module vue.esm.js does not fucking work!!! It might be a problem with brunch
@@ -106,7 +108,6 @@ Vue.use(VCalendar, {
 
 Vue.use(datePicker);
 
-import rootVue from './vue/root.vue'
 const app = new Vue({
 	i18n,
  	router,

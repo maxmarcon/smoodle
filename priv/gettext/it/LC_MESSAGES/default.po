@@ -50,3 +50,8 @@ msgstr ""
 #: lib/smoodle_web/templates/email/new_event.html.pug:11
 msgid "Sincerely, your LetsMeet! bot"
 msgstr ""
+
+#, elixir-format
+#: lib/smoodle_web/email.ex:5
+msgid "Your LetsMeet! Bot"
+msgstr ""

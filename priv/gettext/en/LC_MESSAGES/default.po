@@ -26,7 +26,7 @@ msgstr ""
 msgid "You created a new event called \"%{event_name}\". This is the link you should share with the event participants:"
 msgstr ""
 
-#, elixir-format, fuzzy
+#, elixir-format
 #: lib/smoodle_web/templates/email/new_event.html.pug:9
 msgid "You should keep this link to yourself and not share it with anyone else. Enjoy!"
 msgstr "You should keep this link to yourself and not share it with anyone else."
@@ -49,4 +49,9 @@ msgstr ""
 #, elixir-format
 #: lib/smoodle_web/templates/email/new_event.html.pug:11
 msgid "Sincerely, your LetsMeet! bot"
+msgstr "Sincerely, your LetsMeet! Bot"
+
+#, elixir-format
+#: lib/smoodle_web/email.ex:5
+msgid "Your LetsMeet! Bot"
 msgstr ""

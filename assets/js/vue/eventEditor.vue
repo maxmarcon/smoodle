@@ -185,14 +185,14 @@
 
 			.card-footer
 				.row.justify-content-center(v-if="!createdEvent")
-					.col-auto
+					.col-auto.mt-1
 						button.btn.btn-primary(v-if="!eventId" @click="saveEvent" :disabled="requestOngoing")
 							i.fas.fa-plus
 							| &nbsp; {{ $t('event_editor.create_event') }}
 						button.btn.btn-primary(v-else @click="saveEvent" :disabled="requestOngoing")
 							i.fas.fa-save
 							| &nbsp; {{ $t('event_editor.update_event') }}
-					.col-auto(v-if="eventId")
+					.col-auto.mt-1(v-if="eventId")
 						button.btn.btn-secondary(@click="backToEvent" :disabled="requestOngoing")
 							i.fas.fa-ban
 							| &nbsp; {{ $t('actions.cancel') }}

@@ -35,7 +35,7 @@
 					.card
 						.card-header
 							i18n.card-title.text-muted(path="home.step2.title" tag="h6")
-								span.h5.text-info(place="step") {{ $t('home.step', {step: 2})}}
+								span.h5.text-primary(place="step") {{ $t('home.step', {step: 2})}}
 						.card-body
 							ul.list-group.list-group-flush
 								li.list-group-item.d-flex.justify-content-around.pb-4
@@ -53,7 +53,7 @@
 					.card
 						.card-header
 							i18n.card-title.text-muted(path="home.step3.title" tag="h6")
-								span.h5.text-success(place="step") {{ $t('home.step', {step: 3})}}
+								span.h5.text-primary(place="step") {{ $t('home.step', {step: 3})}}
 						.card-body
 							ul.list-group.list-group-flush
 								li.list-group-item

@@ -15,7 +15,7 @@ msgid "can't be blank"
 msgstr "darf nicht leer sein"
 
 msgid "has already been taken"
-msgstr "wurde schon verteilt"
+msgstr "ist schon vergeben"
 
 msgid "is invalid"
 msgstr "ist ungültig"
@@ -27,7 +27,7 @@ msgid "has invalid format"
 msgstr "hat ungültiges Format"
 
 msgid "has an invalid entry"
-msgstr "hat einen ungültigen Eintrag"
+msgstr "hat einen ungültigen Wert"
 
 msgid "is reserved"
 msgstr "ist reserviert"
@@ -41,37 +41,31 @@ msgstr "ist noch mit diesem Eintrag assoziert"
 msgid "are still associated with this entry"
 msgstr "sind noch mit diesem Eintrag assoziert"
 
-#, fuzzy
 msgid "should be %{count} character(s)"
 msgid_plural "should be %{count} character(s)"
 msgstr[0] ""
 msgstr[1] ""
 
-#, fuzzy
 msgid "should have %{count} item(s)"
 msgid_plural "should have %{count} item(s)"
 msgstr[0] ""
 msgstr[1] ""
 
-#, fuzzy
 msgid "should be at least %{count} character(s)"
 msgid_plural "should be at least %{count} character(s)"
 msgstr[0] ""
 msgstr[1] ""
 
-#, fuzzy
 msgid "should have at least %{count} item(s)"
 msgid_plural "should have at least %{count} item(s)"
 msgstr[0] ""
 msgstr[1] ""
 
-#, fuzzy
 msgid "should be at most %{count} character(s)"
 msgid_plural "should be at most %{count} character(s)"
 msgstr[0] ""
 msgstr[1] ""
 
-#, fuzzy
 msgid "should have at most %{count} item(s)"
 msgid_plural "should have at most %{count} item(s)"
 msgstr[0] ""
