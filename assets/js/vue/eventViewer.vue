@@ -137,8 +137,9 @@
 									a(href="#" place="participants" v-b-modal.participantsListModal="")
 										| {{ $tc('event_viewer.nof_participants', eventScheduleParticipantsCount, {participants: eventScheduleParticipantsCount}) }}
 
-								i18n(path="event_viewer.event_open" :places="{participants: eventScheduleParticipantsCount}" v-else)
+								i18n(path="event_viewer.event_open" v-else)
 									i.fas.fa-calendar-check.fa-lg(place="calendar_icon")
+									span(place="answers") {{ $tc('event_viewer.answers', eventScheduleParticipantsCount, {count: eventScheduleParticipantsCount}) }}
 							.row.justify-content-center
 								.col-md-3.order-md-last
 									.form-group

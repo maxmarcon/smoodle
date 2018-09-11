@@ -18,24 +18,27 @@ div
 					| &nbsp; {{ $t("event_editor.title") }}
 
 			b-navbar-nav.ml-auto
-				b-nav-item-dropdown(right)
+				b-nav-item-dropdown(right size="sm")
 					template(slot="button-content")
-						i.fas.fa-lg.fa-globe-americas
-					b-dropdown-item(
+						span.fas.fa-lg.fa-globe-americas
+					b-dropdown-item-button(
 						@click="setLocale('en')"
 						:disabled="getLocale() == 'en'"
 					)
-						i.flag-icon.flag-icon-us
-					b-dropdown-item(
+						span.flag-icon.flag-icon-us
+						| &nbsp; EN
+					b-dropdown-item-button(
 						@click="setLocale('de')"
 						:disabled="getLocale() == 'de'"
 					)
-						i.flag-icon.flag-icon-de
-					b-dropdown-item(
+						span.flag-icon.flag-icon-de
+						| &nbsp; DE
+					b-dropdown-item-button(
 						@click="setLocale('it')"
 						:disabled="getLocale() == 'it'"
 					)
-						i.flag-icon.flag-icon-it
+						span.flag-icon.flag-icon-it
+						| &nbsp; IT
 
 	div
 		router-view
