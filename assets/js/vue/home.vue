@@ -56,15 +56,15 @@
 								span.h5.text-primary(place="step") {{ $t('home.step', {step: 3})}}
 						.card-body
 							ul.list-group.list-group-flush
-								li.list-group-item
+								li.list-group-item.text-muted
 									em {{ $t('home.step3.part1') }}
 								li.list-group-item
 									img.img-fluid.w-75.border.border-success.rounded(:src="fullPath('event_overview_calendar.png')")
-								li.list-group-item
+								li.list-group-item.text-muted
 									i18n(path="home.step3.part2" tag="em")
 										span.text-success(place="good") {{ $tc('home.good_upper', 2) }}
 										span.text-danger(place="bad") {{ $tc('home.bad', 2) }}
-								li.list-group-item
+								li.list-group-item.text-muted
 									em {{ $t('home.step3.part3') }}
 
 			.card-footer

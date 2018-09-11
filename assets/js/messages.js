@@ -22,7 +22,7 @@ export default {
 				organizer_email_confirmation_help: "Please confirm your email here. Even the best make mistakes sometimes..."
 			},
 			general_info_group: 'What kind of event is it?',
-			dates_group: 'When should the event roughly happen?',
+			dates_group: 'When should it roughly happen?',
 			organizer_group: 'Who\'s organizing the event?',
 			this_week: "This week",
 			next_week: "Next week",
@@ -108,7 +108,7 @@ export default {
 			event_opened_ok: 'The event has been reopened',
 			open_event_error: 'An error has occurred, the event could not be reopened',
 			share_link: 'Share this link with participants:',
-			nof_participants: "{participants} participant|{participants} participants",
+			nof_participants: "One participant|{participants} participants",
 			current_participants: "Current participants:",
 			negative_participants_for_date: "Everybody can make it|One person can't make it|{count} people can't make it",
 			positive_participants_for_date: "Everybody can make it|One person prefers this date|{count} people prefer this date",
@@ -215,7 +215,7 @@ export default {
 				organizer_email_confirmation_help: "Bitte bestätige deine Email. Sogar den Besten unterläuft manchmal ein Fehler..."
 			},
 			general_info_group: 'Was ist das für ein Event?',
-			dates_group: 'Wann soll das Event ungefähr stattfinden?',
+			dates_group: 'Wann soll es ungefähr stattfinden?',
 			organizer_group: 'Wer organisiert das Event?',
 			this_week: "Diese Woche",
 			next_week: "Nächste Woche",
@@ -301,19 +301,19 @@ export default {
 			event_opened_ok: 'Das Event wurde wiedergeöffnet',
 			open_event_error: 'Ein Fehler ist aufgetreten, das Event konnte nicht wiedergeöffnet werden"',
 			share_link: 'Teile diese Link mit deinen Gästen:',
-			nof_participants: "{participants} Gast|{participants} Gäste",
+			nof_participants: "Ein Gast|{participants} Gäste",
 			current_participants: "Aktuelle Gäste:",
 			negative_participants_for_date: "Alle können kommen|Eine Person kann nicht kommen|{count} Personen können nicht kommen",
-			positive_participants_for_date: "Alle können kommen|Eine Person bevorzugt diesen Tag|{count} Personen bevorzugen diesen Tag",
-			positive_participants_list_date: "{participants} bevorzugt diesen Tag|{participants} bevorzugen diesen Tag",
+			positive_participants_for_date: "Alle können kommen|Eine Person bevorzugt dieses Datum|{count} Personen bevorzugen dieses Datum",
+			positive_participants_list_date: "{participants} bevorzugt dieses Datum|{participants} bevorzugen dieses Datum",
 			negative_participants_list_date: "{participants} kann nicht kommen|{participants} können nicht kommen",
 			schedule_event: "Datum festlegen",
 			about_to_schedule: "Du willst das Event am {date} festlegen",
 			schedule_event_error: "Ein Fehler ist aufgetreten, das Datum konnte nicht festgelegt werden",
 			warning_bad_date: "Achtung! Eine Person kann an diesem Tag nicht kommen|Achtung! {participants} Personen können an diesem Tag nicht kommen",
 			select_time: "Leg eine Uhrzeit für das Event fest:",
-			date_selection_help: "Daten sind von {best} zu {worst} bewertet. Klick ein Datum, um zu erfahren, wie viele an dem Tag kommen können.",
-			date_selection_help_organizer: "Daten sind von {best} zu {worst} bewertet. Klick ein Datum, um zu erfahren, wer an dem Tag kommen kann. Wähl das Datum aus, das du festlegen möchtest",
+			date_selection_help: "Daten sind von {best} zu {worst} bewertet. Klick ein Datum an, um zu erfahren, wie viele an dem Tag kommen können.",
+			date_selection_help_organizer: "Daten sind von {best} zu {worst} bewertet. Klick ein Datum an, um zu erfahren, wer an dem Tag kommen kann. Wähl das Datum aus, das du festlegen möchtest",
 			best: "gut",
 			worst: "schlecht",
 			edit_event: "Event editieren"
@@ -341,7 +341,7 @@ export default {
 				part2: '{good} und {bad} Daten sind deutlich sichtbar im Kalendar.',
 				part3: 'Wenn du bereit bist, wähl ein Datum aus, leg es fest und sag deiner Crowd Bescheid!'
 			},
-			create_new_event: 'Jetzt ein neues Event planen!',
+			create_new_event: 'Jetzt neues Event planen!',
 			good: 'passend|passende',
 			good_upper: 'Passend|Passende',
 			indifferent: 'gleichgültig|gleichgültige',
@@ -392,25 +392,194 @@ export default {
 
 	it: {
 		event_editor: {
+			title: 'Nuovo evento',
+			welcome: 'Ciao! Qui puoi pianificare un nuovo evento e condividerlo con i tuoi amici.',
+			welcome_again: 'Ciao {organizer}! Qui puoi modificare i dettagli del tuo evento.',
 			event: {
-				name: "Titolo dell'evento",
-				name_help: "Dai un nome al tuo evento",
-				desc: "Qual'è l'occasione?",
-				desc_help: "Descrivi l'evento",
-				dates: "Date",
+				name: "Come si chiama l'evento?",
+				name_help: "Dai un nome al tuo evento.",
+				desc: "Di cosa si tratta?",
+				desc_help: "Descrivi l'evento per i tuoi ospiti.",
+				dates: "Scegli un periodo usando il calendario o il menù drop-down.",
 				organizer: "Chi sei?",
-				organizer_help: "Fai sapere ai tuoi amici chi li invita..."
+				organizer_help: "Fai sapere ai tuoi amici chi li invita...",
+				organizer_email: "Immetti la tua email.",
+				organizer_email_help: "Usiamo la tua email unicamente per mandarti un link privato con il quale puoi gestire il tuo evento.",
+				organizer_email_confirmation_help: "Per favore conferma la tua email. Anche i migliori fanno errori ogni tanto..."
 			},
-			next: "Avanti",
-			prev: "Indietro",
+			general_info_group: 'Che gener di evento è?',
+			dates_group: 'Quando deve avere luogo?',
+			organizer_group: 'Chi organizza l\'evento?',
 			this_week: "Questa settimana",
 			next_week: "La prossima settimana",
 			within_months: "Entro un mese|Entro {count} mesi",
-			dates_quick_selection: "Preselezione veloce",
-			step: "Passo {step} di {lastStep}"
+			dates_quick_selection: "Scelta veloce",
+			link_copied: "Link copiato.",
+			event_created: "Congratulazioni {eventOrganizer}! Il tuo evento \u201C{eventName}\u201E è stato creato.\
+			 Una email è stata inviata a {organizerEmail}.",
+			event_created_short: "Il tuo evento è stato creato.",
+			share_link: "Ora condividi questo link con gli ospiti per invitarli:",
+			manage_event: "Gestione vento",
+			create_event: "Salva evento",
+			poll_event: "Immetti la tua disponibilità",
+			dates_placeholder: "Scegli un periodo",
+			back_to_event: "Ritorna all'evento",
+			update_event: "Modifica l'evento",
+			event_updated: "I dettagli dell'evento sono stati modificati.",
+			too_many_requests_error: "Hai creato troppi eventi per {email}. Prenditi una breve pausa..."
+		},
+		poll_editor: {
+			welcome: "Ciao {participant}, qui puoi modificare la tua disponibilità per questo evento.",
+			welcome_new_participant: "Qui puoi immettere la tua disponibilità per questo evento.",
+			title: "La mia disponibilità per \u201C{eventName}\u201E",
+			participant_group: "Chi sei?",
+			poll: {
+				participant: "Nome del partecipante",
+				participant_help: "Fai sapere all'organizzatore chi sei..."
+			},
+			weekday_ranker_group: "Com'è la tua settimana tipica?",
+			weekday_ranker_help: "Dicci quali giorni della tua settimana tipica vanno bene {good}, sono ok {ok}, oppure vanno male {bad} per questo evento. In seguito puoi aggiungere eccezzioni per singole date. {help}.",
+			calendar_ranker_group: "Seleziona singole date",
+			save_poll: "Salva la disponibilità",
+			delete_poll: "Cacnella la tua disponibilità",
+			poll_saved: "La tua disponibilità è stata salvata",
+			really_delete: "Vuoi veramente cancellare la tua disponibilità? L'operazione è irreversibile.",
+			back_to_event: "Ritorna all'evento",
+			poll_deleted: "La tua disponibilità è stata cancellata.",
+			poll_delete_error: "A causa di un errore la tua disponibilità non è stat cancellata.",
+			dates_placeholder: "Scegli un periodo di tempo",
+			date_ranker_helper: "Scegli le date che vanno bene {good} oppure non vanno bene {bad} per questo evento. Questa scelta ha precedenza sulle preferenze per i giorni della settimana. {help}.",
+			date_ranker_help_modal_title: "Aggingi o rimuovi delle date",
+			date_ranker_help_modal_content: "Prima scegli se le date vanno bene {good} o non vanno bene {bad} per questo evento.\
+			Poi aggungile, come giorni singoli oppure come periodo.\
+			Per rimuoverle, seleziona {trash} e clicca sulle date.",
+			weekday_ranker_help_modal_title: "Preferenze per i giorni della settimana",
+			weekday_ranker_help_modal_content: "Com'è la tua settimana tipica? Per esempio, \
+			magari vai ogni Mercoledì a fare sport e vuoi perciò marcare questo giorno con {bad}. Il Venerdì però in genere potrebbe andare bene \
+			e lo potresti marcare con {good}. I rimanenti giorni sono semplicemente ok, e puoi lasciarli con {ok}.",
+			event_no_longer_open: "L'evento non è più aperto.",
+			range: "Periodo"
+		},
+		event_viewer: {
+			organizer: "Organizzatore:",
+			description: "Descrizione:",
+			should_happen: "Dovrebbe aver luogo:",
+			create_poll: "Immetti disponibilità",
+			update_poll: "Aggiorna la tua disponibilità",
+			cancel_event: "Disdici l'evento",
+			no_participants: "{icon} Per l'evento non è stata fissata nessuna data e nessuna disponibilità è stata comunicata. Sii il primo a rispondere!",
+			no_participants_organizer: "{icon} Per l'evento non è stata fissata nessuna data e nessuna disponibilità è stata comunicata.",
+			schedule_not_found: "Le date per questo evento non sono state trovate.",
+			welcome: "{organizer} ti ha invitato a questo evento.",
+			welcome_organizer: "Ciao {organizer}! Qui pui gestire il tuo evento.",
+			event_open: "{calendar_icon} L'organizzatore non ha ancora fissato una data. Qui sotto ci sono le possibili date, in base alle risposte di {participants} invitati. Comunica la tua disponibilità nel caso non l'abbia ancora fatto.",
+			event_open_organizer: "{calendar_icon} Non hai ancora fissato una data. Qui sotto ci sono le possibili date, in base alle risposte di {participants}.",
+			event_canceled: "Questo evento è stato disdetto",
+			event_canceled_organizer: "Hai disdetto l'evento",
+			event_scheduled: "{organizer} ha fissato l'evento per {datetime}.",
+			event_scheduled_organizer: "Hai fissato l'evento per {datetime}.",
+			organizer_says: "{organizer} dice:",
+			update: {
+				title: "Aggiornare la disponibilità",
+				load: "Mostra la disponibilità",
+				how_to: "Digita il nome con il quale hai salvato la tua disponibilità.",
+				name_placeholder: "Digita il tuo nome qui...",
+				poll_not_found: "Nessuna disponibilità trovata sotto questo nome. Lo hai digitato correttamente?"
+			},
+			create_new_event: "Crea un nuovo evento",
+			really_cancel_event: "Sicuro di voler disdirre l'evento?",
+			event_canceled_ok: "L'evento è stato disdetto.",
+			cancel_event_error: "A causa di un errore l'evento non è stato disdetto.",
+			open_event: "Riapri l'evento",
+			event_opened_ok: "L'evento è stato riaperto",
+			open_event_error: 'A causa di un errore l\'evento non è stato riaperto',
+			share_link: 'Condividi questo link con i tuoi ospiti:',
+			nof_participants: "Un invitato|{participants} invitati",
+			current_participants: "Attualmente partecipano:",
+			negative_participants_for_date: "Tutti possono venire|Una persona non può venire|{count} persone non possono venire",
+			positive_participants_for_date: "Tutti possono venire|Una persona preferisce questa data|{count} persone preferiscono questa data",
+			positive_participants_list_date: "{participants} preferisce qesta data|{participants} preferiscono questa data",
+			negative_participants_list_date: "{participants} non può venire|{participants} non possono venire",
+			schedule_event: "Fissa la data",
+			about_to_schedule: "Vuoi fissare l'evento per {date}",
+			schedule_event_error: "A causa di un errore la data non è stat fissata",
+			warning_bad_date: "Attenzione! Una persona non può venire a questa data|Attenzione {participants} persone non possono venire a questa data",
+			select_time: "Fissa un'ora per l'evento:",
+			date_selection_help: "Le date sono classificate da {best} a {worst}. Clicca una data per vedere quanti possono venire.",
+			date_selection_help_organizer: "Le date sono classificate da {best} a {worst}. Clicca una data per vedere chi può venire. Scegli la data che vuoi fissare.",
+			best: "migliori",
+			worst: "peggiori",
+			edit_event: "Modifica l'evento"
+		},
+		home: {
+			title: 'Eventi con facilità',
+			subtitle_1: '{app_name} ti aiuta a trovare le migliori date per i tuoi eventi.',
+			subtitle_2: 'Non c\'è bisogno di account. Ci basta una email per mandarti un link.',
+			step: 'Passo {step}',
+			how_it_works: 'Organizza il tuo evento in 3 facili passi:',
+			step1: {
+				title: '{step} : Crea l\'evento',
+				part1: 'Descrivi l\'evento.',
+				part2: 'Scegli un periodo per l\'evento.',
+				part3: 'Invita i tuoi amici con un link.'
+			},
+			step2: {
+				title: '{step} : Fai decidere ai tuoi amici',
+				part1: 'I tuoi amici decidono se una data è {good}, {indifferent}, oppure {bad}.',
+				part2: 'Possono scegliere singole date o giorni della settimana.'
+			},
+			step3: {
+				title: '{step} : Gestisci l\'evento',
+				part1: 'Come organizzatore hai sempre una chiara panoramica sulle decisioni dei tuoi invitati.',
+				part2: 'Date {good} e che {bad} sono chiaramente visibili nel calendario.',
+				part3: 'Quando sei pronto, fissa una data e dillo alla tua gang!'
+			},
+			create_new_event: 'Crea un evento adesso!',
+			good: 'buona|buone',
+			good_upper: 'Buona|buone',
+			indifferent: 'indifferente|indifferenti',
+			bad: 'non va bene|non vanno bene'
 		},
 		date_format: 'DD/MM/YYYY',
-		week_days: ['Lunedí', 'Martedí', 'Mercoledí', 'Giovedí', 'Venerdí', 'Sabato', 'Domenica'],
-		date_fns_locale: date_fns_it
+		datetime_format: 'DD/MM/YYYY hh:mm',
+		time_format: 'hh:mm',
+		week_days: {
+			mo: 'Lunedì',
+			tu: 'Martedì',
+			we: 'Mercoledì',
+			th: 'Giovedì',
+			fr: 'Venerdì',
+			sa: 'Sabato',
+			su: 'Domenica'
+		},
+		ranker: {
+			good: "Bene!",
+			ok: "Ok",
+			bad: "No"
+		},
+		date_fns_locale: date_fns_de,
+		errors: {
+			required_field: "Non può essere vuoto",
+			network: "Il server non risponde o non può essere raggiunto. Controlla la tua connessione.",
+			generic: "C'è stato un errore durante la connessione col server: {message}",
+			not_found: "I dati richiesti non sono stati trovati.",
+			server: "Il server ha risposto con un codice d'errore {code}.",
+			unprocessable_entity: "Ohi! I dati che hai immessi hanno degli errori. Per favore dai un'occhiata.",
+			error: "Errore",
+			confirmation_required: "Non corrisponde..."
+		},
+		event_header: {
+			by: "da {organizer}",
+			no_name: "Nessuno nome per l'evento",
+			no_dates: "Nessuna data",
+			scheduled: "Fissato per {time}",
+			open: "Nel periodo {dates}",
+			canceled: "L'evento è stato disdetto"
+		},
+		actions: {
+			cancel: "Cancella",
+			tell_me_more: "Voglio saperne di più.",
+			back_home: "Alla homepage"
+		}
 	}
 }

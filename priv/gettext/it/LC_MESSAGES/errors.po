@@ -12,34 +12,34 @@ msgstr ""
 "Plural-Forms: nplurals=2\n"
 
 msgid "can't be blank"
-msgstr "Non può essere vuoto"
+msgstr "non può essere vuoto"
 
 msgid "has already been taken"
-msgstr ""
+msgstr "è stato già assegnato"
 
 msgid "is invalid"
-msgstr ""
+msgstr "è invalido"
 
 msgid "must be accepted"
-msgstr ""
+msgstr "dev'essere accettato"
 
 msgid "has invalid format"
-msgstr ""
+msgstr "ha formato invalido"
 
 msgid "has an invalid entry"
-msgstr ""
+msgstr "ha un valore invalido"
 
 msgid "is reserved"
-msgstr ""
+msgstr "è riservato"
 
 msgid "does not match confirmation"
-msgstr ""
+msgstr "non corrisponde"
 
 msgid "is still associated with this entry"
-msgstr ""
+msgstr "è ancora associato con questa entità"
 
 msgid "are still associated with this entry"
-msgstr ""
+msgstr "sono ancora associati con questa entità"
 
 msgid "should be %{count} character(s)"
 msgid_plural "should be %{count} character(s)"
@@ -53,8 +53,8 @@ msgstr[1] ""
 
 msgid "should be at least %{count} character(s)"
 msgid_plural "should be at least %{count} character(s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "deve avere almeno %{count} caratteri"
+msgstr[1] "deve avere almeno %{count} caratteri"
 
 msgid "should have at least %{count} item(s)"
 msgid_plural "should have at least %{count} item(s)"
@@ -63,8 +63,8 @@ msgstr[1] ""
 
 msgid "should be at most %{count} character(s)"
 msgid_plural "should be at most %{count} character(s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "non può avere più di %{count} caratteri"
+msgstr[1] "non può avere più di %{count} caratteri"
 
 msgid "should have at most %{count} item(s)"
 msgid_plural "should have at most %{count} item(s)"
@@ -72,19 +72,19 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "must be less than %{number}"
-msgstr ""
+msgstr "dev'essere meno di %{number}"
 
 msgid "must be greater than %{number}"
-msgstr ""
+msgstr "dev'essere più grande di %{number}"
 
 msgid "must be less than or equal to %{number}"
-msgstr ""
+msgstr "non può superare %{number}"
 
 msgid "must be greater than or equal to %{number}"
-msgstr ""
+msgstr "dev'essere almeno %{number}"
 
 msgid "must be equal to %{number}"
-msgstr ""
+msgstr "dev'essere uguale a %{number}"
 
 #, elixir-format
 #: lib/smoodle/scheduler/event.ex:156

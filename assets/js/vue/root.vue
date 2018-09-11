@@ -31,6 +31,11 @@ div
 						:disabled="getLocale() == 'de'"
 					)
 						i.flag-icon.flag-icon-de
+					b-dropdown-item(
+						@click="setLocale('it')"
+						:disabled="getLocale() == 'it'"
+					)
+						i.flag-icon.flag-icon-it
 
 	div
 		router-view

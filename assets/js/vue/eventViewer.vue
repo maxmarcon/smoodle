@@ -285,11 +285,12 @@ export default {
 			return this.secret;
 		},
 		scheduleCalendarAttributes() {
-			// Hack: we add this useless locale variable
+			// Hack: we add this otherwise unused locale variable
 			// to triger a dependency on $i18n.locale. This will cause
-			// the scheduleCalendarAttributes to be recomputed when the locale changes, thus
-			// allowing live locale change on the client side
-			let locale = this.$i18n.locale;
+			// the scheduleCalendarAttributes to be recomputed whenever the locale changes, thus
+			// allowing live locale changes on the client side
+			let _hack_dependency_on_locale = this.$i18n.locale;
+
 			let scheduleDates = this.eventScheduleDates.length;
 			let minNegativeRank;
 			let maxPositiveRank;

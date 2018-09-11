@@ -14,7 +14,7 @@ msgstr ""
 #, elixir-format
 #: lib/smoodle_web/templates/email/new_event.html.pug:7
 msgid "And this is the link you can use to manage your event:"
-msgstr ""
+msgstr "And this is the private link that you can use to manage your event:"
 
 #, elixir-format
 #: lib/smoodle_web/templates/email/new_event.html.pug:8
