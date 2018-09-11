@@ -43,6 +43,7 @@ defmodule SmoodleWeb.Endpoint do
     Plug.Session,
     store: :cookie,
     key: "_smoodle_key",
+    encryption_salt: "B27mXwze",
     signing_salt: "B27mXwze"
   )
 
