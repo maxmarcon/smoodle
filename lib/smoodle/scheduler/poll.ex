@@ -10,7 +10,7 @@ defmodule Smoodle.Scheduler.Poll do
 
   defimpl String.Chars, for: Smoodle.Scheduler.Poll do
     def to_string(poll) do
-      "id:#{poll.id} participant:#{poll.participant} event_id:#{poll.event_id}"
+      "id:#{poll.id} participant:\"#{poll.participant}\" event_id:#{poll.event_id}"
     end
   end
 
