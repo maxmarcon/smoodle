@@ -285,6 +285,11 @@ export default {
 			return this.secret;
 		},
 		scheduleCalendarAttributes() {
+			// Hack: we add this useless locale variable
+			// to triger a dependency on $i18n.locale. This will cause
+			// the scheduleCalendarAttributes to be recomputed when the locale changes, thus
+			// allowing live locale change on the client side
+			let locale = this.$i18n.locale;
 			let scheduleDates = this.eventScheduleDates.length;
 			let minNegativeRank;
 			let maxPositiveRank;
@@ -320,25 +325,23 @@ export default {
 		},
 		labelForDate(attribute) {
 			let date_entry = attribute.customData;
-			let label = null;
 			if (date_entry.negative_rank < 0) {
 				if (this.isOrganizer) {
-					label = this.$i18n.tc('event_viewer.negative_participants_list_date', date_entry.negative_participants.length,
+					return this.$i18n.tc('event_viewer.negative_participants_list_date', date_entry.negative_participants.length,
 						{participants: date_entry.negative_participants.join(', ')} );
 				} else {
-					label = this.$i18n.tc('event_viewer.negative_participants_for_date', -date_entry.negative_rank,
+					return this.$i18n.tc('event_viewer.negative_participants_for_date', -date_entry.negative_rank,
 						{count: -date_entry.negative_rank});
 				}
 			} else {
 				if (this.isOrganizer && date_entry.positive_rank > 0) {
-					label = this.$i18n.tc('event_viewer.positive_participants_list_date', date_entry.positive_participants.length,
+					return this.$i18n.tc('event_viewer.positive_participants_list_date', date_entry.positive_participants.length,
 						{participants: date_entry.positive_participants.join(', ')} );
 				} else {
-					label = this.$i18n.tc('event_viewer.positive_participants_for_date', date_entry.positive_rank,
+					return this.$i18n.tc('event_viewer.positive_participants_for_date', date_entry.positive_rank,
 						{count: date_entry.positive_rank});
 				}
 			}
-			return label;
 		},
 		clipboard() {
       this.$refs.copiedToClipboardModal.show();
