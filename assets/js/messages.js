@@ -5,6 +5,9 @@ import date_fns_it from 'date-fns/locale/it'
 export default {
 	en: {
 		app_name: "Lets meet!",
+		navbar: {
+			language: "Language"
+		},
 		event_editor: {
 			title: 'New event',
 			welcome: 'Hello! Here you can create a new event and share it with participants.',
@@ -199,6 +202,9 @@ export default {
 	},
 
 	de: {
+		navbar: {
+			language: "Sprache"
+		},
 		event_editor: {
 			title: 'Neues Event',
 			welcome: 'Hallo! Hier kannst du ein neues Event planen und mit Freunden teilen.',
@@ -330,12 +336,12 @@ export default {
 				title: '{step} : Event planen',
 				part1: 'Beschreibe dein Event.',
 				part2: 'Wähl die passende Zeitspanne für dein Event aus.',
-				part3: 'Lad deine Freunde mit einem Weblink ein.'
+				part3: 'Lade deine Freunde mit einem Weblink ein.'
 			},
 			step2: {
 				title: '{step} : Lass deine Freunde entscheiden',
 				part1: 'Deine Freunde können angeben, ob ein Datum {good}, {indifferent}, oder {bad} ist für sie.',
-				part2: 'Sie können sowhol Wochentage als auch einzelne Daten auswählen.'
+				part2: 'Sie können einzelne Tage oder eine zusammenhängende Zeitspanne auswählen.'
 			},
 			step3: {
 				title: '{step} : Event verwalten',
@@ -393,6 +399,9 @@ export default {
 	},
 
 	it: {
+		navbar: {
+			language: "Lingua"
+		},
 		event_editor: {
 			title: 'Nuovo evento',
 			welcome: 'Ciao! Qui puoi pianificare un nuovo evento e condividerlo con i tuoi amici.',
@@ -440,10 +449,10 @@ export default {
 				participant_help: "Fai sapere all'organizzatore chi sei..."
 			},
 			weekday_ranker_group: "Com'è la tua settimana tipica?",
-			weekday_ranker_help: "Dicci quali giorni della tua settimana tipica vanno bene {good}, sono ok {ok}, oppure vanno male {bad} per questo evento. In seguito puoi aggiungere eccezzioni per singole date. {help}.",
+			weekday_ranker_help: "Dicci quali giorni della tua settimana tipica vanno bene {good}, sono ok {ok}, oppure vanno male {bad} per questo evento. In seguito puoi aggiungere eccezioni per singole date. {help}.",
 			calendar_ranker_group: "Seleziona singole date",
 			save_poll: "Salva la disponibilità",
-			delete_poll: "Cacnella la tua disponibilità",
+			delete_poll: "Cancella la tua disponibilità",
 			poll_saved: "La tua disponibilità è stata salvata",
 			really_delete: "Vuoi veramente cancellare la tua disponibilità? L'operazione è irreversibile.",
 			back_to_event: "Ritorna all'evento",
@@ -560,7 +569,7 @@ export default {
 			ok: "Ok",
 			bad: "No"
 		},
-		date_fns_locale: date_fns_de,
+		date_fns_locale: date_fns_it,
 		errors: {
 			required_field: "Non può essere vuoto",
 			network: "Il server non risponde o non può essere raggiunto. Controlla la tua connessione.",
