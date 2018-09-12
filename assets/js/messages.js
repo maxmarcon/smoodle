@@ -409,7 +409,7 @@ export default {
 				organizer_email_help: "Usiamo la tua email unicamente per mandarti un link privato con il quale puoi gestire il tuo evento.",
 				organizer_email_confirmation_help: "Per favore conferma la tua email. Anche i migliori fanno errori ogni tanto..."
 			},
-			general_info_group: 'Che gener di evento è?',
+			general_info_group: 'Che genere di evento è?',
 			dates_group: 'Quando deve avere luogo?',
 			organizer_group: 'Chi organizza l\'evento?',
 			this_week: "Questa settimana",
@@ -490,7 +490,7 @@ export default {
 				poll_not_found: "Nessuna disponibilità trovata sotto questo nome. Lo hai digitato correttamente?"
 			},
 			create_new_event: "Crea un nuovo evento",
-			really_cancel_event: "Sicuro di voler disdirre l'evento?",
+			really_cancel_event: "Sicuro di voler disdire l'evento?",
 			event_canceled_ok: "L'evento è stato disdetto.",
 			cancel_event_error: "A causa di un errore l'evento non è stato disdetto.",
 			open_event: "Riapri l'evento",
@@ -573,7 +573,7 @@ export default {
 		},
 		event_header: {
 			by: "da {organizer}",
-			no_name: "Nessuno nome per l'evento",
+			no_name: "Nessun nome per l'evento",
 			no_dates: "Nessuna data",
 			scheduled: "Fissato per {time}",
 			open: "Nel periodo {dates}",
