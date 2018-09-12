@@ -1,10 +1,10 @@
 <template lang="pug">
 	div
 		.d-flex.justify-content-between
-			h5.card-title {{ eventName || $t('event_header.no_name') }}
+			h5.card-title(:class="{'text-muted': !eventName, 'font-italic': !eventName}") {{ eventName || $t('event_header.no_name') }}
 			small {{ eventOrganizer ? $t('event_header.by', {organizer: eventOrganizer }) : '' }}
 		.d-flex.justify-content-between
-			h6.card-subtitle {{ stateDesc }}
+			h6.card-subtitle(:class="{'text-muted': noDates, 'font-italic': noDates}") {{ stateDesc }}
 </template>
 <script>
 import { eventHelpersMixin } from '../globals'
@@ -21,6 +21,9 @@ export default {
 		eventState: String
 	},
 	computed: {
+		noDates() {
+			return (this.eventOpen && !this.eventTimeWindow);
+		},
 		stateDesc() {
 			if (this.eventOpen) {
 				if (this.eventTimeWindow) {
