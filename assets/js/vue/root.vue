@@ -20,7 +20,8 @@ div
 			b-navbar-nav.ml-auto
 				b-nav-item-dropdown(right size="sm")
 					template(slot="button-content")
-						span.fas.fa-lg.fa-globe-americas
+						span.fas.fa-globe-americas
+						| &nbsp; {{ $t("navbar.language") }}
 					b-dropdown-item-button(
 						@click="setLocale('en')"
 						:disabled="getLocale() == 'en'"
