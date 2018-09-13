@@ -125,8 +125,8 @@
 					:visible="true"
 				)
 					b-card
-						.row.justify-content-center
-							.col-md-3.order-md-last
+						.row.justify-content-md-between.justify-content-lg-center
+							.col-md-3.offset-md-1.order-md-last.text-justify
 								.form-group
 									i18n.small.text-muted(path="poll_editor.date_ranker_helper" tag="p")
 										i.fas.fa-heart.text-success(place="good")

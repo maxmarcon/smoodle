@@ -146,8 +146,8 @@
 								i18n(path="event_viewer.event_open" v-else)
 									i.fas.fa-calendar-check.fa-lg(place="calendar_icon")
 									span(place="answers") {{ $tc('event_viewer.answers', eventScheduleParticipantsCount, {count: eventScheduleParticipantsCount}) }}
-							.row.justify-content-center
-								.col-md-3.order-md-last
+							.row.justify-content-md-between.justify-content-lg-center
+								.col-md-3.offset-md-1.order-md-last.text-justify
 									.form-group
 										i18n.small.text-muted(
 											:path="isOrganizer ? 'event_viewer.date_selection_help_organizer' : 'event_viewer.date_selection_help'"

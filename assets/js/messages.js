@@ -332,7 +332,7 @@ export default {
 			red: "Rot",
 			green: "Grün",
 			edit_event: "Event editieren",
-			event_modified: 'Der Organisator hat {time_distance} dieses Event abgeändert. Überprüfe deine Verfügbarkeit.'
+			event_modified: 'Der Organisator hat {time_distance} dieses Event aktualisiert. Überprüfe deine Verfügbarkeit.'
 		},
 		home: {
 			title: 'Events leicht gemacht',
@@ -438,7 +438,7 @@ export default {
 			event_created_short: "Il tuo evento è stato creato.",
 			share_link: "Ora condividi questo link con gli ospiti per invitarli:",
 			manage_event: "Gestione vento",
-			create_event: "Salva evento",
+			create_event: "Crea l'evento",
 			poll_event: "Immetti la tua disponibilità",
 			dates_placeholder: "Scegli un periodo",
 			back_to_event: "Ritorna all'evento",
