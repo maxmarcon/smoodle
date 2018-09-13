@@ -28,12 +28,12 @@ defmodule SmoodleWeb.EventControllerTest do
   }
 
   defp rest_repr(%{scheduled_from: scheduled_from, scheduled_to: scheduled_to}) do
-    {:ok, s_from} = NaiveDateTime.from_iso8601(scheduled_from)
-    {:ok, s_to} = NaiveDateTime.from_iso8601(scheduled_to)
+    {:ok, s_from, 0} = DateTime.from_iso8601(scheduled_from)
+    {:ok, s_to, 0} = DateTime.from_iso8601(scheduled_to)
 
     %{
-      "scheduled_from" => NaiveDateTime.to_iso8601(s_from),
-      "scheduled_to" => NaiveDateTime.to_iso8601(s_to)
+      "scheduled_from" => DateTime.to_iso8601(s_from),
+      "scheduled_to" => DateTime.to_iso8601(s_to)
     }
   end
 
@@ -49,14 +49,14 @@ defmodule SmoodleWeb.EventControllerTest do
   end
 
   @update_attrs %{
-    scheduled_from: "2117-04-05 21:10:00",
-    scheduled_to: "2117-04-05 22:10:00",
+    scheduled_from: "2117-04-05 21:10:00Z",
+    scheduled_to: "2117-04-05 22:10:00Z",
     state: "SCHEDULED"
   }
   @invalid_attrs %{
     name: "",
-    scheduled_to: "2117-04-05 21:10:00",
-    scheduled_from: "2117-04-05 22:10:00"
+    scheduled_to: "2117-04-05 21:10:00Z",
+    scheduled_from: "2117-04-05 22:10:00Z"
   }
   # @partial_valid_data %{
   #  name: "Event"

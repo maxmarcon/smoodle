@@ -25,14 +25,14 @@ defmodule Smoodle.Scheduler.Event do
     field(:secret, :string)
     field(:time_window_from, :date)
     field(:time_window_to, :date)
-    field(:scheduled_from, :naive_datetime)
-    field(:scheduled_to, :naive_datetime)
+    field(:scheduled_from, :utc_datetime)
+    field(:scheduled_to, :utc_datetime)
     field(:desc, :string)
     field(:email, :string)
     field(:state, :string, default: "OPEN")
     has_many(:polls, Poll)
 
-    timestamps(usec: false)
+    timestamps(type: :utc_datetime, usec: false)
   end
 
   def is_open(%Event{} = event) do
@@ -139,10 +139,10 @@ defmodule Smoodle.Scheduler.Event do
     to update events whose time_window_from is in the past. Example: event has not been
     scheduled yet, but the current date already lies within the time window
   """
-  defp validate_is_the_future(changeset, keys, t \\ NaiveDateTime) do
+  defp validate_is_the_future(changeset, keys, t \\ DateTime) do
     today =
       case t do
-        NaiveDateTime -> NaiveDateTime.utc_now()
+        DateTime -> DateTime.utc_now()
         Date -> Date.utc_today()
       end
 

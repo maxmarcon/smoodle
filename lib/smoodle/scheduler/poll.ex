@@ -26,7 +26,7 @@ defmodule Smoodle.Scheduler.Poll do
 
     belongs_to(:event, Event, type: :binary_id)
 
-    timestamps(usec: false)
+    timestamps(type: :utc_datetime, usec: false)
   end
 
   @max_date_ranks 100
