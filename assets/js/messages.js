@@ -94,8 +94,8 @@ export default {
 			answers: "one answer|{count} answers",
 			event_canceled: "This event has been canceled",
 			event_canceled_organizer: "You canceled this event",
-			event_scheduled: "{organizer} has scheduled this event to happen on: {datetime}",
-			event_scheduled_organizer: "You have scheduled this event to happen on: {datetime}",
+			event_scheduled: "{organizer} has scheduled this event to happen on: {datetime}. {time_distance} until the event.",
+			event_scheduled_organizer: "You have scheduled this event to happen on: {datetime}. {time_distance} until the event.",
 			organizer_says: "{organizer} says:",
 			update: {
 				title: "Update your answer",
@@ -121,13 +121,17 @@ export default {
 			schedule_event: "Schedule event",
 			about_to_schedule: "You are about to schedule the event to happen on {date}",
 			schedule_event_error: "An error has occurred, the event could not be scheduled",
+			select_date_first: "You have to select a date from the calendar first.",
 			warning_bad_date: "Warning! {participants} person can't make it on this date|Warning! {participants} people cannot make it on this date",
 			select_time: "Finally, select a time for the event:",
-			date_selection_help: "Dates are ranked from {best} to {worst}. Click or hover on a date to see how many can make it on that day.",
-			date_selection_help_organizer: "Dates are ranked from {best} to {worst}. Click or hover on a date to see who can make it on that day. To schedule the event, select a date first.",
+			date_selection_help: "Dates are ranked from {best} to {worst}. Click or hover on a date to see how many can make it on that day. {red} means that at least one person can't make it. {green} means that everyone can make it.",
+			date_selection_help_organizer: "Dates are ranked from {best} to {worst}. Click or hover on a date to see who can make it on that day. {red} means that at least one person can't make it. {green} means that everyone can make it.",
 			best: "best",
 			worst: "worst",
-			edit_event: "Edit event"
+			red: "Red",
+			green: "Green",
+			edit_event: "Edit event",
+			event_modified: 'The organizer modified this event {time_distance}. Reconsider your availability.'
 		},
 		home: {
 			title: 'Events made easy',
@@ -160,7 +164,6 @@ export default {
 		},
 		date_format: 'MM/DD/YYYY',
 		datetime_format: 'MM/DD/YYYY h:mm A',
-		time_format: 'h:mm A',
 		week_days: {
 			mo: 'Monday',
 			tu: 'Tuesday',
@@ -197,7 +200,8 @@ export default {
 		actions: {
 			cancel: "Cancel",
 			tell_me_more: "Tell me more",
-			back_home: "Back home"
+			back_home: "Back home",
+			ok: "Ok"
 		}
 	},
 
@@ -291,8 +295,8 @@ export default {
 			answers: "eine Antwort|{count} Antworten",
 			event_canceled: "Dieses Event wurde abgesagt",
 			event_canceled_organizer: "Du hast dieses Event abgesagt",
-			event_scheduled: "{organizer} hat entschieden, dass das Event am {datetime} stattfinden wird.",
-			event_scheduled_organizer: "Du hast entschieden, dass das Event am {datetime} stattfinden wird.",
+			event_scheduled: "{organizer} hat entschieden, dass das Event am {datetime} stattfinden wird. {time_distance} bis zum Event.",
+			event_scheduled_organizer: "Du hast entschieden, dass das Event am {datetime} stattfinden wird. {time_distance} bis zum Event.",
 			organizer_says: "{organizer} sagt:",
 			update: {
 				title: "Verfügbarkeit aktualisieren",
@@ -318,13 +322,17 @@ export default {
 			schedule_event: "Datum festlegen",
 			about_to_schedule: "Du willst das Event am {date} festlegen",
 			schedule_event_error: "Ein Fehler ist aufgetreten, das Datum konnte nicht festgelegt werden",
+			select_date_first: "Du musst zuerst ein Datum im Kalendar auswählen.",
 			warning_bad_date: "Achtung! Eine Person kann an diesem Tag nicht kommen|Achtung! {participants} Personen können an diesem Tag nicht kommen",
 			select_time: "Leg eine Uhrzeit für das Event fest:",
-			date_selection_help: "Daten sind von {best} zu {worst} bewertet. Klick ein Datum an, um zu erfahren, wie viele an dem Tag kommen können.",
-			date_selection_help_organizer: "Daten sind von {best} zu {worst} bewertet. Klick ein Datum an, um zu erfahren, wer an dem Tag kommen kann. Wähl das Datum aus, das du festlegen möchtest",
+			date_selection_help: "Daten sind von {best} zu {worst} bewertet. Klick ein Datum an, um zu erfahren, wie viele an dem Tag kommen können. {red} bedeutet, dass mindestens eine Person nicht kommen kann. {green} bedeutet, dass alle kommen können.",
+			date_selection_help_organizer: "Daten sind von {best} zu {worst} bewertet. Klick ein Datum an, um zu erfahren, wer an dem Tag kommen kann. {red} bedeutet, dass mindestens eine Person nicht kommen kann. {green} bedeutet, dass alle kommen können.",
 			best: "gut",
 			worst: "schlecht",
-			edit_event: "Event editieren"
+			red: "Rot",
+			green: "Grün",
+			edit_event: "Event editieren",
+			event_modified: 'Der Organisator hat {time_distance} dieses Event abgeändert. Überprüfe deine Verfügbarkeit.'
 		},
 		home: {
 			title: 'Events leicht gemacht',
@@ -356,8 +364,7 @@ export default {
 			bad: 'unpassend|unpassende'
 		},
 		date_format: 'DD/MM/YYYY',
-		datetime_format: 'DD/MM/YYYY hh:mm',
-		time_format: 'hh:mm',
+		datetime_format: 'DD/MM/YYYY HH:mm',
 		week_days: {
 			mo: 'Montag',
 			tu: 'Dienstag',
@@ -488,8 +495,8 @@ export default {
 			answers: "una risposta|{count} risposte",
 			event_canceled: "Questo evento è stato disdetto",
 			event_canceled_organizer: "Hai disdetto l'evento",
-			event_scheduled: "{organizer} ha fissato l'evento per {datetime}.",
-			event_scheduled_organizer: "Hai fissato l'evento per {datetime}.",
+			event_scheduled: "{organizer} ha fissato l'evento per {datetime}. {time_distance} all'evento.",
+			event_scheduled_organizer: "Hai fissato l'evento per {datetime}. {time_distance} all'evento.",
 			organizer_says: "{organizer} dice:",
 			update: {
 				title: "Aggiornare la disponibilità",
@@ -515,13 +522,17 @@ export default {
 			schedule_event: "Fissa la data",
 			about_to_schedule: "Vuoi fissare l'evento per {date}",
 			schedule_event_error: "A causa di un errore la data non è stat fissata",
+			select_date_first: "Prima devi selezionare una data dal calendario.",
 			warning_bad_date: "Attenzione! Una persona non può venire a questa data|Attenzione {participants} persone non possono venire a questa data",
 			select_time: "Fissa un'ora per l'evento:",
-			date_selection_help: "Le date sono classificate da {best} a {worst}. Clicca una data per vedere quanti possono venire.",
-			date_selection_help_organizer: "Le date sono classificate da {best} a {worst}. Clicca una data per vedere chi può venire. Scegli la data che vuoi fissare.",
+			date_selection_help: "Le date sono classificate da {best} a {worst}. Clicca una data per vedere quanti possono venire. {red} significa che almeno una persona non può venire, {green} che tuti possono venire.",
+			date_selection_help_organizer: "Le date sono classificate da {best} a {worst}. Clicca una data per vedere chi può venire. {red} significa che almeno una persona non può venire, {green} che tuti possono venire. ",
 			best: "migliori",
 			worst: "peggiori",
-			edit_event: "Modifica l'evento"
+			edit_event: "Modifica l'evento",
+			red: "Rosso",
+			green: "verde",
+			event_modified: 'L\'organizzatore ha aggiornato questo evento {time_distance}. Rivedi la tua disponibilità.'
 		},
 		home: {
 			title: 'Eventi con facilità',
@@ -553,8 +564,7 @@ export default {
 			bad: 'non va bene|non vanno bene'
 		},
 		date_format: 'DD/MM/YYYY',
-		datetime_format: 'DD/MM/YYYY hh:mm',
-		time_format: 'hh:mm',
+		datetime_format: 'DD/MM/YYYY HH:mm',
 		week_days: {
 			mo: 'Lunedì',
 			tu: 'Martedì',

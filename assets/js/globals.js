@@ -257,7 +257,9 @@ export const eventDataMixin = {
 		eventTimeWindowFrom: null,
 		eventTimeWindowTo: null,
 		eventScheduledFrom: null,
-		eventScheduledTo: null
+		eventScheduledTo: null,
+		eventInsertedAt: null,
+		eventModifiedAt: null,
 	}),
 	methods: {
 		assignEventData(eventData) {
@@ -271,6 +273,8 @@ export const eventDataMixin = {
 			this.eventScheduledFrom = dateFns.parse(eventData.scheduled_from);
 			this.eventScheduledTo = dateFns.parse(eventData.scheduled_to);
 			this.eventShareLink = eventData.share_link;
+			this.eventInsertedAt = dateFns.parse(eventData.inserted_at);
+			this.eventModifiedAt = dateFns.parse(eventData.updated_at);
 		}
 	},
 	computed: {
@@ -323,11 +327,27 @@ export const eventHelpersMixin = {
 				 dateFns.format(to, this.$i18n.t('date_format'), {locale: this.$i18n.t('date_fns_locale')});
 			}
 		},
+		eventModified() {
+			return this.eventInsertedAt && this.eventModifiedAt && !dateFns.isEqual(this.eventInsertedAt, this.eventModifiedAt);
+		},
+		eventModifiedRelative() {
+			if (this.eventModified) {
+				return dateFns.distanceInWordsToNow(this.eventModifiedAt, {locale: this.$i18n.t('date_fns_locale'), addSuffix: true});
+			}
+		},
 		eventScheduledDateTime() {
 			let time = this.eventScheduledFrom;
 
 			if (time) {
 				return dateFns.format(time, this.$i18n.t('datetime_format'), {locale: this.$i18n.t('date_fns_locale')});
+			}
+		},
+		eventScheduledDateTimeRelative() {
+			let time = this.eventScheduledFrom;
+
+			if (time) {
+				let str = dateFns.distanceInWordsToNow(time, {locale: this.$i18n.t('date_fns_locale')});
+				return str.charAt(0).toUpperCase() + str.slice(1);
 			}
 		},
 		eventCanceled() {
@@ -338,9 +358,6 @@ export const eventHelpersMixin = {
 		},
 		eventScheduled() {
 			return this.eventState == "SCHEDULED";
-		},
-		eventScheduledTime() {
-			return dateFns.format(this.eventScheduledFrom, this.$i18n.t('time_format'), {locale: this.$i18n.t('date_fns_locale')});
 		},
 		minDate() {
 			return dateFns.max(dateFns.parse(this.eventTimeWindowFrom), dateFns.startOfTomorrow());

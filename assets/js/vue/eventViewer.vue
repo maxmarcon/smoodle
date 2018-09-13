@@ -62,29 +62,32 @@
 
 		b-modal#scheduleEventModal(
 			:title="$t('event_viewer.schedule_event')"
-			:ok-title="$t('event_viewer.schedule_event')"
 			:cancel-title="$t('actions.cancel')"
 			:ok-disabled="requestOngoing"
+			:ok-only="!selectedDate"
 			@ok="scheduleEvent"
 		)
-			.alert.alert-danger(v-if="selectedDateAttribute && selectedDateAttribute.customData.negative_rank < 0")
-				| {{ $tc('event_viewer.warning_bad_date', -selectedDateAttribute.customData.negative_rank, {participants: -selectedDateAttribute.customData.negative_rank}) }}
-			.alert.alert-info {{ $t('event_viewer.about_to_schedule', {date: selectedDateFormatted}) }}
+			div(v-if="selectedDate")
+				.alert.alert-danger(v-if="selectedDateAttribute && selectedDateAttribute.customData.negative_rank < 0")
+					| {{ $tc('event_viewer.warning_bad_date', -selectedDateAttribute.customData.negative_rank, {participants: -selectedDateAttribute.customData.negative_rank}) }}
+				.alert.alert-info {{ $t('event_viewer.about_to_schedule', {date: selectedDateFormatted}) }}
 
-			.text-center
-				label(for="timePicker") {{ $t('event_viewer.select_time') }}
-			.d-flex.justify-content-center
-				date-picker#timePicker(
-					v-model="selectedTime"
-					:config="timePickerOptions"
-				)
+				.text-center
+					label(for="timePicker") {{ $t('event_viewer.select_time') }}
+				.d-flex.justify-content-center
+					date-picker#timePicker(
+						v-model="selectedTime"
+						:config="timePickerOptions"
+					)
+			div(v-else)
+				p {{ $t('event_viewer.select_date_first') }}
 
 		b-modal#scheduledEventModal(
 			ref="scheduledEventModal"
 			:title="$t('event_viewer.schedule_event')"
 			ok-only
 		)
-			p {{ $t('event_viewer.event_scheduled_organizer', {datetime: eventScheduledDateTime}) }}
+			p {{ $t('event_viewer.event_scheduled_organizer', {datetime: eventScheduledDateTime, time_distance: eventScheduledDateTimeRelative}) }}
 
 		b-modal(ref="scheduleEventErrorModal"
 			:title="$t('errors.error')"
@@ -127,6 +130,9 @@
 						i.fas.fa-share-alt
 						| &nbsp; {{ $t('event_viewer.welcome', {organizer: eventOrganizer}) }}
 					div(v-if="eventOpen")
+						.alert.alert-warning(v-if="eventModified && !isOrganizer")
+							i.fas.fa-cut
+							| &nbsp; {{ $t('event_viewer.event_modified', {time_distance: eventModifiedRelative}) }}
 						.alert.alert-danger(v-if="eventScheduleError")
 							i.fas.fa-exclamation-triangle.fa-lg
 							| &nbsp; {{ eventScheduleError }}
@@ -149,6 +155,8 @@
 										)
 											span.text-success(place="best") {{ $t('event_viewer.best') }}
 											span.text-danger(place="worst") {{ $t('event_viewer.worst') }}
+											span.text-success(place="green") {{ $t('event_viewer.green') }}
+											span.text-danger(place="red") {{ $t('event_viewer.red') }}
 
 								.col-md-6.text-center
 									.form-group
@@ -184,7 +192,7 @@
 								i.fas.fa-trophy.fa-lg(place="icon")
 					.alert.alert-success(v-else-if="eventScheduled")
 						i.fas.fa-handshake.fa-lg
-						| &nbsp; {{ $t(isOrganizer ? 'event_viewer.event_scheduled_organizer' : 'event_viewer.event_scheduled', {datetime: eventScheduledDateTime, organizer: eventOrganizer}) }}
+						| &nbsp; {{ $t(isOrganizer ? 'event_viewer.event_scheduled_organizer' : 'event_viewer.event_scheduled', {datetime: eventScheduledDateTime, organizer: eventOrganizer, time_distance: eventScheduledDateTimeRelative}) }}
 					.alert.alert-warning(v-else-if="eventCanceled")
 						i.fas.fa-ban.fa-lg
 						| &nbsp; {{ $t(isOrganizer ? 'event_viewer.event_canceled_organizer' : 'event_viewer.event_canceled') }}
@@ -192,7 +200,7 @@
 			.card-footer(v-if="eventOpen || isOrganizer")
 				.row.justify-content-center
 					.col-auto.mt-1(v-if="eventOpen && isOrganizer")
-						button.btn.btn-primary(v-b-modal.scheduleEventModal="" :disabled="requestOngoing || !selectedDate")
+						button.btn.btn-primary(v-b-modal.scheduleEventModal="" :disabled="requestOngoing")
 							i.fas.fa-clock
 							| &nbsp; {{ $t('event_viewer.schedule_event') }}
 					.col-auto.mt-1(v-if="eventOpen && isOrganizer")
@@ -404,6 +412,10 @@ export default {
 			});
 		},
 		scheduleEvent() {
+			if (!this.selectedDate) {
+				return;
+			}
+
 			let [hours, minutes] = this.selectedTime.split(':');
 			this.selectedDate = dateFns.setHours(
 				dateFns.setMinutes(this.selectedDate, minutes),
@@ -417,11 +429,8 @@ export default {
 					event: {
 						state: 'SCHEDULED',
 						secret: this.secret,
-						scheduled_from: dateFns.format(this.selectedDate, 'YYYY-MM-DD HH:mm:ss'),
-						scheduled_to: dateFns.format(
-							dateFns.addHours(this.selectedDate, 6),
-							'YYYY-MM-DD HH:mm:ss'
-						)
+						scheduled_from: this.selectedDate.toISOString(),
+						scheduled_to: dateFns.addHours(this.selectedDate, 6).toISOString()
 					}
 				}
 			}).then(function(result) {
