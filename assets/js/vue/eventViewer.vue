@@ -132,7 +132,7 @@
 					div(v-if="eventOpen")
 						.alert.alert-warning(v-if="eventModified && !isOrganizer")
 							i.fas.fa-cut
-							| &nbsp; {{ $t('event_viewer.event_modified', {time_distance: eventModifiedRelative}) }}
+							| &nbsp; {{ $t('event_viewer.event_modified', {time_distance: eventModifiedRelative, organizer: eventOrganizer}) }}
 						.alert.alert-danger(v-if="eventScheduleError")
 							i.fas.fa-exclamation-triangle.fa-lg
 							| &nbsp; {{ eventScheduleError }}

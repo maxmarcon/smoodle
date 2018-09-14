@@ -131,7 +131,7 @@ export default {
 			red: "Red",
 			green: "Green",
 			edit_event: "Edit event",
-			event_modified: 'The organizer modified this event {time_distance}. Reconsider your availability.'
+			event_modified: '{organizer} modified this event {time_distance}. Reconsider your availability.'
 		},
 		home: {
 			title: 'Events made easy',
@@ -273,7 +273,7 @@ export default {
 			Um Daten zu entfernen, wähl {trash} aus, dann Daten anklicken.",
 			weekday_ranker_help_modal_title: "Auswahl für die Wochentage",
 			weekday_ranker_help_modal_content: "Wie sieht deine typische Woche aus? Zum Beispiel, \
-			gehst vielleicht du mittwochs ins Fittnessstudio und möchtest deswegen diesen Wochentag als {bad} markieren. Ein Freitag könnte aber ein guter Tag sein für das Event\
+			gehst du vielleicht mittwochs ins Fittnessstudio und möchtest deswegen diesen Wochentag als {bad} markieren. Ein Freitag könnte aber ein guter Tag sein für das Event\
 			und du kannst ihn mit {good} markieren. Die restlichen Tage sind vielleicht nur ok, und du kannst sie als {ok} lassen.",
 			event_no_longer_open: "Das Event ist nicht mehr offen.",
 			range: "Zeitraum"
@@ -332,7 +332,7 @@ export default {
 			red: "Rot",
 			green: "Grün",
 			edit_event: "Event editieren",
-			event_modified: 'Der Organisator hat {time_distance} dieses Event aktualisiert. Überprüfe deine Verfügbarkeit.'
+			event_modified: '{organizer} hat {time_distance} dieses Event aktualisiert. Überprüfe deine Verfügbarkeit.'
 		},
 		home: {
 			title: 'Events leicht gemacht',
@@ -532,7 +532,7 @@ export default {
 			edit_event: "Modifica l'evento",
 			red: "Rosso",
 			green: "verde",
-			event_modified: 'L\'organizzatore ha aggiornato questo evento {time_distance}. Rivedi la tua disponibilità.'
+			event_modified: '{organizer} ha aggiornato questo evento {time_distance}. Rivedi la tua disponibilità.'
 		},
 		home: {
 			title: 'Eventi con facilità',
@@ -591,7 +591,7 @@ export default {
 			confirmation_required: "Non corrisponde..."
 		},
 		event_header: {
-			by: "da {organizer}",
+			by: "di {organizer}",
 			no_name: "Nessun nome per l'evento",
 			no_dates: "Nessuna data",
 			scheduled: "Fissato per {time}",
@@ -600,7 +600,7 @@ export default {
 		},
 		actions: {
 			cancel: "Annulla",
-			tell_me_more: "Voglio saperne di più.",
+			tell_me_more: "Dimmi di più.",
 			back_home: "Alla homepage"
 		}
 	}
