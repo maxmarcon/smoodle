@@ -2,6 +2,7 @@
   "repository": {},
   "license": "MIT",
   "scripts": {
+    "build": "brunch build",
     "deploy": "brunch build --production",
     "watch": "brunch watch --stdin"
   },
@@ -22,11 +23,8 @@
     "clean-css-brunch": "^2.10.0",
     "copycat-brunch": "^1.1.0",
     "date-fns": "^1.29.0",
-    "dotenv": "^6.0.0",
     "flag-icon-css": "^3.0.0",
-    "jquery": "^3.3.1",
     "pc-bootstrap4-datetimepicker": "^4.17.50",
-    "popper.js": "^1.14.4",
     "pretty-checkbox-vue": "^1.1.9",
     "pug": "^2.0.3",
     "sass-brunch": "^2.10.7",
@@ -39,6 +37,6 @@
     "vue-clipboard2": "^0.2.1",
     "vue-i18n": "^8.1.0",
     "vue-loading-overlay": "^2.2.1",
-    "vue-scrollto": "^2.11.0"
+    "vue-scrollto": "^2.13.0"
   }
 }

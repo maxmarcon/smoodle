@@ -21,6 +21,11 @@ const Vue = require('vue/dist/vue.runtime.js');
 // as it does not translate the "export default Vue" statement at the end of the file into CommonJS
 // ...
 
+// See: https://vuejs.org/v2/guide/installation.html#Development-vs-Production-Mode
+let productionMode = (process.env.NODE_ENV == "production");
+Vue.config.devtools = !productionMode;
+Vue.config.productionTip = false;
+
 Vue.use(VueRouter);
 const router = new VueRouter({
 	mode: 'history',
