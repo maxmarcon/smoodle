@@ -199,34 +199,34 @@
 
 			.card-footer(v-if="eventOpen || isOrganizer")
 				.row.justify-content-center
-					.col-auto.mt-1(v-if="eventOpen && isOrganizer")
-						button.btn.btn-primary(v-b-modal.scheduleEventModal="" :disabled="requestOngoing")
+					.col-12.col-sm-auto.mt-1(v-if="eventOpen && isOrganizer && eventScheduleParticipantsCount")
+						button.btn.btn-block.btn-primary(v-b-modal.scheduleEventModal="" :disabled="requestOngoing")
 							i.fas.fa-clock
 							| &nbsp; {{ $t('event_viewer.schedule_event') }}
-					.col-auto.mt-1(v-if="eventOpen && isOrganizer")
-						router-link.btn.btn-success(
+					.col-12.col-sm-auto.mt-1(v-if="eventOpen && isOrganizer")
+						router-link.btn.btn-block.btn-success(
 							role="button"
 							:to="{ name: 'edit_event', params: {eventId: eventId, secret: secret}, query: {s: secret} }"
 						)
 							i.fas.fa-edit
 							| &nbsp; {{ $t('event_viewer.edit_event') }}
-					.col-auto.mt-1(v-if="eventOpen && isOrganizer")
-						button.btn.btn-warning(v-b-modal.cancelEventModal="" :disabled="requestOngoing")
+					.col-12.col-sm-auto.mt-1(v-if="eventOpen && isOrganizer")
+						button.btn.btn-block.btn-block.btn-warning(v-b-modal.cancelEventModal="" :disabled="requestOngoing")
 							i.fas.fa-ban
 							| &nbsp; {{ $t('event_viewer.cancel_event') }}
-					.col-auto.mt-1(v-if="!eventOpen && isOrganizer")
-						button.btn.btn-warning(@click="openEvent" :disabled="requestOngoing")
+					.col-12.col-sm-auto.mt-1(v-if="!eventOpen && isOrganizer")
+						button.btn.btn-block.btn-warning(@click="openEvent" :disabled="requestOngoing")
 							i.fas.fa-undo
 							| &nbsp; {{ $t('event_viewer.open_event') }}
-					.col-auto.mt-1(v-if="eventOpen && !isOrganizer")
-						router-link.btn.btn-success(
+					.col-12.col-sm-auto.mt-1(v-if="eventOpen && !isOrganizer")
+						router-link.btn.btn-block.btn-success(
 							role="button"
 							:to="{ name: 'new_poll', params: {eventId: eventId}}"
 						)
 							i.fas.fa-question
 							| &nbsp; {{ $t('event_viewer.create_poll') }}
-					.col-auto.mt-1(v-if="eventOpen && !isOrganizer")
-						button.btn.btn-primary(v-b-modal.updateAnswerModal="" :disabled="requestOngoing")
+					.col-12.col-sm-auto.mt-1(v-if="eventOpen && !isOrganizer && eventScheduleParticipantsCount")
+						button.btn.btn-block.btn-primary(v-b-modal.updateAnswerModal="" :disabled="requestOngoing")
 							i.fas.fa-edit
 							| &nbsp; {{ $t('event_viewer.update_poll') }}
 

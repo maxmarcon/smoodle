@@ -22,8 +22,7 @@ const Vue = require('vue/dist/vue.runtime.js');
 // ...
 
 // See: https://vuejs.org/v2/guide/installation.html#Development-vs-Production-Mode
-let productionMode = (process.env.NODE_ENV == "production");
-Vue.config.devtools = !productionMode;
+Vue.config.devtools = (process.env.NODE_ENV != "production");
 Vue.config.productionTip = false;
 
 Vue.use(VueRouter);
@@ -118,5 +117,3 @@ const app = new Vue({
  	router,
 	render: h => h(rootVue)
 }).$mount('#app');
-
-

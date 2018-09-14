@@ -180,16 +180,16 @@
 
 			.card-footer
 				.row.justify-content-center
-					.col-auto.mt-1
-						button.btn.btn-primary(@click="savePoll" :disabled="requestOngoing")
+					.col-12.col-sm-auto.mt-1
+						button.btn.btn-block.btn-primary(@click="savePoll" :disabled="requestOngoing")
 							i.fas.fa-save
 							| &nbsp; {{ $t('poll_editor.save_poll') }}
-					.col-auto.mt-1(v-if="pollId")
-						button.btn.btn-danger(v-b-modal.pollDeleteModal="" :disabled="requestOngoing")
+					.col-12.col-sm-auto.mt-1(v-if="pollId")
+						button.btn.btn-block.btn-danger(v-b-modal.pollDeleteModal="" :disabled="requestOngoing")
 							i.fas.fa-trash-alt
 							| &nbsp; {{ $t('poll_editor.delete_poll') }}
-					.col-auto.mt-1
-						button.btn.btn-secondary(@click="backToEvent" :disabled="requestOngoing")
+					.col-12.col-sm-auto.mt-1
+						button.btn.btn-block.btn-secondary(@click="backToEvent" :disabled="requestOngoing")
 							i.fas.fa-ban
 							| &nbsp; {{ $t('actions.cancel') }}
 

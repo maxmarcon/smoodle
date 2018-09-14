@@ -185,21 +185,21 @@
 
 			.card-footer
 				.row.justify-content-center(v-if="!createdEvent")
-					.col-auto.mt-1
-						button.btn.btn-primary(v-if="!eventId" @click="saveEvent" :disabled="requestOngoing")
+					.col-12.col-sm-auto.mt-1
+						button.btn.btn-block.btn-primary(v-if="!eventId" @click="saveEvent" :disabled="requestOngoing")
 							i.fas.fa-plus
 							| &nbsp; {{ $t('event_editor.create_event') }}
-						button.btn.btn-primary(v-else @click="saveEvent" :disabled="requestOngoing")
+						button.btn.btn-block.btn-primary(v-else @click="saveEvent" :disabled="requestOngoing")
 							i.fas.fa-save
 							| &nbsp; {{ $t('event_editor.update_event') }}
-					.col-auto.mt-1(v-if="eventId")
-						button.btn.btn-secondary(@click="backToEvent" :disabled="requestOngoing")
+					.col-12.col-sm-auto.mt-1(v-if="eventId")
+						button.btn.btn-block.btn-secondary(@click="backToEvent" :disabled="requestOngoing")
 							i.fas.fa-ban
 							| &nbsp; {{ $t('actions.cancel') }}
 
 				.row.justify-content-center(v-else)
-					.col-auto.mt-1
-						router-link.btn.btn-success(
+					.col-12.col-sm-auto.mt-1
+						router-link.btn.btn-block.btn-success(
 							role="button"
 							:to="{ name: 'event', params: {eventId: createdEvent.id, secret: createdEvent.secret}, query: {s: createdEvent.secret}}"
 						)
