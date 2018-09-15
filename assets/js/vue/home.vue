@@ -69,12 +69,13 @@
 
 			.card-footer
 				.row.justify-content-center
-					router-link.btn.btn-success(
-						role="button"
-						:to="{ name: 'new_event'}"
-					)
-						i.fas.fa-plus
-						| &nbsp; {{ $t('home.create_new_event') }}
+					.col-12.col-md-auto
+						router-link.btn.btn-block.btn-success(
+							role="button"
+							:to="{ name: 'new_event'}"
+						)
+							i.fas.fa-plus
+							| &nbsp; {{ $t('home.create_new_event') }}
 
 </template>
 <script>

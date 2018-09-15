@@ -6,13 +6,14 @@
 			strong {{ message }}
 	.card-footer
 		slot
-			.text-center
-				router-link.btn.btn-secondary(
-					role="button"
-					:to="{name: 'home'}"
-				)
-					i.fas.fa-home
-					| &nbsp; {{ $t('actions.back_home') }}
+			.row.justify-content-center
+				.col-12.col-md-auto
+					router-link.btn.btn-block.btn-secondary(
+						role="button"
+						:to="{name: 'home'}"
+					)
+						i.fas.fa-home
+						| &nbsp; {{ $t('actions.back_home') }}
 </template>
 <script>
 export default {
