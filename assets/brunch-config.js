@@ -24,11 +24,11 @@ exports.config = {
       // }
     },
     stylesheets: {
-      joinTo: "css/bundle.css"
-    },
-    templates: {
-      joinTo: "js/bundle.js"
+      joinTo: 'css/bundle.css'
     }
+    //templates: {
+    //  joinTo: "js/bundle.js"
+    //}
   },
 
   conventions: {
@@ -64,6 +64,36 @@ exports.config = {
   modules: {
     autoRequire: {
       "js/bundle.js": ["js/app"]
+    }
+  },
+  overrides: {
+    test: {
+      conventions: {
+        assets: /^(_static)/
+      },
+      plugins: {
+        off: ['copycat-brunch']
+      },
+      files: {
+        javascripts: {
+          entryPoints: {
+           'js/test/suite.js': 'testSuite.js'
+          }
+        },
+        stylesheets: {
+          joinTo: {
+            'css/bundle.css': /^(_css)/
+          }
+        }
+      },
+      paths: {
+        public: 'tests'
+      },
+      modules: {
+        autoRequire: {
+          "testSuite.js": ['js/test/suite']
+        }
+      }
     }
   }
 };
