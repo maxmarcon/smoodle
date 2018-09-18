@@ -55,7 +55,9 @@ defmodule SmoodleWeb.EventController do
 
     with {:ok, %Event{} = event} <- Scheduler.update_event(event, event_params) do
       Logger.info("Updated event: #{event}")
-      render(conn, "show.json", event: event)
+
+      put_resp_header(conn, "location", event_path(conn, :show, event))
+      |> render("show.json", event: event)
     end
   end
 
