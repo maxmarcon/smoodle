@@ -218,7 +218,7 @@ export default {
 				name_help: "Gib deinem Event einen Namen.",
 				desc: "Was findet statt?",
 				desc_help: "Beschreibe dein Event für deine Gäste.",
-				dates: "Gib einem Zeitraum ein, entweder aus dem Kalendar oder Drop-down.",
+				dates: "Gib einem Zeitraum ein, entweder aus dem Kalender oder Drop-down.",
 				organizer: "Wer bist du?",
 				organizer_help: "Lass deine Freunde wissen, wer sie einlädt...",
 				organizer_email: "Bitte gib deine Email ein.",
@@ -257,7 +257,7 @@ export default {
 			},
 			weekday_ranker_group: "Wie sieht deine typische Woche aus?",
 			weekday_ranker_help: "Gib ein, welche Tage deiner typischen Woche passend {good}, ok {ok}, oder unpassend {bad} sind für dieses Event. Du kannst später Ausnahmen für einzelne Daten hinzufügen. {help}.",
-			calendar_ranker_group: "einzelne Daten auswählen",
+			calendar_ranker_group: "Einzelne Daten auswählen",
 			save_poll: "Verfügbarkeit speichern",
 			delete_poll: "Verfügbarkeit löschen",
 			poll_saved: "Deine Verfügbarkeit wurde gespeichert",
@@ -266,9 +266,9 @@ export default {
 			poll_deleted: "Deine Verfügbarkeit wurde gelöscht",
 			poll_delete_error: "Ein Fehler ist aufgetreten, deine Verfügbarkeit konnte nicht gelöscht werden.",
 			dates_placeholder: "Zeitraum auswählen",
-			date_ranker_helper: "Wähl Daten aus, die passend {good} oder unpassend {bad} sind für dieses Event. Das hat Vorrang vor deiner Auaswahl über die Wochentage. {help}.",
+			date_ranker_helper: "Wähle Daten aus, die passend {good} oder unpassend {bad} sind für dieses Event. Das hat Vorrang vor deiner Ausnahmenswahl über die Wochentage. {help}.",
 			date_ranker_help_modal_title: "Daten hinzufügen oder entfernen",
-			date_ranker_help_modal_content: "Zuerst wähl aus, ob die Daten passend {good} oder unpassend {bad} sind für dieses Event.\
+			date_ranker_help_modal_content: "Zuerst wähle aus, ob die Daten passend {good} oder unpassend {bad} sind für dieses Event.\
 			Dann füg die Daten hinzu, entweder einzeln oder als Zeitspanne.\
 			Um Daten zu entfernen, wähl {trash} aus, dann Daten anklicken.",
 			weekday_ranker_help_modal_title: "Auswahl für die Wochentage",
@@ -325,7 +325,7 @@ export default {
 			select_date_first: "Du musst zuerst ein Datum im Kalendar auswählen.",
 			warning_bad_date: "Achtung! Eine Person kann an diesem Tag nicht kommen|Achtung! {participants} Personen können an diesem Tag nicht kommen",
 			select_time: "Leg eine Uhrzeit für das Event fest:",
-			date_selection_help: "Daten sind von {best} zu {worst} bewertet. Klick ein Datum an, um zu erfahren, wie viele an dem Tag kommen können. {red} bedeutet, dass mindestens eine Person nicht kommen kann. {green} bedeutet, dass alle kommen können.",
+			date_selection_help: "Die Daten sind von {best} bis {worst} gekennzeichnet. Klicke ein Datum an, um zu erfahren, wie viele Leute an dem Tag kommen können. {red} bedeutet, dass mindestens eine Person nicht kommen kann. {green} bedeutet, dass alle Leute kommen können.",
 			date_selection_help_organizer: "Daten sind von {best} zu {worst} bewertet. Klick ein Datum an, um zu erfahren, wer an dem Tag kommen kann. {red} bedeutet, dass mindestens eine Person nicht kommen kann. {green} bedeutet, dass alle kommen können.",
 			best: "gut",
 			worst: "schlecht",
@@ -343,19 +343,19 @@ export default {
 			step1: {
 				title: '{step} : Event planen',
 				part1: 'Beschreibe dein Event.',
-				part2: 'Wähl die passende Zeitspanne für dein Event aus.',
+				part2: 'Wähle die passende Zeitspanne für dein Event aus.',
 				part3: 'Lade deine Freunde mit einem Weblink ein.'
 			},
 			step2: {
 				title: '{step} : Lass deine Freunde entscheiden',
-				part1: 'Deine Freunde können angeben, ob ein Datum {good}, {indifferent}, oder {bad} ist für sie.',
-				part2: 'Sie können einzelne Tage oder eine zusammenhängende Zeitspanne auswählen.'
+				part1: 'Deine Freunde können angeben, ob ein Datum {good}, {indifferent}, oder {bad} für sie ist.',
+				part2: 'Sie können einzelne Tage oder einen Zeitraum auswählen.'
 			},
 			step3: {
 				title: '{step} : Event verwalten',
 				part1: 'Als Organisator hast du immer einen klaren Überblick über die Entscheidungen deiner Freunde.',
-				part2: '{good} und {bad} Daten sind deutlich sichtbar im Kalendar.',
-				part3: 'Wenn du bereit bist, wähl ein Datum aus, leg es fest und sag deiner Crowd Bescheid!'
+				part2: '{good} und {bad} Daten sind deutlich im Kalendar sichtbar.',
+				part3: 'Wenn du bereit bist, wähle ein Datum aus, lege es fest und sage deiner Crowd Bescheid!'
 			},
 			create_new_event: 'Jetzt neues Event planen!',
 			good: 'passend|passende',
