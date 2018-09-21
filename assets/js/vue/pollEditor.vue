@@ -1,7 +1,7 @@
 <template lang="pug">
 	div
 		message-bar(ref="errorBar" variant="danger")
-		b-modal(ref="pollSavedModal" hide-header ok-only :ok-title="$t('poll_editor.back_to_event')" @hidden="backToEvent")
+		b-modal#pollSavedModal(ref="pollSavedModal" hide-header ok-only :ok-title="$t('poll_editor.back_to_event')" @hidden="backToEvent")
 			p {{ $t('poll_editor.poll_saved') }}
 
 		b-modal#dateRankerHelpModal(ok-only :title="$t('poll_editor.date_ranker_help_modal_title')")
@@ -40,7 +40,7 @@
 		)
 			p {{ $t('poll_editor.poll_delete_error') }}
 
-		b-modal(ref="eventNoLongerOpenModal"
+		b-modal#eventNoLongerOpenModal(ref="eventNoLongerOpenModal"
 			hide-header
 			:ok-title="$t('poll_editor.back_to_event')"
 			ok-only
@@ -60,7 +60,7 @@
 				.alert.alert-info(v-else)
 					i.fas.fa-edit
 					| &nbsp; {{ $t('poll_editor.welcome_new_participant') }}
-				.small.text-danger {{ eventError }}
+				.small.text-danger(name="event-error") {{ eventError }}
 
 				div(v-if="eventId")
 					b-btn.btn-block.d-flex(
