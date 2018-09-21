@@ -9,8 +9,8 @@ defmodule Smoodle.Repo.Migrations.CreateEvents do
       add :secret, :string, null: false
   		add :time_window_from, :date, null: false
   		add :time_window_to, :date, null: false
-  		add :scheduled_from, :naive_datetime
-  		add :scheduled_to, :naive_datetime
+  		add :scheduled_from, :utc_datetime
+  		add :scheduled_to, :utc_datetime
   		add :desc, :text
       add :email, :string
       add :state, :string
