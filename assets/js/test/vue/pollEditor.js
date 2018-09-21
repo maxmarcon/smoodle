@@ -44,14 +44,31 @@ const POLL_ID = "599a1056-3cea-4c4e-b54c-5fd376f0f632";
 const POLL_DATA = {
 	"updated_at": "2018-09-21T14:55:22.000000Z",
 	"preferences": {
-		"weekday_ranks": []
+		"weekday_ranks": [{
+			rank: -1,
+			day: 0
+		}, {
+			rank: 1,
+			day: 6
+		}, {
+			rank: -1,
+			day: 2
+		}]
 	},
 	"participant": "Min",
 	"inserted_at": "2018-09-21T14:55:22.000000Z",
 	"id": POLL_ID,
 	"event_id": EVENT_ID,
 	"event": EVENT_DATA,
-	"date_ranks": []
+	"date_ranks": [{
+		date_from: "2018-09-12",
+		date_to: "2018-09-12",
+		rank: 1
+	}, {
+		date_from: "2018-10-12",
+		date_to: "2018-10-14",
+		rank: -1
+	}]
 }
 
 const CANCELED_EVENT_POLL_DATA = {
@@ -384,12 +401,26 @@ describe('pollEditor', () => {
 				expect(wrapper.find('input#pollParticipant').exists()).toBeFalsy()
 			})
 
-			it('renders the weekday ranker', () => {
+			it('renders the weekday ranker with the right attributes', () => {
 				expect(wrapper.find('ranker').exists()).toBeTruthy();
+				expect(wrapper.vm.pollWeekdayRanks
+						.filter(obj => obj.rank != 0).map(obj => ({
+							day: obj.day,
+							rank: obj.rank
+						})).sort((o1, o2) => o1.day < o2.day))
+					.toEqual(POLL_DATA.preferences.weekday_ranks.sort((o1, o2) => o1.day < o2.day))
 			})
 
-			it('renders the date picker', () => {
+			it('renders the date picker with the right attributes', () => {
 				expect(wrapper.find('v-date-picker').exists()).toBeTruthy();
+				expect(wrapper.vm.datePickerAttributes
+					.map(attr => ({
+						rank: attr.customData.rank,
+						date_from: attr.dates.start,
+						date_to: attr.dates.end
+					}))
+					.sort((o1, o2) => o1.date_from < o2.date_to)
+				).toEqual(POLL_DATA.date_ranks.sort((o1, o2) => o1.date_from < o2.date_to))
 			})
 
 			it('renders one alert-info', () => {

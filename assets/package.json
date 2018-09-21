@@ -5,8 +5,8 @@
     "build": "brunch build",
     "deploy": "brunch build --production",
     "watch": "brunch watch --stdin",
-    "watch-test": "brunch watch --env test & CHROME_BIN=/usr/bin/chromium-browser karma start",
-    "test": "brunch build --env test && CHROME_BIN=/usr/bin/chromium-browser karma start --single-run"
+    "test": "brunch build --env test",
+    "watch-test": "brunch watch --env test & CHROME_BIN=/usr/bin/chromium-browser karma start"
   },
   "dependencies": {
     "bootstrap": "^4.1.3",
