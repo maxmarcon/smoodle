@@ -6,7 +6,7 @@ exports.config = {
       //  'js/bundle.js': '**/*.js'
       //},
       entryPoints: {
-       'js/app.js': 'js/bundle.js'
+        'js/app.js': 'js/bundle.js'
       }
       // To use a separate vendor.js bundle, specify two files path
       // http://brunch.io/docs/config#-files-
@@ -66,6 +66,7 @@ exports.config = {
       "js/bundle.js": ["js/app"]
     }
   },
+
   overrides: {
     test: {
       conventions: {
@@ -77,7 +78,7 @@ exports.config = {
       files: {
         javascripts: {
           entryPoints: {
-           'js/test/suite.js': 'testSuite.js'
+            'js/test/suite.js': 'testSuite.js'
           }
         },
         stylesheets: {

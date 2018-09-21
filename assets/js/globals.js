@@ -267,14 +267,14 @@ export const eventDataMixin = {
 			this.eventOrganizer = eventData.organizer;
 			this.eventOrganizerEmail = eventData.email;
 			this.eventDesc = eventData.desc;
-			this.eventTimeWindowFrom = dateFns.parse(eventData.time_window_from);
-			this.eventTimeWindowTo = dateFns.parse(eventData.time_window_to);
+			this.eventTimeWindowFrom = eventData.time_window_from && dateFns.parse(eventData.time_window_from);
+			this.eventTimeWindowTo = eventData.time_window_to && dateFns.parse(eventData.time_window_to);
 			this.eventState = eventData.state;
-			this.eventScheduledFrom = dateFns.parse(eventData.scheduled_from);
-			this.eventScheduledTo = dateFns.parse(eventData.scheduled_to);
+			this.eventScheduledFrom = eventData.scheduled_from && dateFns.parse(eventData.scheduled_from);
+			this.eventScheduledTo = eventData.scheduled_to && dateFns.parse(eventData.scheduled_to);
 			this.eventShareLink = eventData.share_link;
-			this.eventInsertedAt = dateFns.parse(eventData.inserted_at);
-			this.eventModifiedAt = dateFns.parse(eventData.updated_at);
+			this.eventInsertedAt = eventData.inserted_at && dateFns.parse(eventData.inserted_at);
+			this.eventModifiedAt = eventData.updated_at && dateFns.parse(eventData.updated_at);
 		}
 	},
 	computed: {

@@ -34,49 +34,46 @@ Vue.config.productionTip = false;
 Vue.use(VueRouter);
 const router = new VueRouter({
 	mode: 'history',
-	routes: [
-		{
-			path: '/home',
-			name: 'home',
-			component: Home
-		},
-	  {
-	  	path: '/events/new',
-	  	name: 'new_event',
-	  	component: EventEditor
-	  },
-	  {
-	  	path: '/events/:eventId/edit',
-	  	name: 'edit_event',
-	  	component: EventEditor,
-	  	props: (route) => Object.assign({secret: route.query.s}, route.params)
-	  },
-	  {
-	  	path: '/events/:eventId',
-	  	name: 'event',
-	  	component: EventViewer,
-	  	props: (route) => Object.assign({secret: route.query.s}, route.params)
-	  },
-	  {
-	  	path: '/events/:eventId/polls/new',
-	  	name: 'new_poll',
-	  	component: PollEditor,
-			props: true
-	  },
-	  {
-	  	path: '/polls/:pollId/edit',
-	  	name: 'edit_poll',
-	  	component: PollEditor,
-			props: true
-	  }
-  ]
+	routes: [{
+		path: '/home',
+		name: 'home',
+		component: Home
+	}, {
+		path: '/events/new',
+		name: 'new_event',
+		component: EventEditor
+	}, {
+		path: '/events/:eventId/edit',
+		name: 'edit_event',
+		component: EventEditor,
+		props: (route) => Object.assign({
+			secret: route.query.s
+		}, route.params)
+	}, {
+		path: '/events/:eventId',
+		name: 'event',
+		component: EventViewer,
+		props: (route) => Object.assign({
+			secret: route.query.s
+		}, route.params)
+	}, {
+		path: '/events/:eventId/polls/new',
+		name: 'new_poll',
+		component: PollEditor,
+		props: true
+	}, {
+		path: '/polls/:pollId/edit',
+		name: 'edit_poll',
+		component: PollEditor,
+		props: true
+	}]
 });
 
 Vue.use(VueI18n);
 const i18n = new VueI18n({
-  locale: smoodle_locale,
-  fallbackLocale: 'en',
-  messages
+	locale: smoodle_locale,
+	fallbackLocale: 'en',
+	messages
 });
 
 Vue.use(PrettyCheckbox);
@@ -107,6 +104,6 @@ Vue.component('error-page', errorPage);
 
 const app = new Vue({
 	i18n,
- 	router,
+	router,
 	render: h => h(rootVue)
 }).$mount('#app');
