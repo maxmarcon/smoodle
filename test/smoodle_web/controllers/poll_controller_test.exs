@@ -219,8 +219,10 @@ defmodule SmoodleWeb.PollControllerTest do
     setup :create_event
 
     test "can create a poll with valid parameters", %{conn: conn, event: event} do
-      conn = post(conn, event_poll_path(conn, :create, event.id), %{poll: @poll_valid_attrs_1})
+      conn = post(conn, event_poll_path(conn, :create, event), %{poll: @poll_valid_attrs_1})
       data = json_response(conn, 201)["data"]
+      location = List.first(get_resp_header(conn, "location"))
+      assert location == poll_path(conn, :show, data["id"])
       assert Map.has_key?(data, "id")
       assert @poll_valid_attrs_1.participant == data["participant"]
 
@@ -249,8 +251,10 @@ defmodule SmoodleWeb.PollControllerTest do
     setup [:create_event, :create_polls]
 
     test "poll can be updated when parameters are valid", %{conn: conn, polls: [poll | _]} do
-      conn = put(conn, poll_path(conn, :update, poll.id), %{poll: @poll_update_attrs_1})
+      conn = put(conn, poll_path(conn, :update, poll), %{poll: @poll_update_attrs_1})
       data = json_response(conn, 200)["data"]
+      location = List.first(get_resp_header(conn, "location"))
+      assert location == poll_path(conn, :show, poll)
       assert poll.id == data["id"]
       assert @poll_valid_attrs_1.participant == data["participant"]
 

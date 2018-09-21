@@ -147,7 +147,8 @@ defmodule Smoodle.Scheduler do
 
   def get_best_schedule(%Event{} = event, opts \\ []) do
     polls =
-      Repo.all(Ecto.assoc(event, :polls)) |> Repo.preload(:date_ranks)
+      Repo.all(Ecto.assoc(event, :polls))
+      |> Repo.preload(:date_ranks)
       |> Enum.map(&transorm_poll_for_ranking/1)
 
     is_owner = opts[:is_owner]

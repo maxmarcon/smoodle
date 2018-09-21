@@ -127,11 +127,13 @@ defmodule SmoodleWeb.EventControllerTest do
       assert %{"id" => id} = data_response
       assert Map.has_key?(data_response, "secret")
       assert data_response["email"] == @create_attrs_1.email
+      location = List.first(get_resp_header(conn, "location"))
+      assert location == event_path(conn, :show, data_response["id"])
 
       expected_data_response = Map.merge(%{"id" => id}, rest_repr(@create_attrs_1))
       assert MapSet.subset?(MapSet.new(expected_data_response), MapSet.new(data_response))
 
-      conn = get(conn, event_path(conn, :show, id))
+      conn = get(conn, location)
       data_response = json_response(conn, 200)["data"]
 
       assert MapSet.subset?(
@@ -212,6 +214,8 @@ defmodule SmoodleWeb.EventControllerTest do
       data_response = json_response(conn, 200)["data"]
       assert %{"id" => ^id} = data_response
       assert Map.has_key?(data_response, "secret")
+      location = List.first(get_resp_header(conn, "location"))
+      assert location == event_path(conn, :show, id)
 
       expected_data_response =
         Map.merge(%{"id" => id}, rest_repr(@create_attrs_1))
@@ -219,7 +223,7 @@ defmodule SmoodleWeb.EventControllerTest do
 
       assert MapSet.subset?(MapSet.new(expected_data_response), MapSet.new(data_response))
 
-      conn = get(conn, event_path(conn, :show, event.id))
+      conn = get(conn, location)
       data_response = json_response(conn, 200)["data"]
 
       assert MapSet.subset?(

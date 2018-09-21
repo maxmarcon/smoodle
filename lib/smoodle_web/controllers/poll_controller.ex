@@ -28,7 +28,7 @@ defmodule SmoodleWeb.PollController do
       # need to preload date_ranks for the case when the poll_params don't include any date ranks
       conn
       |> put_status(:created)
-      |> put_resp_header("location", event_path(conn, :show, poll))
+      |> put_resp_header("location", poll_path(conn, :show, poll))
       |> render("show.json", poll: Repo.preload(poll, :date_ranks))
     end
   end
@@ -47,7 +47,9 @@ defmodule SmoodleWeb.PollController do
 
     with {:ok, %Poll{} = poll} <- Scheduler.update_poll(poll, poll_params) do
       Logger.info("Updated poll: #{poll}")
-      render(conn, "show.json", poll: poll)
+
+      put_resp_header(conn, "location", poll_path(conn, :show, poll))
+      |> render("show.json", poll: poll)
     end
   end
 
