@@ -401,8 +401,11 @@ describe('pollEditor', () => {
 				expect(wrapper.find('input#pollParticipant').exists()).toBeFalsy()
 			})
 
-			it('renders the weekday ranker with the right attributes', () => {
+			it('renders the ranker', () => {
 				expect(wrapper.find('ranker').exists()).toBeTruthy();
+			})
+
+			it('computes the poll weeday ranks', () => {
 				expect(wrapper.vm.pollWeekdayRanks
 						.filter(obj => obj.rank != 0).map(obj => ({
 							day: obj.day,
@@ -411,8 +414,11 @@ describe('pollEditor', () => {
 					.toEqual(POLL_DATA.preferences.weekday_ranks.sort((o1, o2) => o1.day < o2.day))
 			})
 
-			it('renders the date picker with the right attributes', () => {
+			it('renders the date picker', () => {
 				expect(wrapper.find('v-date-picker').exists()).toBeTruthy();
+			})
+
+			it('computed the date picker attributes', () => {
 				expect(wrapper.vm.datePickerAttributes
 					.map(attr => ({
 						rank: attr.customData.rank,
