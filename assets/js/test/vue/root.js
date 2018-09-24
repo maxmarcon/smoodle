@@ -1,7 +1,10 @@
 import rootVue from '../../vue/root.vue'
 import BootstrapVue from 'bootstrap-vue'
 import VueRouter from 'vue-router'
-import { mount, createLocalVue } from '@vue/test-utils'
+import {
+	mount,
+	createLocalVue
+} from '@vue/test-utils'
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
@@ -9,16 +12,13 @@ localVue.use(VueRouter);
 
 const router = new VueRouter({
 	mode: 'history',
-	routes: [
-		{
-			path: '/home',
-			name: 'home'
-		},
-		{
-	  	path: '/events/new',
-	  	name: 'new_event'
-	  }
-	]
+	routes: [{
+		path: '/home',
+		name: 'home'
+	}, {
+		path: '/events/new',
+		name: 'new_event'
+	}]
 });
 
 describe('rootVue', () => {
@@ -26,7 +26,9 @@ describe('rootVue', () => {
 	const wrapper = mount(rootVue, {
 		mocks: {
 			$t: () => "",
-			$i18n: { locale: 'default' }
+			$i18n: {
+				locale: 'default'
+			}
 		},
 		localVue,
 		router

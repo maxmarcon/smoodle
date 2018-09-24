@@ -1,7 +1,7 @@
 import dateFns from 'date-fns'
 
 export function dotAccessObject(obj, deep_key) {
-	if (!obj instanceof Object) {
+	if (!(obj instanceof Object)) {
 		throw "dotAccessObject should be called with an object";
 	}
 	let retval = undefined;
@@ -99,7 +99,9 @@ export const accordionGroupsMixin = {
 						let confirmation_field = `${field}_confirmation`;
 						let confirmation_error_field = `${errorField}_confirmation`;
 						self[confirmation_error_field] = (
-							self[field] == self[confirmation_field] ? null : self.$i18n.t('errors.confirmation_required', {field: field})
+							self[field] == self[confirmation_field] ? null : self.$i18n.t('errors.confirmation_required', {
+								field: field
+							})
 						);
 					}
 				}
@@ -142,7 +144,7 @@ export const accordionGroupsMixin = {
 				}
 			}
 		},
-		setServerErrors(errors={}) {
+		setServerErrors(errors = {}) {
 			function setErrorField(fieldMap, errors) {
 				let errorKeys = fieldMap.errorKeys;
 				let errorField = fieldMap.errorField;
@@ -218,7 +220,9 @@ export const restMixin = {
 				if (config.showErrors) {
 					if (error.response) {
 						if (!config.ignoreErrorCodes.includes(error.response.status)) {
-							let message = config.errorCodeMessages[error.response.status] || self.$i18n.t('errors.server', {code: error.response.status});
+							let message = config.errorCodeMessages[error.response.status] || self.$i18n.t('errors.server', {
+								code: error.response.status
+							});
 							self.$refs.errorBar.show(message);
 							scrollToTop = true;
 						}
@@ -226,7 +230,9 @@ export const restMixin = {
 						self.$refs.errorBar.show(self.$i18n.t('errors.network'));
 						scrollToTop = true;
 					} else {
-						self.$refs.errorBar.show(self.$i18n.t('errors.generic', {message: error.message}));
+						self.$refs.errorBar.show(self.$i18n.t('errors.generic', {
+							message: error.message
+						}));
 						scrollToTop = true;
 					}
 					if (self.scrollToTop && scrollToTop) {
@@ -322,9 +328,13 @@ export const eventHelpersMixin = {
 			let to = this.eventTimeWindowTo;
 
 			if (from && to) {
-				return dateFns.format(from, this.$i18n.t('date_format'), {locale: this.$i18n.t('date_fns_locale')})
-				 + " - " +
-				 dateFns.format(to, this.$i18n.t('date_format'), {locale: this.$i18n.t('date_fns_locale')});
+				return dateFns.format(from, this.$i18n.t('date_format'), {
+						locale: this.$i18n.t('date_fns_locale')
+					}) +
+					" - " +
+					dateFns.format(to, this.$i18n.t('date_format'), {
+						locale: this.$i18n.t('date_fns_locale')
+					});
 			}
 		},
 		eventModified() {
@@ -332,21 +342,28 @@ export const eventHelpersMixin = {
 		},
 		eventModifiedRelative() {
 			if (this.eventModified) {
-				return dateFns.distanceInWordsToNow(this.eventModifiedAt, {locale: this.$i18n.t('date_fns_locale'), addSuffix: true});
+				return dateFns.distanceInWordsToNow(this.eventModifiedAt, {
+					locale: this.$i18n.t('date_fns_locale'),
+					addSuffix: true
+				});
 			}
 		},
 		eventScheduledDateTime() {
 			let time = this.eventScheduledFrom;
 
 			if (time) {
-				return dateFns.format(time, this.$i18n.t('datetime_format'), {locale: this.$i18n.t('date_fns_locale')});
+				return dateFns.format(time, this.$i18n.t('datetime_format'), {
+					locale: this.$i18n.t('date_fns_locale')
+				});
 			}
 		},
 		eventScheduledDateTimeRelative() {
 			let time = this.eventScheduledFrom;
 
 			if (time) {
-				let str = dateFns.distanceInWordsToNow(time, {locale: this.$i18n.t('date_fns_locale')});
+				let str = dateFns.distanceInWordsToNow(time, {
+					locale: this.$i18n.t('date_fns_locale')
+				});
 				return str.charAt(0).toUpperCase() + str.slice(1);
 			}
 		},

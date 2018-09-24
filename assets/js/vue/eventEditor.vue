@@ -25,7 +25,7 @@
 						label.col-md-auto.col-form-label  {{ $t('event_editor.share_link') }}
 						.col-md
 							.input-group
-								input.form-control(:value="createdEvent.share_link" readonly)
+								input#shareLink.form-control(:value="createdEvent.share_link" readonly)
 								.input-group-append
 									a.btn.bdn-sm.btn-outline-secondary(
 										target="_blank"
@@ -33,6 +33,7 @@
 									)
 										span.fab.fa-lg.fa-whatsapp
 									button.btn.btn-sm.btn-outline-secondary(
+										name="share-button"
 										v-clipboard:copy="createdEvent.share_link"
 										v-clipboard:success="clipboard"
 									)
@@ -75,7 +76,7 @@
 										:disabled="createdEvent"
 										:class="inputFieldClass('eventOrganizer')"
 									)
-									.invalid-feedback {{ eventOrganizerError }}
+									.invalid-feedback(name="event-organizer-error") {{ eventOrganizerError }}
 
 							.form-group.row
 								label.col-md-3.col-form-label(for="eventOrganizerEmail") {{ $t('event_editor.event.organizer_email') }}
@@ -88,7 +89,7 @@
 										:disabled="createdEvent"
 										:class="inputFieldClass('eventOrganizerEmail')"
 									)
-									.invalid-feedback {{ eventOrganizerEmailError }}
+									.invalid-feedback(name="event-organizer-email-error") {{ eventOrganizerEmailError }}
 
 									small.form-text.text-muted {{ $t('event_editor.event.organizer_email_confirmation_help') }}
 									input#eventOrganizerEmailConfirmation.form-control(
@@ -98,7 +99,7 @@
 										:disabled="createdEvent"
 										:class="inputFieldClass('eventOrganizerEmail_confirmation')"
 									)
-									.invalid-feedback {{ eventOrganizerEmailError_confirmation }}
+									.invalid-feedback(name="event-organizer-email-confirmation-error") {{ eventOrganizerEmailError_confirmation }}
 
 
 					b-btn.btn-block.d-flex.mt-2(
@@ -125,7 +126,7 @@
 									@blur="localValidation"
 									:class="inputFieldClass('eventName')"
 									)
-									.invalid-feedback {{ eventNameError }}
+									.invalid-feedback(name="event-name-error") {{ eventNameError }}
 							.form-group.row
 								label.col-md-3.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
 								.col-md-9
@@ -136,7 +137,7 @@
 									@blur="localValidation"
 									:class="inputFieldClass('eventDesc')"
 									)
-									.invalid-feedback {{ eventDescError }}
+									.invalid-feedback(name="event-desc-error") {{ eventDescError }}
 
 
 					b-btn.btn-block.d-flex.mt-2(
@@ -170,7 +171,7 @@
 										popover-direction="top"
 									)
 									//- invalid feedback won't work here because v-date-picker is not a form-control
-									.small.text-danger {{ eventTimeWindowError }}
+									.small.text-danger(name="event-time-window-error") {{ eventTimeWindowError }}
 
 								.col-md-auto
 									b-dropdown(
@@ -186,14 +187,11 @@
 			.card-footer
 				.row.justify-content-center(v-if="!createdEvent")
 					.col-12.col-sm-auto.mt-1
-						button.btn.btn-block.btn-primary(v-if="!eventId" @click="saveEvent" :disabled="requestOngoing")
-							i.fas.fa-plus
-							| &nbsp; {{ $t('event_editor.create_event') }}
-						button.btn.btn-block.btn-primary(v-else @click="saveEvent" :disabled="requestOngoing")
-							i.fas.fa-save
-							| &nbsp; {{ $t('event_editor.update_event') }}
+						button.btn.btn-block.btn-primary(@click="saveEvent" :disabled="requestOngoing" name="save-event")
+							i.fas(v-bind:class="{'fa-save': eventId, 'fa-plus': !eventId}")
+							| &nbsp; {{ $t(eventId ? 'event_editor.update_event' : 'event_editor.create_event') }}
 					.col-12.col-sm-auto.mt-1(v-if="eventId")
-						button.btn.btn-block.btn-secondary(@click="backToEvent" :disabled="requestOngoing")
+						button.btn.btn-block.btn-secondary(@click="backToEvent" :disabled="requestOngoing" name="cancel")
 							i.fas.fa-ban
 							| &nbsp; {{ $t('actions.cancel') }}
 
@@ -201,6 +199,7 @@
 					.col-12.col-sm-auto.mt-1
 						router-link.btn.btn-block.btn-success(
 							role="button"
+							name="manage-event"
 							:to="{ name: 'event', params: {eventId: createdEvent.id, secret: createdEvent.secret}, query: {s: createdEvent.secret}}"
 						)
 							i.fas.fa-key
@@ -214,7 +213,13 @@
 
 <script>
 import dateFns from 'date-fns'
-import { accordionGroupsMixin, scrollToTopMixin, restMixin, eventDataMixin, whatsAppHelpersMixin } from '../globals'
+import {
+	accordionGroupsMixin,
+	scrollToTopMixin,
+	restMixin,
+	eventDataMixin,
+	whatsAppHelpersMixin
+} from '../globals'
 
 const today = new Date();
 const InvalidDate = 'Invalid Date';
@@ -290,30 +295,37 @@ export default {
 		loadedSuccessfully: false,
 		loaded: false,
 		showThisWeekButton: (dateFns.getDay(today) > 0 && dateFns.getDay(today) < 4), // betewn Mon and Wed
-		createdEvent: null/*{
-						id: 'd8763187-ed3d-4572-ae50-02d5cc874804',
-						name: "Dinner party",
-						organizer: "Max",
-						share_link: "http://localhost:4000/event/967d9e9b-ad9f-4312-863f-c760a52db4e2",
-						owner_link: "http://share",
-						secret: "dasdas",
-						email: 'noname@nodomain.com'
-					}*/
- 	}),
- 	created() {
- 		if (this.eventId) {
- 			if (this.secret) {
-	 			let self = this;
-		 		this.restRequest(['events', this.eventId].join('/'), { params: {secret: this.secret} }).then(function(result) {
+		createdEvent: null
+		/*{
+								id: 'd8763187-ed3d-4572-ae50-02d5cc874804',
+								name: "Dinner party",
+								organizer: "Max",
+								share_link: "http://localhost:4000/event/967d9e9b-ad9f-4312-863f-c760a52db4e2",
+								owner_link: "http://share",
+								secret: "dasdas",
+								email: 'noname@nodomain.com'
+							}*/
+	}),
+	created() {
+		if (this.eventId) {
+			if (this.secret) {
+				let self = this;
+				this.restRequest(['events', this.eventId].join('/'), {
+					params: {
+						secret: this.secret
+					}
+				}).then(function(result) {
 					self.assignEventData(result.data.data);
 					self.applyDates(self.eventTimeWindowFrom, self.eventTimeWindowTo, true);
 					self.loadedSuccessfully = true;
-				}).finally(function() { self.loaded = true; })
+				}).finally(function() {
+					self.loaded = true;
+				})
 			} else {
 				this.loaded = true;
 			}
 		}
- 	},
+	},
 	methods: {
 		datesSelected() {
 			this.eventTimeWindowFrom = this.eventTimeWindow.start;
@@ -321,7 +333,7 @@ export default {
 			this.localValidation();
 		},
 		clipboard() {
-      this.$refs.copiedToClipboardModal.show();
+			this.$refs.copiedToClipboardModal.show();
 		},
 		applyDates(from, to, skipDatesSelected = false) {
 			this.eventTimeWindow = {
@@ -334,19 +346,27 @@ export default {
 		},
 		pickThisWeek() {
 			this.applyDates(
-				dateFns.max(today, dateFns.startOfWeek(today, {weekStartsOn: 1})),
-				dateFns.endOfWeek(today, {weekStartsOn: 1})
+				dateFns.max(today, dateFns.startOfWeek(today, {
+					weekStartsOn: 1
+				})),
+				dateFns.endOfWeek(today, {
+					weekStartsOn: 1
+				})
 			);
 		},
 		pickNextWeek() {
 			let today_next_week = dateFns.addWeeks(today, 1);
 			this.applyDates(
-				dateFns.startOfWeek(today_next_week, {weekStartsOn: 1}),
-				dateFns.endOfWeek(today_next_week, {weekStartsOn: 1})
+				dateFns.startOfWeek(today_next_week, {
+					weekStartsOn: 1
+				}),
+				dateFns.endOfWeek(today_next_week, {
+					weekStartsOn: 1
+				})
 			);
 		},
 		pickNextMonths(months) {
-			this.applyDates(today, dateFns.addMonths(today,months));
+			this.applyDates(today, dateFns.addMonths(today, months));
 		},
 		saveEvent() {
 			let self = this;
@@ -357,14 +377,15 @@ export default {
 				delete dataForRequest['email'];
 			}
 			this.restRequest(
-				(this.eventId ? ["events", this.eventId].join('/') : "events"),
-				{
+				(this.eventId ? ["events", this.eventId].join('/') : "events"), {
 					data: {
-						event: Object.assign(dataForRequest, {secret: this.secret})
+						event: Object.assign(dataForRequest, {
+							secret: this.secret
+						})
 					},
 					method: (this.eventId ? 'patch' : 'post'),
 					ignoreErrorCodes: [429]
-			}).then(function(result) {
+				}).then(function(result) {
 				self.setServerErrors();
 				self.collapseAllGroups();
 				self.$scrollTo('#event-header');
@@ -381,7 +402,9 @@ export default {
 						self.setServerErrors(error.response.data.errors);
 						self.wasServerValidated = true;
 					} else if (error.response.status == 429) {
-						self.$refs.errorBar.show(self.$i18n.t('event_editor.too_many_requests_error', {email: dataForRequest["email"]}));
+						self.$refs.errorBar.show(self.$i18n.t('event_editor.too_many_requests_error', {
+							email: dataForRequest["email"]
+						}));
 						self.scrollToTop();
 					}
 				} else {
@@ -390,7 +413,16 @@ export default {
 			});
 		},
 		backToEvent() {
-			this.$router.push({name: 'event', params: {eventId: this.eventId, secret: this.secret}, query: {s: this.secret}});
+			this.$router.push({
+				name: 'event',
+				params: {
+					eventId: this.eventId,
+					secret: this.secret
+				},
+				query: {
+					s: this.secret
+				}
+			});
 		}
 	}
 }

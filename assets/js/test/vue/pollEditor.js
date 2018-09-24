@@ -1,6 +1,5 @@
 import pollEditor from '../../vue/pollEditor.vue'
 import BootstrapVue from 'bootstrap-vue'
-import VueRouter from 'vue-router'
 
 import {
 	mount,
@@ -85,8 +84,8 @@ const CANCELED_EVENT_POLL_DATA = {
 }
 
 
-let routerSpy = jasmine.createSpyObj("router", ["push"])
-let dayClickedSpy = jasmine.createSpy('dayClicked')
+const routerSpy = jasmine.createSpyObj("router", ["push"])
+const dayClickedSpy = jasmine.createSpy("dayClicked")
 
 function mountPollEditor(restRequest, propsData) {
 
@@ -100,10 +99,10 @@ function mountPollEditor(restRequest, propsData) {
 			dayClicked: dayClickedSpy
 		},
 		mocks: {
-			$t: () => "",
-			$tc: () => "",
+			$t: k => k,
+			$tc: k => k,
 			$i18n: {
-				t: (key) => key
+				t: k => k
 			},
 			$router: routerSpy
 		},
