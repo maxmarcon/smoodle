@@ -5,7 +5,7 @@
 			p {{ $t('event_editor.link_copied') }}
 		b-modal(ref="eventCreatedModal" hide-header ok-only)
 			p {{ $t('event_editor.event_created_short') }}
-		b-modal(ref="eventUpdatedModal" hide-header ok-only :ok-title="$t('event_editor.back_to_event')" @ok="backToEvent")
+		b-modal#eventUpdatedModal(ref="eventUpdatedModal" hide-header ok-only :ok-title="$t('event_editor.back_to_event')" @ok="backToEvent")
 			p {{ $t('event_editor.event_updated') }}
 		.card(v-if="!eventId || loadedSuccessfully")
 			.card-header

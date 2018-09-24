@@ -129,7 +129,7 @@ describe('pollEditor', () => {
 		describe('when loading an non-open event', () => {
 
 			beforeEach((done) => {
-				restRequest = jasmine.createSpy("restRequest").and.returnValues(
+				restRequest = jasmine.createSpy("restRequest").and.returnValue(
 					Promise.resolve({
 						data: {
 							data: CANCELED_EVENT_DATA

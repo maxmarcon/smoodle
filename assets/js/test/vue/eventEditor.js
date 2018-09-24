@@ -26,6 +26,8 @@ localVue.use(BootstrapVue);
 localVue.use(VueRouter)
 localVue.use(VueClipboard)
 
+let backToEventSpy = jasmine.createSpy()
+
 function mountEventEditor(restRequest, propsData) {
 	return mount(eventEditor, {
 		mixins: [{
@@ -42,6 +44,9 @@ function mountEventEditor(restRequest, propsData) {
 			},
 			$scrollTo: () => null
 		},
+		methods: {
+			backToEvent: backToEventSpy
+		},
 		propsData,
 		localVue,
 		router
@@ -57,10 +62,24 @@ const inputElements = [
 	'v-date-picker#eventTimeWindow'
 ]
 
+const inputElementsForUpdate = [
+	'input#eventName',
+	'textarea#eventDesc',
+	'v-date-picker#eventTimeWindow'
+]
+
+
 const errorElements = [
 	'.invalid-feedback[name="event-organizer-error"]',
 	'.invalid-feedback[name="event-organizer-email-error"]',
 	'.invalid-feedback[name="event-organizer-email-confirmation-error"]',
+	'.invalid-feedback[name="event-name-error"]',
+	'.invalid-feedback[name="event-desc-error"]',
+	'.small.text-danger[name="event-time-window-error"]'
+]
+
+
+const errorElementsForUpdate = [
 	'.invalid-feedback[name="event-name-error"]',
 	'.invalid-feedback[name="event-desc-error"]',
 	'.small.text-danger[name="event-time-window-error"]'
@@ -98,6 +117,15 @@ describe('without an eventId', () => {
 		beforeEach(() => {
 			wrapper = mountEventEditor(restRequest, {})
 		})
+
+		it('renders the main card', () => {
+			expect(wrapper.find('div.card').exists()).toBeTruthy();
+		})
+
+		it('renders the card body', () => {
+			expect(wrapper.find('div.card-body').exists()).toBeTruthy();
+		})
+
 
 		it('renders one info element', () => {
 			expect(wrapper.findAll('.alert-info').length).toBe(1)
@@ -163,7 +191,7 @@ describe('without an eventId', () => {
 	})
 
 
-	describe('when creating an event', () => {
+	describe('when successfully creating an event', () => {
 
 		beforeEach((done) => {
 
@@ -176,6 +204,24 @@ describe('without an eventId', () => {
 			wrapper = mountEventEditor(restRequest, {})
 			wrapper.find('button[name="save-event"]').trigger("click")
 			setTimeout(done, 0)
+		})
+
+		it('renders one success element', () => {
+			expect(wrapper.findAll('.alert-success').length).toBe(1)
+		})
+
+		it('renders the main card', () => {
+			expect(wrapper.find('div.card').exists()).toBeTruthy();
+		})
+
+		it('does not render the card body', () => {
+			expect(wrapper.find('div.card-body').exists()).toBeFalsy();
+		})
+
+		inputElements.forEach(selector => {
+			it(`does not render input element ${selector}`, () => {
+				expect(wrapper.find(selector).exists()).toBeFalsy()
+			})
 		})
 
 		it('renders the share link input field', () => {
@@ -195,6 +241,146 @@ describe('without an eventId', () => {
 			expect(wrapper.find('button[name="cancel"]').exists()).toBeFalsy()
 			expect(wrapper.find(`a[name="manage-event"][href="/events/${EVENT_ID}?s=${EVENT_SECRET}"]`).exists()).toBeTruthy()
 		})
+	})
 
+	describe('when loading an existing event', () => {
+		beforeEach((done) => {
+			restRequest = jasmine.createSpy().and.returnValue(Promise.resolve({
+				data: {
+					data: EVENT_DATA
+				}
+			}))
+
+			wrapper = mountEventEditor(restRequest, {
+				eventId: EVENT_ID,
+				secret: EVENT_SECRET
+			})
+
+			setTimeout(done, 0)
+		})
+
+		it('renders the main card', () => {
+			expect(wrapper.find('div.card').exists()).toBeTruthy();
+		})
+
+		it('renders the card body', () => {
+			expect(wrapper.find('div.card-body').exists()).toBeTruthy();
+		})
+
+		it('renders one info element', () => {
+			expect(wrapper.findAll('.alert-info').length).toBe(1)
+		})
+
+		inputElementsForUpdate.forEach(selector => {
+			it(`renders input element ${selector}`, () => {
+				expect(wrapper.find(selector).exists()).toBeTruthy()
+			})
+		})
+
+		it('user can go back to the event', () => {
+
+			wrapper.find('button[name="cancel"]').trigger("click")
+			expect(backToEventSpy).toHaveBeenCalled()
+		})
+
+		it('renders the save and cancel button', () => {
+
+			expect(wrapper.find('button[name="save-event"]').exists()).toBeTruthy()
+			expect(wrapper.find('button[name="cancel"]').exists()).toBeTruthy()
+			expect(wrapper.find('router-link[name="manage-event"]').exists()).toBeFalsy()
+		})
+	})
+
+	describe('when trying to load an event without using the secret', () => {
+
+		beforeEach((done) => {
+			restRequest = jasmine.createSpy().and.returnValue(Promise.resolve({
+				data: {
+					data: EVENT_DATA
+				}
+			}))
+
+			wrapper = mountEventEditor(restRequest, {
+				eventId: EVENT_ID
+			})
+
+			setTimeout(done, 0)
+		})
+
+		it('does not render the main card', () => {
+			expect(wrapper.find('div.card').exists()).toBeFalsy();
+		})
+
+		it('renders an error page', () => {
+			expect(wrapper.find('error-page').exists()).toBeTruthy();
+		})
+	})
+
+	describe('when trying to load an non-existent event', () => {
+
+		beforeEach((done) => {
+			restRequest = jasmine.createSpy().and.returnValue(Promise.reject({
+				response: {
+					status: 404
+				}
+			}))
+
+			wrapper = mountEventEditor(restRequest, {
+				eventId: EVENT_ID,
+				secret: EVENT_SECRET
+			})
+
+			setTimeout(done, 0)
+		})
+
+		it('does not render the main card', () => {
+			expect(wrapper.find('div.card').exists()).toBeFalsy();
+		})
+
+		it('renders an error page', () => {
+			expect(wrapper.find('error-page').exists()).toBeTruthy();
+		})
+	})
+
+	describe('when saving an existing event', () => {
+
+		beforeEach((done) => {
+			restRequest = jasmine.createSpy().and.returnValues(Promise.resolve({
+					data: {
+						data: EVENT_DATA
+					}
+				}),
+				Promise.resolve({
+					data: {
+						data: EVENT_DATA
+					}
+				})
+			)
+
+			wrapper = mountEventEditor(restRequest, {
+				eventId: EVENT_ID,
+				secret: EVENT_SECRET
+			})
+
+			setTimeout(() => {
+				wrapper.find('button[name="save-event"]').trigger('click')
+				setTimeout(done, 0)
+			}, 0)
+		})
+
+		errorElementsForUpdate.forEach(selector => {
+			it(`no error in ${selector}`, () => {
+				expect(wrapper.find(selector).text()).toBeFalsy()
+			})
+		})
+
+		it('opens the eventUpdatedModal modal', () => {
+			expect(wrapper.find('#eventUpdatedModal').isVisible()).toBeTruthy()
+		})
+
+		it('the eventUpdatedModal has a button that takes the user back to the event', () => {
+			wrapper.find('#eventUpdatedModal button.btn-primary').trigger('click')
+			expect(backToEventSpy).toHaveBeenCalled()
+		})
 	})
 })
