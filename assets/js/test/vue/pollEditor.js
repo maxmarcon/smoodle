@@ -210,8 +210,8 @@ describe('pollEditor', () => {
 				expect(wrapper.find('v-date-picker').exists()).toBeTruthy();
 			})
 
-			it('renders one alert-info', () => {
-				expect(wrapper.findAll('.alert.alert-info').length).toBe(1)
+			it('renders one alert', () => {
+				expect(wrapper.findAll('.alert').length).toBe(1)
 			})
 
 			it('renders the right buttons', () => {
@@ -428,8 +428,8 @@ describe('pollEditor', () => {
 				).toEqual(POLL_DATA.date_ranks.sort((o1, o2) => o1.date_from < o2.date_to))
 			})
 
-			it('renders one alert-info', () => {
-				expect(wrapper.findAll('.alert.alert-info').length).toBe(1)
+			it('renders one alert', () => {
+				expect(wrapper.findAll('.alert').length).toBe(1)
 			})
 
 			it('renders the right buttons', () => {

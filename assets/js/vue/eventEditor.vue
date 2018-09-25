@@ -7,7 +7,7 @@
 			p {{ $t('event_editor.event_created_short') }}
 		b-modal#eventUpdatedModal(ref="eventUpdatedModal" hide-header ok-only :ok-title="$t('event_editor.back_to_event')" @ok="backToEvent")
 			p {{ $t('event_editor.event_updated') }}
-		.card(v-if="!eventId || loadedSuccessfully")
+		.card(v-if="!eventId || loadedSuccessfully || eventCreated")
 			.card-header
 				event-header#event-header(
 					:eventName="eventName"
@@ -16,25 +16,25 @@
 					:eventTimeWindowTo="eventTimeWindowTo"
 					eventState="OPEN"
 				)
-			ul.list-group.list-group-flush(v-if="createdEvent")
+			ul.list-group.list-group-flush(v-if="eventCreated")
 				li.list-group-item
 					.alert.alert-success
-						| {{ $t('event_editor.event_created', {eventName: createdEvent.name, eventOrganizer: createdEvent.organizer, organizerEmail: createdEvent.email}) }}
+						| {{ $t('event_editor.event_created', {eventName, eventOrganizer, eventOrganizerEmail}) }}
 				li.list-group-item
 					.row.justify-content-center
 						label.col-md-auto.col-form-label  {{ $t('event_editor.share_link') }}
 						.col-md
 							.input-group
-								input#shareLink.form-control(:value="createdEvent.share_link" readonly)
+								input#shareLink.form-control(:value="eventShareLink" readonly)
 								.input-group-append
 									a.btn.bdn-sm.btn-outline-secondary(
 										target="_blank"
-										:href="whatsAppMessageURL(createdEvent.share_link)"
+										:href="whatsAppMessageURL(eventShareLink)"
 									)
 										span.fab.fa-lg.fa-whatsapp
 									button.btn.btn-sm.btn-outline-secondary(
 										name="share-button"
-										v-clipboard:copy="createdEvent.share_link"
+										v-clipboard:copy="eventShareLink"
 										v-clipboard:success="clipboard"
 									)
 										span.fas.fa-lg.fa-share-alt
@@ -73,7 +73,7 @@
 										v-model.trim="eventOrganizer"
 										@change="localValidation"
 										@blur="localValidation"
-										:disabled="createdEvent"
+										:disabled="eventCreated"
 										:class="inputFieldClass('eventOrganizer')"
 									)
 									.invalid-feedback(name="event-organizer-error") {{ eventOrganizerError }}
@@ -86,7 +86,7 @@
 										v-model.trim="eventOrganizerEmail"
 										@change="localValidation"
 										@blur="localValidation"
-										:disabled="createdEvent"
+										:disabled="eventCreated"
 										:class="inputFieldClass('eventOrganizerEmail')"
 									)
 									.invalid-feedback(name="event-organizer-email-error") {{ eventOrganizerEmailError }}
@@ -96,7 +96,7 @@
 										v-model.trim="eventOrganizerEmail_confirmation"
 										@change="localValidation"
 										@blur="localValidation"
-										:disabled="createdEvent"
+										:disabled="eventCreated"
 										:class="inputFieldClass('eventOrganizerEmail_confirmation')"
 									)
 									.invalid-feedback(name="event-organizer-email-confirmation-error") {{ eventOrganizerEmailError_confirmation }}
@@ -121,7 +121,7 @@
 								.col-md-9
 									small.form-text.text-muted {{ $t('event_editor.event.name_help') }}
 									input#eventName.form-control(v-model.trim="eventName" type="text"
-									:disabled="createdEvent"
+									:disabled="eventCreated"
 									@change="localValidation"
 									@blur="localValidation"
 									:class="inputFieldClass('eventName')"
@@ -132,7 +132,7 @@
 								.col-md-9
 									small.form-text.text-muted {{ $t('event_editor.event.desc_help') }}
 									textarea#eventDesc.form-control(v-model.trim="eventDesc"
-									:disabled="createdEvent"
+									:disabled="eventCreated"
 									@change="localValidation"
 									@blur="localValidation"
 									:class="inputFieldClass('eventDesc')"
@@ -176,7 +176,7 @@
 								.col-md-auto
 									b-dropdown(
 										:text="$t('event_editor.dates_quick_selection')"
-										:disabled="createdEvent != null"
+										:disabled="eventCreated"
 										:dropup="true"
 									)
 										b-dropdown-item(v-if="showThisWeekButton" @click="pickThisWeek") {{ $t('event_editor.this_week') }}
@@ -185,7 +185,7 @@
 										b-dropdown-item(@click="pickNextMonths(3); localValidation();") {{ $tc('event_editor.within_months', 3, {count: 3}) }}
 
 			.card-footer
-				.row.justify-content-center(v-if="!createdEvent")
+				.row.justify-content-center(v-if="!eventCreated")
 					.col-12.col-sm-auto.mt-1
 						button.btn.btn-block.btn-primary(@click="saveEvent" :disabled="requestOngoing" name="save-event")
 							i.fas(v-bind:class="{'fa-save': eventId, 'fa-plus': !eventId}")
@@ -200,7 +200,7 @@
 						router-link.btn.btn-block.btn-success(
 							role="button"
 							name="manage-event"
-							:to="{ name: 'event', params: {eventId: createdEvent.id, secret: createdEvent.secret}, query: {s: createdEvent.secret}}"
+							:to="{ name: 'event', params: {eventId: computedEventId, secret: computedSecret}, query: {s: computedSecret}}"
 						)
 							i.fas.fa-key
 							| &nbsp; {{ $t('event_editor.manage_event') }}
@@ -210,7 +210,6 @@
 			:message="$t('errors.not_found')"
 		)
 </template>
-
 <script>
 import dateFns from 'date-fns'
 import {
@@ -277,34 +276,20 @@ export default {
 			'dates-group': false,
 			'organizer-group': true
 		},
-		eventError: null,
-		eventName: null,
 		eventNameError: null,
-		eventOrganizer: null,
 		eventOrganizerError: null,
-		eventOrganizerEmail: null,
 		eventOrganizerEmailError: null,
-		eventOrganizerEmail_confirmation: null,
 		eventOrganizerEmailError_confirmation: null,
-		eventDesc: null,
 		eventDescError: null,
 		eventTimeWindow: null,
 		eventTimeWindowError: null,
-		requestOngoing: false,
 		today,
 		loadedSuccessfully: false,
 		loaded: false,
 		showThisWeekButton: (dateFns.getDay(today) > 0 && dateFns.getDay(today) < 4), // betewn Mon and Wed
-		createdEvent: null
-		/*{
-								id: 'd8763187-ed3d-4572-ae50-02d5cc874804',
-								name: "Dinner party",
-								organizer: "Max",
-								share_link: "http://localhost:4000/event/967d9e9b-ad9f-4312-863f-c760a52db4e2",
-								owner_link: "http://share",
-								secret: "dasdas",
-								email: 'noname@nodomain.com'
-							}*/
+		eventCreated: false,
+		createdEventId: null,
+		createdEventSecret: null
 	}),
 	created() {
 		if (this.eventId) {
@@ -324,6 +309,14 @@ export default {
 			} else {
 				this.loaded = true;
 			}
+		}
+	},
+	computed: {
+		computedEventId() {
+			return this.eventId || this.createdEventId
+		},
+		computedSecret() {
+			return this.secret || this.createdEventSecret
 		}
 	},
 	methods: {
@@ -390,10 +383,14 @@ export default {
 				self.collapseAllGroups();
 				self.$scrollTo('#event-header');
 				self.wasServerValidated = true;
+
 				if (self.eventId) {
 					self.$refs.eventUpdatedModal.show();
 				} else {
-					self.createdEvent = result.data.data;
+					self.eventCreated = true;
+					self.createdEventId = result.data.data.id
+					self.createdEventSecret = result.data.data.secret
+					self.assignEventData(result.data.data)
 					self.$refs.eventCreatedModal.show();
 				}
 			}, function(error) {
@@ -416,11 +413,11 @@ export default {
 			this.$router.push({
 				name: 'event',
 				params: {
-					eventId: this.eventId,
-					secret: this.secret
+					eventId: this.computedEventId,
+					secret: this.computedSecret
 				},
 				query: {
-					s: this.secret
+					s: this.computedSecret
 				}
 			});
 		}

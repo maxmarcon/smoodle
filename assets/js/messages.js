@@ -33,7 +33,7 @@ export default {
 			dates_quick_selection: "Quick pre-selection",
 			link_copied: "Link copied to clipboard",
 			event_created: "Congratulations! Your event \u201C{eventName}\u201E has been created.\
-			 An email has been sent to {organizerEmail}",
+			 An email has been sent to {eventOrganizerEmail}",
 			event_created_short: "Your event has been created",
 			share_link: "Now share this link with your friends to invite them:",
 			manage_event: "Manage event",
@@ -88,7 +88,7 @@ export default {
 			no_participants_organizer: "{icon} The event has not been scheduled and nobody entered their availabiliy yet.",
 			schedule_not_found: "We were unable to fetch the current schedule for this event",
 			welcome: "{organizer} has invited you to this event.",
-			welcome_organizer: "You are the manager of this event.",
+			welcome_organizer: "You are the organizer of this event.",
 			event_open: "{calendar_icon} The event has not been scheduled yet. Below are the candidate dates so far, based on {answers}. If you haven't yet, please enter your availability",
 			event_open_organizer: "{calendar_icon} You haven't scheduled the event yet. Below are the candidate dates so far, based on the answers from {participants}.",
 			answers: "one answer|{count} answers",
@@ -234,7 +234,7 @@ export default {
 			dates_quick_selection: "Schnelle Vorwahl",
 			link_copied: "Link in der Zwischenablage gespeichert",
 			event_created: "Gratulation {eventOrganizer}! Dein Event \u201C{eventName}\u201E wurde gespeichert.\
-			 Eine Email wurde an {organizerEmail} gesendet.",
+			 Eine Email wurde an {eventOrganizerEmail} gesendet.",
 			event_created_short: "Dein Event wurde gespeichert.",
 			share_link: "Jetzt diesen Link mit Gästen teilen und einladen:",
 			manage_event: "Event verwalten",
@@ -434,7 +434,7 @@ export default {
 			dates_quick_selection: "Scelta veloce",
 			link_copied: "Link copiato.",
 			event_created: "Congratulazioni! Il tuo evento \u201C{eventName}\u201E è stato creato.\
-			 Una email è stata inviata a {organizerEmail}.",
+			 Una email è stata inviata a {eventOrganizerEmail}.",
 			event_created_short: "Il tuo evento è stato creato.",
 			share_link: "Ora condividi questo link con gli ospiti per invitarli:",
 			manage_event: "Gestione vento",
