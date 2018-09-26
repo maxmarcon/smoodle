@@ -1,6 +1,5 @@
 import pollEditor from '../../vue/pollEditor.vue'
 import BootstrapVue from 'bootstrap-vue'
-
 import {
 	mount,
 	shallowMount,

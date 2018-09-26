@@ -439,7 +439,7 @@ export default {
 			return this.colorForRank(this.selectedDateRank);
 		},
 		computedEventId() {
-			return (this.eventId ? this.eventId : this.eventIdFromPoll);
+			return this.eventId || this.eventIdFromPoll;
 		},
 		initialWeeklyRanks() {
 			return Object.keys(this.$i18n.t('week_days')).map((code, index) => ({

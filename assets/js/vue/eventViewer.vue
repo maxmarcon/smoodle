@@ -200,33 +200,39 @@
 			.card-footer(v-if="eventOpen || isOrganizer")
 				.row.justify-content-center
 					.col-12.col-sm-auto.mt-1(v-if="eventOpen && isOrganizer && eventScheduleParticipantsCount")
-						button.btn.btn-block.btn-primary(v-b-modal.scheduleEventModal="" :disabled="requestOngoing")
+						button.btn.btn-block.btn-primary(v-b-modal.scheduleEventModal="" :disabled="requestOngoing" name="schedule-button")
 							i.fas.fa-clock
 							| &nbsp; {{ $t('event_viewer.schedule_event') }}
 					.col-12.col-sm-auto.mt-1(v-if="eventOpen && isOrganizer")
 						router-link.btn.btn-block.btn-success(
+							name="edit-button"
 							role="button"
 							:to="{ name: 'edit_event', params: {eventId: eventId, secret: secret}, query: {s: secret} }"
 						)
 							i.fas.fa-edit
 							| &nbsp; {{ $t('event_viewer.edit_event') }}
 					.col-12.col-sm-auto.mt-1(v-if="eventOpen && isOrganizer")
-						button.btn.btn-block.btn-block.btn-warning(v-b-modal.cancelEventModal="" :disabled="requestOngoing")
+						button.btn.btn-block.btn-block.btn-warning(v-b-modal.cancelEventModal="" :disabled="requestOngoing"
+							name="cancel-button"
+						)
 							i.fas.fa-ban
 							| &nbsp; {{ $t('event_viewer.cancel_event') }}
 					.col-12.col-sm-auto.mt-1(v-if="!eventOpen && isOrganizer")
-						button.btn.btn-block.btn-warning(@click="openEvent" :disabled="requestOngoing")
+						button.btn.btn-block.btn-warning(@click="openEvent" :disabled="requestOngoing"
+							name="open-button"
+						)
 							i.fas.fa-undo
 							| &nbsp; {{ $t('event_viewer.open_event') }}
 					.col-12.col-sm-auto.mt-1(v-if="eventOpen && !isOrganizer")
 						router-link.btn.btn-block.btn-success(
+							name="new-poll-button"
 							role="button"
 							:to="{ name: 'new_poll', params: {eventId: eventId}}"
 						)
 							i.fas.fa-question
 							| &nbsp; {{ $t('event_viewer.create_poll') }}
 					.col-12.col-sm-auto.mt-1(v-if="eventOpen && !isOrganizer && eventScheduleParticipantsCount")
-						button.btn.btn-block.btn-primary(v-b-modal.updateAnswerModal="" :disabled="requestOngoing")
+						button.btn.btn-block.btn-primary(v-b-modal.updateAnswerModal="" :disabled="requestOngoing" name="edit-poll-button")
 							i.fas.fa-edit
 							| &nbsp; {{ $t('event_viewer.update_poll') }}
 

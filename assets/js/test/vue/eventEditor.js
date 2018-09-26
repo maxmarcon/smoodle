@@ -2,6 +2,10 @@ import eventEditor from '../../vue/eventEditor.vue'
 import BootstrapVue from 'bootstrap-vue'
 import VueRouter from 'vue-router'
 import VueClipboard from 'vue-clipboard2'
+import {
+	mount,
+	createLocalVue
+} from '@vue/test-utils'
 
 const router = new VueRouter({
 	mode: 'history',
@@ -15,11 +19,6 @@ const router = new VueRouter({
 });
 
 const routerSpy = jasmine.createSpyObj("routerSpy", ["push"])
-
-import {
-	mount,
-	createLocalVue
-} from '@vue/test-utils'
 
 
 const CANT_BE_BLANK = 'can\'t be blank'
@@ -45,8 +44,7 @@ function mountEventEditor(restRequest, propsData, withRouter = true) {
 			$i18n: {
 				t: k => k
 			},
-			$scrollTo: () => null,
-			$router: routerSpy
+			$scrollTo: () => null
 		},
 		propsData,
 		localVue
@@ -318,6 +316,14 @@ describe('eventEditor', () => {
 			it('renders one alert', () => {
 				expect(wrapper.findAll('.alert').length).toBe(1)
 			})
+
+			inputElements
+				.filter(element => inputElementsForUpdate.indexOf(element) < 0)
+				.forEach(selector => {
+					it(`does not render input element ${selector}`, () => {
+						expect(wrapper.find(selector).exists()).toBeFalsy()
+					})
+				})
 
 			inputElementsForUpdate.forEach(selector => {
 				it(`renders input element ${selector}`, () => {
