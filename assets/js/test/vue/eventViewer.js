@@ -12,8 +12,14 @@ const routerSpy = jasmine.createSpyObj("routerSpy", ["push"])
 const router = new VueRouter({
 	mode: 'history',
 	routes: [{
-		path: '/events/:eventId',
-		name: 'event',
+		path: '/events/:eventId/polls/new',
+		name: 'new_poll',
+		component: PollEditor,
+		props: true
+	}, {
+		path: '/events/:eventId/edit',
+		name: 'edit_event',
+		component: EventEditor,
 		props: (route) => Object.assign({
 			secret: route.query.s
 		}, route.params)
@@ -78,26 +84,69 @@ const EVENT_DATA = {
 const SCHEDULE_DATA = {
 	participants_count: 5,
 	participants: [],
-	dates: []
+	dates: [{
+		"positive_rank": 1,
+		"negative_rank": 0,
+		"date": "2018-09-29"
+	}, {
+		"positive_rank": 1,
+		"negative_rank": 0,
+		"date": "2018-09-30"
+	}, {
+		"positive_rank": 1,
+		"negative_rank": 0,
+		"date": "2018-10-06"
+	}]
 }
 
 const SCHEDULE_DATA_SECRET = {
 	participants_count: 5,
 	participants: ['A', 'B', 'C', 'D', 'E'],
-	dates: []
+	dates: [{
+		"positive_rank": 1,
+		"negative_rank": 0,
+		"date": "2018-09-29",
+		"positive_participants": [
+			"A", "B"
+		],
+		"negative_participants": [
+			"C", "D", "E"
+		]
+	}, {
+		"positive_rank": 1,
+		"negative_rank": 0,
+		"date": "2018-09-30",
+		"positive_participants": [
+			"A", "B"
+		],
+		"negative_participants": [
+			"C", "D", "E"
+		]
+
+	}, {
+		"positive_rank": 1,
+		"negative_rank": 0,
+		"date": "2018-10-06",
+		"positive_participants": [
+			"A", "B"
+		],
+		"negative_participants": [
+			"C", "D", "E"
+		]
+	}]
 }
 
 let buttonSelectors = {
 	organizer: {
 		open: ['a[name="edit-button"]', 'button[name="cancel-button"]'],
 		closed: ['button[name="open-button"]'],
-		open_with_participants: ['a[name="edit-button"]', 'button[name="cancel-button"]', 'button[name="schedule-button"]']
+		openWithParticipants: ['a[name="edit-button"]', 'button[name="cancel-button"]', 'button[name="schedule-button"]']
 	},
 	guest: {
 		open: [
 			'a[name="new-poll-button"]',
 		],
-		open_with_participants: [
+		openWithParticipants: [
 			'a[name="new-poll-button"]',
 			'button[name="edit-poll-button"]'
 		]
@@ -122,7 +171,19 @@ function makeEvent(type = 'OPEN', withSecret = false) {
 		delete eventData['share_link']
 	}
 
-	return eventData;
+	return eventData
+}
+
+function makeSchedule(withParticipants = false, withSecret = false) {
+	const schedule = withSecret ? SCHEDULE_DATA_SECRET : SCHEDULE_DATA
+
+	if (!withParticipants) {
+		schedule.participants_count = 0
+		schedule.participants = []
+		schedule.dates = []
+	}
+
+	return schedule
 }
 
 describe('eventViewer', () => {
@@ -145,15 +206,15 @@ describe('eventViewer', () => {
 									data: makeEvent()
 								}
 							})
-						}
-						if (path == `events/${EVENT_ID}/schedule`) {
+						} else if (path == `events/${EVENT_ID}/schedule`) {
 							return Promise.resolve({
 								data: {
-									data: SCHEDULE_DATA
+									data: makeSchedule(true)
 								}
 							})
+						} else {
+							return Promise.reject()
 						}
-						return Promise.reject()
 					})
 
 					wrapper = mountEventViewer(restRequest, {
@@ -179,7 +240,7 @@ describe('eventViewer', () => {
 				})
 
 				it('renders the right buttons', () => {
-					buttonSelectors.guest.open_with_participants.forEach(selector => {
+					buttonSelectors.guest.openWithParticipants.forEach(selector => {
 						expect(wrapper.find(selector).exists()).toBeTruthy()
 					})
 				})
