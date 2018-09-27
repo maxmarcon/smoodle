@@ -1,37 +1,21 @@
 import eventEditor from '../../vue/eventEditor.vue'
 import BootstrapVue from 'bootstrap-vue'
-import VueRouter from 'vue-router'
 import VueClipboard from 'vue-clipboard2'
 import {
 	mount,
 	createLocalVue
 } from '@vue/test-utils'
 
-const router = new VueRouter({
-	mode: 'history',
-	routes: [{
-		path: '/events/:eventId',
-		name: 'event',
-		props: (route) => Object.assign({
-			secret: route.query.s
-		}, route.params)
-	}]
-});
-
 const routerSpy = jasmine.createSpyObj("routerSpy", ["push"])
-
+const localVue = createLocalVue();
+localVue.use(BootstrapVue);
+localVue.use(VueClipboard)
 
 const CANT_BE_BLANK = 'can\'t be blank'
 
-function mountEventEditor(restRequest, propsData, withRouter = true) {
-	const localVue = createLocalVue();
-	localVue.use(BootstrapVue);
-	localVue.use(VueClipboard)
-	if (withRouter) {
-		localVue.use(VueRouter)
-	}
+function mountEventEditor(restRequest, propsData) {
 
-	let config = {
+	const config = {
 		mixins: [{
 			methods: {
 				restRequest,
@@ -44,15 +28,11 @@ function mountEventEditor(restRequest, propsData, withRouter = true) {
 			$i18n: {
 				t: k => k
 			},
-			$scrollTo: () => null
+			$scrollTo: () => null,
+			$router: routerSpy
 		},
 		propsData,
 		localVue
-	}
-	if (withRouter) {
-		config.router = router
-	} else {
-		config.mocks.$router = routerSpy
 	}
 
 	return mount(eventEditor, config)
@@ -144,7 +124,6 @@ describe('eventEditor', () => {
 			it('renders the card body', () => {
 				expect(wrapper.find('div.card-body').exists()).toBeTruthy();
 			})
-
 
 			it('renders one alert', () => {
 				expect(wrapper.findAll('.alert').length).toBe(1)
@@ -269,7 +248,7 @@ describe('eventEditor', () => {
 			it('renders only the manage event button', () => {
 				expect(wrapper.find('button[name="save-event"]').exists()).toBeFalsy()
 				expect(wrapper.find('button[name="cancel"]').exists()).toBeFalsy()
-				expect(wrapper.find(`a[name="manage-event"][href="/events/${EVENT_ID}?s=${EVENT_SECRET}"]`).exists()).toBeTruthy()
+				expect(wrapper.find('router-link[name="manage-event"]').exists()).toBeTruthy()
 			})
 		})
 	})
@@ -288,7 +267,7 @@ describe('eventEditor', () => {
 				wrapper = mountEventEditor(restRequest, {
 					eventId: EVENT_ID,
 					secret: EVENT_SECRET
-				}, false)
+				})
 
 				setTimeout(done, 0)
 			})
@@ -481,7 +460,7 @@ describe('eventEditor', () => {
 				wrapper = mountEventEditor(restRequest, {
 					eventId: EVENT_ID,
 					secret: EVENT_SECRET
-				}, false)
+				})
 
 				setTimeout(() => {
 					wrapper.find('button[name="save-event"]').trigger('click')

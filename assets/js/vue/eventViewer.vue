@@ -102,7 +102,7 @@
 				)
 			ul.list-group.list-group-flush
 				li.list-group-item
-					p
+					p(name="event-intro")
 						em.text-muted {{ isOrganizer ? $t('event_viewer.description') : $t('event_viewer.organizer_says', {organizer: eventOrganizer}) }} &nbsp;
 						| {{ eventDesc }}
 				li.list-group-item(v-if="isOrganizer && !eventCanceled")

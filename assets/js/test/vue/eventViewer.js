@@ -1,40 +1,20 @@
 import eventViewer from '../../vue/eventViewer.vue'
 import BootstrapVue from 'bootstrap-vue'
-import VueRouter from 'vue-router'
 import VueClipboard from 'vue-clipboard2'
+import flushPromises from 'flush-promises'
 import {
 	mount,
 	createLocalVue
 } from '@vue/test-utils'
 
 const routerSpy = jasmine.createSpyObj("routerSpy", ["push"])
+const localVue = createLocalVue();
+localVue.use(BootstrapVue);
+localVue.use(VueClipboard)
 
-const router = new VueRouter({
-	mode: 'history',
-	routes: [{
-		path: '/events/:eventId/polls/new',
-		name: 'new_poll',
-		component: PollEditor,
-		props: true
-	}, {
-		path: '/events/:eventId/edit',
-		name: 'edit_event',
-		component: EventEditor,
-		props: (route) => Object.assign({
-			secret: route.query.s
-		}, route.params)
-	}]
-});
+function mountEventViewer(restRequest, propsData) {
 
-function mountEventViewer(restRequest, propsData, withRouter = true) {
-	const localVue = createLocalVue();
-	localVue.use(BootstrapVue);
-	localVue.use(VueClipboard)
-	if (withRouter) {
-		localVue.use(VueRouter)
-	}
-
-	let config = {
+	const config = {
 		mixins: [{
 			methods: {
 				restRequest
@@ -46,17 +26,15 @@ function mountEventViewer(restRequest, propsData, withRouter = true) {
 			$i18n: {
 				t: k => k
 			},
+			$router: routerSpy
 		},
 		propsData,
 		localVue
 	}
-	if (withRouter) {
-		config.router = router
-	} else {
-		config.mocks.$router = routerSpy
-	}
 
-	return mount(eventViewer, config)
+	const wrapper = mount(eventViewer, config)
+
+	return wrapper
 }
 
 
@@ -136,22 +114,38 @@ const SCHEDULE_DATA_SECRET = {
 	}]
 }
 
-let buttonSelectors = {
+const POLL_PARTICIPANT = 'Fritz'
+const POLL_ID = "599a1056-3cea-4c4e-b54c-5fd376f0f632";
+
+const NEW_POLL_BUTTON = 'router-link[name="new-poll-button"]'
+const EDIT_EVENT_BUTTON = 'router-link[name="edit-button"]'
+const CANCEL_EVENT_BUTTON = 'button[name="cancel-button"]'
+const EDIT_POLL_BUTTON = 'button[name="edit-poll-button"]'
+const OPEN_EVENT_BUTTON = 'button[name="open-button"]'
+const SCHEDULE_EVENT_BUTTON = 'button[name="schedule-button"]'
+
+const buttonSelectors = {
 	organizer: {
-		open: ['a[name="edit-button"]', 'button[name="cancel-button"]'],
-		closed: ['button[name="open-button"]'],
-		openWithParticipants: ['a[name="edit-button"]', 'button[name="cancel-button"]', 'button[name="schedule-button"]']
+		open: [EDIT_EVENT_BUTTON, CANCEL_EVENT_BUTTON],
+		closed: [OPEN_EVENT_BUTTON],
+		openWithParticipants: [EDIT_EVENT_BUTTON, CANCEL_EVENT_BUTTON, SCHEDULE_EVENT_BUTTON]
 	},
 	guest: {
 		open: [
-			'a[name="new-poll-button"]',
+			NEW_POLL_BUTTON,
 		],
 		openWithParticipants: [
-			'a[name="new-poll-button"]',
-			'button[name="edit-poll-button"]'
+			NEW_POLL_BUTTON,
+			EDIT_POLL_BUTTON
 		]
-	}
+	},
+	all: [
+		NEW_POLL_BUTTON, EDIT_EVENT_BUTTON, CANCEL_EVENT_BUTTON,
+		EDIT_POLL_BUTTON, OPEN_EVENT_BUTTON, SCHEDULE_EVENT_BUTTON
+	]
 }
+
+const EVENT_INTRO = 'p[name="event-intro"]'
 
 function makeEvent(type = 'OPEN', withSecret = false) {
 	const eventData = EVENT_DATA
@@ -199,7 +193,7 @@ describe('eventViewer', () => {
 
 				beforeEach((done) => {
 
-					restRequest = jasmine.createSpy('restRequest').and.callFake((path) => {
+					restRequest = jasmine.createSpy('restRequest').and.callFake((path, config) => {
 						if (path == `events/${EVENT_ID}`) {
 							return Promise.resolve({
 								data: {
@@ -212,6 +206,14 @@ describe('eventViewer', () => {
 									data: makeSchedule(true)
 								}
 							})
+						} else if (path == `events/${EVENT_ID}/polls` && config.params.participant == POLL_PARTICIPANT) {
+							return Promise.resolve({
+								data: {
+									data: {
+										id: POLL_ID
+									}
+								}
+							})
 						} else {
 							return Promise.reject()
 						}
@@ -220,7 +222,7 @@ describe('eventViewer', () => {
 					wrapper = mountEventViewer(restRequest, {
 						eventId: EVENT_ID
 					})
-					setTimeout(done, 0)
+					setTimeout(() => flushPromises().then(() => done()), 0)
 				})
 
 				it('renders the event header', () => {
@@ -239,25 +241,172 @@ describe('eventViewer', () => {
 					expect(wrapper.find('div.card').exists()).toBeTruthy();
 				})
 
-				it('renders the right buttons', () => {
-					buttonSelectors.guest.openWithParticipants.forEach(selector => {
-						expect(wrapper.find(selector).exists()).toBeTruthy()
+				buttonSelectors.all.forEach(selector => {
+					if (buttonSelectors.guest.openWithParticipants.indexOf(selector) > -1) {
+						it(`renders the ${selector}`, () => {
+							expect(wrapper.find(selector).exists()).toBeTruthy()
+						})
+					} else {
+						it(`does not render the ${selector}`, () => {
+							expect(wrapper.find(selector).exists()).toBeFalsy()
+						})
+					}
+				})
+
+				it('renders the event intro', () => {
+					expect(wrapper.find(EVENT_INTRO).exists()).toBeTruthy()
+				})
+
+				it('renders one alert', () => {
+					expect(wrapper.findAll('.alert').length).toBe(1)
+				})
+
+				it('renders the calendar', () => {
+					expect(wrapper.find('v-calendar').exists()).toBeTruthy()
+				})
+
+				describe('clicking on update availability', () => {
+
+					beforeEach((done) => {
+						setTimeout(() => {
+							wrapper.find(EDIT_POLL_BUTTON).trigger("click")
+							setTimeout(done, 0)
+						}, 0)
+					})
+
+					it('opens modal', () => {
+						expect(wrapper.find('#updateAnswerModal').visible()).toBeTruthy()
+					})
+
+					describe('clicking on the load button', () => {
+
+						beforeEach((done) => {
+							wrapper.find('input#pollParticipant').setValue(POLL_PARTICIPANT)
+							setTimeout(() => {
+								wrapper.find('#updateAnswerModal button.btn.btn-primary').trigger('click')
+								setTimeout(done, 0)
+							}, 0)
+						})
+
+						it('takes user to editor for the poll', () => {
+							expect(routerSpy.push).toHaveBeenCalledWith({
+								name: 'edit_poll',
+								params: {
+									pollId: POLL_ID
+								}
+							})
+						})
 					})
 				})
 			})
 
 			describe("without participants", () => {
 
+				beforeEach((done) => {
+					restRequest = jasmine.createSpy('restRequest').and.callFake((path, config) => {
+						if (path == `events/${EVENT_ID}`) {
+							return Promise.resolve({
+								data: {
+									data: makeEvent()
+								}
+							})
+						} else if (path == `events/${EVENT_ID}/schedule`) {
+							return Promise.resolve({
+								data: {
+									data: makeSchedule(false)
+								}
+							})
+						} else {
+							return Promise.reject()
+						}
+					})
+
+					wrapper = mountEventViewer(restRequest, {
+						eventId: EVENT_ID
+					})
+					setTimeout(() => flushPromises().then(() => done()), 0)
+				})
+
+				it('renders the event header', () => {
+					let eventHeader = wrapper.find('event-header')
+					expect(eventHeader.exists).toBeTruthy();
+					expect(eventHeader.attributes('eventname')).toBe(EVENT_DATA.name)
+					expect(eventHeader.attributes('eventorganizer')).toBe(EVENT_DATA.organizer)
+					expect(eventHeader.attributes('eventstate')).toBe(EVENT_DATA.state)
+					expect(eventHeader.attributes('eventscheduledfrom')).toBeUndefined()
+					expect(eventHeader.attributes('eventscheduledto')).toBeUndefined()
+					expect(eventHeader.attributes('eventtimewindowfrom')).toBeDefined()
+					expect(eventHeader.attributes('eventtimewindowto')).toBeDefined()
+				})
+
+				it('renders the main card', () => {
+					expect(wrapper.find('div.card').exists()).toBeTruthy();
+				})
+
+				buttonSelectors.all.forEach(selector => {
+					if (buttonSelectors.guest.open.indexOf(selector) > -1) {
+						it(`renders the ${selector}`, () => {
+							expect(wrapper.find(selector).exists()).toBeTruthy()
+						})
+					} else {
+						it(`does not render the ${selector}`, () => {
+							expect(wrapper.find(selector).exists()).toBeFalsy()
+						})
+					}
+				})
+
+				it('renders the event intro', () => {
+					expect(wrapper.find(EVENT_INTRO).exists()).toBeTruthy()
+				})
+
+				it('renders one alert', () => {
+					expect(wrapper.findAll('.alert').length).toBe(1)
+				})
+
+				it('does not render the calendar', () => {
+					expect(wrapper.find('v-calendar').exists()).toBeFalsy()
+				})
 			})
 		})
 
 		describe('canceled event', () => {
 
+			beforeEach((done) => {
+				restRequest = jasmine.createSpy('restRequest').and.callFake((path, config) => {
+					if (path == `events/${EVENT_ID}`) {
+						return Promise.resolve({
+							data: {
+								data: makeEvent('CANCELED')
+							}
+						})
+					} else if (path == `events/${EVENT_ID}/schedule`) {
+						return Promise.resolve({
+							data: {
+								data: makeSchedule(false)
+							}
+						})
+					} else {
+						return Promise.reject()
+					}
+				})
+
+				wrapper = mountEventViewer(restRequest, {
+					eventId: EVENT_ID
+				})
+				setTimeout(() => flushPromises().then(() => done()), 0)
+			})
+
+			buttonSelectors.all.forEach(selector => {
+				it(`does not render the ${selector}`, () => {
+					expect(wrapper.find(selector).exists()).toBeFalsy()
+				})
+			})
 		})
 
 		describe('scheduled event', () => {
 
 		})
+
 	})
 
 	describe('with secret', () => {
