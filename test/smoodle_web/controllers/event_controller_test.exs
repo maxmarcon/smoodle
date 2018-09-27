@@ -27,6 +27,17 @@ defmodule SmoodleWeb.EventControllerTest do
     email_confirmation: "bot@fake.com"
   }
 
+  @create_attrs_3 %{
+    name: "Dinner",
+    desc: "Yummy!",
+    state: "CANCELED",
+    organizer: "The Hoff",
+    time_window_from: "2117-04-01",
+    time_window_to: "2117-08-20",
+    email: "bot@fake.com",
+    email_confirmation: "bot@fake.com"
+  }
+
   defp rest_repr(%{scheduled_from: scheduled_from, scheduled_to: scheduled_to}) do
     {:ok, s_from, 0} = DateTime.from_iso8601(scheduled_from)
     {:ok, s_to, 0} = DateTime.from_iso8601(scheduled_to)
@@ -63,6 +74,11 @@ defmodule SmoodleWeb.EventControllerTest do
   # }
 
   def create_event(_) do
+    {:ok, event} = Scheduler.create_event(@create_attrs_1)
+    {:ok, event: event}
+  end
+
+  def create_closed_event(_) do
     {:ok, event} = Scheduler.create_event(@create_attrs_1)
     {:ok, event: event}
   end
@@ -306,6 +322,30 @@ defmodule SmoodleWeb.EventControllerTest do
       conn = get(conn, event_path(conn, :schedule, event), %{limit: "bogus!"})
       data_response = json_response(conn, 200)
       assert Map.has_key?(data_response, "data")
+    end
+  end
+
+  describe "get_schedule with closed event" do
+    setup :create_closed_event
+
+    test "returns an empty schedule", %{conn: conn, event: event} do
+      conn = get(conn, event_path(conn, :schedule, event))
+      data_response = json_response(conn, 200)
+      assert Map.has_key?(data_response, "data")
+
+      assert data_response["data"]["participants"] == []
+      assert data_response["data"]["participants_count"] == 0
+      assert data_response["data"]["dates"] == []
+    end
+
+    test "returns an empty schedule event with the right secret", %{conn: conn, event: event} do
+      conn = get(conn, event_path(conn, :schedule, event), %{secret: event.secret})
+      data_response = json_response(conn, 200)
+      assert Map.has_key?(data_response, "data")
+
+      assert data_response["data"]["participants"] == []
+      assert data_response["data"]["participants_count"] == 0
+      assert data_response["data"]["dates"] == []
     end
   end
 end

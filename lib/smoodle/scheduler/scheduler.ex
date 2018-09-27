@@ -145,6 +145,14 @@ defmodule Smoodle.Scheduler do
     Repo.delete(poll)
   end
 
+  def empty_schedule do
+    %{
+      dates: [],
+      participants: [],
+      participants_count: 0
+    }
+  end
+
   def get_best_schedule(%Event{} = event, opts \\ []) do
     polls =
       Repo.all(Ecto.assoc(event, :polls))
