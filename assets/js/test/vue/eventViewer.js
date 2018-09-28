@@ -1,7 +1,6 @@
 import eventViewer from '../../vue/eventViewer.vue'
 import BootstrapVue from 'bootstrap-vue'
 import VueClipboard from 'vue-clipboard2'
-import flushPromises from 'flush-promises'
 import {
 	mount,
 	createLocalVue
