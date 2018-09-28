@@ -186,6 +186,24 @@ describe('eventViewer', () => {
 	let wrapper
 	let restRequest
 
+	describe('when loading fails', () => {
+
+		beforeEach((done) => {
+
+			restRequest = jasmine.createSpy('restRequest').and.returnValue(Promise.reject())
+
+			wrapper = mountEventViewer(restRequest, {
+				eventId: EVENT_ID
+			})
+
+			setTimeout(done, 0)
+		})
+
+		it('shows the error page', () => {
+			expect(wrapper.find('error-page').exists()).toBeTruthy()
+		})
+	})
+
 	describe('without secret', () => {
 
 		describe('open event', () => {
