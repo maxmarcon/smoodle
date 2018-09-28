@@ -8,6 +8,7 @@ import {
 } from '@vue/test-utils'
 
 const routerSpy = jasmine.createSpyObj("routerSpy", ["push"])
+
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
 localVue.use(VueClipboard)
@@ -26,15 +27,14 @@ function mountEventViewer(restRequest, propsData) {
 			$i18n: {
 				t: k => k
 			},
-			$router: routerSpy
+			$router: routerSpy,
+			$scrollTo: () => null
 		},
 		propsData,
 		localVue
 	}
 
-	const wrapper = mount(eventViewer, config)
-
-	return wrapper
+	return mount(eventViewer, config)
 }
 
 
@@ -148,7 +148,7 @@ const buttonSelectors = {
 const EVENT_INTRO = 'p[name="event-intro"]'
 
 function makeEvent(type = 'OPEN', withSecret = false) {
-	const eventData = EVENT_DATA
+	const eventData = Object.assign({}, EVENT_DATA)
 
 	if (type == 'CANCELED') {
 		eventData.state = type
@@ -169,7 +169,7 @@ function makeEvent(type = 'OPEN', withSecret = false) {
 }
 
 function makeSchedule(withParticipants = false, withSecret = false) {
-	const schedule = withSecret ? SCHEDULE_DATA_SECRET : SCHEDULE_DATA
+	const schedule = Object.assign({}, (withSecret ? SCHEDULE_DATA_SECRET : SCHEDULE_DATA))
 
 	if (!withParticipants) {
 		schedule.participants_count = 0
@@ -179,6 +179,7 @@ function makeSchedule(withParticipants = false, withSecret = false) {
 
 	return schedule
 }
+
 
 describe('eventViewer', () => {
 
@@ -214,15 +215,15 @@ describe('eventViewer', () => {
 									}
 								}
 							})
-						} else {
-							return Promise.reject()
 						}
+						return Promise.reject()
 					})
 
 					wrapper = mountEventViewer(restRequest, {
 						eventId: EVENT_ID
 					})
-					setTimeout(() => flushPromises().then(() => done()), 0)
+
+					setTimeout(done, 0)
 				})
 
 				it('renders the event header', () => {
@@ -265,14 +266,13 @@ describe('eventViewer', () => {
 					expect(wrapper.find('v-calendar').exists()).toBeTruthy()
 				})
 
-				describe('clicking on update availability', () => {
+				describe('when clicking on update availability', () => {
 
 					beforeEach((done) => {
-						setTimeout(() => {
-							wrapper.find(EDIT_POLL_BUTTON).trigger("click")
-							setTimeout(done, 0)
-						}, 0)
+						wrapper.find(EDIT_POLL_BUTTON).trigger("click")
+						setTimeout(done, 0)
 					})
+
 
 					it('opens modal', () => {
 						expect(wrapper.find('#updateAnswerModal').visible()).toBeTruthy()
@@ -300,6 +300,7 @@ describe('eventViewer', () => {
 				})
 			})
 
+
 			describe("without participants", () => {
 
 				beforeEach((done) => {
@@ -316,15 +317,14 @@ describe('eventViewer', () => {
 									data: makeSchedule(false)
 								}
 							})
-						} else {
-							return Promise.reject()
 						}
+						return Promise.reject()
 					})
 
 					wrapper = mountEventViewer(restRequest, {
 						eventId: EVENT_ID
 					})
-					setTimeout(() => flushPromises().then(() => done()), 0)
+					setTimeout(done, 0)
 				})
 
 				it('renders the event header', () => {
@@ -369,6 +369,7 @@ describe('eventViewer', () => {
 			})
 		})
 
+
 		describe('canceled event', () => {
 
 			beforeEach((done) => {
@@ -385,15 +386,14 @@ describe('eventViewer', () => {
 								data: makeSchedule(false)
 							}
 						})
-					} else {
-						return Promise.reject()
 					}
+					return Promise.reject()
 				})
 
 				wrapper = mountEventViewer(restRequest, {
 					eventId: EVENT_ID
 				})
-				setTimeout(() => flushPromises().then(() => done()), 0)
+				setTimeout(done, 0)
 			})
 
 			buttonSelectors.all.forEach(selector => {
