@@ -282,18 +282,28 @@ export default {
 	created() {
 		let self = this;
 		Promise.all([
-			this.restRequest(['events', this.eventId].join('/'), { params: {secret: this.secret} }).then(function(result) {
-				self.assignEventData(result.data.data);
-			}),
-			this.restRequest(['events', this.eventId, 'schedule'].join('/'),
-				{ params: {limit: SCHEDULE_DATES_LIMIT, secret: this.secret } }).then(function(result) {
-				self.eventScheduleDates = result.data.data.dates;
-				self.eventScheduleParticipants = result.data.data.participants;
-				self.eventScheduleParticipantsCount = result.data.data.participants_count;
+				this.restRequest(['events', this.eventId].join('/'), {
+					params: {
+						secret: this.secret
+					}
+				}),
+				this.restRequest(['events', this.eventId, 'schedule'].join('/'), {
+					params: {
+						limit: SCHEDULE_DATES_LIMIT,
+						secret: this.secret
+					}
+				})
+			])
+			.then(function([eventResult, scheduleResult]) {
+				self.assignEventData(eventResult.data.data);
+				self.eventScheduleDates = scheduleResult.data.data.dates;
+				self.eventScheduleParticipants = scheduleResult.data.data.participants;
+				self.eventScheduleParticipantsCount = scheduleResult.data.data.participants_count;
+				self.loadedSuccessfully = true;
 			})
-		])
-		.then(function() { self.loadedSuccessfully = true; })
-		.finally(function() { self.loaded = true });
+			.finally(function() {
+				self.loaded = true
+			});
 	},
 	computed: {
 		isOrganizer() {
