@@ -1,4 +1,5 @@
 //import 'vueify/lib/insert-css'
+import 'babel-polyfill';
 import EventEditor from './vue/eventEditor.vue'
 import PollEditor from './vue/pollEditor.vue'
 import EventViewer from './vue/eventViewer.vue'

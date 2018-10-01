@@ -56,7 +56,8 @@ exports.config = {
       presets: [['env', {
         targets: {
           browsers: ["last 1 version", "not dead", "> 0.25%"]
-        }
+        },
+        useBuiltIns: 'entry'
       }]]
     },
     copycat: {
