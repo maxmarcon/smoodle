@@ -53,7 +53,11 @@ exports.config = {
       // Do not use ES6 compiler in vendor code
       ignore: [/vendor/],
       pattern: /\.(js)$/,
-      presets: ['env']
+      presets: [['env', {
+        targets: {
+          browsers: ["last 1 version", "not dead", "> 0.25%"]
+        }
+      }]]
     },
     copycat: {
       webfonts: ['node_modules/@fortawesome/fontawesome-free/webfonts'],
