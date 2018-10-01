@@ -35,7 +35,6 @@ describe('messageBar', () => {
 			wrapper.vm.show(MESSAGE)
 
 			alert = wrapper.find('balert-stub')
-
 		})
 
 		it('shows a permanent dismissable message', () => {
@@ -75,7 +74,7 @@ describe('messageBar', () => {
 
 		beforeEach(() => {
 
-	    jasmine.clock().install();
+			jasmine.clock().install();
 
 			wrapper = mount(messageBar, {
 				localVue,
@@ -87,11 +86,11 @@ describe('messageBar', () => {
 
 			wrapper.vm.show(MESSAGE)
 
-	    jasmine.clock().tick(SECONDS * 1010)
+			jasmine.clock().tick(SECONDS * 1010)
 		})
 
 		afterEach(() => {
-	    jasmine.clock().uninstall()
+			jasmine.clock().uninstall()
 		})
 
 		it('can count down', () => {
