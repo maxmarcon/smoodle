@@ -1,5 +1,5 @@
 //import 'vueify/lib/insert-css'
-import 'babel-polyfill';
+//import 'babel-polyfill'; Would be good for IE11 compatibility, but unfortunately it breaks Firefox...
 import EventEditor from './vue/eventEditor.vue'
 import PollEditor from './vue/pollEditor.vue'
 import EventViewer from './vue/eventViewer.vue'
