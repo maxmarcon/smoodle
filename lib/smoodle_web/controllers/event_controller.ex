@@ -55,7 +55,9 @@ defmodule SmoodleWeb.EventController do
 
     with {:ok, %Event{} = event} <- Scheduler.update_event(event, event_params) do
       Logger.info("Updated event: #{event}")
-      render(conn, "show.json", event: event)
+
+      put_resp_header(conn, "location", event_path(conn, :show, event))
+      |> render("show.json", event: event)
     end
   end
 
@@ -73,10 +75,14 @@ defmodule SmoodleWeb.EventController do
 
     render(conn, "schedule.json", %{
       schedule:
-        Scheduler.get_best_schedule(
-          event,
-          Keyword.merge(schedule_parse_params(params), is_owner: true)
-        )
+        if Event.is_open(event) do
+          Scheduler.get_best_schedule(
+            event,
+            Keyword.merge(schedule_parse_params(params), is_owner: true)
+          )
+        else
+          Scheduler.empty_schedule()
+        end
     })
   end
 
@@ -84,7 +90,12 @@ defmodule SmoodleWeb.EventController do
     event = Scheduler.get_event!(id)
 
     render(conn, "schedule.json", %{
-      schedule: Scheduler.get_best_schedule(event, schedule_parse_params(params))
+      schedule:
+        if Event.is_open(event) do
+          Scheduler.get_best_schedule(event, schedule_parse_params(params))
+        else
+          Scheduler.empty_schedule()
+        end
     })
   end
 

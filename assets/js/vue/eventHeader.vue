@@ -7,7 +7,9 @@
 			h6.card-subtitle(:class="{'text-muted': noDates, 'font-italic': noDates}") {{ stateDesc }}
 </template>
 <script>
-import { eventHelpersMixin } from '../globals'
+import {
+	eventHelpersMixin
+} from '../globals'
 
 export default {
 	mixins: [eventHelpersMixin],
@@ -27,17 +29,20 @@ export default {
 		stateDesc() {
 			if (this.eventOpen) {
 				if (this.eventTimeWindow) {
-					return this.$i18n.t('event_header.open', {dates: this.eventTimeWindow});
+					return this.$i18n.t('event_header.open', {
+						dates: this.eventTimeWindow
+					});
 				} else {
 					return this.$i18n.t('event_header.no_dates');
 				}
 			} else if (this.eventScheduled) {
-				return this.$i18n.t('event_header.scheduled', {time: this.eventScheduledDateTime});
+				return this.$i18n.t('event_header.scheduled', {
+					time: this.eventScheduledDateTime
+				});
 			} else {
 				return this.$i18n.t('event_header.canceled');
 			}
 		}
 	}
 }
-
 </script>

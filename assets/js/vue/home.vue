@@ -79,7 +79,9 @@
 
 </template>
 <script>
-import { imageHelpersMixin } from '../globals'
+import {
+	imageHelpersMixin
+} from '../globals'
 
 export default {
 	mixins: [imageHelpersMixin]

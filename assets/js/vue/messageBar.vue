@@ -15,11 +15,11 @@ export default {
 		seconds: {
 			type: Number,
 			default: 5
-	  },
-	  variant: {
-	  	type: String,
-	  	default: "info"
-	  }
+		},
+		variant: {
+			type: String,
+			default: "info"
+		}
 	},
 	data: () => ({
 		dismissCountDown: 0,

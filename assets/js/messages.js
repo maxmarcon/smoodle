@@ -10,8 +10,8 @@ export default {
 		},
 		event_editor: {
 			title: 'New event',
-			welcome: 'Hello! Here you can create a new event and share it with participants.',
-			welcome_again: 'Hello {organizer}! You can edit your event details here.',
+			welcome: 'Here you can create a new event and share it with participants.',
+			welcome_again: 'You are the organizer of this event, and you can edit its details here.',
 			event: {
 				name: "Give the event a name",
 				name_help: "Enter a name for your event",
@@ -32,8 +32,8 @@ export default {
 			within_months: "Within one month|Within {count} months",
 			dates_quick_selection: "Quick pre-selection",
 			link_copied: "Link copied to clipboard",
-			event_created: "Congratulations {eventOrganizer}! Your event \u201C{eventName}\u201E has been created.\
-			 An email has been sent to {organizerEmail}",
+			event_created: "Congratulations! Your event \u201C{eventName}\u201E has been created.\
+			 An email has been sent to {eventOrganizerEmail}",
 			event_created_short: "Your event has been created",
 			share_link: "Now share this link with your friends to invite them:",
 			manage_event: "Manage event",
@@ -46,7 +46,7 @@ export default {
 			too_many_requests_error: "You have created too many events for {email}. Take a short break..."
 		},
 		poll_editor: {
-			welcome: "Hey {participant}, here you can update your availabiliy for ths event.",
+			welcome: "Here you can update your availabiliy for ths event. Your participant name is: \u201C{participant}\u201E",
 			welcome_new_participant: "Here you can enter your availabiliy for this event.",
 			title: "My availabiliy for \u201C{eventName}\u201E",
 			participant_group: "Who are you?",
@@ -88,7 +88,7 @@ export default {
 			no_participants_organizer: "{icon} The event has not been scheduled and nobody entered their availabiliy yet.",
 			schedule_not_found: "We were unable to fetch the current schedule for this event",
 			welcome: "{organizer} has invited you to this event.",
-			welcome_organizer: "Hey {organizer}! Here you can manage your event.",
+			welcome_organizer: "You are the organizer of this event.",
 			event_open: "{calendar_icon} The event has not been scheduled yet. Below are the candidate dates so far, based on {answers}. If you haven't yet, please enter your availability",
 			event_open_organizer: "{calendar_icon} You haven't scheduled the event yet. Below are the candidate dates so far, based on the answers from {participants}.",
 			answers: "one answer|{count} answers",
@@ -211,8 +211,8 @@ export default {
 		},
 		event_editor: {
 			title: 'Neues Event',
-			welcome: 'Hallo! Hier kannst du ein neues Event planen und mit Freunden teilen.',
-			welcome_again: 'Hallo {organizer}! Hier kannst du die Details deines Events anpassen.',
+			welcome: 'Hier kannst du ein neues Event planen und mit Freunden teilen.',
+			welcome_again: 'Du organisierst dieses Event, und hier kannst du seine Details aktualisieren.',
 			event: {
 				name: "Wie heißt dein Event?",
 				name_help: "Gib deinem Event einen Namen.",
@@ -234,7 +234,7 @@ export default {
 			dates_quick_selection: "Schnelle Vorwahl",
 			link_copied: "Link in der Zwischenablage gespeichert",
 			event_created: "Gratulation {eventOrganizer}! Dein Event \u201C{eventName}\u201E wurde gespeichert.\
-			 Eine Email wurde an {organizerEmail} gesendet.",
+			 Eine Email wurde an {eventOrganizerEmail} gesendet.",
 			event_created_short: "Dein Event wurde gespeichert.",
 			share_link: "Jetzt diesen Link mit Gästen teilen und einladen:",
 			manage_event: "Event verwalten",
@@ -247,7 +247,7 @@ export default {
 			too_many_requests_error: "Du hast zu viele Events für {email} angelegt. Gönne dir eine kurze Pause..."
 		},
 		poll_editor: {
-			welcome: "Hey {participant}, hier kannst du deine Verfügbarkeit für dieses Event aktualisieren.",
+			welcome: "Hier kannst du deine Verfügbarkeit für dieses Event aktualisieren. Dein Teilnehmername ist: \u201C{participant}\u201E",
 			welcome_new_participant: "Hier kannst du deine Verfügbarkeit für dieses Event eingeben.",
 			title: "Meine Verfügbarkeit für \u201C{eventName}\u201E",
 			participant_group: "Wer bist du?",
@@ -289,7 +289,7 @@ export default {
 			no_participants_organizer: "{icon} Für das Event wurde noch kein Datum festgelet und es liegt keine Verfügbarkeit vor.",
 			schedule_not_found: "Die Planung für dieses Event konnte nicht gefunden werden.",
 			welcome: "{organizer} hat dich zu diesem Event eingeladen.",
-			welcome_organizer: "Hey {organizer}! Hier kannst du dein Event verwalten.",
+			welcome_organizer: "Du organisierst dieses Event.",
 			event_open: "{calendar_icon} Der Organisator hat noch kein Datum festgelegt. Hier unten sind die möglichen Daten, basierend auf {answers}. Gib deine Verfügbarkeit an, falls du es noch nicht getan hast.",
 			event_open_organizer: "{calendar_icon} Du hast dich noch nicht für ein Datum entschieden. Hier unten sind die möglichen Daten, basierend auf den Antworten von {participants}.",
 			answers: "eine Antwort|{count} Antworten",
@@ -411,8 +411,8 @@ export default {
 		},
 		event_editor: {
 			title: 'Nuovo evento',
-			welcome: 'Ciao! Qui puoi pianificare un nuovo evento e condividerlo con i tuoi amici.',
-			welcome_again: 'Ciao {organizer}! Qui puoi modificare i dettagli del tuo evento.',
+			welcome: 'Qui puoi pianificare un nuovo evento e condividerlo con i tuoi amici.',
+			welcome_again: 'Sei l\'organizzatore di questo\'evento, e qui puoi modificarne i dettagli.',
 			event: {
 				name: "Come si chiama l'evento?",
 				name_help: "Dai un nome al tuo evento.",
@@ -433,8 +433,8 @@ export default {
 			within_months: "Entro un mese|Entro {count} mesi",
 			dates_quick_selection: "Scelta veloce",
 			link_copied: "Link copiato.",
-			event_created: "Congratulazioni {eventOrganizer}! Il tuo evento \u201C{eventName}\u201E è stato creato.\
-			 Una email è stata inviata a {organizerEmail}.",
+			event_created: "Congratulazioni! Il tuo evento \u201C{eventName}\u201E è stato creato.\
+			 Una email è stata inviata a {eventOrganizerEmail}.",
 			event_created_short: "Il tuo evento è stato creato.",
 			share_link: "Ora condividi questo link con gli ospiti per invitarli:",
 			manage_event: "Gestione vento",
@@ -447,7 +447,7 @@ export default {
 			too_many_requests_error: "Hai creato troppi eventi per {email}. Prenditi una breve pausa..."
 		},
 		poll_editor: {
-			welcome: "Ciao {participant}, qui puoi modificare la tua disponibilità per questo evento.",
+			welcome: "Qui puoi modificare la tua disponibilità per questo evento. Il tuo nome per l'evento è: \u201C{participant}\u201E",
 			welcome_new_participant: "Qui puoi immettere la tua disponibilità per questo evento.",
 			title: "La mia disponibilità per \u201C{eventName}\u201E",
 			participant_group: "Chi sei?",
@@ -489,7 +489,7 @@ export default {
 			no_participants_organizer: "{icon} Per l'evento non è stata fissata nessuna data e nessuna disponibilità è stata comunicata.",
 			schedule_not_found: "Le date per questo evento non sono state trovate.",
 			welcome: "{organizer} ti ha invitato a questo evento.",
-			welcome_organizer: "Ciao {organizer}! Qui puoi gestire il tuo evento.",
+			welcome_organizer: "Sei l'organizzatore di quest'evento.",
 			event_open: "{calendar_icon} L'organizzatore non ha ancora fissato una data. Qui sotto ci sono le possibili date, in base a {answers}. Comunica la tua disponibilità nel caso non l'abbia ancora fatto.",
 			event_open_organizer: "{calendar_icon} Non hai ancora fissato una data. Qui sotto ci sono le possibili date, in base alle risposte di {participants}.",
 			answers: "una risposta|{count} risposte",

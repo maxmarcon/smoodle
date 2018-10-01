@@ -1,7 +1,7 @@
 <template lang="pug">
 	div
 		message-bar(ref="errorBar" variant="danger")
-		b-modal(ref="pollSavedModal" hide-header ok-only :ok-title="$t('poll_editor.back_to_event')" @hidden="backToEvent")
+		b-modal#pollSavedModal(ref="pollSavedModal" hide-header ok-only :ok-title="$t('poll_editor.back_to_event')" @hidden="backToEvent")
 			p {{ $t('poll_editor.poll_saved') }}
 
 		b-modal#dateRankerHelpModal(ok-only :title="$t('poll_editor.date_ranker_help_modal_title')")
@@ -40,7 +40,7 @@
 		)
 			p {{ $t('poll_editor.poll_delete_error') }}
 
-		b-modal(ref="eventNoLongerOpenModal"
+		b-modal#eventNoLongerOpenModal(ref="eventNoLongerOpenModal"
 			hide-header
 			:ok-title="$t('poll_editor.back_to_event')"
 			ok-only
@@ -60,7 +60,7 @@
 				.alert.alert-info(v-else)
 					i.fas.fa-edit
 					| &nbsp; {{ $t('poll_editor.welcome_new_participant') }}
-				.small.text-danger {{ eventError }}
+				.small.text-danger(name="event-error") {{ eventError }}
 
 				div(v-if="eventId")
 					b-btn.btn-block.d-flex(
@@ -84,7 +84,7 @@
 											@blur="localValidation"
 											:class="inputFieldClass('pollParticipant')"
 										)
-										.invalid-feedback {{ pollParticipantError }}
+										.invalid-feedback(name="poll-participant-error") {{ pollParticipantError }}
 
 
 				b-btn#weekday-ranker-button.d-flex.btn-block.mt-2(
@@ -181,15 +181,15 @@
 			.card-footer
 				.row.justify-content-center
 					.col-12.col-sm-auto.mt-1
-						button.btn.btn-block.btn-primary(@click="savePoll" :disabled="requestOngoing")
+						button.btn.btn-block.btn-primary(name="save-poll" @click="savePoll" :disabled="requestOngoing")
 							i.fas.fa-save
 							| &nbsp; {{ $t('poll_editor.save_poll') }}
 					.col-12.col-sm-auto.mt-1(v-if="pollId")
-						button.btn.btn-block.btn-danger(v-b-modal.pollDeleteModal="" :disabled="requestOngoing")
+						button.btn.btn-block.btn-danger(name="delete-poll"  v-b-modal.pollDeleteModal="" :disabled="requestOngoing")
 							i.fas.fa-trash-alt
 							| &nbsp; {{ $t('poll_editor.delete_poll') }}
 					.col-12.col-sm-auto.mt-1
-						button.btn.btn-block.btn-secondary(@click="backToEvent" :disabled="requestOngoing")
+						button.btn.btn-block.btn-secondary(name="back-to-event" @click="backToEvent" :disabled="requestOngoing")
 							i.fas.fa-ban
 							| &nbsp; {{ $t('actions.cancel') }}
 
@@ -199,8 +199,14 @@
 		)
 </template>
 <script>
-import { accordionGroupsMixin,
-	restMixin, colorCodes, eventHelpersMixin, eventDataMixin, scrollToTopMixin} from '../globals'
+import {
+	accordionGroupsMixin,
+	restMixin,
+	colorCodes,
+	eventHelpersMixin,
+	eventDataMixin,
+	scrollToTopMixin
+} from '../globals'
 import dateFns from 'date-fns'
 
 export default {
@@ -264,33 +270,37 @@ export default {
 			},
 			disabledAttribute: {
 				contentStyle: {
-						color: colorCodes.red,
-						opacity: 0.5,
-						cursor: 'default'
-					}
+					color: colorCodes.red,
+					opacity: 0.5,
+					cursor: 'default'
 				}
 			}
+		}
 	},
 	created() {
 		let self = this;
 		if (this.eventId) {
 			this.restRequest(['events', this.eventId].join('/'))
-			.then(function(response) {
-				self.assignEventData(response.data.data);
-				self.assignPollData(null);
-				self.checkEventOpen();
-				self.loadedSuccessfully = true;
-			})
-			.finally(function() { self.loaded = true; });
+				.then(function(response) {
+					self.assignEventData(response.data.data);
+					self.assignPollData(null);
+					self.checkEventOpen();
+					self.loadedSuccessfully = true;
+				})
+				.finally(function() {
+					self.loaded = true;
+				});
 		} else {
 			this.restRequest(['polls', this.pollId].join('/'))
-			.then(function(response) {
-				self.assignEventData(response.data.data.event);
-				self.assignPollData(response.data.data);
-				self.checkEventOpen();
-				self.loadedSuccessfully = true;
-			})
-			.finally(function() { self.loaded = true; });
+				.then(function(response) {
+					self.assignEventData(response.data.data.event);
+					self.assignPollData(response.data.data);
+					self.checkEventOpen();
+					self.loadedSuccessfully = true;
+				})
+				.finally(function() {
+					self.loaded = true;
+				});
 			this.groupVisibility['participant-group'] = false;
 			this.groupVisibility['weekday-ranker-group'] = false;
 			this.groupVisibility['calendar-ranker-group'] = true;
@@ -339,11 +349,11 @@ export default {
 			// had a larger time window (which was then shrunk by the organizer)
 			// to show up
 			let excludeDates = [{
-					start: null,
-					end: dateFns.subDays(this.minDate, 1)
-				}, {
-					start: dateFns.addDays(this.maxDate, 1),
-					end: null
+				start: null,
+				end: dateFns.subDays(this.minDate, 1)
+			}, {
+				start: dateFns.addDays(this.maxDate, 1),
+				end: null
 			}];
 			if (poll) {
 				this.eventIdFromPoll = poll.event_id;
@@ -374,8 +384,7 @@ export default {
 		savePoll() {
 			let self = this;
 			this.restRequest(
-				(this.pollId ? ['polls', this.pollId].join('/') : ['events', this.eventId, 'polls'].join('/')),
-				{
+				(this.pollId ? ['polls', this.pollId].join('/') : ['events', this.eventId, 'polls'].join('/')), {
 					method: (this.pollId ? 'put' : 'post'),
 					data: {
 						poll: this.pollDataForRequest
@@ -402,16 +411,23 @@ export default {
 		},
 		deletePoll() {
 			let self = this;
-			this.restRequest(['polls', this.pollId].join('/'), { method: 'delete'})
-			.then(function() {
-				self.$refs.pollDeletedModal.show();
-			}, function(error) {
-				self.$refs.pollDeleteErrorModal.show();
-				throw error;
-			});
+			this.restRequest(['polls', this.pollId].join('/'), {
+					method: 'delete'
+				})
+				.then(function() {
+					self.$refs.pollDeletedModal.show();
+				}, function(error) {
+					self.$refs.pollDeleteErrorModal.show();
+					throw error;
+				});
 		},
 		backToEvent() {
-			this.$router.push({name: 'event', params: {eventId: this.computedEventId}});
+			this.$router.push({
+				name: 'event',
+				params: {
+					eventId: this.computedEventId
+				}
+			});
 		},
 		colorForRank: (rank) => (rank > 0 ? colorCodes.green : colorCodes.red)
 	},
@@ -423,10 +439,14 @@ export default {
 			return this.colorForRank(this.selectedDateRank);
 		},
 		computedEventId() {
-			return (this.eventId ? this.eventId : this.eventIdFromPoll);
+			return this.eventId || this.eventIdFromPoll;
 		},
 		initialWeeklyRanks() {
-			return Object.keys(this.$i18n.t('week_days')).map((code, index) => ({day: index, name: `week_days.${code}`, rank: 0}));
+			return Object.keys(this.$i18n.t('week_days')).map((code, index) => ({
+				day: index,
+				name: `week_days.${code}`,
+				rank: 0
+			}));
 		},
 		pollDataForRequest() {
 			return {

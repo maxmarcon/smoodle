@@ -6,7 +6,7 @@ exports.config = {
       //  'js/bundle.js': '**/*.js'
       //},
       entryPoints: {
-       'js/app.js': 'js/bundle.js'
+        'js/app.js': 'js/bundle.js'
       }
       // To use a separate vendor.js bundle, specify two files path
       // http://brunch.io/docs/config#-files-
@@ -24,11 +24,11 @@ exports.config = {
       // }
     },
     stylesheets: {
-      joinTo: "css/bundle.css"
-    },
-    templates: {
-      joinTo: "js/bundle.js"
+      joinTo: 'css/bundle.css'
     }
+    //templates: {
+    //  joinTo: "js/bundle.js"
+    //}
   },
 
   conventions: {
@@ -53,11 +53,15 @@ exports.config = {
       // Do not use ES6 compiler in vendor code
       ignore: [/vendor/],
       pattern: /\.(js)$/,
-      presets: ['env']
+      presets: [['env', {
+        targets: {
+          browsers: ["last 1 version", "not dead", "> 0.25%"]
+        },
+        useBuiltIns: 'entry'
+      }]]
     },
     copycat: {
       webfonts: ['node_modules/@fortawesome/fontawesome-free/webfonts'],
-      images: ['images'],
       flags: ['node_modules/flag-icon-css/flags']
     }
   },
@@ -65,6 +69,37 @@ exports.config = {
   modules: {
     autoRequire: {
       "js/bundle.js": ["js/app"]
+    }
+  },
+
+  overrides: {
+    test: {
+      conventions: {
+        assets: /^(_static)/
+      },
+      plugins: {
+        off: ['copycat-brunch']
+      },
+      files: {
+        javascripts: {
+          entryPoints: {
+            'js/test/suite.js': 'testSuite.js'
+          }
+        },
+        stylesheets: {
+          joinTo: {
+            'css/bundle.css': /^(_css)/
+          }
+        }
+      },
+      paths: {
+        public: 'tests'
+      },
+      modules: {
+        autoRequire: {
+          "testSuite.js": ['js/test/suite']
+        }
+      }
     }
   }
 };

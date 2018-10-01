@@ -5,9 +5,9 @@
 			p {{ $t('event_editor.link_copied') }}
 		b-modal(ref="eventCreatedModal" hide-header ok-only)
 			p {{ $t('event_editor.event_created_short') }}
-		b-modal(ref="eventUpdatedModal" hide-header ok-only :ok-title="$t('event_editor.back_to_event')" @ok="backToEvent")
+		b-modal#eventUpdatedModal(ref="eventUpdatedModal" hide-header ok-only :ok-title="$t('event_editor.back_to_event')" @ok="backToEvent")
 			p {{ $t('event_editor.event_updated') }}
-		.card(v-if="!eventId || loadedSuccessfully")
+		.card(v-if="!eventId || loadedSuccessfully || eventCreated")
 			.card-header
 				event-header#event-header(
 					:eventName="eventName"
@@ -16,24 +16,25 @@
 					:eventTimeWindowTo="eventTimeWindowTo"
 					eventState="OPEN"
 				)
-			ul.list-group.list-group-flush(v-if="createdEvent")
+			ul.list-group.list-group-flush(v-if="eventCreated")
 				li.list-group-item
 					.alert.alert-success
-						| {{ $t('event_editor.event_created', {eventName: createdEvent.name, eventOrganizer: createdEvent.organizer, organizerEmail: createdEvent.email}) }}
+						| {{ $t('event_editor.event_created', {eventName, eventOrganizer, eventOrganizerEmail}) }}
 				li.list-group-item
 					.row.justify-content-center
 						label.col-md-auto.col-form-label  {{ $t('event_editor.share_link') }}
 						.col-md
 							.input-group
-								input.form-control(:value="createdEvent.share_link" readonly)
+								input#shareLink.form-control(:value="eventShareLink" readonly)
 								.input-group-append
 									a.btn.bdn-sm.btn-outline-secondary(
 										target="_blank"
-										:href="whatsAppMessageURL(createdEvent.share_link)"
+										:href="whatsAppMessageURL(eventShareLink)"
 									)
 										span.fab.fa-lg.fa-whatsapp
 									button.btn.btn-sm.btn-outline-secondary(
-										v-clipboard:copy="createdEvent.share_link"
+										name="share-button"
+										v-clipboard:copy="eventShareLink"
 										v-clipboard:success="clipboard"
 									)
 										span.fas.fa-lg.fa-share-alt
@@ -72,10 +73,10 @@
 										v-model.trim="eventOrganizer"
 										@change="localValidation"
 										@blur="localValidation"
-										:disabled="createdEvent"
+										:disabled="eventCreated"
 										:class="inputFieldClass('eventOrganizer')"
 									)
-									.invalid-feedback {{ eventOrganizerError }}
+									.invalid-feedback(name="event-organizer-error") {{ eventOrganizerError }}
 
 							.form-group.row
 								label.col-md-3.col-form-label(for="eventOrganizerEmail") {{ $t('event_editor.event.organizer_email') }}
@@ -85,20 +86,20 @@
 										v-model.trim="eventOrganizerEmail"
 										@change="localValidation"
 										@blur="localValidation"
-										:disabled="createdEvent"
+										:disabled="eventCreated"
 										:class="inputFieldClass('eventOrganizerEmail')"
 									)
-									.invalid-feedback {{ eventOrganizerEmailError }}
+									.invalid-feedback(name="event-organizer-email-error") {{ eventOrganizerEmailError }}
 
 									small.form-text.text-muted {{ $t('event_editor.event.organizer_email_confirmation_help') }}
 									input#eventOrganizerEmailConfirmation.form-control(
 										v-model.trim="eventOrganizerEmail_confirmation"
 										@change="localValidation"
 										@blur="localValidation"
-										:disabled="createdEvent"
+										:disabled="eventCreated"
 										:class="inputFieldClass('eventOrganizerEmail_confirmation')"
 									)
-									.invalid-feedback {{ eventOrganizerEmailError_confirmation }}
+									.invalid-feedback(name="event-organizer-email-confirmation-error") {{ eventOrganizerEmailError_confirmation }}
 
 
 					b-btn.btn-block.d-flex.mt-2(
@@ -120,23 +121,23 @@
 								.col-md-9
 									small.form-text.text-muted {{ $t('event_editor.event.name_help') }}
 									input#eventName.form-control(v-model.trim="eventName" type="text"
-									:disabled="createdEvent"
+									:disabled="eventCreated"
 									@change="localValidation"
 									@blur="localValidation"
 									:class="inputFieldClass('eventName')"
 									)
-									.invalid-feedback {{ eventNameError }}
+									.invalid-feedback(name="event-name-error") {{ eventNameError }}
 							.form-group.row
 								label.col-md-3.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
 								.col-md-9
 									small.form-text.text-muted {{ $t('event_editor.event.desc_help') }}
 									textarea#eventDesc.form-control(v-model.trim="eventDesc"
-									:disabled="createdEvent"
+									:disabled="eventCreated"
 									@change="localValidation"
 									@blur="localValidation"
 									:class="inputFieldClass('eventDesc')"
 									)
-									.invalid-feedback {{ eventDescError }}
+									.invalid-feedback(name="event-desc-error") {{ eventDescError }}
 
 
 					b-btn.btn-block.d-flex.mt-2(
@@ -170,12 +171,12 @@
 										popover-direction="top"
 									)
 									//- invalid feedback won't work here because v-date-picker is not a form-control
-									.small.text-danger {{ eventTimeWindowError }}
+									.small.text-danger(name="event-time-window-error") {{ eventTimeWindowError }}
 
 								.col-md-auto
 									b-dropdown(
 										:text="$t('event_editor.dates_quick_selection')"
-										:disabled="createdEvent != null"
+										:disabled="eventCreated"
 										:dropup="true"
 									)
 										b-dropdown-item(v-if="showThisWeekButton" @click="pickThisWeek") {{ $t('event_editor.this_week') }}
@@ -184,16 +185,13 @@
 										b-dropdown-item(@click="pickNextMonths(3); localValidation();") {{ $tc('event_editor.within_months', 3, {count: 3}) }}
 
 			.card-footer
-				.row.justify-content-center(v-if="!createdEvent")
+				.row.justify-content-center(v-if="!eventCreated")
 					.col-12.col-sm-auto.mt-1
-						button.btn.btn-block.btn-primary(v-if="!eventId" @click="saveEvent" :disabled="requestOngoing")
-							i.fas.fa-plus
-							| &nbsp; {{ $t('event_editor.create_event') }}
-						button.btn.btn-block.btn-primary(v-else @click="saveEvent" :disabled="requestOngoing")
-							i.fas.fa-save
-							| &nbsp; {{ $t('event_editor.update_event') }}
+						button.btn.btn-block.btn-primary(@click="saveEvent" :disabled="requestOngoing" name="save-event")
+							i.fas(v-bind:class="{'fa-save': eventId, 'fa-plus': !eventId}")
+							| &nbsp; {{ $t(eventId ? 'event_editor.update_event' : 'event_editor.create_event') }}
 					.col-12.col-sm-auto.mt-1(v-if="eventId")
-						button.btn.btn-block.btn-secondary(@click="backToEvent" :disabled="requestOngoing")
+						button.btn.btn-block.btn-secondary(@click="backToEvent" :disabled="requestOngoing" name="cancel")
 							i.fas.fa-ban
 							| &nbsp; {{ $t('actions.cancel') }}
 
@@ -201,7 +199,8 @@
 					.col-12.col-sm-auto.mt-1
 						router-link.btn.btn-block.btn-success(
 							role="button"
-							:to="{ name: 'event', params: {eventId: createdEvent.id, secret: createdEvent.secret}, query: {s: createdEvent.secret}}"
+							name="manage-event"
+							:to="{ name: 'event', params: {eventId: computedEventId, secret: computedSecret}, query: {s: computedSecret}}"
 						)
 							i.fas.fa-key
 							| &nbsp; {{ $t('event_editor.manage_event') }}
@@ -211,10 +210,15 @@
 			:message="$t('errors.not_found')"
 		)
 </template>
-
 <script>
 import dateFns from 'date-fns'
-import { accordionGroupsMixin, scrollToTopMixin, restMixin, eventDataMixin, whatsAppHelpersMixin } from '../globals'
+import {
+	accordionGroupsMixin,
+	scrollToTopMixin,
+	restMixin,
+	eventDataMixin,
+	whatsAppHelpersMixin
+} from '../globals'
 
 const today = new Date();
 const InvalidDate = 'Invalid Date';
@@ -272,48 +276,49 @@ export default {
 			'dates-group': false,
 			'organizer-group': true
 		},
-		eventError: null,
-		eventName: null,
 		eventNameError: null,
-		eventOrganizer: null,
 		eventOrganizerError: null,
-		eventOrganizerEmail: null,
 		eventOrganizerEmailError: null,
-		eventOrganizerEmail_confirmation: null,
 		eventOrganizerEmailError_confirmation: null,
-		eventDesc: null,
 		eventDescError: null,
 		eventTimeWindow: null,
 		eventTimeWindowError: null,
-		requestOngoing: false,
 		today,
 		loadedSuccessfully: false,
 		loaded: false,
 		showThisWeekButton: (dateFns.getDay(today) > 0 && dateFns.getDay(today) < 4), // betewn Mon and Wed
-		createdEvent: null/*{
-						id: 'd8763187-ed3d-4572-ae50-02d5cc874804',
-						name: "Dinner party",
-						organizer: "Max",
-						share_link: "http://localhost:4000/event/967d9e9b-ad9f-4312-863f-c760a52db4e2",
-						owner_link: "http://share",
-						secret: "dasdas",
-						email: 'noname@nodomain.com'
-					}*/
- 	}),
- 	created() {
- 		if (this.eventId) {
- 			if (this.secret) {
-	 			let self = this;
-		 		this.restRequest(['events', this.eventId].join('/'), { params: {secret: this.secret} }).then(function(result) {
+		eventCreated: false,
+		createdEventId: null,
+		createdEventSecret: null
+	}),
+	created() {
+		if (this.eventId) {
+			if (this.secret) {
+				let self = this;
+				this.restRequest(['events', this.eventId].join('/'), {
+					params: {
+						secret: this.secret
+					}
+				}).then(function(result) {
 					self.assignEventData(result.data.data);
 					self.applyDates(self.eventTimeWindowFrom, self.eventTimeWindowTo, true);
 					self.loadedSuccessfully = true;
-				}).finally(function() { self.loaded = true; })
+				}).finally(function() {
+					self.loaded = true;
+				})
 			} else {
 				this.loaded = true;
 			}
 		}
- 	},
+	},
+	computed: {
+		computedEventId() {
+			return this.eventId || this.createdEventId
+		},
+		computedSecret() {
+			return this.secret || this.createdEventSecret
+		}
+	},
 	methods: {
 		datesSelected() {
 			this.eventTimeWindowFrom = this.eventTimeWindow.start;
@@ -321,7 +326,7 @@ export default {
 			this.localValidation();
 		},
 		clipboard() {
-      this.$refs.copiedToClipboardModal.show();
+			this.$refs.copiedToClipboardModal.show();
 		},
 		applyDates(from, to, skipDatesSelected = false) {
 			this.eventTimeWindow = {
@@ -334,19 +339,27 @@ export default {
 		},
 		pickThisWeek() {
 			this.applyDates(
-				dateFns.max(today, dateFns.startOfWeek(today, {weekStartsOn: 1})),
-				dateFns.endOfWeek(today, {weekStartsOn: 1})
+				dateFns.max(today, dateFns.startOfWeek(today, {
+					weekStartsOn: 1
+				})),
+				dateFns.endOfWeek(today, {
+					weekStartsOn: 1
+				})
 			);
 		},
 		pickNextWeek() {
 			let today_next_week = dateFns.addWeeks(today, 1);
 			this.applyDates(
-				dateFns.startOfWeek(today_next_week, {weekStartsOn: 1}),
-				dateFns.endOfWeek(today_next_week, {weekStartsOn: 1})
+				dateFns.startOfWeek(today_next_week, {
+					weekStartsOn: 1
+				}),
+				dateFns.endOfWeek(today_next_week, {
+					weekStartsOn: 1
+				})
 			);
 		},
 		pickNextMonths(months) {
-			this.applyDates(today, dateFns.addMonths(today,months));
+			this.applyDates(today, dateFns.addMonths(today, months));
 		},
 		saveEvent() {
 			let self = this;
@@ -357,22 +370,27 @@ export default {
 				delete dataForRequest['email'];
 			}
 			this.restRequest(
-				(this.eventId ? ["events", this.eventId].join('/') : "events"),
-				{
+				(this.eventId ? ["events", this.eventId].join('/') : "events"), {
 					data: {
-						event: Object.assign(dataForRequest, {secret: this.secret})
+						event: Object.assign(dataForRequest, {
+							secret: this.secret
+						})
 					},
 					method: (this.eventId ? 'patch' : 'post'),
 					ignoreErrorCodes: [429]
-			}).then(function(result) {
+				}).then(function(result) {
 				self.setServerErrors();
 				self.collapseAllGroups();
 				self.$scrollTo('#event-header');
 				self.wasServerValidated = true;
+
 				if (self.eventId) {
 					self.$refs.eventUpdatedModal.show();
 				} else {
-					self.createdEvent = result.data.data;
+					self.eventCreated = true;
+					self.createdEventId = result.data.data.id
+					self.createdEventSecret = result.data.data.secret
+					self.assignEventData(result.data.data)
 					self.$refs.eventCreatedModal.show();
 				}
 			}, function(error) {
@@ -381,7 +399,9 @@ export default {
 						self.setServerErrors(error.response.data.errors);
 						self.wasServerValidated = true;
 					} else if (error.response.status == 429) {
-						self.$refs.errorBar.show(self.$i18n.t('event_editor.too_many_requests_error', {email: dataForRequest["email"]}));
+						self.$refs.errorBar.show(self.$i18n.t('event_editor.too_many_requests_error', {
+							email: dataForRequest["email"]
+						}));
 						self.scrollToTop();
 					}
 				} else {
@@ -390,7 +410,16 @@ export default {
 			});
 		},
 		backToEvent() {
-			this.$router.push({name: 'event', params: {eventId: this.eventId, secret: this.secret}, query: {s: this.secret}});
+			this.$router.push({
+				name: 'event',
+				params: {
+					eventId: this.computedEventId,
+					secret: this.computedSecret
+				},
+				query: {
+					s: this.computedSecret
+				}
+			});
 		}
 	}
 }

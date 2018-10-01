@@ -102,10 +102,10 @@
 				)
 			ul.list-group.list-group-flush
 				li.list-group-item
-					p
+					p(name="event-intro")
 						em.text-muted {{ isOrganizer ? $t('event_viewer.description') : $t('event_viewer.organizer_says', {organizer: eventOrganizer}) }} &nbsp;
 						| {{ eventDesc }}
-				li.list-group-item(v-if="isOrganizer && !eventCanceled")
+				li.list-group-item(v-if="isOrganizer && eventOpen")
 					.alert.alert-success
 						i.fas.fa-key
 						| &nbsp; {{ $t('event_viewer.welcome_organizer', {organizer: eventOrganizer}) }}
@@ -113,7 +113,7 @@
 						label.col-md-auto.col-form-label {{ $t('event_viewer.share_link') }}
 						.col-md
 							.input-group
-								input.form-control(:value="eventShareLink" readonly)
+								input#shareLink.form-control(:value="eventShareLink" readonly)
 								.input-group-append
 									a.btn.bdn-sm.btn-outline-secondary(
 										target="_blank"
@@ -121,22 +121,21 @@
 									)
 										span.fab.fa-lg.fa-whatsapp
 									button.btn.btn-sm.btn-outline-secondary(
+										name="share-button"
 										v-clipboard:copy="eventShareLink"
 										v-clipboard:success="clipboard"
 									)
 										span.fas.fa-lg.fa-share-alt
 				li.list-group-item
-					.alert.alert-success(v-if="!isOrganizer")
-						i.fas.fa-share-alt
-						| &nbsp; {{ $t('event_viewer.welcome', {organizer: eventOrganizer}) }}
 					div(v-if="eventOpen")
-						.alert.alert-warning(v-if="eventModified && !isOrganizer")
-							i.fas.fa-cut
-							| &nbsp; {{ $t('event_viewer.event_modified', {time_distance: eventModifiedRelative, organizer: eventOrganizer}) }}
-						.alert.alert-danger(v-if="eventScheduleError")
-							i.fas.fa-exclamation-triangle.fa-lg
-							| &nbsp; {{ eventScheduleError }}
-						div(v-else-if="eventScheduleParticipantsCount")
+						div(v-if="!isOrganizer")
+							.alert.alert-warning(v-if="eventModified")
+								i.fas.fa-cut
+								| &nbsp; {{ $t('event_viewer.event_modified', {time_distance: eventModifiedRelative, organizer: eventOrganizer}) }}
+							.alert.alert-success(v-else)
+								i.fas.fa-share-alt
+								| &nbsp; {{ $t('event_viewer.welcome', {organizer: eventOrganizer}) }}
+						div(v-if="eventScheduleParticipantsCount")
 							.alert.alert-info
 								i18n(path="event_viewer.event_open_organizer" v-if="isOrganizer")
 									i.fas.fa-calendar-check.fa-lg(place="calendar_icon")
@@ -185,11 +184,12 @@
 											:theme-styles="{dayCellNotInMonth: {opacity: 0}}"
 										)
 
-						div.alert.alert-primary(v-else v-else-if="loaded")
+						div.alert.alert-primary(v-else-if="loaded")
 							i18n(path="event_viewer.no_participants_organizer" v-if="isOrganizer")
-								i.fas.fa-grin-beam-sweat.fa-lg(place="icon")
+								i.fas.fa-thermometer-empty.fa-lg(place="icon")
 							i18n(path="event_viewer.no_participants" v-else)
 								i.fas.fa-trophy.fa-lg(place="icon")
+
 					.alert.alert-success(v-else-if="eventScheduled")
 						i.fas.fa-handshake.fa-lg
 						| &nbsp; {{ $t(isOrganizer ? 'event_viewer.event_scheduled_organizer' : 'event_viewer.event_scheduled', {datetime: eventScheduledDateTime, organizer: eventOrganizer, time_distance: eventScheduledDateTimeRelative}) }}
@@ -200,33 +200,39 @@
 			.card-footer(v-if="eventOpen || isOrganizer")
 				.row.justify-content-center
 					.col-12.col-sm-auto.mt-1(v-if="eventOpen && isOrganizer && eventScheduleParticipantsCount")
-						button.btn.btn-block.btn-primary(v-b-modal.scheduleEventModal="" :disabled="requestOngoing")
+						button.btn.btn-block.btn-primary(v-b-modal.scheduleEventModal="" :disabled="requestOngoing" name="schedule-button")
 							i.fas.fa-clock
 							| &nbsp; {{ $t('event_viewer.schedule_event') }}
 					.col-12.col-sm-auto.mt-1(v-if="eventOpen && isOrganizer")
 						router-link.btn.btn-block.btn-success(
+							name="edit-button"
 							role="button"
 							:to="{ name: 'edit_event', params: {eventId: eventId, secret: secret}, query: {s: secret} }"
 						)
 							i.fas.fa-edit
 							| &nbsp; {{ $t('event_viewer.edit_event') }}
 					.col-12.col-sm-auto.mt-1(v-if="eventOpen && isOrganizer")
-						button.btn.btn-block.btn-block.btn-warning(v-b-modal.cancelEventModal="" :disabled="requestOngoing")
+						button.btn.btn-block.btn-block.btn-warning(v-b-modal.cancelEventModal="" :disabled="requestOngoing"
+							name="cancel-button"
+						)
 							i.fas.fa-ban
 							| &nbsp; {{ $t('event_viewer.cancel_event') }}
 					.col-12.col-sm-auto.mt-1(v-if="!eventOpen && isOrganizer")
-						button.btn.btn-block.btn-warning(@click="openEvent" :disabled="requestOngoing")
+						button.btn.btn-block.btn-warning(@click="openEvent" :disabled="requestOngoing"
+							name="open-button"
+						)
 							i.fas.fa-undo
 							| &nbsp; {{ $t('event_viewer.open_event') }}
 					.col-12.col-sm-auto.mt-1(v-if="eventOpen && !isOrganizer")
 						router-link.btn.btn-block.btn-success(
+							name="new-poll-button"
 							role="button"
 							:to="{ name: 'new_poll', params: {eventId: eventId}}"
 						)
 							i.fas.fa-question
 							| &nbsp; {{ $t('event_viewer.create_poll') }}
 					.col-12.col-sm-auto.mt-1(v-if="eventOpen && !isOrganizer && eventScheduleParticipantsCount")
-						button.btn.btn-block.btn-primary(v-b-modal.updateAnswerModal="" :disabled="requestOngoing")
+						button.btn.btn-block.btn-primary(v-b-modal.updateAnswerModal="" :disabled="requestOngoing" name="edit-poll-button")
 							i.fas.fa-edit
 							| &nbsp; {{ $t('event_viewer.update_poll') }}
 
@@ -255,7 +261,6 @@ export default {
 		eventScheduleDates: [],
 		eventScheduleParticipantsCount: 0,
 		eventScheduleParticipants: [],
-		eventScheduleError: null,
 		pollParticipant: null,
 		pollParticipantError: null,
 		loaded: false,
@@ -276,18 +281,28 @@ export default {
 	created() {
 		let self = this;
 		Promise.all([
-			this.restRequest(['events', this.eventId].join('/'), { params: {secret: this.secret} }).then(function(result) {
-				self.assignEventData(result.data.data);
-			}),
-			this.restRequest(['events', this.eventId, 'schedule'].join('/'),
-				{ params: {limit: SCHEDULE_DATES_LIMIT, secret: this.secret } }).then(function(result) {
-				self.eventScheduleDates = result.data.data.dates;
-				self.eventScheduleParticipants = result.data.data.participants;
-				self.eventScheduleParticipantsCount = result.data.data.participants_count;
+				this.restRequest(['events', this.eventId].join('/'), {
+					params: {
+						secret: this.secret
+					}
+				}),
+				this.restRequest(['events', this.eventId, 'schedule'].join('/'), {
+					params: {
+						limit: SCHEDULE_DATES_LIMIT,
+						secret: this.secret
+					}
+				})
+			])
+			.then(function([eventResult, scheduleResult]) {
+				self.assignEventData(eventResult.data.data);
+				self.eventScheduleDates = scheduleResult.data.data.dates;
+				self.eventScheduleParticipants = scheduleResult.data.data.participants;
+				self.eventScheduleParticipantsCount = scheduleResult.data.data.participants_count;
+				self.loadedSuccessfully = true;
 			})
-		])
-		.then(function() { self.loadedSuccessfully = true; })
-		.finally(function() { self.loaded = true });
+			.finally(function() {
+				self.loaded = true
+			});
 	},
 	computed: {
 		isOrganizer() {
@@ -308,7 +323,7 @@ export default {
 				maxPositiveRank = this.eventScheduleDates[0].positive_rank;
 			}
 			let limit = (SCHEDULE_DATES_LIMIT != null ? SCHEDULE_DATES_LIMIT : this.eventScheduleDates.length);
-			return this.eventScheduleDates.slice(0, limit).map((date_entry, index) => ({
+			return this.eventScheduleDates.slice(0, limit).map((date_entry) => ({
 				dates: dateFns.parse(date_entry.date),
 				highlight: {
 					backgroundColor: (date_entry.negative_rank < 0 ? colorCodes.red : colorCodes.green),
