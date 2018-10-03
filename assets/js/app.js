@@ -1,5 +1,8 @@
-//import 'vueify/lib/insert-css'
-//import 'babel-polyfill'; Would be good for IE11 compatibility, but unfortunately it breaks Firefox...
+// import 'babel-polyfill';
+// This would enable IE11 compatibility, but unfortunately it breaks Firefox...
+// we would have to upgrade to babel7 for it to work, but that's got its own issue cause vueify is still
+// not compatible with babel7 (see babel-7 brunch and https://github.com/vuejs/vueify/issues/237)
+// therefore we wait...
 import EventEditor from './vue/eventEditor.vue'
 import PollEditor from './vue/pollEditor.vue'
 import EventViewer from './vue/eventViewer.vue'

@@ -201,7 +201,7 @@ export const restMixin = {
 					422: this.$i18n.t('errors.unprocessable_entity'),
 					404: this.$i18n.t('errors.not_found')
 				},
-				spinnerDelay: 1000
+				spinnerDelay: 100
 			}, config);
 
 			let self = this;

@@ -8,5 +8,11 @@
 @import "node_modules/flag-icon-css/sass/flag-icon.scss";
 
 [v-cloak] {
-	display: none;
+	> * {
+		display: none;
+	}
+	&:before {
+		content: "Loading...";
+	}
 }
+
