@@ -377,7 +377,7 @@ export const eventHelpersMixin = {
 			return this.eventState == "SCHEDULED";
 		},
 		minDate() {
-			return dateFns.max(dateFns.parse(this.eventTimeWindowFrom), dateFns.startOfTomorrow());
+			return dateFns.max(this.eventTimeWindowFrom, dateFns.startOfTomorrow());
 		},
 		maxDate() {
 			return dateFns.parse(this.eventTimeWindowTo);
