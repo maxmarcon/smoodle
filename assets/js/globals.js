@@ -354,10 +354,14 @@ export const eventHelpersMixin = {
 			let time = this.eventScheduledFrom;
 
 			if (time) {
-				let str = dateFns.distanceInWordsToNow(time, {
-					locale: this.$i18n.t('date_fns_locale')
+				let distance = dateFns.distanceInWordsToNow(time, {
+					locale: this.$i18n.t('date_fns_locale'),
+					addSuffix: true
 				});
-				return str.charAt(0).toUpperCase() + str.slice(1);
+
+				let trans_key = dateFns.isFuture(time) ? 'event_viewer.time_distance_future' : 'event_viewer.time_distance_past';
+
+				return this.$i18n.t(trans_key, {time_distance: distance})
 			}
 		},
 		eventCanceled() {
