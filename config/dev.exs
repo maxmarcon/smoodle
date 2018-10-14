@@ -12,9 +12,9 @@ config :smoodle, SmoodleWeb.Endpoint,
   code_reloader: true,
   check_origin: false,
   watchers: [
-    node: [
-      "node_modules/webpack/bin/webpack.js",
-      "--watch",
+    npm: [
+      "run",
+      "watch",
       cd: Path.expand("../assets", __DIR__)
     ]
   ]

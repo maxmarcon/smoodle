@@ -2,8 +2,8 @@
   "repository": {},
   "license": "MIT",
   "scripts": {
-    "build": "NODE_ENV=development webpack --mode development",
-    "watch": "NODE_ENV=development webpack --watch --mode development",
+    "build": "NODE_ENV=development webpack --mode development --colors",
+    "watch": "NODE_ENV=development webpack --watch --mode development --colors",
     "deploy": "NODE_ENV=production webpack -p",
     "test": "NODE_ENV=development webpack --mode development && karma start --single-run",
     "watch-test": "NODE_ENV=development webpack --watch --mode development & karma start"
