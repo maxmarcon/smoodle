@@ -1,3 +1,4 @@
+
 // import 'babel-polyfill';
 // This would enable IE11 compatibility, but unfortunately it breaks Firefox...
 // we would have to upgrade to babel7 for it to work, but that's got its own issue cause vueify is still
@@ -7,6 +8,7 @@ import EventEditor from './vue/eventEditor.vue'
 import PollEditor from './vue/pollEditor.vue'
 import EventViewer from './vue/eventViewer.vue'
 import Home from './vue/home.vue'
+
 import datePicker from 'vue-bootstrap-datetimepicker';
 import VueRouter from 'vue-router'
 import VueI18n from 'vue-i18n'
@@ -24,12 +26,7 @@ import ranker from './vue/ranker.vue'
 import eventHeader from './vue/eventHeader.vue'
 import errorPage from './vue/errorPage.vue'
 import PrettyCheckbox from 'pretty-checkbox-vue';
-
-const Vue = require('vue/dist/vue.runtime.js');
-//import Vue from 'vue/dist/vue.runtime.esm';
-// becaue ES module vue.esm.js does not fucking work!!! It might be a problem with brunch
-// as it does not translate the "export default Vue" statement at the end of the file into CommonJS
-// ...
+import Vue from 'vue/dist/vue.runtime.esm';
 
 // See: https://vuejs.org/v2/guide/installation.html#Development-vs-Production-Mode
 Vue.config.devtools = (process.env.NODE_ENV != "production");

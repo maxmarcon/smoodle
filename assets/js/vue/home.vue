@@ -29,7 +29,7 @@
 								li.list-group-item.text-muted
 									em {{ $t('home.step1.part2') }}
 								li.list-group-item
-									img.img-fluid.w-75.border.border-primary.rounded(:src="fullPath('event_creation_calendar.png')")
+									img.img-fluid.w-75.border.border-primary.rounded(src="../../static/images/event_creation_calendar.png")
 								li.list-group-item.text-muted
 									em {{ $t('home.step1.part3') }}
 					.card
@@ -59,7 +59,7 @@
 								li.list-group-item.text-muted
 									em {{ $t('home.step3.part1') }}
 								li.list-group-item
-									img.img-fluid.w-75.border.border-success.rounded(:src="fullPath('event_overview_calendar.png')")
+									img.img-fluid.w-75.border.border-success.rounded(src="../../static/images/event_overview_calendar.png")
 								li.list-group-item.text-muted
 									i18n(path="home.step3.part2" tag="em")
 										span.text-success(place="good") {{ $tc('home.good_upper', 2) }}
@@ -78,12 +78,3 @@
 							| &nbsp; {{ $t('home.create_new_event') }}
 
 </template>
-<script>
-import {
-	imageHelpersMixin
-} from '../globals'
-
-export default {
-	mixins: [imageHelpersMixin]
-}
-</script>

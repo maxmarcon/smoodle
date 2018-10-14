@@ -257,7 +257,7 @@ export const eventDataMixin = {
 		eventOrganizer: null,
 		eventOrganizerEmail: null,
 		eventOrganizerEmail_confirmation: null,
-		evendDesc: null,
+		eventDesc: null,
 		eventState: null,
 		eventShareLink: null,
 		eventTimeWindowFrom: null,
@@ -311,13 +311,6 @@ export const eventDataMixin = {
 			Object.keys(data).forEach((k) => data[k] == null && delete data[k]);
 			return data;
 		}
-	}
-}
-
-const IMAGE_PATH = "/images";
-export const imageHelpersMixin = {
-	methods: {
-		fullPath: (path) => [IMAGE_PATH, path.replace(/^\//, '').replace(/\/{2,}/g, '/')].join('/')
 	}
 }
 

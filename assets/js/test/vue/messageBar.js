@@ -93,7 +93,7 @@ describe('messageBar', () => {
 			jasmine.clock().uninstall()
 		})
 
-		it('can count down', () => {
+		it('counts down to 0', () => {
 			expect(wrapper.vm.dismissCountDown).toBeFalsy()
 		})
 	})

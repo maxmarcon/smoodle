@@ -27,7 +27,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'tests/testSuite.js'
+      '../priv/static/test/testSuite.js'
     ],
 
 
