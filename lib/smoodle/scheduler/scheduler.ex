@@ -157,7 +157,7 @@ defmodule Smoodle.Scheduler do
     polls =
       Repo.all(Ecto.assoc(event, :polls))
       |> Repo.preload(:date_ranks)
-      |> Enum.map(&transorm_poll_for_ranking/1)
+      |> Enum.map(&transform_poll_for_ranking/1)
 
     is_owner = opts[:is_owner]
     limit = opts[:limit]
@@ -176,7 +176,7 @@ defmodule Smoodle.Scheduler do
             if is_owner do
               date_entry
             else
-              Map.drop(date_entry, [:negative_participants, :positive_participants])
+              mask_participants(date_entry)
             end
           end
         ),
@@ -193,35 +193,39 @@ defmodule Smoodle.Scheduler do
   defp generate_date_ranking(start_date, end_date, polls, limit \\ nil) do
     if Date.compare(start_date, end_date) == :lt && Enum.any?(polls) do
       Date.range(start_date, end_date)
-      |> Enum.map(fn date ->
-        Enum.reduce(
-          polls,
-          %{
-            date: date,
-            negative_rank: 0,
-            positive_rank: 0,
-            negative_participants: [],
-            positive_participants: []
-          },
-          &reduce_polls_for_date/2
-        )
-      end)
-      |> Enum.sort(fn d1, d2 ->
-        cond do
-          d1.negative_rank != d2.negative_rank ->
-            d1.negative_rank > d2.negative_rank
-
-          d1.positive_rank != d2.positive_rank ->
-            d1.positive_rank > d2.positive_rank
-
-          true ->
-            Date.compare(d1.date, d2.date) != :gt
-        end
-      end)
+      |> Enum.map(fn date -> Enum.reduce(polls, initial_date_rank(date), &accumulate_poll/2) end)
+      |> Enum.sort(&compare_date_ranks/2)
       |> shorten_ranking(limit)
     else
       []
     end
+  end
+
+  defp mask_participants(date_entry) do
+    Map.drop(date_entry, [:negative_participants, :positive_participants])
+  end
+
+  defp compare_date_ranks(date_rank_1, date_rank_2) do
+    cond do
+      date_rank_1.negative_rank != date_rank_2.negative_rank ->
+        date_rank_1.negative_rank > date_rank_2.negative_rank
+
+      date_rank_1.positive_rank != date_rank_2.positive_rank ->
+        date_rank_1.positive_rank > date_rank_2.positive_rank
+
+      true ->
+        Date.compare(date_rank_1.date, date_rank_2.date) != :gt
+    end
+  end
+
+  defp initial_date_rank(date) do
+    %{
+      date: date,
+      negative_rank: 0,
+      positive_rank: 0,
+      negative_participants: [],
+      positive_participants: []
+    }
   end
 
   defp shorten_ranking(ranking, limit) do
@@ -232,7 +236,7 @@ defmodule Smoodle.Scheduler do
     end
   end
 
-  defp reduce_polls_for_date(poll, acc) do
+  defp accumulate_poll(poll, acc) do
     rank = compute_rank(poll, acc.date)
 
     Map.update!(acc, :negative_rank, fn value ->
@@ -277,7 +281,7 @@ defmodule Smoodle.Scheduler do
     date_rank || weekday_rank
   end
 
-  defp transorm_poll_for_ranking(%Poll{} = poll) do
+  defp transform_poll_for_ranking(%Poll{} = poll) do
     poll
     |> Map.from_struct()
     |> Map.update!(
