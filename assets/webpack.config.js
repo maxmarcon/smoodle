@@ -5,7 +5,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const CssUrlRelativePlugin = require('css-url-relative-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 const distPath = path.resolve('..', 'priv', 'static')
 const jsPath = 'js'
@@ -15,7 +15,7 @@ const fontsPath = 'fonts'
 const imagesPath = 'images'
 
 if (process.env.NODE_ENV == undefined) {
-	throw "You need to set NODE_ENV for this configuration to work."
+	throw 'You need to set NODE_ENV for this configuration to work.'
 }
 
 const devMode = process.env.NODE_ENV == 'development';
@@ -61,8 +61,6 @@ module.exports = {
 			]
 		}, {
 			test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-			// Limiting the size of the woff fonts breaks font-awesome ONLY for the extract text plugin
-			// loader: 'url?limit=10000'
 			loader: 'url-loader'
 		}, {
 			test: /\.(ttf|eot|svg)(\?[\s\S]+)?$/,
