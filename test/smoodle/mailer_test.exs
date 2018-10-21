@@ -41,7 +41,7 @@ defmodule Smoodle.MailerTest do
       subject: "nothing #{max_emails() + 1}"
     }
 
-    assert :error = deliver_with_rate_limit(email, email.to)
+    assert {:error, :rate_limit_exceeded} = deliver_with_rate_limit(email, email.to)
     refute_delivered_email(email)
 
     Smoodle.Mailer.reset_counters()

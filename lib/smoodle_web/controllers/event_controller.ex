@@ -27,8 +27,8 @@ defmodule SmoodleWeb.EventController do
                     Email.new_event_email(event) |> Mailer.deliver_with_rate_limit(event.email) do
                event
              else
+               {:error, :rate_limit_exceeded} -> Repo.rollback(:too_many_requests)
                {:error, error} -> Repo.rollback(error)
-               :error -> Repo.rollback(:too_many_requests)
              end
            end) do
       Logger.info("Created event: #{event}")

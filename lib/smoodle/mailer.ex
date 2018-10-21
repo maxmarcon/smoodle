@@ -41,7 +41,7 @@ defmodule Smoodle.Mailer do
 
     if counter > max_emails do
       Logger.info("Rate limit of #{max_emails} emails exceeded for key #{cache_key}")
-      :error
+      {:error, :rate_limit_exceeded}
     else
       {:ok, deliver_later(email)}
     end
