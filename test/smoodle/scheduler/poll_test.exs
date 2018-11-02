@@ -243,7 +243,7 @@ defmodule Smoodle.Scheduler.PollTest do
     test "the poll is invalid", %{poll: poll} do
       changeset = Poll.changeset(poll, Map.merge(@poll_attrs, %{date_ranks: "foo"}))
 
-      assert %{date_ranks: [{_, [type: {:array, :map}]}]} = traverse_errors(changeset, & &1)
+      assert %{date_ranks: [{_, [validation: :assoc, type: {:array, :map}]}]} = traverse_errors(changeset, & &1)
       refute changeset.valid?
     end
   end

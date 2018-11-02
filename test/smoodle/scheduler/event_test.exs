@@ -83,7 +83,8 @@ defmodule Smoodle.Scheduler.EventTest do
         Map.replace!(@valid_attrs, :desc, String.pad_trailing("Yeah!", 251, "123"))
       )
 
-    assert [desc: {_, [count: 250, validation: :length, max: 250]}] = changeset.errors
+    assert [desc: {_, [count: 250, validation: :length, kind: :max]}] = changeset.errors
+  end
   end
 
   test "changeset with invalid email" do
