@@ -85,7 +85,6 @@ defmodule Smoodle.Scheduler.EventTest do
 
     assert [desc: {_, [count: 250, validation: :length, kind: :max]}] = changeset.errors
   end
-  end
 
   test "changeset with invalid email" do
     changeset =
