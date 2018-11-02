@@ -20,7 +20,7 @@ defmodule Smoodle.Mixfile do
   def application do
     [
       mod: {Smoodle.Application, []},
-      extra_applications: [:logger, :runtime_tools, :dotenv, :bamboo],
+      extra_applications: [:logger, :runtime_tools, :dotenv, :bamboo, :phoenix_ecto],
       included_applications: [:expug, :parse_trans]
     ]
   end
@@ -36,22 +36,23 @@ defmodule Smoodle.Mixfile do
     [
       {:phoenix, "~> 1.3.0"},
       {:phoenix_pubsub, "~> 1.0"},
-      {:phoenix_ecto, "~> 3.2"},
-      {:mariaex, ">= 0.0.0"},
+      {:ecto_sql, "~> 3.0"},
       {:postgrex, "~> 0.11"},
       {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
+      {:plug_cowboy, "~> 1.0"},
       {:secure_random, "~> 0.5"},
       {:phoenix_expug, "~> 0.1.1"},
-      {:poison, "~> 3.1"},
+      {:phoenix_ecto, "~> 3.0"},
       {:dotenv, "~> 3.0.0"},
       {:bamboo, ">= 0.7.0"},
       {:bamboo_mailjet, "~> 0.0.1"},
       {:cachex, "~> 3.0"},
       {:distillery, "~> 2.0"},
-      {:mock, "~> 0.3.0", only: :test}
+      {:mock, "~> 0.3.0", only: :test},
+      {:jason, "~> 1.1"}
     ]
   end
 

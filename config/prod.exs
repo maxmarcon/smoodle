@@ -24,7 +24,6 @@ config :smoodle, SmoodleWeb.Endpoint,
 config :logger, level: :info
 
 config :smoodle, Smoodle.Repo,
-  adapter: Ecto.Adapters.Postgres,
   url: "${DATABASE_URL}",
   database: "",
   ssl: true,

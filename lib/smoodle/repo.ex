@@ -1,5 +1,7 @@
 defmodule Smoodle.Repo do
-  use Ecto.Repo, otp_app: :smoodle
+  use Ecto.Repo,
+  	otp_app: :smoodle,
+    adapter: Ecto.Adapters.Postgres
 
   @doc """
   Dynamically loads the repository url from the
