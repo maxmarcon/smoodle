@@ -63,7 +63,7 @@ defmodule Smoodle.Scheduler.EventTest do
         Map.replace!(@valid_attrs, :name, String.pad_trailing("Party", 51, "123"))
       )
 
-    assert [name: {_, [count: 50, validation: :length, max: 50]}] = changeset.errors
+    assert [name: {_, [count: 50, validation: :length, kind: :max]}] = changeset.errors
   end
 
   test "changeset with organizer too long" do
@@ -73,7 +73,7 @@ defmodule Smoodle.Scheduler.EventTest do
         Map.replace!(@valid_attrs, :organizer, String.pad_trailing("Trump", 51, "123"))
       )
 
-    assert [organizer: {_, [count: 50, validation: :length, max: 50]}] = changeset.errors
+    assert [organizer: {_, [count: 50, validation: :length, kind: :max]}] = changeset.errors
   end
 
   test "changeset with description too long" do
