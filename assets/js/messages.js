@@ -17,7 +17,7 @@ export default {
 				name_help: "Enter a name for your event",
 				desc: "What is going to happen?",
 				desc_help: "Describe the event to your guests",
-				dates: "Specify a custom time period or select one from the drop-down",
+				dates: "Specify the dates and optionally the weekdays for the event",
 				organizer: "Who are you?",
 				organizer_help: "Let your friends know who invitied them...",
 				organizer_email: "Please enter your email",
@@ -65,7 +65,7 @@ export default {
 			poll_deleted: "Your availabiliy has been deleted",
 			poll_delete_error: "An error has occurred, the availabiliy could not be deleted",
 			dates_placeholder: "Select a time period",
-			date_ranker_helper: "Select specific dates that are good {good} or bad {bad} for the event. This takes precedence over the preferences you expressed for the week days. {help}.",
+			date_ranker_helper: "Select dates and weekdays that are good {good}, bad {bad} or {indifferent} for the event.",
 			date_ranker_help_modal_title: "Adding and removing dates",
 			date_ranker_help_modal_content: "First choose whether you are adding dates that are good {good} or bad {bad}.\
 			Then add the dates, either as single dates or date ranges.\
@@ -189,7 +189,8 @@ export default {
 			server: "The server reported a {code} error",
 			unprocessable_entity: "Ouch! The data you entered contains some errors, or something is missing. Please double check.",
 			error: "Error",
-			confirmation_required: "Doesn't match..."
+			confirmation_required: "Doesn't match...",
+			enable_at_least_one_weekday: "Enable at least one weekday."
 		},
 		event_header: {
 			by: "by {organizer}",
@@ -220,7 +221,7 @@ export default {
 				name_help: "Gib deinem Event einen Namen.",
 				desc: "Was findet statt?",
 				desc_help: "Beschreibe dein Event für deine Gäste.",
-				dates: "Gib einem Zeitraum ein, entweder aus dem Kalender oder Drop-down.",
+				dates: "Wähle die Daten und eventuell die Wochentage für das Event aus",
 				organizer: "Wer bist du?",
 				organizer_help: "Lass deine Freunde wissen, wer sie einlädt...",
 				organizer_email: "Bitte gib deine Email ein.",
@@ -268,7 +269,7 @@ export default {
 			poll_deleted: "Deine Verfügbarkeit wurde gelöscht",
 			poll_delete_error: "Ein Fehler ist aufgetreten, deine Verfügbarkeit konnte nicht gelöscht werden.",
 			dates_placeholder: "Zeitraum auswählen",
-			date_ranker_helper: "Wähle Daten aus, die passend {good} oder unpassend {bad} sind für dieses Event. Das hat Vorrang vor deiner Ausnahmenswahl über die Wochentage. {help}.",
+			date_ranker_helper: "Wähle Daten und Wochentage aus, die passend {good}, unpassend {bad} oder gleichgültig {indifferent} sind für dieses Event.",
 			date_ranker_help_modal_title: "Daten hinzufügen oder entfernen",
 			date_ranker_help_modal_content: "Zuerst wähle aus, ob die Daten passend {good} oder unpassend {bad} sind für dieses Event.\
 			Dann füg die Daten hinzu, entweder einzeln oder als Zeitspanne.\
@@ -392,7 +393,8 @@ export default {
 			server: "Der Server hat mit einem {code} Fehler geantwortet",
 			unprocessable_entity: "Autsch! Die angegebenen Daten enthalten Fehler. Überprüfe bitte deine Angaben.",
 			error: "Fehler",
-			confirmation_required: "Stimmt nicht überein..."
+			confirmation_required: "Stimmt nicht überein...",
+			enable_at_least_one_weekday: "Ermögliche mindestens einen Wochentag."
 		},
 		event_header: {
 			by: "von {organizer}",
@@ -422,7 +424,7 @@ export default {
 				name_help: "Dai un nome al tuo evento.",
 				desc: "Di cosa si tratta?",
 				desc_help: "Descrivi l'evento per i tuoi ospiti.",
-				dates: "Scegli un periodo usando il calendario o il menù drop-down.",
+				dates: "Scegli le date e eventualmente i giorni della settimana per l'evento.",
 				organizer: "Chi sei?",
 				organizer_help: "Fai sapere ai tuoi amici chi li invita...",
 				organizer_email: "Immetti la tua email.",
@@ -470,7 +472,7 @@ export default {
 			poll_deleted: "La tua disponibilità è stata cancellata.",
 			poll_delete_error: "A causa di un errore la tua disponibilità non è stat cancellata.",
 			dates_placeholder: "Scegli un periodo di tempo",
-			date_ranker_helper: "Scegli le date che vanno bene {good} oppure non vanno bene {bad} per questo evento. Questa scelta ha precedenza sulle preferenze per i giorni della settimana. {help}.",
+			date_ranker_helper: "Scegli le date e i giorni della settimana che vanno bene {good}, non vanno bene {bad} o sono indifferenti {indifferent} per questo evento.",
 			date_ranker_help_modal_title: "Aggingi o rimuovi delle date",
 			date_ranker_help_modal_content: "Prima scegli se le date vanno bene {good} o non vanno bene {bad} per questo evento.\
 			Poi aggungile, come giorni singoli oppure come periodo.\
@@ -594,7 +596,8 @@ export default {
 			server: "Il server ha risposto con un codice d'errore {code}.",
 			unprocessable_entity: "Ohi! I dati che hai immessi hanno degli errori. Per favore dai un'occhiata.",
 			error: "Errore",
-			confirmation_required: "Non corrisponde..."
+			confirmation_required: "Non corrisponde...",
+			enable_at_least_one_weekday: "Attiva almeno un giorno della settimana."
 		},
 		event_header: {
 			by: "di {organizer}",

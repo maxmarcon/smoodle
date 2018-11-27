@@ -99,7 +99,7 @@ Vue.component('event-header', eventHeader);
 
 Vue.component('error-page', errorPage);
 
-const app = new Vue({
+new Vue({
 	i18n,
 	router,
 	render: h => h(rootVue)

@@ -52,6 +52,6 @@ msgid "Sincerely, your LetsMeet! bot"
 msgstr "Sincerely, your LetsMeet! Bot"
 
 #, elixir-format
-#: lib/smoodle_web/email.ex:5
+#: lib/smoodle_web/email.ex:10
 msgid "Your LetsMeet! Bot"
 msgstr ""

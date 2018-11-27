@@ -145,14 +145,6 @@ defmodule Smoodle.Scheduler do
     Repo.delete(poll)
   end
 
-  def empty_schedule do
-    %{
-      dates: [],
-      participants: [],
-      participants_count: 0
-    }
-  end
-
   def get_best_schedule(%Event{} = event, opts \\ []) do
     polls =
       Repo.all(Ecto.assoc(event, :polls))
@@ -162,16 +154,10 @@ defmodule Smoodle.Scheduler do
     is_owner = opts[:is_owner]
     limit = opts[:limit]
 
-    start_date =
-      case Date.compare(Date.utc_today(), event.time_window_from) do
-        :gt -> Date.utc_today()
-        _ -> event.time_window_from
-      end
-
     %{
       dates:
         Enum.map(
-          generate_date_ranking(start_date, event.time_window_to, polls, limit),
+          date_ranking(date_domain(event), polls, limit),
           fn date_entry ->
             if is_owner do
               date_entry
@@ -190,9 +176,44 @@ defmodule Smoodle.Scheduler do
     }
   end
 
-  defp generate_date_ranking(start_date, end_date, polls, limit \\ nil) do
-    if Date.compare(start_date, end_date) == :lt && Enum.any?(polls) do
-      Date.range(start_date, end_date)
+  defp date_domain(%Event{
+         preferences: preferences,
+         time_window_from: time_window_from,
+         time_window_to: time_window_to
+       }) do
+    start_date =
+      case Date.compare(Date.utc_today(), time_window_from) do
+        :gt -> Date.utc_today()
+        _ -> time_window_from
+      end
+
+    end_date = time_window_to
+
+    # when there are no preferences or weekdays is empty, all days are good
+    weekdays_permitted =
+      if is_nil(preferences) || Enum.empty?(preferences.weekdays) do
+        Map.new(1..7, &{&1, true})
+      else
+        Map.new(preferences.weekdays, fn %{day: day, permitted: permitted} ->
+          {day + 1, permitted}
+        end)
+      end
+
+    case Date.compare(start_date, end_date) do
+      :lt ->
+        Enum.filter(
+          Date.range(start_date, end_date),
+          &(weekdays_permitted[Date.day_of_week(&1)] || false)
+        )
+
+      _ ->
+        []
+    end
+  end
+
+  defp date_ranking(date_domain, polls, limit \\ nil) do
+    if Enum.any?(polls) do
+      date_domain
       |> Enum.map(fn date -> Enum.reduce(polls, initial_date_rank(date), &accumulate_poll/2) end)
       |> Enum.sort(&compare_date_ranks/2)
       |> shorten_ranking(limit)
@@ -299,10 +320,9 @@ defmodule Smoodle.Scheduler do
           %{}
 
         _ ->
-          Enum.map(poll.preferences.weekday_ranks, fn %{day: day, rank: rank} ->
+          Map.new(poll.preferences.weekday_ranks, fn %{day: day, rank: rank} ->
             {day + 1, rank}
           end)
-          |> Map.new()
       end
     )
     |> Map.take([:date_ranks, :weekday_ranks, :participant])

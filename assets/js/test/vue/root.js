@@ -3,7 +3,8 @@ import BootstrapVue from 'bootstrap-vue'
 import VueRouter from 'vue-router'
 import {
 	mount,
-	createLocalVue
+	createLocalVue,
+	RouterLinkStub
 } from '@vue/test-utils'
 
 const localVue = createLocalVue();
@@ -23,23 +24,30 @@ const router = new VueRouter({
 
 describe('rootVue', () => {
 
-	const wrapper = mount(rootVue, {
-		mocks: {
-			$t: () => "",
-			$i18n: {
-				locale: 'default'
-			}
-		},
-		localVue,
-		router
-	});
+	let wrapper;
+
+	beforeEach(() => {
+		wrapper = mount(rootVue, {
+			mocks: {
+				$t: () => "",
+				$i18n: {
+					locale: 'default'
+				}
+			},
+			stubs: {
+				RouterLink: RouterLinkStub
+			},
+			localVue,
+			router
+		});
+	})
 
 	it('renders a link to the home route', () => {
-		expect(wrapper.find('a[href="/home"]').exists()).toBeTruthy()
+		expect(wrapper.findAll(RouterLinkStub).at(0).props().to).toEqual({name: 'home'})
 	});
 
 	it('renders a link to the new_event route', () => {
-		expect(wrapper.find('a[href="/events/new"]').exists()).toBeTruthy()
+		expect(wrapper.findAll(RouterLinkStub).at(1).props().to).toEqual({name: 'new_event'})
 	});
 
 	it('can change the locale to en', () => {

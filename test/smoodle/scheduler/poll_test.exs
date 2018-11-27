@@ -150,7 +150,7 @@ defmodule Smoodle.Scheduler.PollTest do
 
       refute changeset.valid?
 
-      assert %{preferences: %{weekday_ranks: [{_, [validation: :weekday_ranked_twice]}]}} =
+      assert %{preferences: %{weekday_ranks: [{_, [validation: :weekday_listed_twice]}]}} =
                traverse_errors(changeset, & &1)
     end
 
@@ -243,7 +243,9 @@ defmodule Smoodle.Scheduler.PollTest do
     test "the poll is invalid", %{poll: poll} do
       changeset = Poll.changeset(poll, Map.merge(@poll_attrs, %{date_ranks: "foo"}))
 
-      assert %{date_ranks: [{_, [validation: :assoc, type: {:array, :map}]}]} = traverse_errors(changeset, & &1)
+      assert %{date_ranks: [{_, [validation: :assoc, type: {:array, :map}]}]} =
+               traverse_errors(changeset, & &1)
+
       refute changeset.valid?
     end
   end

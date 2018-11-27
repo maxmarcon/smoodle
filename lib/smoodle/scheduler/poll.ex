@@ -109,25 +109,6 @@ defmodule Smoodle.Scheduler.Poll do
     preferences
     |> cast(attrs, [])
     |> cast_embed(:weekday_ranks)
-    |> validate_no_weekday_duplicates
-  end
-
-  defp validate_no_weekday_duplicates(changeset) do
-    case fetch_field(changeset, :weekday_ranks) do
-      {_, changes} ->
-        if Enum.count(Enum.uniq_by(changes, fn %{day: day} -> day end)) != Enum.count(changes) do
-          add_error(
-            changeset,
-            :weekday_ranks,
-            dgettext("errors", "you can only rank a weekday once"),
-            validation: :weekday_ranked_twice
-          )
-        else
-          changeset
-        end
-
-      _ ->
-        changeset
-    end
+    |> validate_no_weekday_duplicates(:weekday_ranks)
   end
 end

@@ -8,6 +8,7 @@ defmodule Smoodle.Scheduler.Event do
   alias Smoodle.Scheduler.Event
   alias Smoodle.Scheduler.Poll
   import Smoodle.Scheduler.Utils
+  alias Smoodle.Scheduler.WeekdayConfig
 
   defimpl String.Chars, for: Smoodle.Scheduler.Event do
     def to_string(event) do
@@ -28,9 +29,15 @@ defmodule Smoodle.Scheduler.Event do
     field(:scheduled_from, :utc_datetime)
     field(:scheduled_to, :utc_datetime)
     field(:desc, :string)
+    field(:organizer_message, :string)
     field(:email, :string)
     field(:state, :string, default: "OPEN")
+
     has_many(:polls, Poll)
+
+    embeds_one(:preferences, Preferences, primary_key: false, on_replace: :delete) do
+      embeds_many(:weekdays, WeekdayConfig)
+    end
 
     timestamps(type: :utc_datetime, usec: false)
   end
@@ -42,7 +49,6 @@ defmodule Smoodle.Scheduler.Event do
   @doc false
   def changeset(%Event{} = event, attrs) do
     event
-    |> Repo.preload(:polls)
     |> cast(attrs, [
       :name,
       :organizer,
@@ -51,6 +57,7 @@ defmodule Smoodle.Scheduler.Event do
       :scheduled_from,
       :scheduled_to,
       :desc,
+      :organizer_message,
       :email,
       :state
     ])
@@ -58,6 +65,7 @@ defmodule Smoodle.Scheduler.Event do
     |> validate_length(:name, max: 50)
     |> validate_length(:organizer, max: 50)
     |> validate_length(:desc, max: 250)
+    |> validate_length(:organizer_message, max: 250)
     |> validate_format(:email, ~r/.+@.+\..+/)
     |> validate_length(:email, max: 100)
     |> validate_email_confirmation
@@ -68,13 +76,25 @@ defmodule Smoodle.Scheduler.Event do
     |> validate_is_the_future([:time_window_from, :time_window_to], Date)
     |> validate_window_not_too_large([:time_window_from, :time_window_to], 365, :time_window)
     |> trim_text_changes([:name, :organizer, :desc])
-    |> validate_consistency
     |> validate_inclusion(:state, @valid_states)
+    |> clear_or_validate_scheduled
+    |> clear_organizer_message
+    |> cast_embed(:preferences, with: &preferences_changeset/2)
   end
 
   def changeset_insert(attrs) do
     changeset(%Event{}, attrs)
     |> change(%{secret: SecureRandom.urlsafe_base64(@secret_len)})
+  end
+
+  defp clear_organizer_message(changeset) do
+    {_, state} = fetch_field(changeset, :state)
+
+    if state == "OPEN" do
+      force_change(changeset, :organizer_message, nil)
+    else
+      changeset
+    end
   end
 
   defp validate_email_confirmation(changeset) do
@@ -85,18 +105,17 @@ defmodule Smoodle.Scheduler.Event do
     end
   end
 
-  defp validate_consistency(changeset) do
-    if (get_field(changeset, :scheduled_from) && get_field(changeset, :state) != "SCHEDULED") ||
-         (get_field(changeset, :state) == "SCHEDULED" &&
-            !(get_field(changeset, :scheduled_from) && get_field(changeset, :scheduled_from))) do
-      add_error(
-        changeset,
-        :state,
-        dgettext("errors", "inconsistent event state"),
-        validation: :inconsistent_event_state
-      )
+  defp clear_or_validate_scheduled(changeset) do
+    {_, state} = fetch_field(changeset, :state)
+
+    if state != "SCHEDULED" do
+      changeset
+      |> force_change(:scheduled_from, nil)
+      |> force_change(:scheduled_to, nil)
     else
       changeset
+      |> validate_required(:scheduled_from)
+      |> validate_required(:scheduled_to)
     end
   end
 
@@ -131,6 +150,33 @@ defmodule Smoodle.Scheduler.Event do
       )
     else
       changeset
+    end
+  end
+
+  defp preferences_changeset(preferences, attrs) do
+    preferences
+    |> cast(attrs, [])
+    |> cast_embed(:weekdays)
+    |> validate_no_weekday_duplicates
+    |> validate_one_weekday_enabled
+  end
+
+  defp validate_one_weekday_enabled(changeset) do
+    case fetch_field(changeset, :weekdays) do
+      {_, changes} ->
+        unless Enum.any?(changes, fn %{permitted: permitted} -> permitted end) do
+          add_error(
+            changeset,
+            :weekdays,
+            dgettext("errors", "enable at least one weekday."),
+            validation: :no_weekdays_enabled
+          )
+        else
+          changeset
+        end
+
+      _ ->
+        changeset
     end
   end
 

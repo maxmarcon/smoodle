@@ -106,4 +106,34 @@ defmodule Smoodle.Scheduler.Utils do
       changeset
     end
   end
+
+  @doc """
+  iex> cs = Ecto.Changeset.change({%{weekdays: [%{day: 1}]}, %{weekdays: List}}, %{weekdays: [%{day: 0}, %{day: 1}]})
+  iex> cs = Smoodle.Scheduler.Utils.validate_no_weekday_duplicates(cs)
+  iex> cs.errors
+  []
+
+  iex> cs = Ecto.Changeset.change({%{weekdays: [%{day: 1}]}, %{weekdays: List}}, %{weekdays: [%{day: 0}, %{day: 0}]})
+  iex> cs = Smoodle.Scheduler.Utils.validate_no_weekday_duplicates(cs)
+  iex> cs.errors
+  [weekdays: {"you can only list a weekday once", [validation: :weekday_listed_twice]}]
+  """
+  def validate_no_weekday_duplicates(changeset, key \\ :weekdays) do
+    case fetch_field(changeset, key) do
+      {_, changes} ->
+        if Enum.count(Enum.uniq_by(changes, fn %{day: day} -> day end)) != Enum.count(changes) do
+          add_error(
+            changeset,
+            key,
+            dgettext("errors", "you can only list a weekday once"),
+            validation: :weekday_listed_twice
+          )
+        else
+          changeset
+        end
+
+      _ ->
+        changeset
+    end
+  end
 end

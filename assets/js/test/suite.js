@@ -8,4 +8,3 @@ import ranker from './vue/ranker.js'
 import pollEditor from './vue/pollEditor.js'
 import eventEditor from './vue/eventEditor.js'
 import eventViewer from './vue/eventViewer.js'
-

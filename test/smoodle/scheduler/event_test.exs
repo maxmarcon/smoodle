@@ -3,6 +3,8 @@ defmodule Smoodle.Scheduler.EventTest do
 
   alias Smoodle.Scheduler.Event
 
+  @organizer_message "Glad everybody can make it"
+
   @valid_attrs %{
     name: "Party",
     desc: "Yeah!",
@@ -11,6 +13,19 @@ defmodule Smoodle.Scheduler.EventTest do
     time_window_to: "2118-03-20",
     scheduled_from: "2118-02-05 19:00:00",
     scheduled_to: "2118-02-05 23:00:00",
+    organizer_message: @organizer_message,
+    preferences: %{
+      weekdays: [
+        %{
+          day: 5,
+          permitted: true
+        },
+        %{
+          day: 6,
+          permitted: true
+        }
+      ]
+    },
     state: "SCHEDULED",
     email: "bot@fake.com",
     email_confirmation: "bot@fake.com"
@@ -25,6 +40,19 @@ defmodule Smoodle.Scheduler.EventTest do
     scheduled_from: "1118-02-05 19:00:00",
     scheduled_to: "1118-02-05 23:00:00",
     state: "SCHEDULED",
+    organizer_message: @organizer_message,
+    preferences: %{
+      weekdays: [
+        %{
+          day: 5,
+          permitted: true
+        },
+        %{
+          day: 6,
+          permitted: true
+        }
+      ]
+    },
     email: "bot@fake.com",
     email_confirmation: "bot@fake.com"
   }
@@ -86,6 +114,37 @@ defmodule Smoodle.Scheduler.EventTest do
     assert [desc: {_, [count: 250, validation: :length, kind: :max]}] = changeset.errors
   end
 
+  test "changeset with organizer_message too long" do
+    changeset =
+      Event.changeset(
+        %Event{},
+        Map.put(@valid_attrs, :organizer_message, String.pad_trailing("Yeah!", 251, "123"))
+      )
+
+    assert [organizer_message: {_, [count: 250, validation: :length, kind: :max]}] =
+             changeset.errors
+  end
+
+  test "organizer_message is cleared if state is open" do
+    changeset =
+      Event.changeset(
+        %Event{},
+        Map.drop(Map.put(@valid_attrs, :state, "OPEN"), [:scheduled_from, :scheduled_to])
+      )
+
+    assert {:ok, nil} = Ecto.Changeset.fetch_change(changeset, :organizer_message)
+  end
+
+  test "organizer_message is not cleared if state is not open" do
+    changeset =
+      Event.changeset(
+        %Event{},
+        @valid_attrs
+      )
+
+    assert {:ok, @organizer_message} = Ecto.Changeset.fetch_change(changeset, :organizer_message)
+  end
+
   test "changeset with invalid email" do
     changeset =
       Event.changeset(
@@ -134,9 +193,23 @@ defmodule Smoodle.Scheduler.EventTest do
     assert [state: {_, [validation: :inclusion]}] = changeset.errors
   end
 
-  test "changeset with inconsitent state" do
-    changeset = Event.changeset(%Event{}, Map.put(@valid_attrs, :state, "OPEN"))
-    assert [state: {_, [validation: :inconsistent_event_state]}] = changeset.errors
+  test "scheduled fields cleared if state is not scheduled" do
+    changeset = Event.changeset(%Event{}, %{@valid_attrs | state: "CANCELED"})
+    assert changeset.valid?
+    assert is_nil(changeset.changes.scheduled_from)
+    assert is_nil(changeset.changes.scheduled_to)
+  end
+
+  test "scheduled fields required if state is scheduled" do
+    changeset =
+      Event.changeset(%Event{}, %{@valid_attrs | scheduled_from: nil, scheduled_to: nil})
+
+    assert Enum.any?(
+             changeset.errors,
+             &match?({:scheduled_from, {_, [validation: :required]}}, &1)
+           )
+
+    assert Enum.any?(changeset.errors, &match?({:scheduled_to, {_, [validation: :required]}}, &1))
   end
 
   test "changeset with valid state" do
@@ -158,13 +231,16 @@ defmodule Smoodle.Scheduler.EventTest do
   end
 
   test "validate both scheduled ends must be defined" do
-    changeset = Event.changeset(%Event{}, Map.delete(@valid_attrs, :scheduled_to))
-    assert [scheduled: {_, [validation: :only_one_end_defined]}] = changeset.errors
+    changeset = Event.changeset(%Event{}, %{@valid_attrs | scheduled_to: nil})
+
+    assert Enum.any?(
+             changeset.errors,
+             &match?({:scheduled, {_, [validation: :only_one_end_defined]}}, &1)
+           )
   end
 
   test "validate both time window ends must be consistent" do
-    changeset =
-      Event.changeset(%Event{}, Map.replace!(@valid_attrs, :time_window_from, "2118-03-21"))
+    changeset = Event.changeset(%Event{}, %{@valid_attrs | time_window_from: "2118-03-21"})
 
     assert [time_window: {_, [validation: :inconsistent_interval]}] = changeset.errors
   end
@@ -176,16 +252,39 @@ defmodule Smoodle.Scheduler.EventTest do
     assert [scheduled: {_, [validation: :inconsistent_interval]}] = changeset.errors
   end
 
-  test "validate setting a scheduling for the event set the state to \"SCHEDULED\"" do
-    changeset = Event.changeset(%Event{}, @valid_attrs)
-    assert get_change(changeset, :state) == "SCHEDULED"
-  end
-
   test "validate time window can't be too large" do
     changeset =
       Event.changeset(%Event{}, Map.replace!(@valid_attrs, :time_window_to, "2119-01-11"))
 
     assert [time_window: {_, [validation: :time_interval_too_large]}] = changeset.errors
+  end
+
+  test "validate weekdays" do
+    changeset = Event.changeset(%Event{}, %{@valid_attrs | preferences: %{weekdays: [%{day: 0}]}})
+    weekday_changeset = hd(changeset.changes.preferences.changes.weekdays)
+    assert [permitted: {_, [validation: :required]}] = weekday_changeset.errors
+  end
+
+  test "validate weekday duplicates" do
+    changeset =
+      Event.changeset(%Event{}, %{
+        @valid_attrs
+        | preferences: %{weekdays: [%{day: 0, permitted: true}, %{day: 0, permitted: true}]}
+      })
+
+    assert [weekdays: {_, [validation: :weekday_listed_twice]}] =
+             changeset.changes.preferences.errors
+  end
+
+  test "validate at least one weekday enabled" do
+    changeset =
+      Event.changeset(%Event{}, %{
+        @valid_attrs
+        | preferences: %{weekdays: for(d <- 0..6, do: %{day: d, permitted: false})}
+      })
+
+    assert [weekdays: {_, [validation: :no_weekdays_enabled]}] =
+             changeset.changes.preferences.errors
   end
 
   test "validate events cannot be in the past" do

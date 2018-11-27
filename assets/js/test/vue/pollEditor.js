@@ -2,7 +2,6 @@ import pollEditor from '../../vue/pollEditor.vue'
 import BootstrapVue from 'bootstrap-vue'
 import {
 	mount,
-	shallowMount,
 	createLocalVue
 } from '@vue/test-utils'
 
@@ -11,9 +10,9 @@ localVue.use(BootstrapVue);
 
 const EVENT_ID = '73b422e0-a1a1-4c42-9c91-833a82e76acd'
 const EVENT_DATA = {
-	"updated_at": "2018-09-04T18:47:21.000000Z",
-	"time_window_to": "2018-10-02",
-	"time_window_from": "2018-09-02",
+	"updated_at": "2118-09-04T18:47:21.000000Z",
+	"time_window_to": "2118-10-02",
+	"time_window_from": "2118-09-02",
 	"state": "OPEN",
 	"scheduled_to": null,
 	"scheduled_from": null,
@@ -21,13 +20,19 @@ const EVENT_DATA = {
 	"name": "Party",
 	"inserted_at": "2018-09-02T19:11:19.000000Z",
 	"id": EVENT_ID,
-	"desc": "By the pool"
+	"desc": "By the pool",
+	"preferences": {
+		"weekdays": [{
+			"day": 0,
+			"permitted": false
+		}]
+	}
 }
 
 const CANCELED_EVENT_DATA = {
 	"updated_at": "2018-09-04T18:47:21.000000Z",
-	"time_window_to": "2018-10-02",
-	"time_window_from": "2018-09-02",
+	"time_window_to": "2118-10-02",
+	"time_window_from": "2118-09-02",
 	"state": "CANCELED",
 	"scheduled_to": null,
 	"scheduled_from": null,
@@ -59,12 +64,12 @@ const POLL_DATA = {
 	"event_id": EVENT_ID,
 	"event": EVENT_DATA,
 	"date_ranks": [{
-		date_from: "2018-09-12",
-		date_to: "2018-09-12",
+		date_from: "2118-09-12",
+		date_to: "2118-09-12",
 		rank: 1
 	}, {
-		date_from: "2018-10-12",
-		date_to: "2018-10-14",
+		date_from: "2118-09-28",
+		date_to: "2118-10-01",
 		rank: -1
 	}]
 }
@@ -84,7 +89,7 @@ const CANCELED_EVENT_POLL_DATA = {
 
 
 const routerSpy = jasmine.createSpyObj("router", ["push"])
-const dayClickedSpy = jasmine.createSpy("dayClicked")
+const newDateSpy = jasmine.createSpy("newDate")
 
 function mountPollEditor(restRequest, propsData) {
 
@@ -95,7 +100,7 @@ function mountPollEditor(restRequest, propsData) {
 			}
 		}],
 		methods: {
-			dayClicked: dayClickedSpy
+			newDate: newDateSpy
 		},
 		mocks: {
 			$t: k => k,
@@ -241,20 +246,11 @@ describe('pollEditor', () => {
 				})
 			})
 
-			describe('when adding a new date to the date-picker', () => {
+			describe('when a date is selected in the date-picker', () => {
 
-				it('increases the size of the attributes', () => {
-					let oldlen = wrapper.vm.datePickerAttributes.length
+				it('newDate is called', () => {
 					wrapper.find('v-date-picker').trigger('input')
-					expect(wrapper.vm.datePickerAttributes.length).toBe(oldlen + 1)
-				})
-			})
-
-			describe('when clicking a date in the date-picker', () => {
-
-				it('dayClicked is called', () => {
-					wrapper.find('v-date-picker').trigger('dayclick')
-					expect(dayClickedSpy).toHaveBeenCalled()
+					expect(newDateSpy).toHaveBeenCalled()
 				})
 			})
 
@@ -405,26 +401,45 @@ describe('pollEditor', () => {
 
 			it('computes the poll weeday ranks', () => {
 				expect(wrapper.vm.pollWeekdayRanks
-						.filter(obj => obj.rank != 0).map(obj => ({
-							day: obj.day,
-							rank: obj.rank
+						.filter(obj => obj.value != 0).map(({
+							day,
+							value
+						}) => ({
+							day: day,
+							rank: value
 						})).sort((o1, o2) => o1.day < o2.day))
 					.toEqual(POLL_DATA.preferences.weekday_ranks.sort((o1, o2) => o1.day < o2.day))
+			})
+
+			it('disables some poll weeday ranks', () => {
+				let disabledWeekdays = EVENT_DATA.preferences.weekdays
+					.filter(({
+						permitted
+					}) => !permitted)
+
+				expect(disabledWeekdays.length).toBe(1)
+
+				disabledWeekdays.forEach(({
+					day: event_day
+				}) => {
+					let wr = wrapper.vm.pollWeekdayRanks.find(({
+						day
+					}) => day == event_day)
+					expect(wr).toBeDefined()
+					expect(wr.disabled).toBeTruthy()
+				})
 			})
 
 			it('renders the date picker', () => {
 				expect(wrapper.find('v-date-picker').exists()).toBeTruthy();
 			})
 
-			it('computed the date picker attributes', () => {
-				expect(wrapper.vm.datePickerAttributes
-					.map(attr => ({
-						rank: attr.customData.rank,
-						date_from: attr.dates.start,
-						date_to: attr.dates.end
-					}))
-					.sort((o1, o2) => o1.date_from < o2.date_to)
-				).toEqual(POLL_DATA.date_ranks.sort((o1, o2) => o1.date_from < o2.date_to))
+			it('computes datePickerAttributes', () => {
+				expect(wrapper.vm.datePickerAttributes.length).toBeGreaterThan(0)
+			})
+
+			it('computes disabledDates', () => {
+				expect(wrapper.vm.disabledDates.length).toBeGreaterThan(0)
 			})
 
 			it('renders one alert', () => {

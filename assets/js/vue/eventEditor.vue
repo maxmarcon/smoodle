@@ -155,34 +155,29 @@
 					)
 						b-card
 							.form-group.row
-								label.col-md-4.col-form-label(for="eventTimeWindow") {{ $t('event_editor.event.dates') }}
-								.col-md-4.mb-3
+								label.col.text-center.col-form-label(for="eventTimeWindow") {{ $t('event_editor.event.dates') }}
+							.form-group.row.justify-content-center.justify-content-md-between.justify-content-lg-center
+								.col-md-6.mb-4.text-center
 									v-date-picker#eventTimeWindow(
 										mode="range"
-										:is-linked="true"
 										v-model="eventTimeWindow"
 										nav-visibility="hidden"
 										:min-date="today"
-										:input-props="{readonly: true, placeholder: $t('event_editor.dates_placeholder'), class: [ 'form-control', inputFieldClass('eventTimeWindow') ]}"
+										:is-inline="true"
 										:is-double-paned="true"
+										:is-linked="true"
 										:show-caps="true"
-										popover-visibility="focus"
+										:attributes="datePickerAttributes"
+										popover-visibility="hidden"
+										:drag-attribute="dragAndSelectionAttribute"
+										:select-attribute="dragAndSelectionAttribute"
 										@input="datesSelected"
-										popover-direction="top"
 									)
-									//- invalid feedback won't work here because v-date-picker is not a form-control
 									.small.text-danger(name="event-time-window-error") {{ eventTimeWindowError }}
 
-								.col-md-auto
-									b-dropdown(
-										:text="$t('event_editor.dates_quick_selection')"
-										:disabled="eventCreated"
-										:dropup="true"
-									)
-										b-dropdown-item(v-if="showThisWeekButton" @click="pickThisWeek") {{ $t('event_editor.this_week') }}
-										b-dropdown-item(@click="pickNextWeek(); localValidation();") {{ $t('event_editor.next_week') }}
-										b-dropdown-item(@click="pickNextMonths(1); localValidation();") {{ $tc('event_editor.within_months') }}
-										b-dropdown-item(@click="pickNextMonths(3); localValidation();") {{ $tc('event_editor.within_months', 3, {count: 3}) }}
+								.col-11.col-md-3.offset-md-1
+									ranker#eventWeekdays(:elements="eventWeekdays" boolean=true @change="localValidation")
+									.small.text-danger(name="event-weekdays-error") {{ eventWeekdaysError }}
 
 			.card-footer
 				.row.justify-content-center(v-if="!eventCreated")
@@ -217,7 +212,8 @@ import {
 	scrollToTopMixin,
 	restMixin,
 	eventDataMixin,
-	whatsAppHelpersMixin
+	whatsAppHelpersMixin,
+	colorCodes
 } from '../globals'
 
 const today = new Date();
@@ -268,6 +264,11 @@ export default {
 					required: true,
 					errorField: 'eventTimeWindowError',
 					errorKeys: ['time_window_to', 'time_window_from', 'time_window']
+				},
+				eventWeekdays: {
+					errorField: 'eventWeekdaysError',
+					errorKeys: 'preferences.weekdays',
+					customValidation: true
 				}
 			}
 		},
@@ -283,31 +284,41 @@ export default {
 		eventDescError: null,
 		eventTimeWindow: null,
 		eventTimeWindowError: null,
+		eventWeekdaysError: null,
 		today,
 		loadedSuccessfully: false,
 		loaded: false,
 		showThisWeekButton: (dateFns.getDay(today) > 0 && dateFns.getDay(today) < 4), // betewn Mon and Wed
 		eventCreated: false,
 		createdEventId: null,
-		createdEventSecret: null
+		createdEventSecret: null,
+		dragAndSelectionAttribute: {
+			highlight: {
+				backgroundColor: colorCodes.green
+			},
+			popover: {
+				visibility: 'hidden'
+			},
+			order: 0
+		},
 	}),
 	created() {
 		if (this.eventId) {
 			if (this.secret) {
-				let self = this;
+				let self = this
 				this.restRequest(['events', this.eventId].join('/'), {
 					params: {
 						secret: this.secret
 					}
 				}).then(function(result) {
-					self.assignEventData(result.data.data);
-					self.applyDates(self.eventTimeWindowFrom, self.eventTimeWindowTo, true);
-					self.loadedSuccessfully = true;
+					self.assignEventData(result.data.data)
+					self.applyDates(self.eventTimeWindowFrom, self.eventTimeWindowTo)
+					self.loadedSuccessfully = true
 				}).finally(function() {
-					self.loaded = true;
+					self.loaded = true
 				})
 			} else {
-				this.loaded = true;
+				this.loaded = true
 			}
 		}
 	},
@@ -317,49 +328,48 @@ export default {
 		},
 		computedSecret() {
 			return this.secret || this.createdEventSecret
-		}
+		},
+		datePickerAttributes() {
+			return [{
+				dates: {
+					start: this.eventTimeWindowFrom,
+					end: this.eventTimeWindowTo,
+					weekdays: this.eventWeekdays.filter(({
+						value
+					}) => !value).map(({
+						day
+					}) => ((day + 1) % 7) + 1) // from 0=Mon...6=Sun to v-calendar's 1=Sun... 7=Sat,
+				},
+				highlight: {
+					animated: true,
+					backgroundColor: colorCodes.red,
+					opacity: 1
+				},
+				order: 1
+			}]
+		},
 	},
 	methods: {
+		customValidate(fieldName, fieldVal) {
+			if (fieldName == 'eventWeekdays') {
+				if (fieldVal.every(({value}) => !value)) {
+					return this.$i18n.t('errors.enable_at_least_one_weekday')
+				}
+			}
+		},
 		datesSelected() {
 			this.eventTimeWindowFrom = this.eventTimeWindow.start;
 			this.eventTimeWindowTo = this.eventTimeWindow.end;
 			this.localValidation();
 		},
 		clipboard() {
-			this.$refs.copiedToClipboardModal.show();
+			this.$refs.copiedToClipboardModal.show()
 		},
-		applyDates(from, to, skipDatesSelected = false) {
+		applyDates(from, to) {
 			this.eventTimeWindow = {
 				start: from,
 				end: to
-			};
-			if (!skipDatesSelected) {
-				this.datesSelected();
 			}
-		},
-		pickThisWeek() {
-			this.applyDates(
-				dateFns.max(today, dateFns.startOfWeek(today, {
-					weekStartsOn: 1
-				})),
-				dateFns.endOfWeek(today, {
-					weekStartsOn: 1
-				})
-			);
-		},
-		pickNextWeek() {
-			let today_next_week = dateFns.addWeeks(today, 1);
-			this.applyDates(
-				dateFns.startOfWeek(today_next_week, {
-					weekStartsOn: 1
-				}),
-				dateFns.endOfWeek(today_next_week, {
-					weekStartsOn: 1
-				})
-			);
-		},
-		pickNextMonths(months) {
-			this.applyDates(today, dateFns.addMonths(today, months));
 		},
 		saveEvent() {
 			let self = this;

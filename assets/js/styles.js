@@ -8,5 +8,5 @@ import '@fortawesome/fontawesome-free/scss/brands.scss';
 import '@fortawesome/fontawesome-free/scss/fontawesome.scss';
 import 'v-calendar/lib/v-calendar.min.css';
 import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css';
-import 'vue-loading-overlay/dist/vue-loading.min.css';
+import 'vue-loading-overlay/dist/vue-loading.css';
 import 'flag-icon-css/sass/flag-icon.scss';

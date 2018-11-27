@@ -2,21 +2,6 @@ defmodule Smoodle.Scheduler.DateRankTest do
   use Smoodle.DataCase
   alias Smoodle.Scheduler.DateRank
 
-  # @event_attrs %{
-  # 		name: "Party",
-  # 		desc: "Yeah!",
-  # 		organizer: "Donald Trump",
-  # 		time_window_from: "2118-01-10",
-  # 		time_window_to: "2118-03-20",
-  # 		scheduled_from: "2118-02-05 19:00:00",
-  # 		scheduled_to: "2118-02-05 23:00:00"
-  # 	}
-  #
-  # 	@poll_attrs %{
-  # 		participant: "Betty Davies",
-  # 		event_id: Ecto.UUID.generate()
-  # 	}
-
   @valid_attrs %{
     date_from: "2017-02-01",
     date_to: "2017-03-22",

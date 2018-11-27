@@ -92,9 +92,20 @@ export const accordionGroupsMixin = {
 						return;
 					}
 
-					if (fieldMapObj.required) {
-						self[errorField] = (self[field] ? null : self.$i18n.t('errors.required_field'));
+					let errorMsgs = []
+					if (fieldMapObj.required && !self[field]) {
+						errorMsgs.push(self.$i18n.t('errors.required_field'))
 					}
+					if (fieldMapObj.customValidation) {
+						let msg = self.customValidate(field, self[field])
+						if (msg) {
+							errorMsgs.push(msg)
+						}
+					}
+					if (errorMsgs.length) {
+						self[errorField] = errorMsgs.join(', ')
+					}
+
 					if (fieldMapObj.confirmation) {
 						let confirmation_field = `${field}_confirmation`;
 						let confirmation_error_field = `${errorField}_confirmation`;
@@ -252,35 +263,70 @@ export const restMixin = {
 }
 
 export const eventDataMixin = {
-	data: () => ({
-		eventName: null,
-		eventOrganizer: null,
-		eventOrganizerEmail: null,
-		eventOrganizerEmail_confirmation: null,
-		eventDesc: null,
-		eventState: null,
-		eventShareLink: null,
-		eventTimeWindowFrom: null,
-		eventTimeWindowTo: null,
-		eventScheduledFrom: null,
-		eventScheduledTo: null,
-		eventInsertedAt: null,
-		eventModifiedAt: null,
-	}),
+	data() {
+		return {
+			eventName: null,
+			eventOrganizer: null,
+			eventOrganizerEmail: null,
+			eventOrganizerEmail_confirmation: null,
+			eventDesc: null,
+			eventState: null,
+			eventShareLink: null,
+			eventTimeWindowFrom: null,
+			eventTimeWindowTo: null,
+			eventScheduledFrom: null,
+			eventScheduledTo: null,
+			eventInsertedAt: null,
+			eventModifiedAt: null,
+			eventWeekdays: null,
+			eventWeekdays: this.initialWeekdays()
+		}
+	},
 	methods: {
-		assignEventData(eventData) {
-			this.eventName = eventData.name;
-			this.eventOrganizer = eventData.organizer;
-			this.eventOrganizerEmail = eventData.email;
-			this.eventDesc = eventData.desc;
-			this.eventTimeWindowFrom = eventData.time_window_from && dateFns.parse(eventData.time_window_from);
-			this.eventTimeWindowTo = eventData.time_window_to && dateFns.parse(eventData.time_window_to);
-			this.eventState = eventData.state;
-			this.eventScheduledFrom = eventData.scheduled_from && dateFns.parse(eventData.scheduled_from);
-			this.eventScheduledTo = eventData.scheduled_to && dateFns.parse(eventData.scheduled_to);
-			this.eventShareLink = eventData.share_link;
-			this.eventInsertedAt = eventData.inserted_at && dateFns.parse(eventData.inserted_at);
-			this.eventModifiedAt = eventData.updated_at && dateFns.parse(eventData.updated_at);
+		assignEventData({
+			name,
+			organizer,
+			email,
+			desc,
+			time_window_from,
+			time_window_to,
+			state,
+			scheduled_from,
+			scheduled_to,
+			share_link,
+			inserted_at,
+			updated_at,
+			preferences
+		}) {
+			this.eventName = name;
+			this.eventOrganizer = organizer;
+			this.eventOrganizerEmail = email;
+			this.eventDesc = desc;
+			this.eventTimeWindowFrom = time_window_from && dateFns.parse(time_window_from);
+			this.eventTimeWindowTo = time_window_to && dateFns.parse(time_window_to);
+			this.eventState = state;
+			this.eventScheduledFrom = scheduled_from && dateFns.parse(scheduled_from);
+			this.eventScheduledTo = scheduled_to && dateFns.parse(scheduled_to);
+			this.eventShareLink = share_link;
+			this.eventInsertedAt = inserted_at && dateFns.parse(inserted_at);
+			this.eventModifiedAt = updated_at && dateFns.parse(updated_at);
+			(preferences || {
+				weekdays: []
+			}).weekdays.forEach(weekday => {
+				let el = this.eventWeekdays.find(({
+					day
+				}) => day == weekday.day)
+				if (el) {
+					el.value = weekday.permitted;
+				}
+			})
+		},
+		initialWeekdays() {
+			return Object.keys(this.$i18n.t('week_days')).map((code, index) => ({
+				day: index,
+				name: `week_days.${code}`,
+				value: true
+			}));
 		}
 	},
 	computed: {
@@ -295,7 +341,8 @@ export const eventDataMixin = {
 				eventState: this.eventState,
 				eventScheduledFrom: this.eventScheduledFrom,
 				eventScheduledTo: this.eventScheduledTo,
-				eventShareLink: this.eventShareLink
+				eventShareLink: this.eventShareLink,
+				eventWeekdays: this.eventWeekdays
 			};
 		},
 		eventDataForRequest() {
@@ -306,10 +353,112 @@ export const eventDataMixin = {
 				time_window_from: this.eventTimeWindowFrom && dateFns.format(this.eventTimeWindowFrom, 'YYYY-MM-DD'),
 				time_window_to: this.eventTimeWindowTo && dateFns.format(this.eventTimeWindowTo, 'YYYY-MM-DD'),
 				email: this.eventOrganizerEmail,
-				email_confirmation: this.eventOrganizerEmail_confirmation
+				email_confirmation: this.eventOrganizerEmail_confirmation,
+				preferences: {
+					weekdays: (this.eventWeekdays.every((weekday) => weekday.value) ? [] :
+						this.eventWeekdays.map(({
+							value: permitted,
+							day
+						}) => ({
+							permitted,
+							day
+						}))
+					)
+				}
 			};
 			Object.keys(data).forEach((k) => data[k] == null && delete data[k]);
 			return data;
+		}
+	}
+}
+
+export const pollDataMixin = {
+	data() {
+		return {
+			pollParticipant: null,
+			pollWeekdayRanks: this.initialWeeklyRanks(),
+			pollDateRanks: []
+		}
+	},
+	computed: {
+		pollDataForRequest() {
+			return {
+				participant: this.pollParticipant,
+				preferences: {
+					weekday_ranks: this.pollWeekdayRanks
+						.filter(({
+							value
+						}) => value) // exclude 0 ranks
+						.map(({
+							day,
+							value: rank
+						}) => ({
+							day,
+							rank
+						}))
+				},
+				date_ranks: this.pollDateRanks
+				.filter(({rank}) => rank)
+				.map(({date, rank}) => ({
+					date_from: dateFns.format(date, 'YYYY-MM-DD'),
+					date_to: dateFns.format(date, 'YYYY-MM-DD'),
+					rank: rank
+				}))
+			}
+		}
+	},
+	methods: {
+		initialWeeklyRanks() {
+			return Object.keys(this.$i18n.t('week_days')).map((code, index) => ({
+				day: index,
+				name: `week_days.${code}`,
+				value: 0
+			}));
+		},
+		datesKey: (date) => `${date.getTime()}`,
+		assignPollData({
+				participant,
+				date_ranks = [],
+				preferences = {
+					weekday_ranks: []
+				},
+			},
+			eventWeekdays) {
+			this.pollParticipant = participant;
+
+			eventWeekdays.forEach(({
+				day: event_day,
+				value: permitted
+			}) => {
+				let weekDayRank = this.pollWeekdayRanks.find(({
+					day
+				}) => day == event_day)
+				weekDayRank.disabled = !permitted
+			})
+
+			preferences.weekday_ranks.forEach((rank) => {
+				let el = this.pollWeekdayRanks.find(({
+					day
+				}) => day == rank.day);
+				if (el) {
+					el.value = rank.rank;
+				}
+			});
+
+			this.pollDateRanks = date_ranks.flatMap(({
+				date_from,
+				date_to,
+				rank
+			}) => {
+				date_from = dateFns.parse(date_from)
+				date_to = dateFns.parse(date_to)
+
+				return dateFns.eachDay(date_from, date_to).map(date => ({
+					date,
+					rank,
+					key: this.datesKey(date)
+				}))
+			})
 		}
 	}
 }
@@ -361,7 +510,9 @@ export const eventHelpersMixin = {
 
 				let trans_key = dateFns.isFuture(time) ? 'event_viewer.time_distance_future' : 'event_viewer.time_distance_past';
 
-				return this.$i18n.t(trans_key, {time_distance: distance})
+				return this.$i18n.t(trans_key, {
+					time_distance: distance
+				})
 			}
 		},
 		eventCanceled() {
@@ -374,10 +525,13 @@ export const eventHelpersMixin = {
 			return this.eventState == "SCHEDULED";
 		},
 		minDate() {
-			return dateFns.max(this.eventTimeWindowFrom, dateFns.startOfTomorrow());
+			return dateFns.max(this.eventTimeWindowFrom, dateFns.startOfTomorrow())
 		},
 		maxDate() {
-			return dateFns.parse(this.eventTimeWindowTo);
+			return dateFns.max(this.eventTimeWindowTo)
+		},
+		dateDomain() {
+			return dateFns.isAfter(this.minDate, this.maxDate) ? [] : dateFns.eachDay(this.minDate, this.maxDate)
 		},
 		differentMonths() {
 			return dateFns.differenceInCalendarMonths(this.maxDate, this.minDate) > 0;

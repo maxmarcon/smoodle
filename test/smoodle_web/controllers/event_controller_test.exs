@@ -4,6 +4,7 @@ defmodule SmoodleWeb.EventControllerTest do
 
   alias Smoodle.Scheduler
   alias Smoodle.Scheduler.Event
+  alias Smoodle.Scheduler.Event.Preferences
 
   import Ecto.Query
   alias Smoodle.Repo
@@ -14,6 +15,18 @@ defmodule SmoodleWeb.EventControllerTest do
     organizer: "The Hoff",
     time_window_from: "2117-03-01",
     time_window_to: "2117-06-01",
+    preferences: %{
+      weekdays: [
+        %{
+          day: 5,
+          permitted: true
+        },
+        %{
+          day: 6,
+          permitted: true
+        }
+      ]
+    },
     email: "bot@fake.com",
     email_confirmation: "bot@fake.com"
   }
@@ -23,67 +36,92 @@ defmodule SmoodleWeb.EventControllerTest do
     organizer: "The Hoff",
     time_window_from: "2117-04-01",
     time_window_to: "2117-08-20",
+    preferences: nil,
     email: "bot@fake.com",
     email_confirmation: "bot@fake.com"
   }
-
-  @create_attrs_3 %{
-    name: "Dinner",
-    desc: "Yummy!",
-    state: "CANCELED",
-    organizer: "The Hoff",
-    time_window_from: "2117-04-01",
-    time_window_to: "2117-08-20",
-    email: "bot@fake.com",
-    email_confirmation: "bot@fake.com"
-  }
-
-  defp rest_repr(%{scheduled_from: scheduled_from, scheduled_to: scheduled_to}) do
-    {:ok, s_from, 0} = DateTime.from_iso8601(scheduled_from)
-    {:ok, s_to, 0} = DateTime.from_iso8601(scheduled_to)
-
-    %{
-      "scheduled_from" => DateTime.to_iso8601(s_from),
-      "scheduled_to" => DateTime.to_iso8601(s_to)
-    }
-  end
-
-  defp rest_repr(attr) do
-    %{
-      "name" => attr[:name],
-      "desc" => attr[:desc],
-      "time_window_from" => attr[:time_window_from],
-      "time_window_to" => attr[:time_window_to],
-      "organizer" => attr[:organizer],
-      "email" => attr[:email]
-    }
-  end
 
   @update_attrs %{
-    scheduled_from: "2117-04-05 21:10:00Z",
-    scheduled_to: "2117-04-05 22:10:00Z",
+    scheduled_from: "2117-04-05T21:10:00Z",
+    scheduled_to: "2117-04-05T22:10:00Z",
     state: "SCHEDULED"
   }
   @invalid_attrs %{
     name: "",
-    scheduled_to: "2117-04-05 21:10:00Z",
-    scheduled_from: "2117-04-05 22:10:00Z"
+    scheduled_to: "2117-04-05T21:10:00Z",
+    scheduled_from: "2117-04-05T22:10:00Z"
   }
+
   # @partial_valid_data %{
   #  name: "Event"
   # }
 
-  def create_event(_) do
+  defp match_event(event, api_event, exclude \\ [])
+
+  defp match_event(%Event{} = event, api_event, exclude) do
+    match_event(Map.from_struct(event), api_event, exclude)
+  end
+
+  defp match_event(event, api_event, exclude) when is_map(event) and is_map(api_event) do
+    exclude = [:__meta__, :polls, :preferences | exclude]
+
+    Enum.each(event, fn {key, val} ->
+      if key in exclude do
+        nil
+      else
+        val =
+          cond do
+            key in [:scheduled_from, :scheduled_to, :inserted_at, :updated_at] and !is_binary(val) and
+                !is_nil(val) ->
+              DateTime.to_iso8601(val)
+
+            key in [:time_window_from, :time_window_to] and !is_binary(val) and !is_nil(val) ->
+              Date.to_string(val)
+
+            true ->
+              val
+          end
+
+        assert val == api_event[to_string(key)]
+      end
+    end)
+
+    match_preferences(event.preferences, api_event["preferences"])
+  end
+
+  defp match_preferences(nil, nil) do
+  end
+
+  defp match_preferences(%Preferences{} = preferences, api_preferences) do
+    match_preferences(Map.from_struct(preferences), api_preferences)
+  end
+
+  defp match_preferences(preferences, api_preferences) do
+    Enum.each(preferences, fn {:weekdays, weekdays} ->
+      assert length(weekdays) == length(api_preferences["weekdays"])
+
+      Enum.each(weekdays, fn wk ->
+        api_wk =
+          Enum.find(api_preferences["weekdays"], fn api_wk ->
+            api_wk["day"] == wk.day
+          end)
+
+        assert wk.permitted == api_wk["permitted"]
+      end)
+    end)
+  end
+
+  defp create_event(_) do
     {:ok, event} = Scheduler.create_event(@create_attrs_1)
     {:ok, event: event}
   end
 
-  def create_closed_event(_) do
+  defp create_closed_event(_) do
     {:ok, event} = Scheduler.create_event(@create_attrs_1)
     {:ok, event: event}
   end
 
-  def create_events(_) do
+  defp create_events(_) do
     {:ok, event1} = Scheduler.create_event(@create_attrs_1)
     {:ok, event2} = Scheduler.create_event(@create_attrs_2)
     {:ok, events: [event1, event2]}
@@ -98,14 +136,10 @@ defmodule SmoodleWeb.EventControllerTest do
       data = json_response(conn, 200)["data"]
 
       Enum.each(events, fn event ->
-        from_data = Enum.find(data, &(&1["id"] == event.id))
-        refute from_data == nil
-        refute Map.has_key?(from_data, "secret")
-        refute Map.has_key?(from_data, "email")
-        assert event.name == from_data["name"]
-        assert event.desc == from_data["desc"]
-        assert Date.to_string(event.time_window_from) == from_data["time_window_from"]
-        assert Date.to_string(event.time_window_to) == from_data["time_window_to"]
+        api_event = Enum.find(data, &(&1["id"] == event.id))
+        refute Map.has_key?(api_event, "secret")
+        refute Map.has_key?(api_event, "email")
+        match_event(event, api_event, [:email, :secret])
       end)
     end
   end
@@ -122,12 +156,13 @@ defmodule SmoodleWeb.EventControllerTest do
     test "fetches the event when called with the right secret", %{conn: conn, event: event} do
       conn = get(conn, event_path(conn, :show, event.id, %{secret: event.secret}))
       data_response = json_response(conn, 200)["data"]
-      assert event.secret == data_response["secret"]
-      assert event.email == data_response["email"]
-      assert event.name == data_response["name"]
-      assert event.desc == data_response["desc"]
-      assert Date.to_string(event.time_window_from) == data_response["time_window_from"]
-      assert Date.to_string(event.time_window_to) == data_response["time_window_to"]
+      match_event(event, data_response)
+    end
+
+    test "fetches the event without secret", %{conn: conn, event: event} do
+      conn = get(conn, event_path(conn, :show, event.id))
+      data_response = json_response(conn, 200)["data"]
+      match_event(event, data_response, [:email, :secret])
     end
   end
 
@@ -139,26 +174,14 @@ defmodule SmoodleWeb.EventControllerTest do
 
     test "renders event when data is valid", %{conn: conn} do
       conn = post(conn, event_path(conn, :create), event: @create_attrs_1)
-      data_response = json_response(conn, 201)["data"]
-      assert %{"id" => id} = data_response
-      assert Map.has_key?(data_response, "secret")
-      assert data_response["email"] == @create_attrs_1.email
+      data = json_response(conn, 201)["data"]
+      assert Map.has_key?(data, "id")
+      assert Map.has_key?(data, "secret")
+
       location = List.first(get_resp_header(conn, "location"))
-      assert location == event_path(conn, :show, data_response["id"])
+      assert location == event_path(conn, :show, data["id"])
 
-      expected_data_response = Map.merge(%{"id" => id}, rest_repr(@create_attrs_1))
-      assert MapSet.subset?(MapSet.new(expected_data_response), MapSet.new(data_response))
-
-      conn = get(conn, location)
-      data_response = json_response(conn, 200)["data"]
-
-      assert MapSet.subset?(
-               MapSet.new(Map.delete(expected_data_response, "email")),
-               MapSet.new(data_response)
-             )
-
-      refute Map.has_key?(data_response, "secret")
-      refute Map.has_key?(data_response, "email")
+      match_event(@create_attrs_1, data, [:email_confirmation])
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
@@ -219,7 +242,7 @@ defmodule SmoodleWeb.EventControllerTest do
   describe "update event" do
     setup :create_event
 
-    test "renders event when data is valid", %{conn: conn, event: %Event{id: id} = event} do
+    test "renders event when data is valid", %{conn: conn, event: %Event{} = event} do
       conn =
         put(
           conn,
@@ -227,30 +250,14 @@ defmodule SmoodleWeb.EventControllerTest do
           event: Map.merge(@update_attrs, %{secret: event.secret})
         )
 
-      data_response = json_response(conn, 200)["data"]
-      assert %{"id" => ^id} = data_response
-      assert Map.has_key?(data_response, "secret")
+      data = json_response(conn, 200)["data"]
+      assert Map.has_key?(data, "id")
+      assert Map.has_key?(data, "secret")
+      assert Map.has_key?(data, "updated_at")
       location = List.first(get_resp_header(conn, "location"))
-      assert location == event_path(conn, :show, id)
+      assert location == event_path(conn, :show, data["id"])
 
-      expected_data_response =
-        Map.merge(%{"id" => id}, rest_repr(@create_attrs_1))
-        |> Map.merge(rest_repr(@update_attrs))
-
-      assert MapSet.subset?(MapSet.new(expected_data_response), MapSet.new(data_response))
-
-      conn = get(conn, location)
-      data_response = json_response(conn, 200)["data"]
-
-      assert MapSet.subset?(
-               MapSet.new(
-                 Map.delete(Map.merge(%{"id" => id}, rest_repr(@create_attrs_1)), "email")
-               ),
-               MapSet.new(data_response)
-             )
-
-      refute Map.has_key?(data_response, "secret")
-      refute Map.has_key?(data_response, "email")
+      match_event(Map.merge(event, @update_attrs), data)
     end
 
     test "renders errors when data is invalid", %{conn: conn, event: event} do

@@ -34,10 +34,11 @@ describe('messageBar', () => {
 
 			wrapper.vm.show(MESSAGE)
 
-			alert = wrapper.find('balert-stub')
+			alert = wrapper.find('b-alert-stub')
 		})
 
 		it('shows a permanent dismissable message', () => {
+			console.log(wrapper.html())
 			expect(alert.attributes('show')).toBe('true')
 			expect(alert.attributes('dismissible')).toBeTruthy()
 			expect(alert.attributes('variant')).toBe(VARIANT)
@@ -59,7 +60,7 @@ describe('messageBar', () => {
 
 			wrapper.vm.show(MESSAGE)
 
-			alert = wrapper.find('balert-stub')
+			alert = wrapper.find('b-alert-stub')
 		})
 
 		it('shows a message with countdown', () => {

@@ -44,15 +44,16 @@ const inputElements = [
 	'input#eventOrganizerEmailConfirmation',
 	'input#eventName',
 	'textarea#eventDesc',
-	'v-date-picker#eventTimeWindow'
+	'v-date-picker#eventTimeWindow',
+	'ranker#eventWeekdays'
 ]
 
 const inputElementsForUpdate = [
 	'input#eventName',
 	'textarea#eventDesc',
-	'v-date-picker#eventTimeWindow'
+	'v-date-picker#eventTimeWindow',
+	'ranker#eventWeekdays'
 ]
-
 
 const errorElements = [
 	'.invalid-feedback[name="event-organizer-error"]',
@@ -60,14 +61,15 @@ const errorElements = [
 	'.invalid-feedback[name="event-organizer-email-confirmation-error"]',
 	'.invalid-feedback[name="event-name-error"]',
 	'.invalid-feedback[name="event-desc-error"]',
-	'.small.text-danger[name="event-time-window-error"]'
+	'.small.text-danger[name="event-time-window-error"]',
+	'.small.text-danger[name="event-weekdays-error"]'
 ]
-
 
 const errorElementsForUpdate = [
 	'.invalid-feedback[name="event-name-error"]',
 	'.invalid-feedback[name="event-desc-error"]',
-	'.small.text-danger[name="event-time-window-error"]'
+	'.small.text-danger[name="event-time-window-error"]',
+	'.small.text-danger[name="event-weekdays-error"]'
 ]
 
 const EVENT_ID = "bf6747d5-7b32-4bde-8e2d-c055d9bb02d3"
@@ -170,7 +172,8 @@ describe('eventEditor', () => {
 								"email_confirmation": [CANT_BE_BLANK],
 								"desc": [CANT_BE_BLANK],
 								"name": [CANT_BE_BLANK],
-								"time_window": [CANT_BE_BLANK]
+								"time_window": [CANT_BE_BLANK],
+								"preferences": {"weekdays": [CANT_BE_BLANK]}
 							}
 						}
 					}
@@ -418,7 +421,8 @@ describe('eventEditor', () => {
 									"email_confirmation": [CANT_BE_BLANK],
 									"desc": [CANT_BE_BLANK],
 									"name": [CANT_BE_BLANK],
-									"time_window": [CANT_BE_BLANK]
+									"time_window": [CANT_BE_BLANK],
+									"preferences": {"weekdays": [CANT_BE_BLANK]	}
 								}
 							}
 						}
