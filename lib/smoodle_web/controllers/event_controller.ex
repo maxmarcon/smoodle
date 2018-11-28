@@ -75,14 +75,10 @@ defmodule SmoodleWeb.EventController do
 
     render(conn, "schedule.json", %{
       schedule:
-        if Event.is_open(event) do
-          Scheduler.get_best_schedule(
-            event,
-            Keyword.merge(schedule_parse_params(params), is_owner: true)
-          )
-        else
-          Scheduler.empty_schedule()
-        end
+        Scheduler.get_best_schedule(
+          event,
+          Keyword.merge(schedule_parse_params(params), is_owner: true)
+        )
     })
   end
 
@@ -90,12 +86,7 @@ defmodule SmoodleWeb.EventController do
     event = Scheduler.get_event!(id)
 
     render(conn, "schedule.json", %{
-      schedule:
-        if Event.is_open(event) do
-          Scheduler.get_best_schedule(event, schedule_parse_params(params))
-        else
-          Scheduler.empty_schedule()
-        end
+      schedule: Scheduler.get_best_schedule(event, schedule_parse_params(params))
     })
   end
 
