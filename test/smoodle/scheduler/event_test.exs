@@ -287,6 +287,16 @@ defmodule Smoodle.Scheduler.EventTest do
              changeset.changes.preferences.errors
   end
 
+  test "validate empty weekdays accepted" do
+    changeset =
+      Event.changeset(%Event{}, %{
+        @valid_attrs
+        | preferences: %{weekdays: []}
+      })
+
+    assert changeset.valid?
+  end
+
   test "validate events cannot be in the past" do
     changeset = Event.changeset(%Event{}, @past_event)
     assert {_, [validation: :in_the_past]} = changeset.errors[:scheduled_to]

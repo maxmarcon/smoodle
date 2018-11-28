@@ -164,7 +164,8 @@ defmodule Smoodle.Scheduler.Event do
   defp validate_one_weekday_enabled(changeset) do
     case fetch_field(changeset, :weekdays) do
       {_, changes} ->
-        unless Enum.any?(changes, fn %{permitted: permitted} -> permitted end) do
+        unless Enum.empty?(changes) ||
+                 Enum.any?(changes, fn %{permitted: permitted} -> permitted end) do
           add_error(
             changeset,
             :weekdays,
