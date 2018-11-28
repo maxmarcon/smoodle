@@ -27,8 +27,8 @@ config :smoodle, Smoodle.Repo,
   url: "${DATABASE_URL}",
   database: "",
   ssl: true,
-  # Free tier db only allows 1 connection
-  pool_size: 1
+  # Gigalixir free tier db only allows 4 connections. Rolling deploys need pool_sizer db only allows 1 connection
+  pool_size: 2
 
 config :smoodle, Smoodle.Mailer,
   adapter: Bamboo.MailjetAdapter,
