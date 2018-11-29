@@ -399,7 +399,7 @@ describe('pollEditor', () => {
 				expect(wrapper.find('ranker').exists()).toBeTruthy();
 			})
 
-			it('computes the poll weeday ranks', () => {
+			it('computes the poll weekday ranks', () => {
 				expect(wrapper.vm.pollWeekdayRanks
 						.filter(obj => obj.value != 0).map(({
 							day,
@@ -407,8 +407,8 @@ describe('pollEditor', () => {
 						}) => ({
 							day: day,
 							rank: value
-						})).sort((o1, o2) => o1.day < o2.day))
-					.toEqual(POLL_DATA.preferences.weekday_ranks.sort((o1, o2) => o1.day < o2.day))
+						})).sort((o1, o2) => o1.day - o2.day))
+					.toEqual(POLL_DATA.preferences.weekday_ranks.sort((o1, o2) => o1.day - o2.day))
 			})
 
 			it('disables some poll weeday ranks', () => {

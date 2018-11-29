@@ -133,7 +133,7 @@ export default {
 			red: "Red",
 			green: "Green",
 			edit_event: "Edit event",
-			event_modified: '{organizer} modified this event {time_distance}. Reconsider your availability.'
+			event_modified: '{organizer} modified this event {time_distance}.'
 		},
 		home: {
 			title: 'Events made easy',
@@ -145,7 +145,7 @@ export default {
 				title: '{step} : Create the event',
 				part1: 'Describe your event.',
 				part2: 'Select the time period suitable for the event.',
-				part3: 'Finally, invite with friends by sharing a Web link.'
+				part3: 'Finally, invite your friends by sharing a Web link.'
 			},
 			step2: {
 				title: '{step} : Let your friends decide',
@@ -337,7 +337,7 @@ export default {
 			red: "Rot",
 			green: "Grün",
 			edit_event: "Event editieren",
-			event_modified: '{organizer} hat {time_distance} dieses Event aktualisiert. Überprüfe deine Verfügbarkeit.'
+			event_modified: '{organizer} hat {time_distance} dieses Event aktualisiert.'
 		},
 		home: {
 			title: 'Events leicht gemacht',
@@ -540,7 +540,7 @@ export default {
 			edit_event: "Modifica l'evento",
 			red: "Rosso",
 			green: "verde",
-			event_modified: '{organizer} ha aggiornato questo evento {time_distance}. Rivedi la tua disponibilità.'
+			event_modified: '{organizer} ha aggiornato questo evento {time_distance}.'
 		},
 		home: {
 			title: 'Eventi con facilità',
