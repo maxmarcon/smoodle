@@ -58,7 +58,7 @@
 			:title="$t('event_viewer.current_participants')"
 			ok-only
 		)
-			p {{ eventScheduleParticipants && eventScheduleParticipants.join(', ') + '.' }}
+			p {{ trimmedNameList(eventScheduleParticipants, 25) }}
 
 		b-modal#scheduleEventModal(
 			:title="$t('event_viewer.schedule_event')"
@@ -68,8 +68,8 @@
 			@ok="scheduleEvent"
 		)
 			div(v-if="selectedDate")
-				.alert.alert-danger(v-if="selectedDateAttribute && selectedDateAttribute.customData.negative_rank < 0")
-					| {{ $tc('event_viewer.warning_bad_date', -selectedDateAttribute.customData.negative_rank, {participants: -selectedDateAttribute.customData.negative_rank}) }}
+				.alert.alert-danger(v-if="selectedDateNegativeRank < 0")
+					| {{ $tc('event_viewer.warning_bad_date', -selectedDateNegativeRank, {participants: -selectedDateNegativeRank}) }}
 				.alert.alert-info {{ $t('event_viewer.about_to_schedule', {date: selectedDateFormatted}) }}
 
 				.text-center
@@ -168,10 +168,10 @@
 											:is-linked="true"
 											:min-date="minDate"
 											:max-date="maxDate"
+											:disabled-dates="disabledDates"
 											:is-double-paned="differentMonths"
+											:select-attribute="selectAttrubute"
 											nav-visibility="hidden"
-											:theme-styles="{dayCellNotInMonth: {opacity: 0}}"
-											@dayclick="dayClicked"
 										)
 										v-calendar(
 											v-else
@@ -181,7 +181,6 @@
 											:min-date="minDate"
 											:max-date="maxDate"
 											:is-double-paned="differentMonths"
-											:theme-styles="{dayCellNotInMonth: {opacity: 0}}"
 										)
 
 						div.alert.alert-primary(v-else-if="loaded")
@@ -243,13 +242,28 @@
 		)
 </template>
 <script>
-import { colorCodes, eventHelpersMixin, eventDataMixin, scrollToTopMixin, restMixin, whatsAppHelpersMixin} from '../globals'
+import {
+	colorCodes,
+	eventHelpersMixin,
+	eventDataMixin,
+	scrollToTopMixin,
+	restMixin,
+	whatsAppHelpersMixin,
+	nameListTrimmerMixin
+} from '../globals'
 import dateFns from 'date-fns'
 
 const SCHEDULE_DATES_LIMIT = null;
 
 export default {
-	mixins: [restMixin, eventHelpersMixin, eventDataMixin, scrollToTopMixin, whatsAppHelpersMixin],
+	mixins: [
+		restMixin,
+		eventHelpersMixin,
+		eventDataMixin,
+		scrollToTopMixin,
+		whatsAppHelpersMixin,
+		nameListTrimmerMixin
+	],
 	props: {
 		eventId: {
 			type: String,
@@ -268,13 +282,19 @@ export default {
 		requestOngoing: false,
 		selectedDate: null,
 		selectedTime: "19:30",
-		selectedDateAttribute: null,
 		timePickerOptions: {
 			format: 'HH:mm',
 			inline: true,
 			icons: {
 				up: "fas fa-sort-up fa-2x",
 				down: "fas fa-sort-down fa-2x"
+			}
+		},
+		selectAttrubute: {
+			highlight: {
+				backgroundColor: colorCodes.yellow,
+				borderColor: colorCodes.black,
+				borderWidth: "4px"
 			}
 		}
 	}),
@@ -337,12 +357,12 @@ export default {
 		},
 		selectedDateFormatted() {
 			return dateFns.format(this.selectedDate, this.$i18n.t('date_format'), {locale: this.$i18n.t('date_fns_locale')});
+		},
+		selectedDateNegativeRank() {
+			return (this.eventScheduleDates.find(({date}) => dateFns.isEqual(date, this.selectedDate)) || {}).negative_rank
 		}
 	},
 	methods: {
-		dayClicked({attributes}) {
-			this.selectedDateAttribute = (attributes.length > 0 ? attributes[0] : null);
-		},
 		opacityForDate(date_entry, minNegativeRank, maxPositiveRank) {
 			return (date_entry.negative_rank < 0
 				? date_entry.negative_rank / minNegativeRank
@@ -352,19 +372,18 @@ export default {
 			let date_entry = attribute.customData;
 			if (date_entry.negative_rank < 0) {
 				if (this.isOrganizer) {
-					return this.$i18n.tc('event_viewer.negative_participants_list_date', date_entry.negative_participants.length,
-						{participants: date_entry.negative_participants.join(', ')} );
+					return this.$i18n.tc('event_viewer.negative_participants_list_date',
+						date_entry.negative_participants.length,
+						{participants: this.trimmedNameList(date_entry.negative_participants)} );
 				} else {
-					return this.$i18n.tc('event_viewer.negative_participants_for_date', -date_entry.negative_rank,
-						{count: -date_entry.negative_rank});
+					return this.$i18n.tc('event_viewer.negative_participants_for_date', -date_entry.negative_rank);
 				}
 			} else {
 				if (this.isOrganizer && date_entry.positive_rank > 0) {
 					return this.$i18n.tc('event_viewer.positive_participants_list_date', date_entry.positive_participants.length,
-						{participants: date_entry.positive_participants.join(', ')} );
+						{participants: this.trimmedNameList(date_entry.positive_participants)} );
 				} else {
-					return this.$i18n.tc('event_viewer.positive_participants_for_date', date_entry.positive_rank,
-						{count: date_entry.positive_rank});
+					return this.$i18n.tc('event_viewer.positive_participants_for_date', date_entry.positive_rank);
 				}
 			}
 		},

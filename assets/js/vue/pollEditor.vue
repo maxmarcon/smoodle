@@ -399,23 +399,6 @@ export default {
 				})
 			))
 		},
-		disabledDates() {
-			return [{
-				start: this.minDate,
-				end: this.maxDate,
-				weekdays: this.eventWeekdays.filter(({
-					value
-				}) => !value).map(({
-					day
-				}) => ((day + 1) % 7) + 1) // from 0=Mon...6=Sun to v-calendar's 1=Sun... 7=Sat
-			}, {
-				start: null,
-				end: dateFns.subDays(this.minDate, 1),
-			}, {
-				start: dateFns.addDays(this.maxDate, 1),
-				end: null
-			}]
-		},
 		selectedDateRankColor() {
 			return this.colorForRank(this.selectedDateRank);
 		},

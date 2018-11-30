@@ -21,39 +21,6 @@ export function dotAccessObject(obj, deep_key) {
 	return retval;
 }
 
-class LocalStorageProxy {
-	constructor() {
-		try {
-			localStorage.setItem("test", "test");
-			let result = localStorage.getItem("test");
-			localStorage.removeItem("test");
-			this._available = (result == "test");
-		} catch (e) {
-			this._available = false;
-		}
-	}
-
-	get available() {
-		return this._available;
-	}
-
-	getItem(key) {
-		if (this.available) {
-			return localStorage.getItem(key);
-		} else {
-			return undefined;
-		}
-	}
-
-	setItem(key, value) {
-		if (this.available) {
-			localStorage.setItem(key, value);
-		}
-	}
-}
-
-export const localStorageProxy = new LocalStorageProxy();
-
 export function stringifyServerError(error) {
 	if (error instanceof Array) {
 		return error.map(stringifyServerError).join(', ');
@@ -536,6 +503,23 @@ export const eventHelpersMixin = {
 		differentMonths() {
 			return dateFns.differenceInCalendarMonths(this.maxDate, this.minDate) > 0;
 		},
+		disabledDates() {
+			return [{
+				start: this.minDate,
+				end: this.maxDate,
+				weekdays: this.eventWeekdays.filter(({
+					value
+				}) => !value).map(({
+					day
+				}) => ((day + 1) % 7) + 1) // from 0=Mon...6=Sun to v-calendar's 1=Sun... 7=Sat
+			}, {
+				start: null,
+				end: dateFns.subDays(this.minDate, 1),
+			}, {
+				start: dateFns.addDays(this.maxDate, 1),
+				end: null
+			}]
+		},
 		eventBackgroundClass() {
 			if (this.eventOpen) {
 				return 'bg-light';
@@ -543,6 +527,22 @@ export const eventHelpersMixin = {
 				return 'alert-success';
 			} else {
 				return 'alert-warning';
+			}
+		}
+	}
+}
+
+export const nameListTrimmerMixin = {
+	methods: {
+		trimmedNameList(list, maxVisible = 5) {
+			if (!(list instanceof Array)) {
+				throw 'trimmedNameList should be called with an array'
+			}
+
+			if (list.length <= maxVisible) {
+				return list.join(', ')
+			} else {
+				return this.$i18n.t('trimmed_list', {list: list.slice(0, maxVisible).join(', '), others: list.length - maxVisible})
 			}
 		}
 	}

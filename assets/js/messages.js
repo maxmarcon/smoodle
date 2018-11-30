@@ -205,7 +205,8 @@ export default {
 			tell_me_more: "Tell me more",
 			back_home: "Back home",
 			ok: "Ok"
-		}
+		},
+		trimmed_list: "{list} and {others} others"
 	},
 
 	de: {
@@ -408,7 +409,8 @@ export default {
 			cancel: "Abbrechen",
 			tell_me_more: "Ich will mehr wissen",
 			back_home: "Zur Homepage"
-		}
+		},
+		trimmed_list: "{list} und {others} andere"
 	},
 
 	it: {
@@ -611,6 +613,7 @@ export default {
 			cancel: "Annulla",
 			tell_me_more: "Dimmi di più.",
 			back_home: "Alla homepage"
-		}
+		},
+		trimmed_list: "{list} e {others} altri"
 	}
 }

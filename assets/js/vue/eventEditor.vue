@@ -217,7 +217,6 @@ import {
 } from '../globals'
 
 const today = new Date();
-const InvalidDate = 'Invalid Date';
 
 export default {
 	mixins: [accordionGroupsMixin, restMixin, scrollToTopMixin, eventDataMixin, whatsAppHelpersMixin],
@@ -288,7 +287,6 @@ export default {
 		today,
 		loadedSuccessfully: false,
 		loaded: false,
-		showThisWeekButton: (dateFns.getDay(today) > 0 && dateFns.getDay(today) < 4), // betewn Mon and Wed
 		eventCreated: false,
 		createdEventId: null,
 		createdEventSecret: null,
