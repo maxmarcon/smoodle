@@ -9,7 +9,8 @@ defmodule SmoodleWeb.FallbackController do
   def call(conn, {:error, %Ecto.Changeset{} = changeset}) do
     conn
     |> put_status(:unprocessable_entity)
-    |> render(SmoodleWeb.ChangesetView, "error.json", changeset: changeset)
+    |> put_view(SmoodleWeb.ChangesetView)
+    |> render(:error, changeset: changeset)
   end
 
   def call(conn, :ok) do
@@ -21,7 +22,8 @@ defmodule SmoodleWeb.FallbackController do
 
     conn
     |> put_status(reason_atom)
-    |> render(SmoodleWeb.ErrorView, "#{code}.json", %{
+    |> put_view(SmoodleWeb.ErrorView)
+    |> render("#{code}.json", %{
       reason: %{message: Plug.Conn.Status.reason_phrase(code)}
     })
   end

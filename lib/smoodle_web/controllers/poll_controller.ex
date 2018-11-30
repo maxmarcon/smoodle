@@ -12,12 +12,12 @@ defmodule SmoodleWeb.PollController do
     event = Scheduler.get_event!(event_id, secret)
 
     polls = Repo.preload(Scheduler.list_polls(event), :date_ranks)
-    render(conn, "index.json", polls: polls)
+    render(conn, :index, polls: polls)
   end
 
   def index(conn, %{"event_id" => event_id, "participant" => participant}) do
     poll = Repo.preload(Scheduler.get_poll!(event_id, participant), :date_ranks)
-    render(conn, "show.json", poll: poll)
+    render(conn, :show, poll: poll)
   end
 
   def create(conn, %{"event_id" => event_id, "poll" => poll_params}) do
@@ -29,7 +29,7 @@ defmodule SmoodleWeb.PollController do
       conn
       |> put_status(:created)
       |> put_resp_header("location", poll_path(conn, :show, poll))
-      |> render("show.json", poll: Repo.preload(poll, :date_ranks))
+      |> render(:show, poll: Repo.preload(poll, :date_ranks))
     end
   end
 
@@ -39,7 +39,7 @@ defmodule SmoodleWeb.PollController do
       |> Repo.preload(:date_ranks)
       |> Repo.preload(:event)
 
-    render(conn, "show.json", poll: poll)
+    render(conn, :show, poll: poll)
   end
 
   def update(conn, %{"id" => id, "poll" => poll_params}) do
@@ -49,7 +49,7 @@ defmodule SmoodleWeb.PollController do
       Logger.info("Updated poll: #{poll}")
 
       put_resp_header(conn, "location", poll_path(conn, :show, poll))
-      |> render("show.json", poll: poll)
+      |> render(:show, poll: poll)
     end
   end
 
