@@ -107,6 +107,8 @@
 									:is-double-paned="differentMonths"
 									:attributes="datePickerAttributes"
 									:is-linked="true"
+									:min-date="minDate"
+									:max-date="maxDate"
 									:show-caps="true"
 									popover-visibility="hidden"
 									:disabled-attribute="disabledAttribute"
@@ -253,12 +255,11 @@ export default {
 					self.eventIdFromPoll = response.data.data.event_id
 					self.checkEventOpen()
 					self.loadedSuccessfully = true
+					self.groupVisibility['calendar-ranker-group'] = true
 				})
 				.finally(function() {
 					self.loaded = true
 				});
-			this.groupVisibility['participant-group'] = false
-			this.groupVisibility['calendar-ranker-group'] = true
 		}
 	},
 	methods: {

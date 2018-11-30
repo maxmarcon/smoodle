@@ -314,6 +314,7 @@ export default {
 					self.assignEventData(result.data.data)
 					self.applyDates(self.eventTimeWindowFrom, self.eventTimeWindowTo)
 					self.loadedSuccessfully = true
+					self.groupVisibility['dates-group'] = true
 				}).finally(function() {
 					self.loaded = true
 				})

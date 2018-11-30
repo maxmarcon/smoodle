@@ -13,7 +13,7 @@ defmodule SmoodleWeb.EventController do
   def index(conn, _params) do
     if Enum.member?([:test, :dev], Application.get_env(:smoodle, :env)) do
       events = Scheduler.list_events()
-      render(conn, "index.json", events: events)
+      render(conn, :index, events: events)
     else
       {:error, :forbidden}
     end
@@ -36,18 +36,18 @@ defmodule SmoodleWeb.EventController do
       conn
       |> put_status(:created)
       |> put_resp_header("location", event_path(conn, :show, event))
-      |> render("show.json", event: event)
+      |> render(:show, event: event)
     end
   end
 
   def show(conn, %{"id" => id, "secret" => secret}) do
     event = Scheduler.get_event!(id, secret)
-    render(conn, "show.json", event: event)
+    render(conn, :show, event: event)
   end
 
   def show(conn, %{"id" => id}) do
     event = Scheduler.get_event!(id)
-    render(conn, "show.json", event: Map.delete(event, :secret))
+    render(conn, :show, event: Map.delete(event, :secret))
   end
 
   def update(conn, %{"id" => id, "event" => event_params = %{"secret" => secret}}) do
@@ -57,7 +57,7 @@ defmodule SmoodleWeb.EventController do
       Logger.info("Updated event: #{event}")
 
       put_resp_header(conn, "location", event_path(conn, :show, event))
-      |> render("show.json", event: event)
+      |> render(:show, event: event)
     end
   end
 
@@ -73,7 +73,7 @@ defmodule SmoodleWeb.EventController do
   def schedule(conn, %{"id" => id, "secret" => secret} = params) do
     event = Scheduler.get_event!(id, secret)
 
-    render(conn, "schedule.json", %{
+    render(conn, :schedule, %{
       schedule:
         Scheduler.get_best_schedule(
           event,
@@ -85,7 +85,7 @@ defmodule SmoodleWeb.EventController do
   def schedule(conn, %{"id" => id} = params) do
     event = Scheduler.get_event!(id)
 
-    render(conn, "schedule.json", %{
+    render(conn, :schedule, %{
       schedule: Scheduler.get_best_schedule(event, schedule_parse_params(params))
     })
   end

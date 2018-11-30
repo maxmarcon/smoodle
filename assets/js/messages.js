@@ -56,7 +56,7 @@ export default {
 			},
 			weekday_ranker_group: "How is your typical week?",
 			weekday_ranker_help: "Specify which days of your typical week are good {good}, just fine {ok}, or bad {bad} for the event. You can add exception for specific dates later. {help}.",
-			calendar_ranker_group: "Select specific dates",
+			calendar_ranker_group: "Which dates work best for you?",
 			save_poll: "Save availabiliy",
 			delete_poll: "Delete your availabiliy",
 			poll_saved: "Your availabiliy has been saved",
@@ -65,7 +65,7 @@ export default {
 			poll_deleted: "Your availabiliy has been deleted",
 			poll_delete_error: "An error has occurred, the availabiliy could not be deleted",
 			dates_placeholder: "Select a time period",
-			date_ranker_helper: "Select dates and weekdays that are good {good}, bad {bad} or {indifferent} for the event.",
+			date_ranker_helper: "Select dates and weekdays that are good {good}, bad {bad} or ok {indifferent} for the event.",
 			date_ranker_help_modal_title: "Adding and removing dates",
 			date_ranker_help_modal_content: "First choose whether you are adding dates that are good {good} or bad {bad}.\
 			Then add the dates, either as single dates or date ranges.\
@@ -149,7 +149,7 @@ export default {
 			},
 			step2: {
 				title: '{step} : Let your friends decide',
-				part1: 'Your friends can say if a date is {good}, {indifferent}, or {bad} for them.',
+				part1: 'Your friends can say if a date is {good}, just ok {indifferent}, or {bad} for them.',
 				part2: 'They can select weekdays or specific dates.'
 			},
 			step3: {
@@ -260,7 +260,7 @@ export default {
 			},
 			weekday_ranker_group: "Wie sieht deine typische Woche aus?",
 			weekday_ranker_help: "Gib ein, welche Tage deiner typischen Woche passend {good}, ok {ok}, oder unpassend {bad} sind für dieses Event. Du kannst später Ausnahmen für einzelne Daten hinzufügen. {help}.",
-			calendar_ranker_group: "Einzelne Daten auswählen",
+			calendar_ranker_group: "Welche Tage passen Dir am besten?",
 			save_poll: "Verfügbarkeit speichern",
 			delete_poll: "Verfügbarkeit löschen",
 			poll_saved: "Deine Verfügbarkeit wurde gespeichert",
@@ -353,7 +353,7 @@ export default {
 			},
 			step2: {
 				title: '{step} : Lass deine Freunde entscheiden',
-				part1: 'Deine Freunde können angeben, ob ein Datum {good}, {indifferent}, oder {bad} für sie ist.',
+				part1: 'Deine Freunde können angeben, ob ein Datum {good}, gleichgültig {indifferent}, oder {bad} für sie ist.',
 				part2: 'Sie können einzelne Tage oder einen Zeitraum auswählen.'
 			},
 			step3: {
@@ -463,7 +463,7 @@ export default {
 			},
 			weekday_ranker_group: "Com'è la tua settimana tipica?",
 			weekday_ranker_help: "Dicci quali giorni della tua settimana tipica vanno bene {good}, sono ok {ok}, oppure vanno male {bad} per questo evento. In seguito puoi aggiungere eccezioni per singole date. {help}.",
-			calendar_ranker_group: "Seleziona singole date",
+			calendar_ranker_group: "Scegli le date che ti vanno meglio",
 			save_poll: "Salva la disponibilità",
 			delete_poll: "Cancella la tua disponibilità",
 			poll_saved: "La tua disponibilità è stata salvata",
@@ -556,7 +556,7 @@ export default {
 			},
 			step2: {
 				title: '{step} : Fai decidere ai tuoi amici',
-				part1: 'I tuoi amici decidono se una data è {good}, {indifferent}, oppure {bad}.',
+				part1: 'I tuoi amici decidono se una data è {good}, indifferente {indifferent}, oppure {bad}.',
 				part2: 'Possono scegliere singole date o giorni della settimana.'
 			},
 			step3: {
