@@ -3,19 +3,25 @@ defmodule SmoodleWeb.ErrorView do
 
   @statuses_with_own_pages ["404", "500"]
 
-  def render(<<status::binary-size(3), ".json">>, %{reason: %{message: message}}) do
+  def render(<<status::binary-size(3), ".json">>, %{}) do
     status =
       case Integer.parse(status) do
         {numeric_status, _} -> numeric_status
-        _ -> status
+        _ -> 500
       end
 
-    %{status: status, message: message}
+    %{status: status, message: Plug.Conn.Status.reason_phrase(status)}
   end
 
-  def render(<<status::binary-size(3), ".html">>, %{reason: %{message: message}})
+  def render(<<status::binary-size(3), ".html">>, %{})
       when status not in @statuses_with_own_pages do
-    render("generic.html", %{message: message, status: status})
+    status =
+      case Integer.parse(status) do
+        {numeric_status, _} -> numeric_status
+        _ -> 500
+      end
+
+    render("generic.html", %{status: status, message: Plug.Conn.Status.reason_phrase(status)})
   end
 
   # In case no render clause matches or no
