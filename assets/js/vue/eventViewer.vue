@@ -30,6 +30,10 @@
 		)
 			p {{ $t('event_viewer.really_cancel_event') }}
 
+			.form-group
+				label(for=organizerMessage) {{ $t('event_viewer.organizer_message') }}
+				textarea#organizerMessage.form-control(v-model.trim="eventOrganizerMessage")
+
 		b-modal(ref="eventCanceledModal"
 			:title="$t('event_viewer.cancel_event')"
 			ok-only
@@ -72,13 +76,17 @@
 					| {{ $tc('event_viewer.warning_bad_date', -selectedDateNegativeRank, {participants: -selectedDateNegativeRank}) }}
 				.alert.alert-info {{ $t('event_viewer.about_to_schedule', {date: selectedDateFormatted}) }}
 
-				.text-center
-					label(for="timePicker") {{ $t('event_viewer.select_time') }}
-				.d-flex.justify-content-center
-					date-picker#timePicker(
-						v-model="selectedTime"
-						:config="timePickerOptions"
-					)
+				.justify-content-center
+					.form-group
+						label(for="timePicker") {{ $t('event_viewer.select_time') }}
+						date-picker#timePicker(
+							v-model="selectedTime"
+							:config="timePickerOptions"
+						)
+				.form-group
+					label(for=organizerMessage) {{ $t('event_viewer.organizer_message') }}
+					textarea#organizerMessage.form-control(v-model.trim="eventOrganizerMessage")
+
 			div(v-else)
 				p {{ $t('event_viewer.select_date_first') }}
 
@@ -189,12 +197,37 @@
 							i18n(path="event_viewer.no_participants" v-else)
 								i.fas.fa-trophy.fa-lg(place="icon")
 
-					.alert.alert-success(v-else-if="eventScheduled")
-						i.fas.fa-handshake.fa-lg
-						| &nbsp; {{ $t(isOrganizer ? 'event_viewer.event_scheduled_organizer' : 'event_viewer.event_scheduled', {datetime: eventScheduledDateTime, organizer: eventOrganizer, time_distance: eventScheduledDateTimeRelative}) }}
-					.alert.alert-warning(v-else-if="eventCanceled")
-						i.fas.fa-ban.fa-lg
-						| &nbsp; {{ $t(isOrganizer ? 'event_viewer.event_canceled_organizer' : 'event_viewer.event_canceled') }}
+					div(v-else-if="eventScheduled")
+						.alert.alert-success
+							i.fas.fa-handshake.fa-lg
+							| &nbsp; {{ $t(isOrganizer ? 'event_viewer.event_scheduled_organizer' : 'event_viewer.event_scheduled', {datetime: eventScheduledDateTime, organizer: eventOrganizer, time_distance: eventScheduledDateTimeRelative}) }}
+
+						.row.justify-content-md-between.justify-content-lg-center
+							.col-md-3.offset-md-1.text-justify(v-if="eventOrganizerMessage")
+								p
+									em.text-muted {{ $t('event_viewer.organizer_says', {organizer: eventOrganizer}) }} &nbsp;
+									| {{ eventOrganizerMessage }}
+
+							.text-center(:class="eventOrganizerMessage ? 'col-md-6' : 'col'")
+								.form-group
+									v-calendar(
+										:is-linked="true"
+										nav-visibility="hidden"
+										:min-date="eventScheduledFrom"
+										:max-date="eventScheduledTo"
+										:attributes="scheduledEventCalendarAttributes"
+										:is-double-paned="differentMonths"
+									)
+
+					div(v-else-if="eventCanceled")
+						.alert.alert-warning
+							i.fas.fa-ban.fa-lg
+							| &nbsp; {{ $t(isOrganizer ? 'event_viewer.event_canceled_organizer' : 'event_viewer.event_canceled') }}
+
+						div(v-if="eventOrganizerMessage")
+							.d-flex.text-justify
+								em.text-muted {{ $t('event_viewer.organizer_says', {organizer: eventOrganizer}) }} &nbsp;
+								| {{ eventOrganizerMessage }}
 
 			.card-footer(v-if="eventOpen || isOrganizer")
 				.row.justify-content-center
@@ -294,7 +327,7 @@ export default {
 			highlight: {
 				backgroundColor: colorCodes.yellow,
 				borderColor: colorCodes.black,
-				borderWidth: "4px"
+				borderWidth: "2px"
 			}
 		}
 	}),
@@ -354,6 +387,17 @@ export default {
 				},
 				customData: date_entry
 			}));
+		},
+		scheduledEventCalendarAttributes() {
+			return [{
+				dates: this.eventScheduledFrom,
+				popover: {
+					label: this.eventScheduledTime
+				},
+				highlight: {
+					backgroundColor: colorCodes.yellow
+				}
+			}]
 		},
 		selectedDateFormatted() {
 			return dateFns.format(this.selectedDate, this.$i18n.t('date_format'), {locale: this.$i18n.t('date_fns_locale')});
@@ -435,7 +479,11 @@ export default {
 			this.restRequest(['events', this.eventId].join('/'), {
 				method: 'patch',
 				data: {
-					event: { state: "CANCELED", secret: this.secret }
+					event: {
+						state: "CANCELED",
+						secret: this.secret,
+						organizer_message: this.eventOrganizerMessage
+					}
 				}
 			}).then(function(result) {
 				self.assignEventData(result.data.data);
@@ -464,7 +512,8 @@ export default {
 						state: 'SCHEDULED',
 						secret: this.secret,
 						scheduled_from: this.selectedDate.toISOString(),
-						scheduled_to: dateFns.addHours(this.selectedDate, 6).toISOString()
+						scheduled_to: dateFns.addHours(this.selectedDate, 6).toISOString(),
+						organizer_message: this.eventOrganizerMessage
 					}
 				}
 			}).then(function(result) {

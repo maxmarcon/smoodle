@@ -61,7 +61,7 @@ defmodule Smoodle.Scheduler.Event do
       :email,
       :state
     ])
-    |> validate_required([:name, :organizer, :desc, :email, :time_window_from, :time_window_to])
+    |> validate_required([:name, :organizer, :email, :time_window_from, :time_window_to])
     |> validate_length(:name, max: 50)
     |> validate_length(:organizer, max: 50)
     |> validate_length(:desc, max: 250)

@@ -246,7 +246,8 @@ export const eventDataMixin = {
 			eventInsertedAt: null,
 			eventModifiedAt: null,
 			eventWeekdays: null,
-			eventWeekdays: this.initialWeekdays()
+			eventWeekdays: this.initialWeekdays(),
+			eventOrganizerMessage: null
 		}
 	},
 	methods: {
@@ -263,20 +264,22 @@ export const eventDataMixin = {
 			share_link,
 			inserted_at,
 			updated_at,
-			preferences
+			preferences,
+			organizer_message
 		}) {
-			this.eventName = name;
-			this.eventOrganizer = organizer;
-			this.eventOrganizerEmail = email;
-			this.eventDesc = desc;
-			this.eventTimeWindowFrom = time_window_from && dateFns.parse(time_window_from);
-			this.eventTimeWindowTo = time_window_to && dateFns.parse(time_window_to);
-			this.eventState = state;
-			this.eventScheduledFrom = scheduled_from && dateFns.parse(scheduled_from);
-			this.eventScheduledTo = scheduled_to && dateFns.parse(scheduled_to);
-			this.eventShareLink = share_link;
-			this.eventInsertedAt = inserted_at && dateFns.parse(inserted_at);
-			this.eventModifiedAt = updated_at && dateFns.parse(updated_at);
+			this.eventName = name
+			this.eventOrganizer = organizer
+			this.eventOrganizerEmail = email
+			this.eventDesc = desc
+			this.eventTimeWindowFrom = time_window_from && dateFns.parse(time_window_from)
+			this.eventTimeWindowTo = time_window_to && dateFns.parse(time_window_to)
+			this.eventState = state
+			this.eventScheduledFrom = scheduled_from && dateFns.parse(scheduled_from)
+			this.eventScheduledTo = scheduled_to && dateFns.parse(scheduled_to)
+			this.eventShareLink = share_link
+			this.eventInsertedAt = inserted_at && dateFns.parse(inserted_at)
+			this.eventModifiedAt = updated_at && dateFns.parse(updated_at)
+			this.eventOrganizerMessage = organizer_message;
 			(preferences || {
 				weekdays: []
 			}).weekdays.forEach(weekday => {
@@ -309,7 +312,8 @@ export const eventDataMixin = {
 				eventScheduledFrom: this.eventScheduledFrom,
 				eventScheduledTo: this.eventScheduledTo,
 				eventShareLink: this.eventShareLink,
-				eventWeekdays: this.eventWeekdays
+				eventWeekdays: this.eventWeekdays,
+				eventOrganizerMessage: this.eventOrganizerMessage
 			};
 		},
 		eventDataForRequest() {
@@ -321,6 +325,7 @@ export const eventDataMixin = {
 				time_window_to: this.eventTimeWindowTo && dateFns.format(this.eventTimeWindowTo, 'YYYY-MM-DD'),
 				email: this.eventOrganizerEmail,
 				email_confirmation: this.eventOrganizerEmail_confirmation,
+				organizer_message: this.eventOrganizerMessage,
 				preferences: {
 					weekdays: (this.eventWeekdays.every((weekday) => weekday.value) ? [] :
 						this.eventWeekdays.map(({
@@ -457,6 +462,15 @@ export const eventHelpersMixin = {
 				});
 			}
 		},
+		eventScheduledTime() {
+			let time = this.eventScheduledFrom;
+
+			if (time) {
+				return dateFns.format(time, this.$i18n.t('time_format'), {
+					locale: this.$i18n.t('date_fns_locale')
+				});
+			}
+		},
 		eventScheduledDateTime() {
 			let time = this.eventScheduledFrom;
 
@@ -492,10 +506,18 @@ export const eventHelpersMixin = {
 			return this.eventState == "SCHEDULED";
 		},
 		minDate() {
-			return dateFns.max(this.eventTimeWindowFrom, dateFns.startOfTomorrow())
+			if (this.eventScheduled) {
+				return dateFns.eventScheduledFrom
+			} else {
+				return dateFns.max(this.eventTimeWindowFrom, dateFns.startOfTomorrow())
+			}
 		},
 		maxDate() {
-			return dateFns.max(this.eventTimeWindowTo)
+			if (this.eventScheduled) {
+				return dateFns.eventScheduledTo
+			} else {
+				return dateFns.max(this.eventTimeWindowTo)
+			}
 		},
 		dateDomain() {
 			return dateFns.isAfter(this.minDate, this.maxDate) ? [] : dateFns.eachDay(this.minDate, this.maxDate)

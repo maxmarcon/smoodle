@@ -133,7 +133,8 @@ export default {
 			red: "Red",
 			green: "Green",
 			edit_event: "Edit event",
-			event_modified: '{organizer} modified this event {time_distance}.'
+			event_modified: '{organizer} modified this event {time_distance}.',
+			organizer_message: 'Enter a message for the participants:'
 		},
 		home: {
 			title: 'Events made easy',
@@ -165,6 +166,7 @@ export default {
 			bad: 'bad|bad'
 		},
 		date_format: 'MM/DD/YYYY',
+		time_format: 'h:mm A',
 		datetime_format: 'MM/DD/YYYY h:mm A',
 		week_days: {
 			mo: 'Monday',
@@ -370,6 +372,7 @@ export default {
 			bad: 'unpassend|unpassende'
 		},
 		date_format: 'DD/MM/YYYY',
+		time_format: 'HH:mm',
 		datetime_format: 'DD/MM/YYYY HH:mm',
 		week_days: {
 			mo: 'Montag',
@@ -574,6 +577,7 @@ export default {
 			bad: 'non va bene|non vanno bene'
 		},
 		date_format: 'DD/MM/YYYY',
+		time_format: 'HH:mm',
 		datetime_format: 'DD/MM/YYYY HH:mm',
 		week_days: {
 			mo: 'Lunedì',

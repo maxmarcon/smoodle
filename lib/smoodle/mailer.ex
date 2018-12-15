@@ -15,7 +15,7 @@ defmodule Smoodle.Mailer do
   end
 
   def max_emails do
-    Kernel.get_in(get_config(), [:rate_limit, :max_emails]) || @max_emails
+    Kernel.get_in(get_config(), [:rate_limit, :max_emails]) || @default_max_emails
   end
 
   def time_bucket_msec do

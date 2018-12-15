@@ -122,6 +122,7 @@ const CANCEL_EVENT_BUTTON = 'button[name="cancel-button"]'
 const EDIT_POLL_BUTTON = 'button[name="edit-poll-button"]'
 const OPEN_EVENT_BUTTON = 'button[name="open-button"]'
 const SCHEDULE_EVENT_BUTTON = 'button[name="schedule-button"]'
+const ORGANIZER_MESSAGE = 'this is a message from the organizer'
 
 const buttonSelectors = {
 	organizer: {
@@ -522,8 +523,8 @@ describe('eventViewer', () => {
 				expect(wrapper.findAll('.alert').length).toBe(1)
 			})
 
-			it('does not render calendar', () => {
-				expect(wrapper.find('v-calendar').exists()).toBeFalsy()
+			it('renders the calendar', () => {
+				expect(wrapper.find('v-calendar').exists()).toBeTruthy()
 			})
 
 			buttonSelectors.all.forEach(selector => {
@@ -657,6 +658,7 @@ describe('eventViewer', () => {
 						beforeEach((done) => {
 
 							wrapper.vm.selectedDate = wrapper.vm.scheduleCalendarAttributes[0].dates
+							wrapper.find('#scheduleEventModal textarea#organizerMessage').setValue(ORGANIZER_MESSAGE)
 							wrapper.find('#scheduleEventModal button.btn-primary').trigger('click')
 
 							setTimeout(done, 0)
@@ -669,6 +671,7 @@ describe('eventViewer', () => {
 									event: {
 										state: 'SCHEDULED',
 										secret: EVENT_SECRET,
+										organizer_message: ORGANIZER_MESSAGE,
 										scheduled_from: '2018-09-29T19:30:00.000Z',
 										scheduled_to: '2018-09-30T01:30:00.000Z'
 									}
@@ -692,10 +695,11 @@ describe('eventViewer', () => {
 						expect(wrapper.find('#cancelEventModal').visible()).toBeTruthy()
 					})
 
-					describe('clicking on cancel within the modal', () => {
+					describe('clicking on primary button within the modal', () => {
 
 						beforeEach((done) => {
 
+							wrapper.find('#cancelEventModal textarea#organizerMessage').setValue(ORGANIZER_MESSAGE)
 							wrapper.find('#cancelEventModal button.btn-primary').trigger('click')
 
 							setTimeout(done, 0)
@@ -707,7 +711,8 @@ describe('eventViewer', () => {
 								data: {
 									event: {
 										state: 'CANCELED',
-										secret: EVENT_SECRET
+										secret: EVENT_SECRET,
+										organizer_message: ORGANIZER_MESSAGE
 									}
 								}
 							})

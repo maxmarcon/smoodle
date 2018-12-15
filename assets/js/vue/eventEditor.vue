@@ -253,7 +253,7 @@ export default {
 					errorKeys: 'name'
 				},
 				eventDesc: {
-					required: true,
+					required: false,
 					errorField: 'eventDescError',
 					errorKeys: 'desc'
 				}
