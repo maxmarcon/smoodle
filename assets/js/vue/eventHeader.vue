@@ -16,8 +16,7 @@ export default {
 	props: {
 		eventName: String,
 		eventOrganizer: String,
-		eventTimeWindowFrom: [String, Date],
-		eventTimeWindowTo: [String, Date],
+		eventTimeWindow: String,
 		eventScheduledFrom: [String, Date],
 		eventScheduledTo: [String, Date],
 		eventState: String

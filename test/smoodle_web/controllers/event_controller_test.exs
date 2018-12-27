@@ -4,7 +4,6 @@ defmodule SmoodleWeb.EventControllerTest do
 
   alias Smoodle.Scheduler
   alias Smoodle.Scheduler.Event
-  alias Smoodle.Scheduler.Event.Preferences
 
   import Ecto.Query
   alias Smoodle.Repo
@@ -13,8 +12,9 @@ defmodule SmoodleWeb.EventControllerTest do
     name: "Party",
     desc: "Yeah!",
     organizer: "The Hoff",
-    time_window_from: "2117-03-01",
-    time_window_to: "2117-06-01",
+    possible_dates: [
+      %{date_from: "2117-03-01", date_to: "2117-06-01"}
+    ],
     preferences: %{
       weekdays: [
         %{
@@ -34,8 +34,7 @@ defmodule SmoodleWeb.EventControllerTest do
     name: "Dinner",
     desc: "Yummy!",
     organizer: "The Hoff",
-    time_window_from: "2117-04-01",
-    time_window_to: "2117-08-20",
+    possible_dates: [%{date_from: "2117-04-01", date_to: "2117-08-20"}],
     preferences: nil,
     email: "bot@fake.com",
     email_confirmation: "bot@fake.com"
@@ -56,58 +55,23 @@ defmodule SmoodleWeb.EventControllerTest do
   #  name: "Event"
   # }
 
-  defp match_event(event, api_event, exclude \\ [])
+  defp check_event(data = %{}, verify = %{} \\ %{}) do
+    assert Map.has_key?(data, "id")
+    assert Map.has_key?(data, "preferences")
 
-  defp match_event(%Event{} = event, api_event, exclude) do
-    match_event(Map.from_struct(event), api_event, exclude)
-  end
+    unless is_nil(data["preferences"]) do
+      assert is_map(data["preferences"])
+    end
 
-  defp match_event(event, api_event, exclude) when is_map(event) and is_map(api_event) do
-    exclude = [:__meta__, :polls, :preferences | exclude]
+    assert Map.has_key?(data, "name")
+    assert Map.has_key?(data, "desc")
+    assert Map.has_key?(data, "organizer")
+    assert Map.has_key?(data, "possible_dates")
+    assert is_list(data["possible_dates"])
+    refute Enum.empty?(data["possible_dates"])
 
-    Enum.each(event, fn {key, val} ->
-      if key in exclude do
-        nil
-      else
-        val =
-          cond do
-            key in [:scheduled_from, :scheduled_to, :inserted_at, :updated_at] and !is_binary(val) and
-                !is_nil(val) ->
-              DateTime.to_iso8601(val)
-
-            key in [:time_window_from, :time_window_to] and !is_binary(val) and !is_nil(val) ->
-              Date.to_string(val)
-
-            true ->
-              val
-          end
-
-        assert val == api_event[to_string(key)]
-      end
-    end)
-
-    match_preferences(event.preferences, api_event["preferences"])
-  end
-
-  defp match_preferences(nil, nil) do
-  end
-
-  defp match_preferences(%Preferences{} = preferences, api_preferences) do
-    match_preferences(Map.from_struct(preferences), api_preferences)
-  end
-
-  defp match_preferences(preferences, api_preferences) do
-    Enum.each(preferences, fn {:weekdays, weekdays} ->
-      assert length(weekdays) == length(api_preferences["weekdays"])
-
-      Enum.each(weekdays, fn wk ->
-        api_wk =
-          Enum.find(api_preferences["weekdays"], fn api_wk ->
-            api_wk["day"] == wk.day
-          end)
-
-        assert wk.permitted == api_wk["permitted"]
-      end)
+    Enum.each(verify, fn {key, value} ->
+      assert data[to_string(key)] == value
     end)
   end
 
@@ -132,14 +96,12 @@ defmodule SmoodleWeb.EventControllerTest do
 
     test "lists all events", %{conn: conn, events: events} do
       conn = get(conn, event_path(conn, :index))
-      assert length(json_response(conn, 200)["data"]) == 2
-      data = json_response(conn, 200)["data"]
+      event_list = json_response(conn, 200)["data"]
 
-      Enum.each(events, fn event ->
-        api_event = Enum.find(data, &(&1["id"] == event.id))
-        refute Map.has_key?(api_event, "secret")
-        refute Map.has_key?(api_event, "email")
-        match_event(event, api_event, [:email, :secret])
+      assert for(event <- events, do: event.id) == for(data <- event_list, do: data["id"])
+
+      Enum.each(event_list, fn data ->
+        check_event(data)
       end)
     end
   end
@@ -156,13 +118,18 @@ defmodule SmoodleWeb.EventControllerTest do
     test "fetches the event when called with the right secret", %{conn: conn, event: event} do
       conn = get(conn, event_path(conn, :show, event.id, %{secret: event.secret}))
       data_response = json_response(conn, 200)["data"]
-      match_event(event, data_response)
+
+      check_event(data_response, Map.take(event, [:id, :email, :secret]))
     end
 
     test "fetches the event without secret", %{conn: conn, event: event} do
       conn = get(conn, event_path(conn, :show, event.id))
       data_response = json_response(conn, 200)["data"]
-      match_event(event, data_response, [:email, :secret])
+
+      refute Map.has_key?(data_response, "secret")
+      refute Map.has_key?(data_response, "email")
+
+      check_event(data_response, Map.take(event, [:id]))
     end
   end
 
@@ -175,13 +142,13 @@ defmodule SmoodleWeb.EventControllerTest do
     test "renders event when data is valid", %{conn: conn} do
       conn = post(conn, event_path(conn, :create), event: @create_attrs_1)
       data = json_response(conn, 201)["data"]
-      assert Map.has_key?(data, "id")
-      assert Map.has_key?(data, "secret")
 
       location = List.first(get_resp_header(conn, "location"))
       assert location == event_path(conn, :show, data["id"])
 
-      match_event(@create_attrs_1, data, [:email_confirmation])
+      check_event(data, Map.take(@create_attrs_1, [:desc, :organizer, :name]))
+
+      assert Map.has_key?(data, "secret")
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
@@ -251,13 +218,14 @@ defmodule SmoodleWeb.EventControllerTest do
         )
 
       data = json_response(conn, 200)["data"]
-      assert Map.has_key?(data, "id")
-      assert Map.has_key?(data, "secret")
       assert Map.has_key?(data, "updated_at")
+
       location = List.first(get_resp_header(conn, "location"))
       assert location == event_path(conn, :show, data["id"])
 
-      match_event(Map.merge(event, @update_attrs), data)
+      check_event(data, @update_attrs)
+
+      assert Map.has_key?(data, "secret")
     end
 
     test "renders errors when data is invalid", %{conn: conn, event: event} do

@@ -98,28 +98,26 @@
 
 						.form-group.row.justify-content-center.justify-content-md-between.justify-content-lg-center
 							.col-md-6.mb-4.text-center
-								v-date-picker(
+								v-date-picker#pollDateRanks(
 									mode="single"
-									v-model="selectedDates"
+									v-model="datesSelection"
 									nav-visibility="hidden"
 									:is-inline="true"
 									:is-required="true"
 									:is-double-paned="differentMonths"
 									:attributes="datePickerAttributes"
 									:is-linked="true"
-									:min-date="minDate"
-									:max-date="maxDate"
+									:from-page="fromPage"
 									:show-caps="true"
 									popover-visibility="hidden"
 									:disabled-attribute="disabledAttribute"
-									:drag-attribute="dragAttribute"
-									:select-attribute="selectAttrubute"
-									:disabled-dates="disabledDates"
+									:select-attribute="selectAttribute"
+									:available-dates="eventDomain"
 									@input="newDate"
 								)
 								.small.text-danger {{ pollDateRanksError }}
 
-								.d-flex.mt-2.justify-content-center.align-items-end(@click="clearSelectedDates")
+								.d-flex.mt-2.justify-content-center.align-items-end(@click="cleardatesSelection")
 										.form-check
 											p-radio.p-icon.p-plain(name="selectedDateRank" :value="1" v-model="selectedDateRank" toggle)
 												i.icon.fas.fa-heart.text-success(slot="extra")
@@ -137,7 +135,7 @@
 												label(slot="off-label")
 
 							.col-11.col-md-3.offset-md-1
-								ranker(:elements="pollWeekdayRanks")
+								ranker#pollWeekdayRanks(:elements="pollWeekdayRanks")
 								.small.text-danger {{ pollWeekdayRanksError }}
 
 
@@ -217,13 +215,8 @@ export default {
 			requestOngoing: false,
 			loaded: false,
 			loadedSuccessfully: false,
-			selectedDates: null,
+			datesSelection: null,
 			selectedDateRank: 1,
-			dragAttribute: {
-				popover: {
-					visibility: 'hidden'
-				}
-			},
 			disabledAttribute: {
 				contentStyle: {
 					color: colorCodes.red,
@@ -268,8 +261,8 @@ export default {
 				this.$refs.eventNoLongerOpenModal.show();
 			}
 		},
-		clearSelectedDates() {
-			this.selectedDates = null;
+		cleardatesSelection() {
+			this.datesSelection = null;
 		},
 		savePoll() {
 			let self = this;
@@ -343,66 +336,57 @@ export default {
 		}
 	},
 	computed: {
+		fromPage() {
+			return {
+				month: dateFns.getMonth(this.minDate) + 1, // from dateFns 0=Jan...11=Dec to v-calendar 1=Jan...12=Dec
+				year: dateFns.getYear(this.minDate)
+			}
+		},
 		datePickerAttributes() {
-			return this.pollDateRanks.map(({
-				date,
-				rank,
-				key
-			}) => ({
-				key: key,
-				dates: date,
-				excludeDates: this.disabledDates,
-				highlight: {
-					backgroundColor: this.colorForRank(rank)
-				},
-				order: 2
-			}))
-			.concat(this.dateDomain.length == 0 ? [] : [{
-				dates: {
-					start: this.minDate,
-					end: this.maxDate,
-					excludeDates: this.disabledDates,
-					weekdays: this.pollWeekdayRanks.filter(({value}) => value == 1).map(({
-						day
-					}) => ((day + 1) % 7) + 1)
-				}, // from 0=Mon...6=Sun to v-calendar's 1=Sun... 7=Sat,
-				highlight: {
-					animated: true,
-					backgroundColor: this.colorForRank(1),
-					opacity: 1
-				},
-				order: 1
-			}, {
-				dates: {
-					start: this.minDate,
-					end: this.maxDate,
-					excludeDates: this.disabledDates,
-					weekdays: this.pollWeekdayRanks.filter(({value}) => value == -1).map(({
-						day
-					}) => ((day + 1) % 7) + 1)
-				}, // from 0=Mon...6=Sun to v-calendar's 1=Sun... 7=Sat,
-				highlight: {
-					animated: true,
-					backgroundColor: this.colorForRank(-1),
-					opacity: 1
-				},
-				order: 1
-			}])
-			.concat(this.dateDomain.map(date =>
-				({
+			return this.eventDomain.map(date => {
+				let dateRank = this.pollDateRanks.find(({
+					date: rank_date
+				}) => dateFns.isEqual(date, rank_date))
+
+				if (dateRank) {
+					return {
+						key: dateRank.key,
+						dates: date,
+						highlight: {
+							backgroundColor: this.colorForRank(dateRank.rank)
+						}
+					}
+				}
+
+				let weekdayRank = this.pollWeekdayRanks.find(({
+					day
+				}) => ((day + 1) % 7) == dateFns.getDay(date))
+
+				if (weekdayRank) {
+					return {
+						dates: date,
+						highlight: {
+							animated: true,
+							backgroundColor: this.colorForRank(weekdayRank.value),
+							opacity: 1
+						}
+					}
+				}
+
+				return {
 					dates: date,
-					excludeDates: this.disabledDates,
 					highlight: {
-						backgroundColor: this.colorForRank(0)
-					},
-					order: 0
-				})
-			))
+						animated: true,
+						backgroundColor: this.colorForRank(0),
+						opacity: 1
+					}
+				}
+			})
 		},
 		selectedDateRankColor() {
 			return this.colorForRank(this.selectedDateRank);
 		},
-		selectAttrubute() {
+		selectAttribute() {
 			return {
 				highlight: {
 					backgroundColor: this.selectedDateRankColor

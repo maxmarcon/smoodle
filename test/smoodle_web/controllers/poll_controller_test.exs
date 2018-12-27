@@ -2,15 +2,17 @@ defmodule SmoodleWeb.PollControllerTest do
   use SmoodleWeb.ConnCase
 
   alias Smoodle.Scheduler
-  alias Smoodle.Scheduler.Poll
-  alias Smoodle.Scheduler.Poll.Preferences
 
   @event_attrs_1 %{
     name: "Party",
     desc: "Yeah!",
     organizer: "The Hoff",
-    time_window_from: "2117-03-01",
-    time_window_to: "2117-06-01",
+    possible_dates: [
+      %{
+        date_from: "2117-03-01",
+        date_to: "2117-06-01"
+      }
+    ],
     email: "bot@fake.com",
     email_confirmation: "bot@fake.com"
   }
@@ -49,6 +51,7 @@ defmodule SmoodleWeb.PollControllerTest do
   }
 
   @poll_update_attrs_1 %{
+    organizer: "Shaq",
     preferences: %{
       weekday_ranks: [
         %{
@@ -152,87 +155,21 @@ defmodule SmoodleWeb.PollControllerTest do
     %{polls: [poll1, poll2]}
   end
 
-  defp match_poll(poll, api_poll, exclude \\ [])
+  defp check_poll(poll = %{}, verify = %{}) do
+    assert Map.has_key?(poll, "participant")
+    assert Map.has_key?(poll, "preferences")
+    assert Map.has_key?(poll, "event_id")
 
-  defp match_poll(%Poll{} = poll, api_poll, exclude) do
-    match_poll(Map.from_struct(poll), api_poll, exclude)
-  end
-
-  defp match_poll(poll, api_poll, exclude) do
-    exclude = [:__meta__, :date_ranks, :preferences, :event | exclude]
-
-    Enum.each(poll, fn {key, val} ->
-      if key in exclude do
-        nil
-      else
-        val =
-          cond do
-            key in [:inserted_at, :updated_at] and !is_binary(val) and !is_nil(val) ->
-              DateTime.to_iso8601(val)
-
-            true ->
-              val
-          end
-
-        assert val == api_poll[to_string(key)]
-      end
-    end)
-
-    match_preferences(poll.preferences, api_poll["preferences"])
-    match_date_ranks(poll.date_ranks, api_poll["date_ranks"])
-  end
-
-  def match_preferences(nil, nil) do
-  end
-
-  def match_preferences(%Preferences{} = preferences, api_preferences) do
-    match_preferences(Map.from_struct(preferences), api_preferences)
-  end
-
-  def match_preferences(preferences, api_preferences) do
-    Enum.each(preferences, fn {:weekday_ranks, weekday_ranks} ->
-      assert length(weekday_ranks) == length(api_preferences["weekday_ranks"])
-
-      Enum.each(weekday_ranks, fn wk ->
-        api_wk =
-          Enum.find(api_preferences["weekday_ranks"], fn api_wk ->
-            api_wk["day"] == wk.day
-          end)
-
-        assert wk.rank == api_wk["rank"]
-      end)
-    end)
-  end
-
-  def match_date_ranks(date_ranks, api_date_ranks)
-      when is_list(date_ranks) and is_list(api_date_ranks) do
-    assert length(date_ranks) == length(api_date_ranks)
-
-    normalize_date_rank = fn %{rank: rank, date_from: date_from, date_to: date_to} ->
-      date_from =
-        if is_binary(date_from) do
-          date_from
-        else
-          Date.to_string(date_from)
-        end
-
-      date_to =
-        if is_binary(date_to) do
-          date_to
-        else
-          Date.to_string(date_to)
-        end
-
-      %{"rank" => rank, "date_from" => date_from, "date_to" => date_to}
+    unless is_nil(poll["preferences"]) do
+      assert is_map(poll["preferences"])
     end
 
-    assert Enum.sort(Enum.map(date_ranks, normalize_date_rank)) ==
-             Enum.sort(
-               Enum.map(
-                 api_date_ranks,
-                 &Map.drop(&1, ["inserted_at", "updated_at", "id", "poll_id"])
-               )
-             )
+    assert Map.has_key?(poll, "date_ranks")
+    assert is_list(poll["date_ranks"])
+
+    Enum.each(verify, fn {key, val} ->
+      assert poll[to_string(key)] == val
+    end)
   end
 
   describe "index" do
@@ -247,10 +184,9 @@ defmodule SmoodleWeb.PollControllerTest do
       assert length(json_response(conn, 200)["data"]) == 2
       data = json_response(conn, 200)["data"]
 
-      Enum.each(polls, fn poll ->
-        api_poll = Enum.find(data, &(&1["id"] == poll.id))
-        match_poll(poll, api_poll)
-      end)
+      assert for(d <- data, do: d["id"]) == for(p <- polls, do: p.id)
+
+      Enum.each(data, &check_poll(&1, %{event_id: event.id}))
     end
 
     test "does not fetch any polls for event if owner token is wrong", %{conn: conn, event: event} do
@@ -263,7 +199,8 @@ defmodule SmoodleWeb.PollControllerTest do
       poll = hd(polls)
       conn = get(conn, event_poll_path(conn, :index, event.id), %{participant: poll.participant})
       data = json_response(conn, 200)["data"]
-      match_poll(poll, data)
+
+      check_poll(data, Map.take(poll, [:id, :participant, :event_id]))
     end
 
     test "does not fetch any polls for event if participant is wrong", %{conn: conn, event: event} do
@@ -281,7 +218,8 @@ defmodule SmoodleWeb.PollControllerTest do
     test "fetches a poll via its id", %{conn: conn, polls: [poll | _]} do
       conn = get(conn, poll_path(conn, :show, poll.id))
       data = json_response(conn, 200)["data"]
-      match_poll(poll, data)
+
+      check_poll(data, Map.take(poll, [:id, :participant, :event_id]))
     end
 
     test "fetching a poll via its id does not leak event owner token", %{
@@ -307,7 +245,7 @@ defmodule SmoodleWeb.PollControllerTest do
       location = List.first(get_resp_header(conn, "location"))
       assert location == poll_path(conn, :show, data["id"])
 
-      match_poll(@poll_valid_attrs_1, data)
+      check_poll(data, Map.take(@poll_update_attrs_1, [:participant]))
     end
 
     test "attemp to create a poll with invalid parameters renders errors", %{
@@ -333,7 +271,7 @@ defmodule SmoodleWeb.PollControllerTest do
       assert Map.has_key?(data, "id")
       assert Map.has_key?(data, "updated_at")
 
-      match_poll(Map.merge(poll, @poll_update_attrs_1), data)
+      check_poll(data, Map.take(@poll_update_attrs_1, [:participant]))
     end
 
     test "date ranks can be deleted when passing an empty array", %{conn: conn, polls: [poll | _]} do
@@ -352,7 +290,8 @@ defmodule SmoodleWeb.PollControllerTest do
       assert Map.has_key?(data, "id")
       assert Map.has_key?(data, "updated_at")
 
-      match_poll(Map.merge(poll, update), data)
+      check_poll(data, Map.take(update, [:participant]))
+      assert Enum.empty?(data["date_ranks"])
     end
 
     test "weekday ranks can be deleted when passing an empty map as preferences", %{
@@ -374,7 +313,8 @@ defmodule SmoodleWeb.PollControllerTest do
       assert Map.has_key?(data, "id")
       assert Map.has_key?(data, "updated_at")
 
-      match_poll(Map.merge(poll, update), data)
+      check_poll(data, Map.take(update, [:participant]))
+      assert Enum.empty?(get_in(data, ["preferences", "weekday_ranks"]))
     end
 
     test "weekday ranks can be deleted when passing an empty array", %{
@@ -396,7 +336,8 @@ defmodule SmoodleWeb.PollControllerTest do
       assert Map.has_key?(data, "id")
       assert Map.has_key?(data, "updated_at")
 
-      match_poll(Map.merge(poll, update), data)
+      check_poll(data, Map.take(update, [:participant]))
+      assert Enum.empty?(get_in(data, ["preferences", "weekday_ranks"]))
     end
 
     test "attempt to update a poll with invalid parameters renders errors", %{

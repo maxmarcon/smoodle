@@ -174,9 +174,8 @@
 											:attributes="scheduleCalendarAttributes"
 											:is-inline="true"
 											:is-linked="true"
-											:min-date="minDate"
-											:max-date="maxDate"
-											:disabled-dates="disabledDates"
+											:from-page="fromPage"
+											:available-dates="eventDomain"
 											:is-double-paned="differentMonths"
 											:select-attribute="selectAttrubute"
 											nav-visibility="hidden"
@@ -352,12 +351,19 @@ export default {
 				self.eventScheduleParticipants = scheduleResult.data.data.participants;
 				self.eventScheduleParticipantsCount = scheduleResult.data.data.participants_count;
 				self.loadedSuccessfully = true;
+				console.dir(self.eventData)
 			})
 			.finally(function() {
 				self.loaded = true
 			});
 	},
 	computed: {
+		fromPage() {
+			return {
+				month: dateFns.getMonth(this.minDate) + 1, // from dateFns 0=Jan...11=Dec to v-calendar 1=Jan...12=Dec
+				year: dateFns.getYear(this.minDate)
+			}
+		},
 		isOrganizer() {
 			return this.secret;
 		},

@@ -56,6 +56,7 @@ defmodule Smoodle.Scheduler do
   """
   def update_event(%Event{} = event, attrs) do
     event
+    |> Repo.preload(:possible_dates)
     |> Event.changeset(attrs)
     |> Repo.update()
   end
@@ -157,7 +158,7 @@ defmodule Smoodle.Scheduler do
     %{
       dates:
         Enum.map(
-          date_ranking(date_domain(event), polls, limit),
+          date_ranking(Event.domain(event), polls, limit),
           fn date_entry ->
             if is_owner do
               date_entry
@@ -174,41 +175,6 @@ defmodule Smoodle.Scheduler do
         end,
       participants_count: Enum.count(polls)
     }
-  end
-
-  defp date_domain(%Event{
-         preferences: preferences,
-         time_window_from: time_window_from,
-         time_window_to: time_window_to
-       }) do
-    start_date =
-      case Date.compare(Date.utc_today(), time_window_from) do
-        :gt -> Date.utc_today()
-        _ -> time_window_from
-      end
-
-    end_date = time_window_to
-
-    # when there are no preferences or weekdays is empty, all days are good
-    weekdays_permitted =
-      if is_nil(preferences) || Enum.empty?(preferences.weekdays) do
-        Map.new(1..7, &{&1, true})
-      else
-        Map.new(preferences.weekdays, fn %{day: day, permitted: permitted} ->
-          {day + 1, permitted}
-        end)
-      end
-
-    case Date.compare(start_date, end_date) do
-      :lt ->
-        Enum.filter(
-          Date.range(start_date, end_date),
-          &(weekdays_permitted[Date.day_of_week(&1)] || false)
-        )
-
-      _ ->
-        []
-    end
   end
 
   defp date_ranking(date_domain, polls, limit \\ nil) do

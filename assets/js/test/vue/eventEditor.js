@@ -44,14 +44,14 @@ const inputElements = [
 	'input#eventOrganizerEmailConfirmation',
 	'input#eventName',
 	'textarea#eventDesc',
-	'v-date-picker#eventTimeWindow',
+	'v-date-picker#eventPossibleDates',
 	'ranker#eventWeekdays'
 ]
 
 const inputElementsForUpdate = [
 	'input#eventName',
 	'textarea#eventDesc',
-	'v-date-picker#eventTimeWindow',
+	'v-date-picker#eventPossibleDates',
 	'ranker#eventWeekdays'
 ]
 
@@ -61,14 +61,14 @@ const errorElements = [
 	'.invalid-feedback[name="event-organizer-email-confirmation-error"]',
 	'.invalid-feedback[name="event-name-error"]',
 	'.invalid-feedback[name="event-desc-error"]',
-	'.small.text-danger[name="event-time-window-error"]',
+	'.small.text-danger[name="event-possible-dates-error"]',
 	'.small.text-danger[name="event-weekdays-error"]'
 ]
 
 const errorElementsForUpdate = [
 	'.invalid-feedback[name="event-name-error"]',
 	'.invalid-feedback[name="event-desc-error"]',
-	'.small.text-danger[name="event-time-window-error"]',
+	'.small.text-danger[name="event-possible-dates-error"]',
 	'.small.text-danger[name="event-weekdays-error"]'
 ]
 
@@ -77,8 +77,10 @@ const EVENT_SECRET = "NGQ4NkdBQWVTd0U9"
 
 const EVENT_DATA = {
 	"updated_at": "2018-09-20T17:06:20.000000Z",
-	"time_window_to": "2019-12-01",
-	"time_window_from": "2019-06-01",
+	"possible_dates": [{
+		"date_to": "2019-12-01",
+		"date_from": "2019-06-01",
+	}],
 	"state": "OPEN",
 	"share_link": "http://localhost:4000/events/bf6747d5-7b32-4bde-8e2d-c055d9bb02d3",
 	"secret": EVENT_SECRET,
@@ -92,7 +94,6 @@ const EVENT_DATA = {
 	"email": "maxmarcon@gmx.net",
 	"desc": "Be our guest!"
 }
-
 
 describe('eventEditor', () => {
 
@@ -172,7 +173,7 @@ describe('eventEditor', () => {
 								"email_confirmation": [CANT_BE_BLANK],
 								"desc": [CANT_BE_BLANK],
 								"name": [CANT_BE_BLANK],
-								"time_window": [CANT_BE_BLANK],
+								"possible_dates": [CANT_BE_BLANK],
 								"preferences": {"weekdays": [CANT_BE_BLANK]}
 							}
 						}
@@ -218,8 +219,7 @@ describe('eventEditor', () => {
 				expect(eventHeader.attributes('eventstate')).toBe(EVENT_DATA.state)
 				expect(eventHeader.attributes('eventscheduledfrom')).toBeUndefined()
 				expect(eventHeader.attributes('eventscheduledto')).toBeUndefined()
-				expect(eventHeader.attributes('eventtimewindowfrom')).toBeDefined()
-				expect(eventHeader.attributes('eventtimewindowto')).toBeDefined()
+				expect(eventHeader.attributes('eventtimewindow')).toBeDefined()
 			})
 
 			it('renders the main card', () => {
@@ -283,8 +283,7 @@ describe('eventEditor', () => {
 				expect(eventHeader.attributes('eventstate')).toBe(EVENT_DATA.state)
 				expect(eventHeader.attributes('eventscheduledfrom')).toBeUndefined()
 				expect(eventHeader.attributes('eventscheduledto')).toBeUndefined()
-				expect(eventHeader.attributes('eventtimewindowfrom')).toBeDefined()
-				expect(eventHeader.attributes('eventtimewindowto')).toBeDefined()
+				expect(eventHeader.attributes('eventtimewindow')).toBeDefined()
 			})
 
 			it('renders the main card', () => {
@@ -421,7 +420,7 @@ describe('eventEditor', () => {
 									"email_confirmation": [CANT_BE_BLANK],
 									"desc": [CANT_BE_BLANK],
 									"name": [CANT_BE_BLANK],
-									"time_window": [CANT_BE_BLANK],
+									"possible_dates": [CANT_BE_BLANK],
 									"preferences": {"weekdays": [CANT_BE_BLANK]	}
 								}
 							}

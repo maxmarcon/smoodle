@@ -136,4 +136,64 @@ defmodule Smoodle.Scheduler.Utils do
         changeset
     end
   end
+
+  @spec validate_no_overlapping_dates(Ecto.Changeset.t(), atom) :: list
+  @doc """
+  Validates that a list of date ranges accessed via "key" do not overlap
+
+  ### Examples:
+
+  iex> cs = Ecto.Changeset.change({%{dates: []}, %{dates: List}}, %{dates: [%{date_from: ~D[2018-10-01], date_to: ~D[2018-10-14]}]})
+  iex> cs = Smoodle.Scheduler.Utils.validate_no_overlapping_dates(cs, :dates)
+  iex> cs.errors
+  []
+
+  iex> cs = Ecto.Changeset.change({%{dates: [%{date_from: ~D[2018-10-01], date_to: ~D[2018-10-05]}, %{date_from: ~D[2018-10-03], date_to: ~D[2018-10-06]}]}, %{dates: List}}, %{})
+  iex> cs = Smoodle.Scheduler.Utils.validate_no_overlapping_dates(cs, :dates)
+  iex> cs.errors
+  [dates: {"dates cannot overlap", [validation: :overlapping_dates]}]
+
+
+  iex> cs = Ecto.Changeset.change({%{dates: [%{date_from: ~D[2018-10-01], date_to: ~D[2018-10-05]}]}, %{dates: List}}, %{})
+  iex> cs = Smoodle.Scheduler.Utils.validate_no_overlapping_dates(cs, :dates)
+  iex> cs.errors
+  []
+
+  iex> cs = Ecto.Changeset.change({%{dates: []}, %{dates: List}}, %{dates: [%{date_from: ~D[2018-10-01], date_to: ~D[2018-10-14]}, %{date_from: ~D[2018-10-01], date_to: ~D[2018-10-01]}]})
+  iex> cs = Smoodle.Scheduler.Utils.validate_no_overlapping_dates(cs, :dates)
+  iex> cs.errors
+  [dates: {"dates cannot overlap", [validation: :overlapping_dates]}]
+
+  iex> cs = Ecto.Changeset.change({%{dates: []}, %{dates: List}}, %{})
+  iex> cs = Smoodle.Scheduler.Utils.validate_no_overlapping_dates(cs, :dates)
+  iex> cs.errors
+  []
+
+  iex> cs = Ecto.Changeset.change({%{dates: []}, %{dates: List}}, %{dates: [%{date_from: ~D[2018-10-01], date_to: ~D[2018-10-01]}]})
+  iex> cs = Smoodle.Scheduler.Utils.validate_no_overlapping_dates(cs, :dates)
+  iex> cs.errors
+  []
+  """
+  def validate_no_overlapping_dates(changeset, key) do
+    flattened_ranges_sorted_by_date_from =
+      changeset
+      |> get_field(key)
+      |> Enum.filter(&(!is_nil(&1.date_from) && !is_nil(&1.date_to)))
+      |> Enum.sort_by(& &1.date_from, &date_lte/2)
+      |> Enum.flat_map(&Enum.uniq([&1.date_from, &1.date_to]))
+
+    all_dates_sorted = Enum.sort(flattened_ranges_sorted_by_date_from, &date_lte/2)
+
+    if flattened_ranges_sorted_by_date_from != all_dates_sorted ||
+         Enum.uniq(all_dates_sorted) != all_dates_sorted do
+      add_error(
+        changeset,
+        key,
+        dgettext("errors", "dates cannot overlap"),
+        validation: :overlapping_dates
+      )
+    else
+      changeset
+    end
+  end
 end

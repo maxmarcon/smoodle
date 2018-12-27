@@ -51,7 +51,6 @@ defmodule Smoodle.Mixfile do
       {:bamboo_mailjet, "~> 0.0.1"},
       {:cachex, "~> 3.0"},
       {:distillery, "~> 2.0"},
-      {:mock, "~> 0.3.0", only: :test},
       {:jason, "~> 1.1"}
     ]
   end

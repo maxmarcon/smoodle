@@ -208,7 +208,7 @@ defmodule Smoodle.Scheduler.PollTest do
 
       refute changeset.valid?
 
-      assert %{date_ranks: [{_, [validation: :overlapping_date_ranks]}]} =
+      assert %{date_ranks: [{_, [validation: :overlapping_dates]}]} =
                traverse_errors(changeset, & &1)
     end
   end
@@ -234,7 +234,7 @@ defmodule Smoodle.Scheduler.PollTest do
 
       refute changeset.valid?
 
-      assert %{date_ranks: [{_, [validation: :overlapping_date_ranks]}]} =
+      assert %{date_ranks: [{_, [validation: :overlapping_dates]}]} =
                traverse_errors(changeset, & &1)
     end
   end

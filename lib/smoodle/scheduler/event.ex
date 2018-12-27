@@ -4,9 +4,9 @@ defmodule Smoodle.Scheduler.Event do
   import Ecto.Changeset
   import SmoodleWeb.Gettext
 
-  alias Smoodle.Repo
   alias Smoodle.Scheduler.Event
   alias Smoodle.Scheduler.Poll
+  alias Smoodle.Scheduler.EventDate
   import Smoodle.Scheduler.Utils
   alias Smoodle.Scheduler.WeekdayConfig
 
@@ -24,8 +24,6 @@ defmodule Smoodle.Scheduler.Event do
     field(:name, :string)
     field(:organizer, :string)
     field(:secret, :string)
-    field(:time_window_from, :date)
-    field(:time_window_to, :date)
     field(:scheduled_from, :utc_datetime)
     field(:scheduled_to, :utc_datetime)
     field(:desc, :string)
@@ -34,6 +32,8 @@ defmodule Smoodle.Scheduler.Event do
     field(:state, :string, default: "OPEN")
 
     has_many(:polls, Poll)
+
+    has_many(:possible_dates, EventDate, on_replace: :delete)
 
     embeds_one(:preferences, Preferences, primary_key: false, on_replace: :delete) do
       embeds_many(:weekdays, WeekdayConfig)
@@ -52,8 +52,6 @@ defmodule Smoodle.Scheduler.Event do
     |> cast(attrs, [
       :name,
       :organizer,
-      :time_window_from,
-      :time_window_to,
       :scheduled_from,
       :scheduled_to,
       :desc,
@@ -61,7 +59,7 @@ defmodule Smoodle.Scheduler.Event do
       :email,
       :state
     ])
-    |> validate_required([:name, :organizer, :email, :time_window_from, :time_window_to])
+    |> validate_required([:name, :organizer, :email])
     |> validate_length(:name, max: 50)
     |> validate_length(:organizer, max: 50)
     |> validate_length(:desc, max: 250)
@@ -69,22 +67,79 @@ defmodule Smoodle.Scheduler.Event do
     |> validate_format(:email, ~r/.+@.+\..+/)
     |> validate_length(:email, max: 100)
     |> validate_email_confirmation
+    |> cast_assoc(:possible_dates, required: true)
+    |> validate_no_overlapping_dates(:possible_dates)
+    |> validate_length(:possible_dates, max: 100)
     |> validate_window_defined([:scheduled_from, :scheduled_to], :scheduled)
-    |> validate_window_consistent([:time_window_from, :time_window_to], :time_window, Date)
     |> validate_window_consistent([:scheduled_from, :scheduled_to], :scheduled)
-    |> validate_is_the_future([:scheduled_from, :scheduled_to])
-    |> validate_is_the_future([:time_window_from, :time_window_to], Date)
-    |> validate_window_not_too_large([:time_window_from, :time_window_to], 365, :time_window)
+    |> validate_scheduled_in_the_future()
     |> trim_text_changes([:name, :organizer, :desc])
     |> validate_inclusion(:state, @valid_states)
     |> clear_or_validate_scheduled
     |> clear_organizer_message
     |> cast_embed(:preferences, with: &preferences_changeset/2)
+    |> validate_domain_not_empty()
+    |> validate_date_range_not_too_large(max_days: 365)
   end
 
   def changeset_insert(attrs) do
     changeset(%Event{}, attrs)
     |> change(%{secret: SecureRandom.urlsafe_base64(@secret_len)})
+  end
+
+  @doc """
+  Returns the range of all the possible dates for this event
+  """
+  def date_range(%Event{possible_dates: possible_dates}) do
+    _date_range(possible_dates)
+  end
+
+  defp _date_range(possible_dates) when is_list(possible_dates) and length(possible_dates) > 0 do
+    all_dates = Enum.flat_map(possible_dates, &Enum.uniq([&1.date_from, &1.date_to]))
+
+    Date.range(
+      Enum.min_by(all_dates, &Date.to_string/1),
+      Enum.max_by(all_dates, &Date.to_string/1)
+    )
+  end
+
+  @spec domain(%Event{preferences: map, possible_dates: list}) :: [Date.t()]
+  @doc """
+
+  iex> Event.domain(%Event{preferences: %{weekdays: []}, possible_dates: [%{date_from: ~D[2118-01-03], date_to: ~D[2118-01-09]}]})
+  [ ~D[2118-01-03], ~D[2118-01-04], ~D[2118-01-05], ~D[2118-01-06], ~D[2118-01-07], ~D[2118-01-08], ~D[2118-01-09] ]
+
+  iex> Event.domain(%Event{preferences: nil, possible_dates: [%{date_from: ~D[2118-01-03], date_to: ~D[2118-01-09]}]})
+  [ ~D[2118-01-03], ~D[2118-01-04], ~D[2118-01-05], ~D[2118-01-06], ~D[2118-01-07], ~D[2118-01-08], ~D[2118-01-09] ]
+
+  iex> Event.domain(%Event{preferences: %{weekdays: [%{day: 0, permitted: true}, %{day: 6, permitted: true}]}, possible_dates: [%{date_from: ~D[2118-01-03], date_to: ~D[2118-01-09]}]})
+  [ ~D[2118-01-03], ~D[2118-01-09] ]
+
+  iex> Event.domain(%Event{preferences: %{weekdays: [%{day: 0, permitted: false}]}, possible_dates: [%{date_from: ~D[2118-01-03], date_to: ~D[2118-01-09]}]})
+  [ ]
+  """
+  def domain(%Event{
+        preferences: preferences,
+        possible_dates: possible_dates
+      }) do
+    # when there are no preferences or weekdays is empty, all days are good
+
+    weekdays_permitted =
+      if is_nil(preferences) || Enum.empty?(preferences.weekdays) do
+        Map.new(1..7, &{&1, true})
+      else
+        Map.new(preferences.weekdays, fn %{day: day, permitted: permitted} ->
+          # convert from 0-based, Monday-first to 1-based Monday-first
+          {day + 1, permitted}
+        end)
+      end
+
+    possible_dates
+    |> Enum.flat_map(fn %{date_from: date_from, date_to: date_to} ->
+      Date.range(date_from, date_to)
+    end)
+    |> Enum.reject(&(Date.compare(Date.utc_today(), &1) == :gt))
+    |> Enum.filter(&(weekdays_permitted[Date.day_of_week(&1)] || false))
   end
 
   defp clear_organizer_message(changeset) do
@@ -116,25 +171,6 @@ defmodule Smoodle.Scheduler.Event do
       changeset
       |> validate_required(:scheduled_from)
       |> validate_required(:scheduled_to)
-    end
-  end
-
-  defp validate_window_not_too_large(changeset, keys, max_days, error_key) do
-    with [t1, t2] <- Enum.map(keys, &fetch_field(changeset, &1)) |> Enum.map(&elem(&1, 1)),
-         false <- Enum.any?([t1, t2], &is_nil/1),
-         true <- Date.diff(t2, t1) > max_days do
-      add_error(
-        changeset,
-        error_key,
-        dgettext(
-          "errors",
-          "you cannot select a time window larger than %{max_days} days",
-          max_days: max_days
-        ),
-        validation: :time_interval_too_large
-      )
-    else
-      _ -> changeset
     end
   end
 
@@ -181,22 +217,11 @@ defmodule Smoodle.Scheduler.Event do
     end
   end
 
-  @doc """
-    Using fetch_change and not fetch_field here because we still need to be able
-    to update events whose time_window_from is in the past. Example: event has not been
-    scheduled yet, but the current date already lies within the time window
-  """
-  defp validate_is_the_future(changeset, keys, t \\ DateTime) do
-    today =
-      case t do
-        DateTime -> DateTime.utc_now()
-        Date -> Date.utc_today()
-      end
-
-    Enum.reduce(keys, changeset, fn key, changeset ->
-      with {:ok, date_or_time} <- fetch_change(changeset, key),
-           %{} <- date_or_time,
-           :gt <- t.compare(today, date_or_time) do
+  defp validate_scheduled_in_the_future(changeset) do
+    Enum.reduce([:scheduled_from, :scheduled_to], changeset, fn key, changeset ->
+      with {:ok, datetime} <- fetch_change(changeset, key),
+           false <- is_nil(datetime),
+           :gt <- DateTime.compare(DateTime.utc_now(), datetime) do
         add_error(
           changeset,
           key,
@@ -207,5 +232,37 @@ defmodule Smoodle.Scheduler.Event do
         _ -> changeset
       end
     end)
+  end
+
+  defp validate_domain_not_empty(changeset) do
+    if changeset.valid? && Enum.empty?(Event.domain(Ecto.Changeset.apply_changes(changeset))) do
+      add_error(
+        changeset,
+        :possible_dates,
+        dgettext("errors", "there must be at least one possible date"),
+        validation: :empty
+      )
+    else
+      changeset
+    end
+  end
+
+  defp validate_date_range_not_too_large(changeset, max_days: max_days) do
+    with true <- changeset.valid?,
+         event <- Ecto.Changeset.apply_changes(changeset),
+         date_range <- Event.date_range(event),
+         false <- Enum.any?([date_range.first, date_range.last], &is_nil/1),
+         true <- Date.diff(date_range.last, date_range.first) > max_days do
+      add_error(
+        changeset,
+        :possible_dates,
+        dgettext("errors", "you cannot select a time window larger than %{max_days} days",
+          max_days: max_days
+        ),
+        validation: :time_interval_too_large
+      )
+    else
+      _ -> changeset
+    end
   end
 end

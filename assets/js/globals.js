@@ -31,8 +31,6 @@ export function stringifyServerError(error) {
 }
 
 export const accordionGroupsMixin = {
-	// TODO: add a 'required' boolean attribute to the field
-	// to specify that the field is required (if false, skip local validation for that field)
 	data: () => ({
 		wasServerValidated: false,
 		wasLocalValidated: false
@@ -60,7 +58,7 @@ export const accordionGroupsMixin = {
 					}
 
 					let errorMsgs = []
-					if (fieldMapObj.required && !self[field]) {
+					if (fieldMapObj.required && (!self[field] || (self[field] instanceof Array && self[field].length <= 0))) {
 						errorMsgs.push(self.$i18n.t('errors.required_field'))
 					}
 					if (fieldMapObj.customValidation) {
@@ -239,8 +237,7 @@ export const eventDataMixin = {
 			eventDesc: null,
 			eventState: null,
 			eventShareLink: null,
-			eventTimeWindowFrom: null,
-			eventTimeWindowTo: null,
+			eventPossibleDates: [],
 			eventScheduledFrom: null,
 			eventScheduledTo: null,
 			eventInsertedAt: null,
@@ -256,8 +253,6 @@ export const eventDataMixin = {
 			organizer,
 			email,
 			desc,
-			time_window_from,
-			time_window_to,
 			state,
 			scheduled_from,
 			scheduled_to,
@@ -265,14 +260,20 @@ export const eventDataMixin = {
 			inserted_at,
 			updated_at,
 			preferences,
+			possible_dates = [],
 			organizer_message
 		}) {
 			this.eventName = name
 			this.eventOrganizer = organizer
 			this.eventOrganizerEmail = email
 			this.eventDesc = desc
-			this.eventTimeWindowFrom = time_window_from && dateFns.parse(time_window_from)
-			this.eventTimeWindowTo = time_window_to && dateFns.parse(time_window_to)
+			this.eventPossibleDates = possible_dates.map(({
+				date_from,
+				date_to
+			}) => ({
+				date_from: dateFns.parse(date_from),
+				date_to: dateFns.parse(date_to)
+			}))
 			this.eventState = state
 			this.eventScheduledFrom = scheduled_from && dateFns.parse(scheduled_from)
 			this.eventScheduledTo = scheduled_to && dateFns.parse(scheduled_to)
@@ -306,14 +307,14 @@ export const eventDataMixin = {
 				eventOrganizer: this.eventOrganizer,
 				eventOrganizerEmail: this.eventOrganizerEmail,
 				eventDesc: this.eventDesc,
-				eventTimeWindowFrom: this.eventTimeWindowFrom,
-				eventTimeWindowTo: this.eventTimeWindowTo,
+				eventPossibleDates: this.eventPossibleDates,
 				eventState: this.eventState,
 				eventScheduledFrom: this.eventScheduledFrom,
 				eventScheduledTo: this.eventScheduledTo,
 				eventShareLink: this.eventShareLink,
 				eventWeekdays: this.eventWeekdays,
-				eventOrganizerMessage: this.eventOrganizerMessage
+				eventOrganizerMessage: this.eventOrganizerMessage,
+				eventTimeWindow: this.formattedEventTimeWindow
 			};
 		},
 		eventDataForRequest() {
@@ -321,8 +322,13 @@ export const eventDataMixin = {
 				name: this.eventName,
 				desc: this.eventDesc,
 				organizer: this.eventOrganizer,
-				time_window_from: this.eventTimeWindowFrom && dateFns.format(this.eventTimeWindowFrom, 'YYYY-MM-DD'),
-				time_window_to: this.eventTimeWindowTo && dateFns.format(this.eventTimeWindowTo, 'YYYY-MM-DD'),
+				possible_dates: this.eventPossibleDates.map(({
+					date_from,
+					date_to
+				}) => ({
+					date_from: dateFns.format(date_from, 'YYYY-MM-DD'),
+					date_to: dateFns.format(date_to, 'YYYY-MM-DD')
+				})),
 				email: this.eventOrganizerEmail,
 				email_confirmation: this.eventOrganizerEmail_confirmation,
 				organizer_message: this.eventOrganizerMessage,
@@ -370,12 +376,17 @@ export const pollDataMixin = {
 						}))
 				},
 				date_ranks: this.pollDateRanks
-				.filter(({rank}) => rank)
-				.map(({date, rank}) => ({
-					date_from: dateFns.format(date, 'YYYY-MM-DD'),
-					date_to: dateFns.format(date, 'YYYY-MM-DD'),
-					rank: rank
-				}))
+					.filter(({
+						rank
+					}) => rank)
+					.map(({
+						date,
+						rank
+					}) => ({
+						date_from: dateFns.format(date, 'YYYY-MM-DD'),
+						date_to: dateFns.format(date, 'YYYY-MM-DD'),
+						rank: rank
+					}))
 			}
 		}
 	},
@@ -437,9 +448,9 @@ export const pollDataMixin = {
 
 export const eventHelpersMixin = {
 	computed: {
-		eventTimeWindow() {
-			let from = this.eventTimeWindowFrom;
-			let to = this.eventTimeWindowTo;
+		formattedEventTimeWindow() {
+			let from = this.minDate
+			let to = this.maxDate
 
 			if (from && to) {
 				return dateFns.format(from, this.$i18n.t('date_format'), {
@@ -507,40 +518,48 @@ export const eventHelpersMixin = {
 		},
 		minDate() {
 			if (this.eventScheduled) {
-				return dateFns.eventScheduledFrom
-			} else {
-				return dateFns.max(this.eventTimeWindowFrom, dateFns.startOfTomorrow())
+				return this.eventScheduledFrom
+			} else if (this.eventDomain.length > 0) {
+				return dateFns.min.apply(null, this.eventDomain)
 			}
 		},
 		maxDate() {
 			if (this.eventScheduled) {
-				return dateFns.eventScheduledTo
-			} else {
-				return dateFns.max(this.eventTimeWindowTo)
+				return this.eventScheduledTo
+			} else if (this.eventDomain.length > 0) {
+				return dateFns.max.apply(null, this.eventDomain)
 			}
 		},
-		dateDomain() {
-			return dateFns.isAfter(this.minDate, this.maxDate) ? [] : dateFns.eachDay(this.minDate, this.maxDate)
+		dateRange() {
+			if (this.allDates.length <= 0) {
+				return {
+					start: null,
+					end: null
+				}
+			}
+			return {
+				start: dateFns.min.apply(null, this.allDates),
+				end: dateFns.max.apply(null, this.allDates)
+			}
+		},
+		allDates() {
+			return this.eventPossibleDates.flatMap(({
+					date_from,
+					date_to
+				}) => dateFns.eachDay(date_from, date_to))
+		},
+		eventDomain() {
+			let enabledWeekdays = this.eventWeekdays.filter(({
+				value
+			}) => value).map(({
+				day
+			}) => (day + 1) % 7) // from 0=Mon...6=Sun to dateFns's 0=Sun...6=Sat
+
+			return this.allDates.filter(date =>
+				enabledWeekdays.indexOf(dateFns.getDay(date)) > -1)
 		},
 		differentMonths() {
 			return dateFns.differenceInCalendarMonths(this.maxDate, this.minDate) > 0;
-		},
-		disabledDates() {
-			return [{
-				start: this.minDate,
-				end: this.maxDate,
-				weekdays: this.eventWeekdays.filter(({
-					value
-				}) => !value).map(({
-					day
-				}) => ((day + 1) % 7) + 1) // from 0=Mon...6=Sun to v-calendar's 1=Sun... 7=Sat
-			}, {
-				start: null,
-				end: dateFns.subDays(this.minDate, 1),
-			}, {
-				start: dateFns.addDays(this.maxDate, 1),
-				end: null
-			}]
 		},
 		eventBackgroundClass() {
 			if (this.eventOpen) {
@@ -564,7 +583,10 @@ export const nameListTrimmerMixin = {
 			if (list.length <= maxVisible) {
 				return list.join(', ')
 			} else {
-				return this.$i18n.t('trimmed_list', {list: list.slice(0, maxVisible).join(', '), others: list.length - maxVisible})
+				return this.$i18n.t('trimmed_list', {
+					list: list.slice(0, maxVisible).join(', '),
+					others: list.length - maxVisible
+				})
 			}
 		}
 	}

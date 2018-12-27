@@ -12,7 +12,7 @@ defmodule SmoodleWeb.EventController do
 
   def index(conn, _params) do
     if Enum.member?([:test, :dev], Application.get_env(:smoodle, :env)) do
-      events = Scheduler.list_events()
+      events = Repo.preload(Scheduler.list_events(), :possible_dates)
       render(conn, :index, events: events)
     else
       {:error, :forbidden}
@@ -41,12 +41,12 @@ defmodule SmoodleWeb.EventController do
   end
 
   def show(conn, %{"id" => id, "secret" => secret}) do
-    event = Scheduler.get_event!(id, secret)
+    event = Repo.preload(Scheduler.get_event!(id, secret), :possible_dates)
     render(conn, :show, event: event)
   end
 
   def show(conn, %{"id" => id}) do
-    event = Scheduler.get_event!(id)
+    event = Repo.preload(Scheduler.get_event!(id), :possible_dates)
     render(conn, :show, event: Map.delete(event, :secret))
   end
 
@@ -71,7 +71,7 @@ defmodule SmoodleWeb.EventController do
   end
 
   def schedule(conn, %{"id" => id, "secret" => secret} = params) do
-    event = Scheduler.get_event!(id, secret)
+    event = Repo.preload(Scheduler.get_event!(id, secret), :possible_dates)
 
     render(conn, :schedule, %{
       schedule:
@@ -83,7 +83,7 @@ defmodule SmoodleWeb.EventController do
   end
 
   def schedule(conn, %{"id" => id} = params) do
-    event = Scheduler.get_event!(id)
+    event = Repo.preload(Scheduler.get_event!(id), :possible_dates)
 
     render(conn, :schedule, %{
       schedule: Scheduler.get_best_schedule(event, schedule_parse_params(params))

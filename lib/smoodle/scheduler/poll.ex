@@ -41,7 +41,7 @@ defmodule Smoodle.Scheduler.Poll do
     |> validate_required([:participant])
     |> cast_assoc(:date_ranks)
     |> cast_embed(:preferences, with: &preferences_changeset/2)
-    |> validate_no_overlapping_date_ranks
+    |> validate_no_overlapping_dates(:date_ranks)
     |> validate_length(:date_ranks, max: 100)
     |> assoc_constraint(:event)
     |> unique_constraint(:participant, name: :polls_event_id_participant_index)
@@ -61,49 +61,26 @@ defmodule Smoodle.Scheduler.Poll do
     end
   end
 
-  defp validate_date_ranks_within_event_time_window(changeset) do
-    %Event{time_window_from: from, time_window_to: to} = get_field(changeset, :event)
-
-    if changeset
-       |> get_field(:date_ranks)
-       |> Enum.filter(&(!is_nil(&1.date_from) && !is_nil(&1.date_to)))
-       |> Enum.flat_map(&[&1.date_from, &1.date_to])
-       |> Enum.all?(fn date ->
-         Enum.member?(Date.range(from, to), date)
-       end) do
-      changeset
-    else
-      add_error(
-        changeset,
-        :date_ranks,
-        dgettext("errors", "dates cannot be outside of the event time window"),
-        validation: :date_ranks_outside_of_event_window
-      )
-    end
-  end
-
-  defp validate_no_overlapping_date_ranks(changeset) do
-    flattened_ranks_sorted_by_date_from =
-      changeset
-      |> get_field(:date_ranks)
-      |> Enum.filter(&(!is_nil(&1.date_from) && !is_nil(&1.date_to)))
-      |> Enum.sort_by(& &1.date_from, &date_lte/2)
-      |> Enum.flat_map(&Enum.uniq([&1.date_from, &1.date_to]))
-
-    all_dates_sorted = Enum.sort(flattened_ranks_sorted_by_date_from, &date_lte/2)
-
-    if flattened_ranks_sorted_by_date_from != all_dates_sorted ||
-         Enum.uniq(all_dates_sorted) != all_dates_sorted do
-      add_error(
-        changeset,
-        :date_ranks,
-        dgettext("errors", "dates cannot overlap"),
-        validation: :overlapping_date_ranks
-      )
-    else
-      changeset
-    end
-  end
+  # defp validate_date_ranks_within_event_time_window(changeset) do
+  #  %Event{time_window_from: from, time_window_to: to} = get_field(changeset, :event)
+  #
+  #  if changeset
+  #     |> get_field(:date_ranks)
+  #     |> Enum.filter(&(!is_nil(&1.date_from) && !is_nil(&1.date_to)))
+  #     |> Enum.flat_map(&[&1.date_from, &1.date_to])
+  #     |> Enum.all?(fn date ->
+  #       Enum.member?(Date.range(from, to), date)
+  #     end) do
+  #    changeset
+  #  else
+  #    add_error(
+  #      changeset,
+  #      :date_ranks,
+  #      dgettext("errors", "dates cannot be outside of the event time window"),
+  #      validation: :date_ranks_outside_of_event_window
+  #    )
+  #  end
+  # end
 
   defp preferences_changeset(preferences, attrs) do
     preferences

@@ -12,8 +12,7 @@
 				event-header#event-header(
 					:eventName="eventName"
 					:eventOrganizer="eventOrganizer"
-					:eventTimeWindowFrom="eventTimeWindowFrom"
-					:eventTimeWindowTo="eventTimeWindowTo"
+					:eventTimeWindow="formattedEventTimeWindow"
 					eventState="OPEN"
 				)
 			ul.list-group.list-group-flush(v-if="eventCreated")
@@ -155,25 +154,39 @@
 					)
 						b-card
 							.form-group.row
-								label.col.text-center.col-form-label(for="eventTimeWindow") {{ $t('event_editor.event.dates') }}
+								label.col.text-center.col-form-label(for="eventPossibleDates") {{ $t('event_editor.event.dates') }}
 							.form-group.row.justify-content-center.justify-content-md-between.justify-content-lg-center
 								.col-md-6.mb-4.text-center
-									v-date-picker#eventTimeWindow(
-										mode="range"
-										v-model="eventTimeWindow"
+									v-date-picker#eventPossibleDates(
+										:mode="selectedDateRank == 1 ? 'range' : 'single'"
+										v-model="datesSelection"
 										nav-visibility="hidden"
 										:min-date="today"
 										:is-inline="true"
 										:is-double-paned="true"
+										:from-page="fromPage"
 										:is-linked="true"
 										:show-caps="true"
 										:attributes="datePickerAttributes"
 										popover-visibility="hidden"
-										:drag-attribute="dragAndSelectionAttribute"
-										:select-attribute="dragAndSelectionAttribute"
-										@input="datesSelected"
+										:select-attribute="selectAttribute"
+										:drag-attribute="selectAttribute"
+										@input="newDate"
+										@drag="drag"
 									)
-									.small.text-danger(name="event-time-window-error") {{ eventTimeWindowError }}
+									.small.text-danger(name="event-possible-dates-error") {{ eventPossibleDatesError }}
+
+									.d-flex.mt-2.justify-content-center.align-items-end
+										.form-check
+											p-radio.p-icon.p-plain(name="selectedDateRank" :value="1" v-model="selectedDateRank" toggle)
+												i.icon.fas.fa-heart.text-success(slot="extra")
+												i.icon.far.fa-heart(slot="off-extra")
+												label(slot="off-label")
+										.form-check
+											p-radio.p-icon.p-plain(name="selectedDateRank" :value="-1" v-model="selectedDateRank" toggle)
+												i.icon.fas.fa-thumbs-down.text-danger(slot="extra")
+												i.icon.far.fa-thumbs-down(slot="off-extra")
+												label(slot="off-label")
 
 								.col-11.col-md-3.offset-md-1
 									ranker#eventWeekdays(:elements="eventWeekdays" boolean=true @change="localValidation")
@@ -212,6 +225,7 @@ import {
 	scrollToTopMixin,
 	restMixin,
 	eventDataMixin,
+	eventHelpersMixin,
 	whatsAppHelpersMixin,
 	colorCodes
 } from '../globals'
@@ -219,7 +233,7 @@ import {
 const today = new Date();
 
 export default {
-	mixins: [accordionGroupsMixin, restMixin, scrollToTopMixin, eventDataMixin, whatsAppHelpersMixin],
+	mixins: [accordionGroupsMixin, restMixin, scrollToTopMixin, eventDataMixin, eventHelpersMixin,whatsAppHelpersMixin],
 	props: {
 		eventId: String,
 		secret: String
@@ -259,10 +273,10 @@ export default {
 				}
 			},
 			'dates-group': {
-				eventTimeWindow: {
+				eventPossibleDates: {
 					required: true,
-					errorField: 'eventTimeWindowError',
-					errorKeys: ['time_window_to', 'time_window_from', 'time_window']
+					errorField: 'eventPossibleDatesError',
+					errorKeys: ['possible_dates']
 				},
 				eventWeekdays: {
 					errorField: 'eventWeekdaysError',
@@ -281,8 +295,7 @@ export default {
 		eventOrganizerEmailError: null,
 		eventOrganizerEmailError_confirmation: null,
 		eventDescError: null,
-		eventTimeWindow: null,
-		eventTimeWindowError: null,
+		eventPossibleDatesError: null,
 		eventWeekdaysError: null,
 		today,
 		loadedSuccessfully: false,
@@ -290,15 +303,10 @@ export default {
 		eventCreated: false,
 		createdEventId: null,
 		createdEventSecret: null,
-		dragAndSelectionAttribute: {
-			highlight: {
-				backgroundColor: colorCodes.green
-			},
-			popover: {
-				visibility: 'hidden'
-			},
-			order: 0
-		},
+		selectedDateRank: 1,
+		datesSelection: null,
+		selectedDateRange: null,
+		fromPage: null,
 	}),
 	created() {
 		if (this.eventId) {
@@ -310,9 +318,13 @@ export default {
 					}
 				}).then(function(result) {
 					self.assignEventData(result.data.data)
-					self.applyDates(self.eventTimeWindowFrom, self.eventTimeWindowTo)
-					self.loadedSuccessfully = true
+					self.selectedDateRange = self.dateRange
+					self.loadedSuccessfully 	= true
 					self.groupVisibility['dates-group'] = true
+					self.fromPage = {
+						month: dateFns.getMonth(self.minDate) + 1, // from dateFns 0=Jan...11=Dec to v-calendar 1=Jan...12=Dec
+						year: dateFns.getYear(self.minDate)
+					}
 				}).finally(function() {
 					self.loaded = true
 				})
@@ -329,26 +341,49 @@ export default {
 			return this.secret || this.createdEventSecret
 		},
 		datePickerAttributes() {
-			return [{
-				dates: {
-					start: this.eventTimeWindowFrom,
-					end: this.eventTimeWindowTo,
-					weekdays: this.eventWeekdays.filter(({
-						value
-					}) => !value).map(({
-						day
-					}) => ((day + 1) % 7) + 1) // from 0=Mon...6=Sun to v-calendar's 1=Sun... 7=Sat,
-				},
-				highlight: {
-					animated: true,
-					backgroundColor: colorCodes.red,
-					opacity: 1
-				},
-				order: 1
-			}]
+			if (!this.selectedDateRange) {
+				return []
+			}
+
+			return dateFns.eachDay(this.selectedDateRange.start, this.selectedDateRange.end)
+				.filter(date => !this.eventDomain.find(d => dateFns.isEqual(d, date)))
+				.map(date => ({
+					dates: date,
+					highlight: {
+						animated: false,
+						backgroundColor: this.colorForRank(-1),
+						opacity: 1
+					},
+					order: 2
+				})).concat({
+					dates: {
+						start: this.selectedDateRange.start,
+						end: this.selectedDateRange.end,
+					},
+					highlight: {
+						animated: false,
+						backgroundColor: this.colorForRank(1),
+						opacity: 0.6
+					},
+					order: 1
+				})
 		},
+		selectedDateRankColor() {
+			return this.colorForRank(this.selectedDateRank);
+		},
+		selectAttribute() {
+			return {
+				highlight: {
+					backgroundColor: this.selectedDateRankColor
+				},
+				popover: {
+					visibility: 'hidden'
+				}
+			}
+		}
 	},
 	methods: {
+		colorForRank: (rank) => (rank > 0 ? colorCodes.green : (rank < 0 ? colorCodes.red : colorCodes.yellow)),
 		customValidate(fieldName, fieldVal) {
 			if (fieldName == 'eventWeekdays') {
 				if (fieldVal.every(({value}) => !value)) {
@@ -356,19 +391,76 @@ export default {
 				}
 			}
 		},
-		datesSelected() {
-			this.eventTimeWindowFrom = this.eventTimeWindow.start;
-			this.eventTimeWindowTo = this.eventTimeWindow.end;
-			this.localValidation();
+		clearDateSelection() {
+			this.datesSelection = null;
+		},
+		drag(value) {
+			if (value && this.eventPossibleDates.length > 0) {
+				this.eventPossibleDates = []
+				this.selectedDateRange = null
+			}
+		},
+		newDate(value) {
+			if (value) {
+				if (this.selectedDateRank == 1 && value.start && value.end) {
+					// only range supported (mode = range)
+					this.eventPossibleDates = [{
+						date_from: value.start,
+						date_to: value.end,
+					}]
+					this.selectedDateRange = value
+					this.clearDateSelection()
+					this.localValidation()
+
+				} else if (this.selectedDateRank == -1 && value instanceof Date) {
+					// only array supported (mode = single)
+					let toReplaceIndex = this.eventPossibleDates.findIndex(({
+						date_from,
+						date_to
+					}) => dateFns.isWithinRange(value, date_from, date_to))
+
+					if (toReplaceIndex > -1) {
+						let toReplace = this.eventPossibleDates[toReplaceIndex]
+
+						let before_date = dateFns.subDays(value, 1)
+						let after_date = dateFns.addDays(value, 1)
+						let replaceMent = []
+
+						if (!dateFns.isBefore(before_date, toReplace.date_from)) {
+							replaceMent.push({
+								date_from: toReplace.date_from,
+								date_to: before_date
+							})
+						}
+						if (!dateFns.isAfter(after_date, toReplace.date_to)) {
+							replaceMent.push({
+								date_from: after_date,
+								date_to: toReplace.date_to
+							})
+						}
+						if (replaceMent.length > 1) {
+							this.eventPossibleDates.splice(toReplaceIndex, 1, replaceMent[0], replaceMent[1])
+						} else if (replaceMent.length > 0) {
+							this.eventPossibleDates.splice(toReplaceIndex, 1, replaceMent[0])
+						} else {
+							this.eventPossibleDates.splice(toReplaceIndex, 1)
+						}
+						this.localValidation()
+
+					} else {
+						this.clearDateSelection()
+					}
+
+				}
+				/*console.dir(this.eventPossibleDates)
+				console.dir(this.allDates)
+				console.dir(this.eventDomain)
+				console.log(this.minDate)
+				console.log(this.maxDate)*/
+			}
 		},
 		clipboard() {
 			this.$refs.copiedToClipboardModal.show()
-		},
-		applyDates(from, to) {
-			this.eventTimeWindow = {
-				start: from,
-				end: to
-			}
 		},
 		saveEvent() {
 			let self = this;

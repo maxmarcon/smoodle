@@ -11,8 +11,16 @@ defmodule Smoodle.SchedulerTest do
     name: "Party",
     desc: "Yeah!",
     organizer: "The Hoff",
-    time_window_from: "2117-03-01",
-    time_window_to: "2117-06-01",
+    possible_dates: [
+      %{
+        date_from: "2117-03-01",
+        date_to: "2117-05-01"
+      },
+      %{
+        date_from: "2117-05-20",
+        date_to: "2117-06-01"
+      }
+    ],
     preferences: %{
       weekdays: [
         %{
@@ -37,24 +45,17 @@ defmodule Smoodle.SchedulerTest do
     email_confirmation: "bot1@fake.com"
   }
 
-  @event_no_preferences %{
-    name: "Party",
-    desc: "Yeah!",
-    organizer: "The Hoff",
-    time_window_from: "2117-03-01",
-    time_window_to: "2117-06-01",
-    preferences: nil,
-    email: "bot1@fake.com",
-    email_confirmation: "bot1@fake.com"
-  }
-
   @event_valid_attrs_2 %{
     name: "Breakfast",
     desc: "Mmmhhh!",
     organizer: "The Hoff",
     preferences: nil,
-    time_window_from: "2118-01-01",
-    time_window_to: "2118-06-01",
+    possible_dates: [
+      %{
+        date_from: "2118-01-01",
+        date_to: "2118-06-01"
+      }
+    ],
     email: "bot2@fake.com",
     email_confirmation: "bot2@fake.com"
   }
@@ -71,22 +72,27 @@ defmodule Smoodle.SchedulerTest do
     scheduled_from: "2117-03-20T23:10:00Z"
   }
 
-  defp convert_time_fields(event) when is_map(event) do
-    Enum.map(event, fn {key, val} ->
-      val =
-        cond do
-          key in [:scheduled_from, :scheduled_to] and is_binary(val) ->
-            DateTime.from_iso8601(val)
+  defp check_new_event(data, event) do
+    assert Map.take(data, [
+             :organizer,
+             :name,
+             :desc,
+             :email
+           ]) ==
+             Map.take(event, [
+               :organizer,
+               :name,
+               :desc,
+               :email
+             ])
 
-          key in [:time_window_from, :time_window_to] and is_binary(val) ->
-            Date.from_iso8601(val)
+    assert is_nil(event.scheduled_from)
+    assert is_nil(event.scheduled_to)
 
-          true ->
-            val
-        end
-
-      {key, val}
-    end)
+    assert data[:preferences] ==
+             Map.update!(Map.from_struct(event.preferences), :weekdays, fn weekdays ->
+               Enum.map(weekdays, &Map.from_struct/1)
+             end)
   end
 
   describe "when retrieving events" do
@@ -99,17 +105,17 @@ defmodule Smoodle.SchedulerTest do
 
     test "list_events/0 returns all events", %{events: events} do
       listed_events = Scheduler.list_events()
-      assert MapSet.new(listed_events) == MapSet.new(events)
+      assert MapSet.new(Repo.preload(listed_events, :possible_dates)) == MapSet.new(events)
     end
 
     test "get_event!/1 returns the event with given id", %{events: [event | _]} do
       fetched_event = Scheduler.get_event!(event.id)
-      assert fetched_event == event
+      assert Repo.preload(fetched_event, :possible_dates) == event
     end
 
     test "get_event!/2 returns the event with given id and secret", %{events: [event | _]} do
       fetched_event = Scheduler.get_event!(event.id, event.secret)
-      assert fetched_event == event
+      assert Repo.preload(fetched_event, :possible_dates) == event
     end
 
     test "get_event!/2 does not returns the event if the secret is wrong", %{events: [event | _]} do
@@ -120,12 +126,11 @@ defmodule Smoodle.SchedulerTest do
   describe "when creating an event" do
     test "create_event/2 with valid data creates an event" do
       assert {:ok, %Event{} = event} = Scheduler.create_event(@event_valid_attrs_1)
-      temp = convert_time_fields(@event_valid_attrs_1)
-      assert temp = event
+      check_new_event(@event_valid_attrs_1, event)
       assert String.length(event.secret) == 16
       assert Map.has_key?(event, :inserted_at)
       assert event.state == "OPEN"
-      assert Scheduler.get_event!(event.id) == event
+      assert Repo.preload(Scheduler.get_event!(event.id), :possible_dates) == event
     end
 
     # test "create_event/2 with valid data for validation does not create an event and returns valid changeset" do
@@ -160,8 +165,13 @@ defmodule Smoodle.SchedulerTest do
 
     test "update_event/2 with valid data updates the event", %{event: event} do
       assert {:ok, updated_event} = Scheduler.update_event(event, @event_update_attrs)
-      temp = convert_time_fields(@event_update_attrs)
-      assert temp = updated_event
+      assert @event_update_attrs.name == updated_event.name
+      assert @event_update_attrs.state == updated_event.state
+
+      {:ok, sfrom, _} = DateTime.from_iso8601(@event_update_attrs.scheduled_from)
+      {:ok, sto, _} = DateTime.from_iso8601(@event_update_attrs.scheduled_to)
+      assert sfrom == updated_event.scheduled_from
+      assert sto == updated_event.scheduled_to
     end
 
     test "update_event/2 with valid data cannot update the token", %{event: event} do
@@ -173,8 +183,6 @@ defmodule Smoodle.SchedulerTest do
                  Map.merge(@event_update_attrs, %{secret: "sneaky_token"})
                )
 
-      temp = convert_time_fields(@event_update_attrs)
-      assert temp = updated_event
       assert event.secret == old_token
     end
 
@@ -184,16 +192,13 @@ defmodule Smoodle.SchedulerTest do
       assert {:ok, updated_event} =
                Scheduler.update_event(event, Map.merge(@event_update_attrs, %{id: "sneaky_id"}))
 
-      temp = convert_time_fields(@event_update_attrs)
-      assert temp = updated_event
-
       assert event.id == old_id
     end
 
     test "update_event/2 with invalid data returns error changeset", context do
       event = context[:event]
       assert {:error, %Ecto.Changeset{}} = Scheduler.update_event(event, @event_invalid_attrs)
-      assert event == Scheduler.get_event!(event.id)
+      assert event == Repo.preload(Scheduler.get_event!(event.id), :possible_dates)
     end
   end
 
@@ -531,10 +536,18 @@ defmodule Smoodle.SchedulerTest do
     test "get_best_schedule correctly computed the date domain for the event", %{event: event} do
       best_schedule = Scheduler.get_best_schedule(event)
 
-      assert Date.range(event.time_window_from, event.time_window_to)
-             |> Enum.filter(&(Date.day_of_week(&1) not in [1, 2, 3, 5]))
-             |> Enum.sort() ==
-               Enum.map(best_schedule.dates, fn %{date: date} -> date end) |> Enum.sort()
+      sorted_domain =
+        Enum.flat_map(event.possible_dates, fn %{date_from: date_from, date_to: date_to} ->
+          Date.range(date_from, date_to)
+        end)
+        |> Enum.filter(&(Date.day_of_week(&1) not in [1, 2, 3, 5]))
+        |> Enum.sort(&(Date.compare(&1, &2) != :gt))
+
+      computed_domain =
+        Enum.map(best_schedule.dates, fn %{date: date} -> date end)
+        |> Enum.sort(&(Date.compare(&1, &2) != :gt))
+
+      assert sorted_domain == computed_domain
     end
 
     test "get_best_schedule returns the number of participants", %{event: event, polls: polls} do
@@ -561,22 +574,6 @@ defmodule Smoodle.SchedulerTest do
 
       assert Enum.sort(best_schedule.participants) ==
                Enum.map(polls, &Map.get(&1, :participant)) |> Enum.sort()
-    end
-
-    test "get_best_schedule for event returns empty list when time window is invalid", %{
-      event: event
-    } do
-      best_schedule =
-        Scheduler.get_best_schedule(
-          %{
-            event
-            | time_window_to: event.time_window_from,
-              time_window_from: event.time_window_to
-          },
-          is_owner: true
-        )
-
-      assert Enum.empty?(best_schedule.dates)
     end
 
     test "get_best_schedule returns a shortened list when a limit is passed", %{event: event} do

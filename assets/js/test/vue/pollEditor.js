@@ -11,8 +11,10 @@ localVue.use(BootstrapVue);
 const EVENT_ID = '73b422e0-a1a1-4c42-9c91-833a82e76acd'
 const EVENT_DATA = {
 	"updated_at": "2118-09-04T18:47:21.000000Z",
-	"time_window_to": "2118-10-02",
-	"time_window_from": "2118-09-02",
+	"possible_dates": [{
+		"date_to": "2118-10-02",
+		"date_from": "2118-09-02",
+	}],
 	"state": "OPEN",
 	"scheduled_to": null,
 	"scheduled_from": null,
@@ -31,8 +33,10 @@ const EVENT_DATA = {
 
 const CANCELED_EVENT_DATA = {
 	"updated_at": "2018-09-04T18:47:21.000000Z",
-	"time_window_to": "2118-10-02",
-	"time_window_from": "2118-09-02",
+	"possible_dates": [{
+		"date_to": "2118-10-02",
+		"date_from": "2118-09-02",
+	}],
 	"state": "CANCELED",
 	"scheduled_to": null,
 	"scheduled_from": null,
@@ -198,8 +202,7 @@ describe('pollEditor', () => {
 				expect(eventHeader.attributes('eventstate')).toBe(EVENT_DATA.state)
 				expect(eventHeader.attributes('eventscheduledfrom')).toBeUndefined()
 				expect(eventHeader.attributes('eventscheduledto')).toBeUndefined()
-				expect(eventHeader.attributes('eventtimewindowfrom')).toBeDefined()
-				expect(eventHeader.attributes('eventtimewindowto')).toBeDefined()
+				expect(eventHeader.attributes('eventtimewindow')).toBeDefined()
 			})
 
 			it('renders the participant name input', () => {
@@ -387,8 +390,7 @@ describe('pollEditor', () => {
 				expect(eventHeader.attributes('eventstate')).toBe(EVENT_DATA.state)
 				expect(eventHeader.attributes('eventscheduledfrom')).toBeUndefined()
 				expect(eventHeader.attributes('eventscheduledto')).toBeUndefined()
-				expect(eventHeader.attributes('eventtimewindowfrom')).toBeDefined()
-				expect(eventHeader.attributes('eventtimewindowto')).toBeDefined()
+				expect(eventHeader.attributes('eventtimewindow')).toBeDefined()
 			})
 
 			it('does not render the participant name input', () => {
@@ -396,7 +398,7 @@ describe('pollEditor', () => {
 			})
 
 			it('renders the ranker', () => {
-				expect(wrapper.find('ranker').exists()).toBeTruthy();
+				expect(wrapper.find('ranker#pollWeekdayRanks').exists()).toBeTruthy();
 			})
 
 			it('computes the poll weekday ranks', () => {
@@ -431,15 +433,11 @@ describe('pollEditor', () => {
 			})
 
 			it('renders the date picker', () => {
-				expect(wrapper.find('v-date-picker').exists()).toBeTruthy();
+				expect(wrapper.find('v-date-picker#pollDateRanks').exists()).toBeTruthy();
 			})
 
 			it('computes datePickerAttributes', () => {
 				expect(wrapper.vm.datePickerAttributes.length).toBeGreaterThan(0)
-			})
-
-			it('computes disabledDates', () => {
-				expect(wrapper.vm.disabledDates.length).toBeGreaterThan(0)
 			})
 
 			it('renders one alert', () => {

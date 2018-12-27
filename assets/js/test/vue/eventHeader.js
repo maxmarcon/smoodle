@@ -8,8 +8,7 @@ import {
 const localVue = createLocalVue()
 
 const EVENT_DATA = {
-	"time_window_to": "2019-12-01",
-	"time_window_from": "2019-06-01",
+	"time_window": "2019-12-01 - 2019-06-01",
 	"scheduled_to": null,
 	"scheduled_from": null,
 	"organizer": "Max",
@@ -19,8 +18,7 @@ const EVENT_DATA = {
 const OPEN_EVENT = {
 	eventName: EVENT_DATA.name,
 	eventOrganizer: EVENT_DATA.organizer,
-	eventTimeWindowFrom: EVENT_DATA.time_window_from,
-	eventTimeWindowTo: EVENT_DATA.time_window_to,
+	eventTimeWindow: EVENT_DATA.time_window,
 	eventScheduledFrom: EVENT_DATA.scheduled_from,
 	eventScheduledTo: EVENT_DATA.scheduled_to,
 	eventState: "OPEN"
@@ -30,8 +28,7 @@ const OPEN_EVENT = {
 const SCHEDULED_EVENT = {
 	eventName: EVENT_DATA.name,
 	eventOrganizer: EVENT_DATA.organizer,
-	eventTimeWindowFrom: EVENT_DATA.time_window_from,
-	eventTimeWindowTo: EVENT_DATA.time_window_to,
+	eventTimeWindow: EVENT_DATA.time_window,
 	eventScheduledFrom: EVENT_DATA.scheduled_from,
 	eventScheduledTo: EVENT_DATA.scheduled_to,
 	eventState: "SCHEDULED"
@@ -41,8 +38,7 @@ const SCHEDULED_EVENT = {
 const CANCELED_EVENT = {
 	eventName: EVENT_DATA.name,
 	eventOrganizer: EVENT_DATA.organizer,
-	eventTimeWindowFrom: EVENT_DATA.time_window_from,
-	eventTimeWindowTo: EVENT_DATA.time_window_to,
+	eventTimeWindow: EVENT_DATA.time_window,
 	eventScheduledFrom: EVENT_DATA.scheduled_from,
 	eventScheduledTo: EVENT_DATA.scheduled_to,
 	eventState: "CANCELED"

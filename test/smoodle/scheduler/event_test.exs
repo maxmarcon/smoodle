@@ -1,7 +1,7 @@
 defmodule Smoodle.Scheduler.EventTest do
   use Smoodle.DataCase
-
   alias Smoodle.Scheduler.Event
+  doctest Event
 
   @organizer_message "Glad everybody can make it"
 
@@ -9,8 +9,9 @@ defmodule Smoodle.Scheduler.EventTest do
     name: "Party",
     desc: "Yeah!",
     organizer: "Donald Trump",
-    time_window_from: "2118-01-10",
-    time_window_to: "2118-03-20",
+    possible_dates: [
+      %{date_from: "2118-01-10", date_to: "2118-03-20"}
+    ],
     scheduled_from: "2118-02-05 19:00:00",
     scheduled_to: "2118-02-05 23:00:00",
     organizer_message: @organizer_message,
@@ -31,12 +32,13 @@ defmodule Smoodle.Scheduler.EventTest do
     email_confirmation: "bot@fake.com"
   }
 
-  @past_event %{
+  @past_event_scheduled %{
     name: "Party",
     desc: "Yeah!",
     organizer: "Donald Trump",
-    time_window_from: "1118-01-10",
-    time_window_to: "1118-03-20",
+    possible_dates: [
+      %{date_from: "1118-01-10", date_to: "1118-03-20"}
+    ],
     scheduled_from: "1118-02-05 19:00:00",
     scheduled_to: "1118-02-05 23:00:00",
     state: "SCHEDULED",
@@ -150,7 +152,7 @@ defmodule Smoodle.Scheduler.EventTest do
       Event.changeset(
         %Event{},
         Map.replace!(@valid_attrs, :email, "me@invaliddomain")
-        |> Map.replace(:email_confirmation, "me@invaliddomain")
+        |> Map.replace!(:email_confirmation, "me@invaliddomain")
       )
 
     assert [email: {_, [validation: :format]}] = changeset.errors
@@ -222,14 +224,6 @@ defmodule Smoodle.Scheduler.EventTest do
     assert changeset.valid?
   end
 
-  test "validate both time window ends must be defined" do
-    changeset = Event.changeset(%Event{}, Map.delete(@valid_attrs, :time_window_from))
-    assert [time_window_from: {_, [validation: :required]}] = changeset.errors
-
-    changeset = Event.changeset(%Event{}, Map.delete(@valid_attrs, :time_window_to))
-    assert [time_window_to: {_, [validation: :required]}] = changeset.errors
-  end
-
   test "validate both scheduled ends must be defined" do
     changeset = Event.changeset(%Event{}, %{@valid_attrs | scheduled_to: nil})
 
@@ -237,12 +231,6 @@ defmodule Smoodle.Scheduler.EventTest do
              changeset.errors,
              &match?({:scheduled, {_, [validation: :only_one_end_defined]}}, &1)
            )
-  end
-
-  test "validate both time window ends must be consistent" do
-    changeset = Event.changeset(%Event{}, %{@valid_attrs | time_window_from: "2118-03-21"})
-
-    assert [time_window: {_, [validation: :inconsistent_interval]}] = changeset.errors
   end
 
   test "validate both scheduled ends must be consistent" do
@@ -254,9 +242,14 @@ defmodule Smoodle.Scheduler.EventTest do
 
   test "validate time window can't be too large" do
     changeset =
-      Event.changeset(%Event{}, Map.replace!(@valid_attrs, :time_window_to, "2119-01-11"))
+      Event.changeset(
+        %Event{},
+        Map.replace!(@valid_attrs, :possible_dates, [
+          %{date_from: "2118-01-10", date_to: "2119-01-11"}
+        ])
+      )
 
-    assert [time_window: {_, [validation: :time_interval_too_large]}] = changeset.errors
+    assert [possible_dates: {_, [validation: :time_interval_too_large]}] = changeset.errors
   end
 
   test "validate weekdays" do
@@ -297,12 +290,61 @@ defmodule Smoodle.Scheduler.EventTest do
     assert changeset.valid?
   end
 
-  test "validate events cannot be in the past" do
-    changeset = Event.changeset(%Event{}, @past_event)
+  test "validate event cannot be scheduled in the past" do
+    changeset = Event.changeset(%Event{}, @past_event_scheduled)
+
     assert {_, [validation: :in_the_past]} = changeset.errors[:scheduled_to]
     assert {_, [validation: :in_the_past]} = changeset.errors[:scheduled_from]
-    assert {_, [validation: :in_the_past]} = changeset.errors[:time_window_to]
-    assert {_, [validation: :in_the_past]} = changeset.errors[:time_window_from]
+  end
+
+  test "validate possible_dates cannot overlap" do
+    changeset =
+      Event.changeset(
+        %Event{},
+        Map.replace!(@valid_attrs, :possible_dates, [
+          %{date_from: "2118-01-10", date_to: "2118-01-21"},
+          %{date_from: "2118-01-20", date_to: "2118-01-22"}
+        ])
+      )
+
+    assert [possible_dates: {_, [validation: :overlapping_dates]}] = changeset.errors
+  end
+
+  test "validate possible_dates is present" do
+    changeset =
+      Event.changeset(
+        %Event{},
+        Map.delete(@valid_attrs, :possible_dates)
+      )
+
+    assert [possible_dates: {_, [validation: :required]}] = changeset.errors
+  end
+
+  test "validate possible_dates has length > 0" do
+    changeset =
+      Event.changeset(
+        %Event{},
+        Map.replace!(@valid_attrs, :possible_dates, [])
+      )
+
+    assert [possible_dates: {_, [validation: :required]}] = changeset.errors
+  end
+
+  test "validate domain non empty" do
+    changeset =
+      Event.changeset(
+        %Event{
+          name: @valid_attrs.name,
+          organizer: @valid_attrs.organizer,
+          email: @valid_attrs.email,
+          preferences: %{weekdays: [%{day: 6, permitted: true}]}
+        },
+        %{
+          possible_dates: [%{date_from: "2118-01-03", date_to: "2118-01-08"}]
+        }
+      )
+
+    assert [possible_dates: {_, [validation: :empty]}] = changeset.errors
   end
 
   test "changeset removes trailing and leading spaces" do
