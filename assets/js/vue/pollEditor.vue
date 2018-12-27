@@ -314,8 +314,6 @@ export default {
 		},
 		colorForRank: (rank) => (rank > 0 ? colorCodes.green : (rank < 0 ? colorCodes.red : colorCodes.yellow)),
 		newDate(value) {
-			//console.log("newDate")
-			//console.dir(value)
 			if (value) {
 				let new_key = this.datesKey(value)
 				let toReplace = this.pollDateRanks.findIndex(({
@@ -332,7 +330,6 @@ export default {
 					this.pollDateRanks.splice(toReplace, 1)
 				}
 			}
-			//console.dir(this.pollDateRanks)
 		}
 	},
 	computed: {

@@ -351,7 +351,6 @@ export default {
 				self.eventScheduleParticipants = scheduleResult.data.data.participants;
 				self.eventScheduleParticipantsCount = scheduleResult.data.data.participants_count;
 				self.loadedSuccessfully = true;
-				console.dir(self.eventData)
 			})
 			.finally(function() {
 				self.loaded = true

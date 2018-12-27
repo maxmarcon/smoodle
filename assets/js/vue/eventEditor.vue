@@ -450,13 +450,7 @@ export default {
 					} else {
 						this.clearDateSelection()
 					}
-
 				}
-				/*console.dir(this.eventPossibleDates)
-				console.dir(this.allDates)
-				console.dir(this.eventDomain)
-				console.log(this.minDate)
-				console.log(this.maxDate)*/
 			}
 		},
 		clipboard() {
