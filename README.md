@@ -1,7 +1,7 @@
 # Smoodle
 
-Smoodle (the name of the outside applicaiton is now *Let's meet*, but throughout the codebase 
-the initial name *Smoodle* is still used), 
+Smoodle (the web applicaiton has been released under the name *Let's meet*, but throughout the codebase 
+the initial, tentative name *Smoodle* is still used), 
 is a responsive, mobile first single page web app that allows users to create events and share them with
 the participants to find out the best date for them. *"Best"* here means the date that works best for the
 most people.
