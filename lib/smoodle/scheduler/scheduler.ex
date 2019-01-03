@@ -276,8 +276,7 @@ defmodule Smoodle.Scheduler do
       &(&1
         |> Enum.map(fn %{date_from: date_from, date_to: date_to, rank: rank} ->
           {Date.range(date_from, date_to), rank}
-        end)
-        |> Enum.sort())
+        end))
     )
     |> Map.put(
       :weekday_ranks,
