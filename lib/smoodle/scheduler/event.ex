@@ -89,12 +89,11 @@ defmodule Smoodle.Scheduler.Event do
 
   @doc """
   Returns the range of all the possible dates for this event
+
+  iex> Event.date_range(%Event{preferences: nil, possible_dates: [%{date_from: ~D[2118-01-03], date_to: ~D[2118-01-05], rank: 0}, %{date_from: ~D[2118-01-07], date_to: ~D[2118-01-09], rank: 1}]})
+  Date.range(~D[2118-01-03], ~D[2118-01-09])
   """
   def date_range(%Event{possible_dates: possible_dates}) do
-    _date_range(possible_dates)
-  end
-
-  defp _date_range(possible_dates) when is_list(possible_dates) and length(possible_dates) > 0 do
     all_dates = Enum.flat_map(possible_dates, &Enum.uniq([&1.date_from, &1.date_to]))
 
     Date.range(
@@ -106,17 +105,20 @@ defmodule Smoodle.Scheduler.Event do
   @spec domain(%Event{preferences: map, possible_dates: list}) :: [Date.t()]
   @doc """
 
-  iex> Event.domain(%Event{preferences: %{weekdays: []}, possible_dates: [%{date_from: ~D[2118-01-03], date_to: ~D[2118-01-09]}]})
+  iex> Event.domain(%Event{preferences: %{weekdays: []}, possible_dates: [%{date_from: ~D[2118-01-03], date_to: ~D[2118-01-09], rank: 0}]})
   [ ~D[2118-01-03], ~D[2118-01-04], ~D[2118-01-05], ~D[2118-01-06], ~D[2118-01-07], ~D[2118-01-08], ~D[2118-01-09] ]
 
-  iex> Event.domain(%Event{preferences: nil, possible_dates: [%{date_from: ~D[2118-01-03], date_to: ~D[2118-01-09]}]})
+  iex> Event.domain(%Event{preferences: nil, possible_dates: [%{date_from: ~D[2118-01-03], date_to: ~D[2118-01-09], rank: 0}]})
   [ ~D[2118-01-03], ~D[2118-01-04], ~D[2118-01-05], ~D[2118-01-06], ~D[2118-01-07], ~D[2118-01-08], ~D[2118-01-09] ]
 
-  iex> Event.domain(%Event{preferences: %{weekdays: [%{day: 0, permitted: true}, %{day: 6, permitted: true}]}, possible_dates: [%{date_from: ~D[2118-01-03], date_to: ~D[2118-01-09]}]})
-  [ ~D[2118-01-03], ~D[2118-01-09] ]
+  iex> Event.domain(%Event{preferences: nil, possible_dates: [%{date_from: ~D[2118-01-03], date_to: ~D[2118-01-05], rank: 0}, %{date_from: ~D[2118-01-07], date_to: ~D[2118-01-09], rank: 1}]})
+  [ ~D[2118-01-03], ~D[2118-01-04], ~D[2118-01-05], ~D[2118-01-07], ~D[2118-01-08], ~D[2118-01-09] ]
 
-  iex> Event.domain(%Event{preferences: %{weekdays: [%{day: 0, permitted: false}]}, possible_dates: [%{date_from: ~D[2118-01-03], date_to: ~D[2118-01-09]}]})
+  iex> Event.domain(%Event{preferences: %{weekdays: [%{day: 0, rank: -1}, %{day: 1, rank: -1}, %{day: 2, rank: -1}, %{day: 3, rank: -1}, %{day: 4, rank: -1}, %{day: 5, rank: -1}, %{day: 6, rank: -1}]}, possible_dates: [%{date_from: ~D[2118-01-03], date_to: ~D[2118-01-09], rank: 0}]})
   [ ]
+
+  iex> Event.domain(%Event{preferences: %{weekdays: [%{day: 0, rank: -1}, %{day: 1, rank: -1}, %{day: 2, rank: -1}, %{day: 3, rank: -1}, %{day: 4, rank: -1}, %{day: 5, rank: -1}, %{day: 6, rank: -1}]}, possible_dates: [%{date_from: ~D[2118-01-03], date_to: ~D[2118-01-05], rank: 0}, %{date_from: ~D[2118-01-06], date_to: ~D[2118-01-07], rank: 1}]})
+  [ ~D[2118-01-06], ~D[2118-01-07]]
   """
   def domain(%Event{
         preferences: preferences,
@@ -124,22 +126,25 @@ defmodule Smoodle.Scheduler.Event do
       }) do
     # when there are no preferences or weekdays is empty, all days are good
 
-    weekdays_permitted =
-      if is_nil(preferences) || Enum.empty?(preferences.weekdays) do
-        Map.new(1..7, &{&1, true})
+    weekdays_ranks =
+      if is_nil(preferences) do
+        %{}
       else
-        Map.new(preferences.weekdays, fn %{day: day, permitted: permitted} ->
+        Map.new(preferences.weekdays, fn %{day: day, rank: rank} ->
           # convert from 0-based, Monday-first to 1-based Monday-first
-          {day + 1, permitted}
+          {day + 1, rank}
         end)
       end
 
     possible_dates
-    |> Enum.flat_map(fn %{date_from: date_from, date_to: date_to} ->
-      Date.range(date_from, date_to)
+    |> Enum.flat_map(fn %{date_from: date_from, date_to: date_to, rank: rank} ->
+      Enum.map(Date.range(date_from, date_to), &%{date: &1, rank: rank})
     end)
-    |> Enum.reject(&(Date.compare(Date.utc_today(), &1) == :gt))
-    |> Enum.filter(&(weekdays_permitted[Date.day_of_week(&1)] || false))
+    |> Enum.reject(fn %{date: date} -> Date.compare(Date.utc_today(), date) == :gt end)
+    |> Enum.reject(fn %{date: date, rank: rank} ->
+      Map.get(weekdays_ranks, Date.day_of_week(date), 0) < 0 && rank <= 0
+    end)
+    |> Enum.map(fn %{date: date} -> date end)
   end
 
   defp clear_organizer_message(changeset) do
@@ -200,8 +205,7 @@ defmodule Smoodle.Scheduler.Event do
   defp validate_one_weekday_enabled(changeset) do
     case fetch_field(changeset, :weekdays) do
       {_, changes} ->
-        unless Enum.empty?(changes) ||
-                 Enum.any?(changes, fn %{permitted: permitted} -> permitted end) do
+        if Enum.count(changes, fn %{rank: rank} -> rank < 0 end) == 7 do
           add_error(
             changeset,
             :weekdays,

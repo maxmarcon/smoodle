@@ -1,6 +1,6 @@
 defmodule Smoodle.Scheduler.DateRankTest do
-  use Smoodle.DataCase
   alias Smoodle.Scheduler.DateRank
+  use ExUnit.Case
 
   @valid_attrs %{
     date_from: "2017-02-01",

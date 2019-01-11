@@ -129,7 +129,7 @@ msgstr "Du darfst keine Wochentage wiederholen"
 #, elixir-format
 #: lib/smoodle/scheduler/event.ex:211
 msgid "enable at least one weekday."
-msgstr "Ermögliche mindestens einen Wochentag"
+msgstr "Wähle mindestens einen Wochentag aus."
 
 #, elixir-format
 #: lib/smoodle/scheduler/event.ex:261

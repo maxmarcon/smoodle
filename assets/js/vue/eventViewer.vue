@@ -109,7 +109,7 @@
 					v-bind="eventData"
 				)
 			ul.list-group.list-group-flush
-				li.list-group-item
+				li.list-group-item(v-if="eventDesc")
 					p(name="event-intro")
 						em.text-muted {{ isOrganizer ? $t('event_viewer.description') : $t('event_viewer.organizer_says', {organizer: eventOrganizer}) }} &nbsp;
 						| {{ eventDesc }}
@@ -324,7 +324,7 @@ export default {
 		},
 		selectAttrubute: {
 			highlight: {
-				backgroundColor: colorCodes.yellow,
+				backgroundColor: colorCodes.blue,
 				borderColor: colorCodes.black,
 				borderWidth: "2px"
 			}

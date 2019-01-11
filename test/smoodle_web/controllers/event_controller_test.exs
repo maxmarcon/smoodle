@@ -13,17 +13,29 @@ defmodule SmoodleWeb.EventControllerTest do
     desc: "Yeah!",
     organizer: "The Hoff",
     possible_dates: [
-      %{date_from: "2117-03-01", date_to: "2117-06-01"}
+      %{date_from: "2117-03-01", date_to: "2117-06-01", rank: 0}
     ],
     preferences: %{
       weekdays: [
         %{
-          day: 5,
-          permitted: true
+          day: 0,
+          rank: -1
         },
         %{
-          day: 6,
-          permitted: true
+          day: 1,
+          rank: -1
+        },
+        %{
+          day: 2,
+          rank: -1
+        },
+        %{
+          day: 3,
+          rank: -1
+        },
+        %{
+          day: 4,
+          rank: -1
         }
       ]
     },
@@ -34,7 +46,7 @@ defmodule SmoodleWeb.EventControllerTest do
     name: "Dinner",
     desc: "Yummy!",
     organizer: "The Hoff",
-    possible_dates: [%{date_from: "2117-04-01", date_to: "2117-08-20"}],
+    possible_dates: [%{date_from: "2117-04-01", date_to: "2117-08-20", rank: 0}],
     preferences: nil,
     email: "bot@fake.com",
     email_confirmation: "bot@fake.com"

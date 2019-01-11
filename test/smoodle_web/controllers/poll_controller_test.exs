@@ -10,7 +10,8 @@ defmodule SmoodleWeb.PollControllerTest do
     possible_dates: [
       %{
         date_from: "2117-03-01",
-        date_to: "2117-06-01"
+        date_to: "2117-06-01",
+        rank: 0
       }
     ],
     email: "bot@fake.com",

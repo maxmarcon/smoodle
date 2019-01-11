@@ -1,5 +1,5 @@
 defmodule Smoodle.Scheduler.PollTest do
-  use Smoodle.DataCase
+  use ExUnit.Case
   import Ecto.Changeset
   alias Smoodle.Scheduler.Poll
   alias Smoodle.Scheduler.Event

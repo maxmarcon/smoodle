@@ -153,12 +153,13 @@
 						v-model="groupVisibility['dates-group']"
 					)
 						b-card
-							.form-group.row
-								label.col.text-center.col-form-label(for="eventPossibleDates") {{ $t('event_editor.event.dates') }}
 							.form-group.row.justify-content-center.justify-content-md-between.justify-content-lg-center
-								.col-md-6.mb-4.text-center
+								.col-md-6.mb-3.text-center
+									.d-flex.justify-content-center.align-items-end
+										label {{ $t(selectedDateRank == 0 ? 'event_editor.event.dates_range' : 'event_editor.event.dates_single') }}
+
 									v-date-picker#eventPossibleDates(
-										:mode="selectedDateRank == 1 ? 'range' : 'single'"
+										:mode="selectedDateRank == 0 ? 'range' : 'single'"
 										v-model="datesSelection"
 										nav-visibility="hidden"
 										:min-date="today"
@@ -167,29 +168,32 @@
 										:from-page="fromPage"
 										:is-linked="true"
 										:show-caps="true"
+										:is-required="true"
 										:attributes="datePickerAttributes"
 										popover-visibility="hidden"
 										:select-attribute="selectAttribute"
 										:drag-attribute="selectAttribute"
 										@input="newDate"
-										@drag="drag"
 									)
 									.small.text-danger(name="event-possible-dates-error") {{ eventPossibleDatesError }}
 
-									.d-flex.mt-2.justify-content-center.align-items-end
+									.d-flex.mt-2.justify-content-center.align-items-end(@click="clearDateSelection")
 										.form-check
-											p-radio.p-icon.p-plain(name="selectedDateRank" :value="1" v-model="selectedDateRank" toggle)
-												i.icon.fas.fa-heart.text-success(slot="extra")
-												i.icon.far.fa-heart(slot="off-extra")
+											p-radio.p-icon.p-plain(:disabled="selectedDateRank == 0" name="selectedDateRank" :value="1" v-model="selectedDateRank" toggle)
+												i.icon.fas.fa-thumbs-up.text-success(slot="extra")
+												i.icon.far.fa-thumbs-up(slot="off-extra")
 												label(slot="off-label")
 										.form-check
-											p-radio.p-icon.p-plain(name="selectedDateRank" :value="-1" v-model="selectedDateRank" toggle)
+											p-radio.p-icon.p-plain(:disabled="selectedDateRank == 0" name="selectedDateRank" :value="-1" v-model="selectedDateRank" toggle)
 												i.icon.fas.fa-thumbs-down.text-danger(slot="extra")
 												i.icon.far.fa-thumbs-down(slot="off-extra")
 												label(slot="off-label")
+										.form-check
+											button.btn.btn-sm.btn-outline-secondary(@click="clearPossibleDates" :disabled="selectedDateRank == 0")
+												i.fas.fa-trash-alt
 
 								.col-11.col-md-3.offset-md-1
-									ranker#eventWeekdays(:elements="eventWeekdays" boolean=true @change="localValidation")
+									ranker#eventWeekdays(:elements="eventWeekdays" boolean=true :disabled="selectedDateRank == 0" @change="eventWeekdaysChanged")
 									.small.text-danger(name="event-weekdays-error") {{ eventWeekdaysError }}
 
 			.card-footer
@@ -303,9 +307,8 @@ export default {
 		eventCreated: false,
 		createdEventId: null,
 		createdEventSecret: null,
-		selectedDateRank: 1,
+		selectedDateRank: 0,
 		datesSelection: null,
-		selectedDateRange: null,
 		fromPage: null,
 	}),
 	created() {
@@ -318,8 +321,8 @@ export default {
 					}
 				}).then(function(result) {
 					self.assignEventData(result.data.data)
-					self.selectedDateRange = self.dateRange
-					self.loadedSuccessfully 	= true
+					self.selectedDateRank = 1
+					self.loadedSuccessfully = true
 					self.groupVisibility['dates-group'] = true
 					self.fromPage = {
 						month: dateFns.getMonth(self.minDate) + 1, // from dateFns 0=Jan...11=Dec to v-calendar 1=Jan...12=Dec
@@ -341,32 +344,41 @@ export default {
 			return this.secret || this.createdEventSecret
 		},
 		datePickerAttributes() {
-			if (!this.selectedDateRange) {
-				return []
-			}
-
-			return dateFns.eachDay(this.selectedDateRange.start, this.selectedDateRange.end)
-				.filter(date => !this.eventDomain.find(d => dateFns.isEqual(d, date)))
-				.map(date => ({
-					dates: date,
-					highlight: {
-						animated: false,
-						backgroundColor: this.colorForRank(-1),
-						opacity: 1
-					},
-					order: 2
-				})).concat({
+			return this.eventPossibleDates.map(({
+				date_from,
+				date_to,
+				rank
+			}) => {
+				return {
 					dates: {
-						start: this.selectedDateRange.start,
-						end: this.selectedDateRange.end,
+						start: date_from,
+						end: date_to,
 					},
 					highlight: {
 						animated: false,
-						backgroundColor: this.colorForRank(1),
-						opacity: 0.6
+						backgroundColor: this.colorForRank(rank),
+						opacity: (rank == 0 ? 0.6 : 1)
 					},
-					order: 1
-				})
+					order: (rank == 0 ? 0 : 2)
+				}
+			}).concat([{
+				dates: {
+					start: null,
+					end: null,
+					weekdays: this.eventWeekdays.filter(({
+						value
+					}) => !value).map(({
+						day
+					}) => ((day + 1) % 7) + 1)
+					// from 0=Mon...6=Sun to v-calendars's 1=Sun...7=Sat
+				},
+				highlight: {
+					animated: false,
+					backgroundColor: this.colorForRank(-1),
+					opacity: 0.8
+				},
+				order: 1
+			}])
 		},
 		selectedDateRankColor() {
 			return this.colorForRank(this.selectedDateRank);
@@ -383,7 +395,7 @@ export default {
 		}
 	},
 	methods: {
-		colorForRank: (rank) => (rank > 0 ? colorCodes.green : (rank < 0 ? colorCodes.red : colorCodes.yellow)),
+		colorForRank: (rank) => (rank >= 0 ? colorCodes.green : colorCodes.red),
 		customValidate(fieldName, fieldVal) {
 			if (fieldName == 'eventWeekdays') {
 				if (fieldVal.every(({value}) => !value)) {
@@ -391,66 +403,85 @@ export default {
 				}
 			}
 		},
+		eventWeekdaysChanged() {
+			this.normalizePossibleDates()
+			this.localValidation()
+		},
 		clearDateSelection() {
 			this.datesSelection = null;
 		},
-		drag(value) {
-			if (value && this.eventPossibleDates.length > 0) {
-				this.eventPossibleDates = []
-				this.selectedDateRange = null
-			}
+		clearPossibleDates() {
+			this.eventPossibleDates = []
+			this.eventWeekdays = this.initialWeekdays()
+			this.selectedDateRank = 0
 		},
 		newDate(value) {
 			if (value) {
-				if (this.selectedDateRank == 1 && value.start && value.end) {
-					// only range supported (mode = range)
+				if (this.selectedDateRank == 0 && value.start && value.end) {
+
 					this.eventPossibleDates = [{
 						date_from: value.start,
 						date_to: value.end,
+						rank: 0
 					}]
-					this.selectedDateRange = value
+					this.selectedDateRank = -1
 					this.clearDateSelection()
 					this.localValidation()
 
-				} else if (this.selectedDateRank == -1 && value instanceof Date) {
-					// only array supported (mode = single)
-					let toReplaceIndex = this.eventPossibleDates.findIndex(({
+				} else if (this.selectedDateRank != 0 && value instanceof Date) {
+
+					let containingIndex = this.eventPossibleDates.findIndex(({
 						date_from,
-						date_to
+						date_to,
+						rank
 					}) => dateFns.isWithinRange(value, date_from, date_to))
 
-					if (toReplaceIndex > -1) {
-						let toReplace = this.eventPossibleDates[toReplaceIndex]
+					let insertElement = false
 
-						let before_date = dateFns.subDays(value, 1)
-						let after_date = dateFns.addDays(value, 1)
-						let replaceMent = []
+					if (containingIndex > -1) {
 
-						if (!dateFns.isBefore(before_date, toReplace.date_from)) {
-							replaceMent.push({
-								date_from: toReplace.date_from,
-								date_to: before_date
-							})
-						}
-						if (!dateFns.isAfter(after_date, toReplace.date_to)) {
-							replaceMent.push({
-								date_from: after_date,
-								date_to: toReplace.date_to
-							})
-						}
-						if (replaceMent.length > 1) {
-							this.eventPossibleDates.splice(toReplaceIndex, 1, replaceMent[0], replaceMent[1])
-						} else if (replaceMent.length > 0) {
-							this.eventPossibleDates.splice(toReplaceIndex, 1, replaceMent[0])
-						} else {
-							this.eventPossibleDates.splice(toReplaceIndex, 1)
-						}
-						this.localValidation()
+						let containingElement = this.eventPossibleDates[containingIndex]
+						if (containingElement.rank != this.selectedDateRank) {
 
+							insertElement = (this.selectedDateRank >= 0)
+
+							this.eventPossibleDates.splice(containingIndex, 1)
+
+							if (dateFns.isAfter(value, containingElement.date_from)) {
+								this.eventPossibleDates.push({
+									date_from: containingElement.date_from,
+									date_to: dateFns.subDays(value, 1),
+									rank: containingElement.rank
+								})
+							}
+							if (dateFns.isBefore(value, containingElement.date_to)) {
+								this.eventPossibleDates.push({
+									date_from: dateFns.addDays(value, 1),
+									date_to: containingElement.date_to,
+									rank: containingElement.rank
+								})
+							}
+						}
 					} else {
-						this.clearDateSelection()
+						insertElement = (this.selectedDateRank >= 0)
 					}
+
+					if (insertElement) {
+						this.eventPossibleDates.push({
+							date_from: value,
+							date_to: value,
+							rank: this.selectedDateRank
+						})
+					}
+
+					this.clearDateSelection()
+
+					this.normalizePossibleDates()
 				}
+
+				//DEBUG
+				//console.dir(this.eventPossibleDates)
+				//console.dir(this.eventDomain)
 			}
 		},
 		clipboard() {

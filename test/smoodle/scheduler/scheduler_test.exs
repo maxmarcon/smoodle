@@ -14,30 +14,32 @@ defmodule Smoodle.SchedulerTest do
     possible_dates: [
       %{
         date_from: "2117-03-01",
-        date_to: "2117-05-01"
+        date_to: "2117-05-01",
+        rank: 0
       },
       %{
         date_from: "2117-05-20",
-        date_to: "2117-06-01"
+        date_to: "2117-06-01",
+        rank: 0
       }
     ],
     preferences: %{
       weekdays: [
         %{
-          day: 3,
-          permitted: true
+          day: 0,
+          rank: -1
+        },
+        %{
+          day: 1,
+          rank: -1
+        },
+        %{
+          day: 2,
+          rank: -1
         },
         %{
           day: 4,
-          permitted: false
-        },
-        %{
-          day: 5,
-          permitted: true
-        },
-        %{
-          day: 6,
-          permitted: true
+          rank: -1
         }
       ]
     },
@@ -53,7 +55,8 @@ defmodule Smoodle.SchedulerTest do
     possible_dates: [
       %{
         date_from: "2118-01-01",
-        date_to: "2118-06-01"
+        date_to: "2118-06-01",
+        rank: 0
       }
     ],
     email: "bot2@fake.com",

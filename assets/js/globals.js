@@ -269,10 +269,12 @@ export const eventDataMixin = {
 			this.eventDesc = desc
 			this.eventPossibleDates = possible_dates.map(({
 				date_from,
-				date_to
+				date_to,
+				rank
 			}) => ({
 				date_from: dateFns.parse(date_from),
-				date_to: dateFns.parse(date_to)
+				date_to: dateFns.parse(date_to),
+				rank
 			}))
 			this.eventState = state
 			this.eventScheduledFrom = scheduled_from && dateFns.parse(scheduled_from)
@@ -288,7 +290,7 @@ export const eventDataMixin = {
 					day
 				}) => day == weekday.day)
 				if (el) {
-					el.value = weekday.permitted;
+					el.value = weekday.rank >= 0
 				}
 			})
 		},
@@ -324,24 +326,26 @@ export const eventDataMixin = {
 				organizer: this.eventOrganizer,
 				possible_dates: this.eventPossibleDates.map(({
 					date_from,
-					date_to
+					date_to,
+					rank
 				}) => ({
 					date_from: dateFns.format(date_from, 'YYYY-MM-DD'),
-					date_to: dateFns.format(date_to, 'YYYY-MM-DD')
+					date_to: dateFns.format(date_to, 'YYYY-MM-DD'),
+					rank: rank
 				})),
 				email: this.eventOrganizerEmail,
 				email_confirmation: this.eventOrganizerEmail_confirmation,
 				organizer_message: this.eventOrganizerMessage,
 				preferences: {
-					weekdays: (this.eventWeekdays.every((weekday) => weekday.value) ? [] :
-						this.eventWeekdays.map(({
-							value: permitted,
+					weekdays: this.eventWeekdays.filter(({
+							value
+						}) => !value)
+						.map(({
 							day
 						}) => ({
-							permitted,
-							day
+							day,
+							rank: -1
 						}))
-					)
 				}
 			};
 			Object.keys(data).forEach((k) => data[k] == null && delete data[k]);
@@ -428,7 +432,7 @@ export const pollDataMixin = {
 				}
 			});
 
-			this.pollDateRanks = date_ranks.flatMap(({
+			this.pollDateRanks = date_ranks.map(({
 				date_from,
 				date_to,
 				rank
@@ -441,12 +445,56 @@ export const pollDataMixin = {
 					rank,
 					key: this.datesKey(date)
 				}))
-			})
+			}).flat()
 		}
 	}
 }
 
 export const eventHelpersMixin = {
+	methods: {
+		weekdayEnabled(date) {
+			let enabledWeekdays = this.eventWeekdays.filter(({
+				value
+			}) => value).map(({
+				day
+			}) => (day + 1) % 7) // from 0=Mon...6=Sun to dateFns's 0=Sun...6=Sat
+
+			return enabledWeekdays.indexOf(dateFns.getDay(date)) > -1
+		},
+		normalizePossibleDates() {
+			// first, lower the rank to 0 if a rank higher than 0 is not needed...
+			this.eventPossibleDates.forEach(possibleDate => {
+				if (possibleDate.rank > 0 &&
+					dateFns.eachDay(possibleDate.date_from, possibleDate.date_to).every(date =>
+						this.weekdayEnabled(date)
+					)) {
+					possibleDate.rank = 0
+				}
+			})
+
+			//...then, combine adjacent intervals with the same rank
+			this.eventPossibleDates = this.eventPossibleDates
+				.sort(({
+					date_from: date1
+				}, {
+					date_from: date2
+				}) => dateFns.differenceInDays(date1, date2))
+				.reduce((output, nextPossibleDate) => {
+					if (output.length == 0) {
+						output.push(nextPossibleDate)
+					} else {
+						let lastPossibleDate = output[output.length - 1]
+						if (lastPossibleDate.rank == nextPossibleDate.rank &&
+							dateFns.isEqual(lastPossibleDate.date_to, dateFns.subDays(nextPossibleDate.date_from, 1))) {
+							lastPossibleDate.date_to = nextPossibleDate.date_to
+						} else {
+							output.push(nextPossibleDate)
+						}
+					}
+					return output
+				}, [])
+		}
+	},
 	computed: {
 		formattedEventTimeWindow() {
 			let from = this.minDate
@@ -530,33 +578,30 @@ export const eventHelpersMixin = {
 				return dateFns.max.apply(null, this.eventDomain)
 			}
 		},
-		dateRange() {
-			if (this.allDates.length <= 0) {
-				return {
-					start: null,
-					end: null
-				}
-			}
-			return {
-				start: dateFns.min.apply(null, this.allDates),
-				end: dateFns.max.apply(null, this.allDates)
-			}
-		},
-		allDates() {
-			return this.eventPossibleDates.flatMap(({
-					date_from,
-					date_to
-				}) => dateFns.eachDay(date_from, date_to))
-		},
 		eventDomain() {
-			let enabledWeekdays = this.eventWeekdays.filter(({
-				value
-			}) => value).map(({
-				day
-			}) => (day + 1) % 7) // from 0=Mon...6=Sun to dateFns's 0=Sun...6=Sat
-
-			return this.allDates.filter(date =>
-				enabledWeekdays.indexOf(dateFns.getDay(date)) > -1)
+			return this.eventPossibleDates.map(({
+						date_from,
+						date_to,
+						rank
+					}) =>
+					dateFns.eachDay(date_from, date_to).map(date => ({
+						date,
+						rank
+					}))
+				)
+				.flat()
+				.filter(({
+					date
+				}) => !dateFns.isPast(date))
+				.filter(({
+						date,
+						rank
+					}) =>
+					this.weekdayEnabled(date) || rank > 0
+				)
+				.map(({
+					date
+				}) => date)
 		},
 		differentMonths() {
 			return dateFns.differenceInCalendarMonths(this.maxDate, this.minDate) > 0;
@@ -604,5 +649,6 @@ export const colorCodes = {
 	yellow: '#ffc107',
 	white: '#f8f9fa',
 	black: '#000000',
-	info: '#17a2b8'
+	info: '#17a2b8',
+	blue: '#007bff'
 }

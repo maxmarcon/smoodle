@@ -17,7 +17,8 @@ export default {
 				name_help: "Enter a name for your event",
 				desc: "What is going to happen?",
 				desc_help: "Describe the event to your guests",
-				dates: "Specify the dates and optionally the weekdays for the event",
+				dates_range: "Select a date range for the event",
+				dates_single: "Add or remove single dates or weekdays",
 				organizer: "Who are you?",
 				organizer_help: "Let your friends know who invitied them...",
 				organizer_email: "Please enter your email",
@@ -74,8 +75,7 @@ export default {
 			weekday_ranker_help_modal_content: "Give us an idea of your typical week. For example, \
 			you might go to the gym every Wednesday and might therefore want to mark it with {bad}. On the other hand, a Friday might be a good day for this event\
 			and you might want to mark it with {good}. The remaining days might be just ok, and you can leave them as {ok}.",
-			event_no_longer_open: "The event is no longer open.",
-			range: "Range"
+			event_no_longer_open: "The event is no longer open."
 		},
 		event_viewer: {
 			organizer: "Organizer:",
@@ -224,7 +224,8 @@ export default {
 				name_help: "Gib deinem Event einen Namen.",
 				desc: "Was findet statt?",
 				desc_help: "Beschreibe dein Event für deine Gäste.",
-				dates: "Wähle die Daten und eventuell die Wochentage für das Event aus",
+				dates_range: "Wähle einen Zeitraum für das Event aus",
+				dates_single: "Einzelne Daten oder Wochentage hinzufügen/ausschließen",
 				organizer: "Wer bist du?",
 				organizer_help: "Lass deine Freunde wissen, wer sie einlädt...",
 				organizer_email: "Bitte gib deine Email ein.",
@@ -282,7 +283,6 @@ export default {
 			gehst du vielleicht mittwochs ins Fittnessstudio und möchtest deswegen diesen Wochentag als {bad} markieren. Ein Freitag könnte aber ein guter Tag sein für das Event\
 			und du kannst ihn mit {good} markieren. Die restlichen Tage sind vielleicht nur ok, und du kannst sie als {ok} lassen.",
 			event_no_longer_open: "Das Event ist nicht mehr offen.",
-			range: "Zeitraum"
 		},
 		event_viewer: {
 			organizer: "Organisator:",
@@ -398,7 +398,7 @@ export default {
 			unprocessable_entity: "Autsch! Die angegebenen Daten enthalten Fehler. Überprüfe bitte deine Angaben.",
 			error: "Fehler",
 			confirmation_required: "Stimmt nicht überein...",
-			enable_at_least_one_weekday: "Ermögliche mindestens einen Wochentag."
+			enable_at_least_one_weekday: "Wähle mindestens einen Wochentag aus."
 		},
 		event_header: {
 			by: "von {organizer}",
@@ -429,7 +429,8 @@ export default {
 				name_help: "Dai un nome al tuo evento.",
 				desc: "Di cosa si tratta?",
 				desc_help: "Descrivi l'evento per i tuoi ospiti.",
-				dates: "Scegli le date e eventualmente i giorni della settimana per l'evento.",
+				dates_range: "Scegli un periodo per l'evento",
+				dates_single: "Aggiungi o escludi singole date o giorni della settimana",
 				organizer: "Chi sei?",
 				organizer_help: "Fai sapere ai tuoi amici chi li invita...",
 				organizer_email: "Immetti la tua email.",
@@ -486,8 +487,7 @@ export default {
 			weekday_ranker_help_modal_content: "Com'è la tua settimana tipica? Per esempio, \
 			magari vai ogni Mercoledì a fare sport e vuoi perciò marcare questo giorno con {bad}. Il Venerdì però in genere potrebbe andare bene \
 			e lo potresti marcare con {good}. I rimanenti giorni sono semplicemente ok, e puoi lasciarli con {ok}.",
-			event_no_longer_open: "L'evento non è più aperto.",
-			range: "Periodo"
+			event_no_longer_open: "L'evento non è più aperto."
 		},
 		event_viewer: {
 			organizer: "Organizzatore:",

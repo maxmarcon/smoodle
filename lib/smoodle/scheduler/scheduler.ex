@@ -263,7 +263,7 @@ defmodule Smoodle.Scheduler do
         nil -> nil
       end
 
-    weekday_rank = poll.weekday_ranks[Date.day_of_week(date)] || 0
+    weekday_rank = Map.get(poll.weekday_ranks, Date.day_of_week(date), 0)
 
     date_rank || weekday_rank
   end
@@ -286,6 +286,7 @@ defmodule Smoodle.Scheduler do
 
         _ ->
           Map.new(poll.preferences.weekday_ranks, fn %{day: day, rank: rank} ->
+            # convert from 0-based, Monday-first to 1-based Monday-first
             {day + 1, rank}
           end)
       end

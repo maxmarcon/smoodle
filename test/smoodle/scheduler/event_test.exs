@@ -1,6 +1,6 @@
 defmodule Smoodle.Scheduler.EventTest do
-  use Smoodle.DataCase
   alias Smoodle.Scheduler.Event
+  use ExUnit.Case
   doctest Event
 
   @organizer_message "Glad everybody can make it"
@@ -10,7 +10,7 @@ defmodule Smoodle.Scheduler.EventTest do
     desc: "Yeah!",
     organizer: "Donald Trump",
     possible_dates: [
-      %{date_from: "2118-01-10", date_to: "2118-03-20"}
+      %{date_from: "2118-01-10", date_to: "2118-03-20", rank: 0}
     ],
     scheduled_from: "2118-02-05 19:00:00",
     scheduled_to: "2118-02-05 23:00:00",
@@ -18,12 +18,24 @@ defmodule Smoodle.Scheduler.EventTest do
     preferences: %{
       weekdays: [
         %{
-          day: 5,
-          permitted: true
+          day: 0,
+          rank: -1
         },
         %{
-          day: 6,
-          permitted: true
+          day: 1,
+          rank: -1
+        },
+        %{
+          day: 2,
+          rank: -1
+        },
+        %{
+          day: 3,
+          rank: -1
+        },
+        %{
+          day: 4,
+          rank: -1
         }
       ]
     },
@@ -37,7 +49,7 @@ defmodule Smoodle.Scheduler.EventTest do
     desc: "Yeah!",
     organizer: "Donald Trump",
     possible_dates: [
-      %{date_from: "1118-01-10", date_to: "1118-03-20"}
+      %{date_from: "1118-01-10", date_to: "1118-03-20", rank: 0}
     ],
     scheduled_from: "1118-02-05 19:00:00",
     scheduled_to: "1118-02-05 23:00:00",
@@ -46,12 +58,24 @@ defmodule Smoodle.Scheduler.EventTest do
     preferences: %{
       weekdays: [
         %{
-          day: 5,
-          permitted: true
+          day: 0,
+          rank: -1
         },
         %{
-          day: 6,
-          permitted: true
+          day: 1,
+          rank: -1
+        },
+        %{
+          day: 2,
+          rank: -1
+        },
+        %{
+          day: 3,
+          rank: -1
+        },
+        %{
+          day: 4,
+          rank: -1
         }
       ]
     },
@@ -245,7 +269,7 @@ defmodule Smoodle.Scheduler.EventTest do
       Event.changeset(
         %Event{},
         Map.replace!(@valid_attrs, :possible_dates, [
-          %{date_from: "2118-01-10", date_to: "2119-01-11"}
+          %{date_from: "2118-01-10", date_to: "2119-01-11", rank: 0}
         ])
       )
 
@@ -255,14 +279,14 @@ defmodule Smoodle.Scheduler.EventTest do
   test "validate weekdays" do
     changeset = Event.changeset(%Event{}, %{@valid_attrs | preferences: %{weekdays: [%{day: 0}]}})
     weekday_changeset = hd(changeset.changes.preferences.changes.weekdays)
-    assert [permitted: {_, [validation: :required]}] = weekday_changeset.errors
+    assert [rank: {_, [validation: :required]}] = weekday_changeset.errors
   end
 
   test "validate weekday duplicates" do
     changeset =
       Event.changeset(%Event{}, %{
         @valid_attrs
-        | preferences: %{weekdays: [%{day: 0, permitted: true}, %{day: 0, permitted: true}]}
+        | preferences: %{weekdays: [%{day: 0, rank: 1}, %{day: 0, rank: 0}]}
       })
 
     assert [weekdays: {_, [validation: :weekday_listed_twice]}] =
@@ -273,7 +297,7 @@ defmodule Smoodle.Scheduler.EventTest do
     changeset =
       Event.changeset(%Event{}, %{
         @valid_attrs
-        | preferences: %{weekdays: for(d <- 0..6, do: %{day: d, permitted: false})}
+        | preferences: %{weekdays: for(d <- 0..6, do: %{day: d, rank: -1})}
       })
 
     assert [weekdays: {_, [validation: :no_weekdays_enabled]}] =
@@ -337,10 +361,19 @@ defmodule Smoodle.Scheduler.EventTest do
           name: @valid_attrs.name,
           organizer: @valid_attrs.organizer,
           email: @valid_attrs.email,
-          preferences: %{weekdays: [%{day: 6, permitted: true}]}
+          preferences: %{
+            weekdays: [
+              %{day: 0, rank: -1},
+              %{day: 1, rank: -1},
+              %{day: 2, rank: -1},
+              %{day: 3, rank: -1},
+              %{day: 4, rank: -1},
+              %{day: 5, rank: -1}
+            ]
+          }
         },
         %{
-          possible_dates: [%{date_from: "2118-01-03", date_to: "2118-01-08"}]
+          possible_dates: [%{date_from: "2118-01-03", date_to: "2118-01-08", rank: 0}]
         }
       )
 
