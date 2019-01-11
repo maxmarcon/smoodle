@@ -325,6 +325,7 @@ export default {
 		selectAttrubute: {
 			highlight: {
 				backgroundColor: colorCodes.blue,
+				opacity: 1,
 				borderColor: colorCodes.black,
 				borderWidth: "2px"
 			}
@@ -401,6 +402,7 @@ export default {
 				},
 				highlight: {
 					borderColor: colorCodes.black,
+					opacity: 0.6,
 					borderWidth: "2px",
 					backgroundColor: colorCodes.blue
 				}
