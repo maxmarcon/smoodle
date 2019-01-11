@@ -400,7 +400,9 @@ export default {
 					label: this.eventScheduledTime
 				},
 				highlight: {
-					backgroundColor: colorCodes.yellow
+					borderColor: colorCodes.black,
+					borderWidth: "2px"
+					backgroundColor: colorCodes.blue
 				}
 			}]
 		},
