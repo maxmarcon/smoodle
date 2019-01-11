@@ -401,7 +401,7 @@ export default {
 				},
 				highlight: {
 					borderColor: colorCodes.black,
-					borderWidth: "2px"
+					borderWidth: "2px",
 					backgroundColor: colorCodes.blue
 				}
 			}]
