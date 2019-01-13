@@ -564,6 +564,20 @@ export const eventHelpersMixin = {
 		eventScheduled() {
 			return this.eventState == "SCHEDULED";
 		},
+		fromPage() {
+			let date = this.minDate || new Date()
+			return {
+				month: dateFns.getMonth(date) + 1, // from dateFns 0=Jan...11=Dec to v-calendar 1=Jan...12=Dec
+				year: dateFns.getYear(date)
+			}
+		},
+		toPage() {
+			let date = this.maxDate || new Date()
+			return {
+				month: dateFns.getMonth(date) + 1, // from dateFns 0=Jan...11=Dec to v-calendar 1=Jan...12=Dec
+				year: dateFns.getYear(date)
+			}
+		},
 		minDate() {
 			if (this.eventScheduled) {
 				return this.eventScheduledFrom
@@ -592,7 +606,7 @@ export const eventHelpersMixin = {
 				.flat()
 				.filter(({
 					date
-				}) => !dateFns.isYesterday(date))
+				}) => !dateFns.isBefore(date, dateFns.startOfToday()))
 				.filter(({
 						date,
 						rank
@@ -604,7 +618,11 @@ export const eventHelpersMixin = {
 				}) => date)
 		},
 		differentMonths() {
-			return dateFns.differenceInCalendarMonths(this.maxDate, this.minDate) > 0;
+			if (this.minDate && this.maxDate) {
+				return dateFns.differenceInCalendarMonths(this.maxDate, this.minDate) > 0
+			} else {
+				return false
+			}
 		},
 		eventBackgroundClass() {
 			if (this.eventOpen) {

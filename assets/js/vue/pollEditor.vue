@@ -108,6 +108,8 @@
 									:attributes="datePickerAttributes"
 									:is-linked="true"
 									:from-page="fromPage"
+									:min-page="fromPage"
+									:max-page="toPage"
 									:show-caps="true"
 									popover-visibility="hidden"
 									:disabled-attribute="disabledAttribute"
@@ -314,7 +316,7 @@ export default {
 		},
 		colorForRank: (rank) => (rank > 0 ? colorCodes.green : (rank < 0 ? colorCodes.red : colorCodes.yellow)),
 		newDate(value) {
-			if (value) {
+			if (value && this.eventDomain.length > 0) {
 				let new_key = this.datesKey(value)
 				let toReplace = this.pollDateRanks.findIndex(({
 					key
@@ -333,12 +335,6 @@ export default {
 		}
 	},
 	computed: {
-		fromPage() {
-			return {
-				month: dateFns.getMonth(this.minDate) + 1, // from dateFns 0=Jan...11=Dec to v-calendar 1=Jan...12=Dec
-				year: dateFns.getYear(this.minDate)
-			}
-		},
 		datePickerAttributes() {
 			return this.eventDomain.map(date => {
 				let dateRank = this.pollDateRanks.find(({

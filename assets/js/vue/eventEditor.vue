@@ -310,7 +310,6 @@ export default {
 		createdEventSecret: null,
 		selectedDateRank: 0,
 		datesSelection: null,
-		fromPage: null,
 		undoData: null,
 	}),
 	created() {
@@ -326,10 +325,6 @@ export default {
 					self.selectedDateRank = 1
 					self.loadedSuccessfully = true
 					self.groupVisibility['dates-group'] = true
-					self.fromPage = {
-						month: dateFns.getMonth(self.minDate) + 1, // from dateFns 0=Jan...11=Dec to v-calendar 1=Jan...12=Dec
-						year: dateFns.getYear(self.minDate)
-					}
 				}).finally(function() {
 					self.loaded = true
 				})
