@@ -63,7 +63,7 @@ defmodule Smoodle.Scheduler.Utils do
     Date.compare(d1, d2) != :gt
   end
 
-  def date_lte(d1, d2) do
+  def date_lte(_, _) do
     true
   end
 

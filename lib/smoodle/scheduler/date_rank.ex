@@ -2,6 +2,7 @@ defmodule Smoodle.Scheduler.DateRank do
   use Ecto.Schema
   import Ecto.Changeset
   alias Smoodle.Scheduler.DateRank
+  alias Smoodle.Scheduler.Poll
   import Smoodle.Scheduler.Utils
 
   schema "date_ranks" do

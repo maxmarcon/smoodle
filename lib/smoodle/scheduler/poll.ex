@@ -2,7 +2,6 @@ defmodule Smoodle.Scheduler.Poll do
   use Ecto.Schema
   import Ecto.Changeset
   alias Smoodle.Scheduler.Event
-  alias Smoodle.Scheduler.Poll
   alias Smoodle.Scheduler.DateRank
   alias Smoodle.Scheduler.WeekDayRank
   import SmoodleWeb.Gettext
@@ -28,8 +27,6 @@ defmodule Smoodle.Scheduler.Poll do
 
     timestamps(type: :utc_datetime, usec: false)
   end
-
-  @max_date_ranks 100
 
   @doc false
   def changeset(changeset, attrs) do
