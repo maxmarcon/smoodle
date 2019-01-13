@@ -592,7 +592,7 @@ export const eventHelpersMixin = {
 				.flat()
 				.filter(({
 					date
-				}) => !dateFns.isPast(date))
+				}) => !dateFns.isYesterday(date))
 				.filter(({
 						date,
 						rank

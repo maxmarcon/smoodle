@@ -189,8 +189,9 @@
 												i.icon.far.fa-thumbs-down(slot="off-extra")
 												label(slot="off-label")
 										.form-check
-											button.btn.btn-sm.btn-outline-secondary(@click="clearPossibleDates" :disabled="selectedDateRank == 0")
-												i.fas.fa-trash-alt
+											button.btn.btn-sm.btn-outline-secondary(@click="clearDateInfo" :disabled="selectedDateRank == 0 && !undoData")
+												i.fas.fa-undo(v-if="undoData")
+												i.fas.fa-trash-alt(v-else)
 
 								.col-11.col-md-3.offset-md-1
 									ranker#eventWeekdays(:elements="eventWeekdays" boolean=true :disabled="selectedDateRank == 0" @change="eventWeekdaysChanged")
@@ -310,6 +311,7 @@ export default {
 		selectedDateRank: 0,
 		datesSelection: null,
 		fromPage: null,
+		undoData: null,
 	}),
 	created() {
 		if (this.eventId) {
@@ -363,7 +365,7 @@ export default {
 				}
 			}).concat([{
 				dates: {
-					start: null,
+					start: today,
 					end: null,
 					weekdays: this.eventWeekdays.filter(({
 						value
@@ -375,7 +377,7 @@ export default {
 				highlight: {
 					animated: false,
 					backgroundColor: this.colorForRank(-1),
-					opacity: 0.8
+					opacity: 0.6
 				},
 				order: 1
 			}])
@@ -410,10 +412,21 @@ export default {
 		clearDateSelection() {
 			this.datesSelection = null;
 		},
-		clearPossibleDates() {
-			this.eventPossibleDates = []
-			this.eventWeekdays = this.initialWeekdays()
-			this.selectedDateRank = 0
+		clearDateInfo() {
+			if (this.undoData) {
+				this.eventPossibleDates = this.undoData.eventPossibleDates
+				this.eventWeekdays = this.undoData.eventWeekdays
+				this.selectedDateRank = -1
+				this.undoData = null
+			} else {
+				this.undoData = {
+					eventPossibleDates: this.eventPossibleDates,
+					eventWeekdays: this.eventWeekdays
+				}
+				this.eventPossibleDates = []
+				this.eventWeekdays = this.initialWeekdays()
+				this.selectedDateRank = 0
+			}
 		},
 		newDate(value) {
 			if (value) {
@@ -425,6 +438,7 @@ export default {
 						rank: 0
 					}]
 					this.selectedDateRank = -1
+					this.undoData = null
 					this.clearDateSelection()
 					this.localValidation()
 
