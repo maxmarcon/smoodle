@@ -380,6 +380,62 @@ defmodule Smoodle.Scheduler.EventTest do
     assert [possible_dates: {_, [validation: :empty]}] = changeset.errors
   end
 
+  test "scheduled event is valid even with empty domain" do
+    changeset =
+      Event.changeset(
+        %Event{
+          name: @valid_attrs.name,
+          organizer: @valid_attrs.organizer,
+          email: @valid_attrs.email,
+          state: "SCHEDULED",
+          scheduled_from: ~N[2118-02-05 19:00:00],
+          scheduled_to: ~N[2118-02-05 23:00:00],
+          preferences: %{
+            weekdays: [
+              %{day: 0, rank: -1},
+              %{day: 1, rank: -1},
+              %{day: 2, rank: -1},
+              %{day: 3, rank: -1},
+              %{day: 4, rank: -1},
+              %{day: 5, rank: -1}
+            ]
+          }
+        },
+        %{
+          possible_dates: [%{date_from: "2118-01-03", date_to: "2118-01-08", rank: 0}]
+        }
+      )
+
+    assert changeset.valid?
+  end
+
+  test "canceled event is valid even with empty domain" do
+    changeset =
+      Event.changeset(
+        %Event{
+          name: @valid_attrs.name,
+          organizer: @valid_attrs.organizer,
+          email: @valid_attrs.email,
+          state: "CANCELED",
+          preferences: %{
+            weekdays: [
+              %{day: 0, rank: -1},
+              %{day: 1, rank: -1},
+              %{day: 2, rank: -1},
+              %{day: 3, rank: -1},
+              %{day: 4, rank: -1},
+              %{day: 5, rank: -1}
+            ]
+          }
+        },
+        %{
+          possible_dates: [%{date_from: "2118-01-03", date_to: "2118-01-08", rank: 0}]
+        }
+      )
+
+    assert changeset.valid?
+  end
+
   test "changeset removes trailing and leading spaces" do
     changeset =
       Event.changeset(

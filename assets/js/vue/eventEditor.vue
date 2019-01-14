@@ -322,7 +322,12 @@ export default {
 					}
 				}).then(function(result) {
 					self.assignEventData(result.data.data)
-					self.selectedDateRank = 1
+					if (self.eventDomain.length == 0) {
+						// this could happen if the original possible dates are all in the past
+						self.eventPossibleDates = []
+					} else {
+						self.selectedDateRank = 1
+					}
 					self.loadedSuccessfully = true
 					self.groupVisibility['dates-group'] = true
 				}).finally(function() {

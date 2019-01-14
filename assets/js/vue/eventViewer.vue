@@ -175,6 +175,8 @@
 											:is-inline="true"
 											:is-linked="true"
 											:from-page="fromPage"
+											:min-page="fromPage"
+											:max-page="toPage"
 											:available-dates="eventDomain"
 											:is-double-paned="differentMonths"
 											:select-attribute="selectAttrubute"
@@ -185,8 +187,8 @@
 											:is-linked="true"
 											nav-visibility="hidden"
 											:attributes="scheduleCalendarAttributes"
-											:min-date="minDate"
-											:max-date="maxDate"
+											:min-page="fromPage"
+											:max-page="toPage"
 											:is-double-paned="differentMonths"
 										)
 
@@ -212,8 +214,8 @@
 									v-calendar(
 										:is-linked="true"
 										nav-visibility="hidden"
-										:min-date="eventScheduledFrom"
-										:max-date="eventScheduledTo"
+										:min-page="fromPage"
+										:max-page="toPage"
 										:attributes="scheduledEventCalendarAttributes"
 										:is-double-paned="differentMonths"
 									)

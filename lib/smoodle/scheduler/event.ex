@@ -239,7 +239,10 @@ defmodule Smoodle.Scheduler.Event do
   end
 
   defp validate_domain_not_empty(changeset) do
-    if changeset.valid? && Enum.empty?(Event.domain(Ecto.Changeset.apply_changes(changeset))) do
+    with true <- changeset.valid?,
+         event <- Ecto.Changeset.apply_changes(changeset),
+         true <- is_open(event),
+         true <- Enum.empty?(domain(event)) do
       add_error(
         changeset,
         :possible_dates,
@@ -247,7 +250,7 @@ defmodule Smoodle.Scheduler.Event do
         validation: :empty
       )
     else
-      changeset
+      _ -> changeset
     end
   end
 
