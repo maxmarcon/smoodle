@@ -360,12 +360,6 @@ export default {
 			});
 	},
 	computed: {
-		fromPage() {
-			return {
-				month: dateFns.getMonth(this.minDate) + 1, // from dateFns 0=Jan...11=Dec to v-calendar 1=Jan...12=Dec
-				year: dateFns.getYear(this.minDate)
-			}
-		},
 		isOrganizer() {
 			return this.secret;
 		},
