@@ -35,6 +35,7 @@ defmodule Smoodle.Scheduler.Poll do
     changeset
     |> cast(attrs, [:participant, :event_id])
     |> validate_event_open
+    |> validate_event_domain_not_empty
     |> validate_required([:participant])
     |> cast_assoc(:date_ranks)
     |> cast_embed(:preferences, with: &preferences_changeset/2)
@@ -43,6 +44,19 @@ defmodule Smoodle.Scheduler.Poll do
     |> assoc_constraint(:event)
     |> unique_constraint(:participant, name: :polls_event_id_participant_index)
     |> trim_text_changes([:participant])
+  end
+
+  defp validate_event_domain_not_empty(changeset) do
+    if Enum.empty?(Event.domain(get_field(changeset, :event))) do
+      add_error(
+        changeset,
+        :event,
+        dgettext("errors", "the event has no valid dates"),
+        validation: :event_domain_empty
+      )
+    else
+      changeset
+    end
   end
 
   defp validate_event_open(changeset) do

@@ -7,9 +7,15 @@ defmodule Smoodle.Scheduler.PollTest do
   @event_attrs %{
     name: "Party",
     desc: "Yeah!",
+    state: "OPEN",
     organizer: "Donald Trump",
-    time_window_from: ~D[2118-01-10],
-    time_window_to: ~D[2118-03-20],
+    possible_dates: [
+      %{
+        date_from: ~D[2118-01-10],
+        date_to: ~D[2118-03-20],
+        rank: 0
+      }
+    ],
     scheduled_from: ~N[2118-02-05 19:00:00],
     scheduled_to: ~N[2118-02-05 23:00:00],
     email: "bot@fake.com"
@@ -18,6 +24,14 @@ defmodule Smoodle.Scheduler.PollTest do
   @poll_attrs %{
     participant: "Betty Davies"
   }
+
+  @past_possible_dates [
+    %{
+      date_from: ~D[1901-01-10],
+      date_to: ~D[1901-03-20],
+      rank: 0
+    }
+  ]
 
   def build_basic_poll(_) do
     %{poll: %Poll{event: struct(Event, @event_attrs)}}
@@ -290,6 +304,20 @@ defmodule Smoodle.Scheduler.PollTest do
 
       assert %{event: [{_, [validation: :event_no_longer_open]}]} =
                traverse_errors(changeset, & &1)
+    end
+  end
+
+  describe "if the event domain is empty" do
+    test "the poll is invalid", %{poll: poll} do
+      poll = Map.update!(poll, :event, &Map.put(&1, :possible_dates, @past_possible_dates))
+
+      changeset =
+        change(poll)
+        |> Poll.changeset(@poll_attrs)
+
+      refute changeset.valid?
+
+      assert %{event: [{_, [validation: :event_domain_empty]}]} = traverse_errors(changeset, & &1)
     end
   end
 
