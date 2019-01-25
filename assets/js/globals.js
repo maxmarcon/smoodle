@@ -592,6 +592,9 @@ export const eventHelpersMixin = {
 				return dateFns.max.apply(null, this.eventDomain)
 			}
 		},
+		emptyDomain() {
+			return this.eventDomain.length == 0
+		},
 		eventDomain() {
 			return this.eventPossibleDates.map(({
 						date_from,

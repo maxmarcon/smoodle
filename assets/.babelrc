@@ -4,8 +4,6 @@
        "targets": {
          "browsers": ["last 1 version", "not dead", "> 0.2%"]
        },
-       "useBuiltIns": "entry",
-       "include": ["es7.promise.finally"]
      }]
    ],
    "plugins": ["@babel/plugin-transform-runtime"]

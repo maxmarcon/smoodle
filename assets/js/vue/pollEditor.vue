@@ -28,13 +28,15 @@
 		)
 			p {{ $t('poll_editor.poll_delete_error') }}
 
-		b-modal#eventNoLongerOpenModal(ref="eventNoLongerOpenModal"
+		b-modal#eventErrorModal(ref="eventErrorModal"
 			hide-header
 			:ok-title="$t('poll_editor.back_to_event')"
 			ok-only
+			no-close-on-esc
+			no-close-on-backdrop
 			@ok="backToEvent"
 		)
-			p {{ $t('poll_editor.event_no_longer_open') }}
+			p {{ eventError }}
 
 		.card(v-if="loadedSuccessfully")
 			.card-header(:class="eventBackgroundClass")
@@ -48,106 +50,109 @@
 				.alert.alert-info(v-else)
 					i.fas.fa-edit
 					| &nbsp; {{ $t('poll_editor.welcome_new_participant') }}
-				.small.text-danger(name="event-error") {{ eventError }}
+				.alert.alert-danger(v-if="emptyDomain")
+								i.fas.fa-exclamation-triangle
+								| &nbsp; {{ $t('event_viewer.empty_domain') }}
+				div(v-else)
+					div(v-if="eventId")
+						//- if we have an eventId, we are creating a new poll and not editing an existing one
+						b-btn.btn-block.d-flex(
+								v-b-toggle.organizer-group=""
+								:variant="groupVariant('participant-group')"
+							)
+								span.fas.fa-chevron-up(v-if="groupVisibility['participant-group']")
+								span.fas.fa-chevron-down(v-else)
+								span.ml-2.mr-auto {{ $t('poll_editor.participant_group') }}
+								div(v-if="showGroupErrorIcon('participant-group')").fas.fa-exclamation
+								div(v-else-if="showGroupOkIcon('participant-group')").fas.fa-check
+						b-collapse#organizer-group(accordion="poll-editor" v-model="groupVisibility['participant-group']")
+								b-card
+									.form-group.row
+										label.col-md-3.col-form-label(for="pollParticipant") {{ $t('poll_editor.poll.participant') }}
+										.col-md-9
+											small.form-text.text-muted {{ $t('poll_editor.poll.participant_help') }}
+											input#pollParticipant.form-control(
+												v-model.trim="pollParticipant"
+												@change="localValidation"
+												@blur="localValidation"
+												:class="inputFieldClass('pollParticipant')"
+											)
+											.invalid-feedback(name="poll-participant-error") {{ pollParticipantError }}
 
-				div(v-if="eventId")
-					b-btn.btn-block.d-flex(
-							v-b-toggle.organizer-group=""
-							:variant="groupVariant('participant-group')"
-						)
-							span.fas.fa-chevron-up(v-if="groupVisibility['participant-group']")
-							span.fas.fa-chevron-down(v-else)
-							span.ml-2.mr-auto {{ $t('poll_editor.participant_group') }}
-							div(v-if="showGroupErrorIcon('participant-group')").fas.fa-exclamation
-							div(v-else-if="showGroupOkIcon('participant-group')").fas.fa-check
-					b-collapse#organizer-group(accordion="poll-editor" v-model="groupVisibility['participant-group']")
-							b-card
-								.form-group.row
-									label.col-md-3.col-form-label(for="pollParticipant") {{ $t('poll_editor.poll.participant') }}
-									.col-md-9
-										small.form-text.text-muted {{ $t('poll_editor.poll.participant_help') }}
-										input#pollParticipant.form-control(
-											v-model.trim="pollParticipant"
-											@change="localValidation"
-											@blur="localValidation"
-											:class="inputFieldClass('pollParticipant')"
-										)
-										.invalid-feedback(name="poll-participant-error") {{ pollParticipantError }}
+					b-btn#calendar-ranker-button.d-flex.btn-block.mt-2(
+						v-b-toggle.calendar-ranker=""
+						:variant="groupVariant('calendar-ranker-group')"
+					)
+						span.fas.fa-chevron-up(v-if="groupVisibility['calendar-ranker-group']")
+						span.fas.fa-chevron-down(v-else)
+						span.ml-2.mr-auto {{ $t('poll_editor.calendar_ranker_group') }}
+						div(v-if="showGroupErrorIcon('calendar-ranker-group')").fas.fa-exclamation
+						div(v-else-if="showGroupOkIcon('calendar-ranker-group')").fas.fa-check
+					b-collapse#calendar-ranker(
+						accordion="poll-editor"
+						v-model="groupVisibility['calendar-ranker-group']"
+						:visible="true"
+					)
+						b-card
+							.form-group.row
+								.col.text-center.text-justify
+									i18n.small.text-muted(path="poll_editor.date_ranker_helper" tag="p")
+										i.fas.fa-heart.text-success(place="good")
+										i.fas.fa-thumbs-down.text-danger(place="bad")
+										i.fas.fa-circle.text-warning(place="indifferent")
 
-				b-btn#calendar-ranker-button.d-flex.btn-block.mt-2(
-					v-b-toggle.calendar-ranker=""
-					:variant="groupVariant('calendar-ranker-group')"
-				)
-					span.fas.fa-chevron-up(v-if="groupVisibility['calendar-ranker-group']")
-					span.fas.fa-chevron-down(v-else)
-					span.ml-2.mr-auto {{ $t('poll_editor.calendar_ranker_group') }}
-					div(v-if="showGroupErrorIcon('calendar-ranker-group')").fas.fa-exclamation
-					div(v-else-if="showGroupOkIcon('calendar-ranker-group')").fas.fa-check
-				b-collapse#calendar-ranker(
-					accordion="poll-editor"
-					v-model="groupVisibility['calendar-ranker-group']"
-					:visible="true"
-				)
-					b-card
-						.form-group.row
-							.col.text-center.text-justify
-								i18n.small.text-muted(path="poll_editor.date_ranker_helper" tag="p")
-									i.fas.fa-heart.text-success(place="good")
-									i.fas.fa-thumbs-down.text-danger(place="bad")
-									i.fas.fa-circle.text-warning(place="indifferent")
+							.form-group.row.justify-content-center.justify-content-md-between.justify-content-lg-center
+								.col-md-6.mb-4.text-center
+									v-date-picker#pollDateRanks(
+										mode="single"
+										v-model="datesSelection"
+										nav-visibility="hidden"
+										:is-inline="true"
+										:is-required="true"
+										:is-double-paned="differentMonths"
+										:attributes="datePickerAttributes"
+										:is-linked="true"
+										:from-page="fromPage"
+										:min-page="fromPage"
+										:max-page="toPage"
+										:show-caps="true"
+										popover-visibility="hidden"
+										:disabled-attribute="disabledAttribute"
+										:select-attribute="selectAttribute"
+										:available-dates="eventDomain"
+										@input="newDate"
+									)
+									.small.text-danger {{ pollDateRanksError }}
 
-						.form-group.row.justify-content-center.justify-content-md-between.justify-content-lg-center
-							.col-md-6.mb-4.text-center
-								v-date-picker#pollDateRanks(
-									mode="single"
-									v-model="datesSelection"
-									nav-visibility="hidden"
-									:is-inline="true"
-									:is-required="true"
-									:is-double-paned="differentMonths"
-									:attributes="datePickerAttributes"
-									:is-linked="true"
-									:from-page="fromPage"
-									:min-page="fromPage"
-									:max-page="toPage"
-									:show-caps="true"
-									popover-visibility="hidden"
-									:disabled-attribute="disabledAttribute"
-									:select-attribute="selectAttribute"
-									:available-dates="eventDomain"
-									@input="newDate"
-								)
-								.small.text-danger {{ pollDateRanksError }}
+									.d-flex.mt-2.justify-content-center.align-items-end(@click="cleardatesSelection")
+											.form-check
+												p-radio.p-icon.p-plain(name="selectedDateRank" :value="1" v-model="selectedDateRank" toggle)
+													i.icon.fas.fa-heart.text-success(slot="extra")
+													i.icon.far.fa-heart(slot="off-extra")
+													label(slot="off-label")
+											.form-check
+												p-radio.p-icon.p-plain(name="selectedDateRank" :value="-1" v-model="selectedDateRank" toggle)
+													i.icon.fas.fa-thumbs-down.text-danger(slot="extra")
+													i.icon.far.fa-thumbs-down(slot="off-extra")
+													label(slot="off-label")
+											.form-check
+												p-radio.p-icon.p-plain(name="selectedDateRank" :value="0" v-model="selectedDateRank" toggle)
+													i.icon.fas.fa-circle.text-warning(slot="extra")
+													i.icon.far.fa-circle(slot="off-extra")
+													label(slot="off-label")
 
-								.d-flex.mt-2.justify-content-center.align-items-end(@click="cleardatesSelection")
-										.form-check
-											p-radio.p-icon.p-plain(name="selectedDateRank" :value="1" v-model="selectedDateRank" toggle)
-												i.icon.fas.fa-heart.text-success(slot="extra")
-												i.icon.far.fa-heart(slot="off-extra")
-												label(slot="off-label")
-										.form-check
-											p-radio.p-icon.p-plain(name="selectedDateRank" :value="-1" v-model="selectedDateRank" toggle)
-												i.icon.fas.fa-thumbs-down.text-danger(slot="extra")
-												i.icon.far.fa-thumbs-down(slot="off-extra")
-												label(slot="off-label")
-										.form-check
-											p-radio.p-icon.p-plain(name="selectedDateRank" :value="0" v-model="selectedDateRank" toggle)
-												i.icon.fas.fa-circle.text-warning(slot="extra")
-												i.icon.far.fa-circle(slot="off-extra")
-												label(slot="off-label")
-
-							.col-11.col-md-3.offset-md-1
-								ranker#pollWeekdayRanks(:elements="pollWeekdayRanks")
-								.small.text-danger {{ pollWeekdayRanksError }}
+								.col-11.col-md-3.offset-md-1
+									ranker#pollWeekdayRanks(:elements="pollWeekdayRanks")
+									.small.text-danger {{ pollWeekdayRanksError }}
 
 
 			.card-footer
 				.row.justify-content-center
-					.col-12.col-sm-auto.mt-1
+					.col-12.col-sm-auto.mt-1(v-if="eventOpen && !emptyDomain")
 						button.btn.btn-block.btn-primary(name="save-poll" @click="savePoll" :disabled="requestOngoing")
 							i.fas.fa-save
 							| &nbsp; {{ $t('poll_editor.save_poll') }}
-					.col-12.col-sm-auto.mt-1(v-if="pollId")
+					.col-12.col-sm-auto.mt-1(v-if="pollId && eventOpen && !emptyDomain")
 						button.btn.btn-block.btn-danger(name="delete-poll"  v-b-modal.pollDeleteModal="" :disabled="requestOngoing")
 							i.fas.fa-trash-alt
 							| &nbsp; {{ $t('poll_editor.delete_poll') }}
@@ -236,7 +241,7 @@ export default {
 				.then(function(response) {
 					self.assignEventData(response.data.data)
 					self.assignPollData({}, self.eventWeekdays)
-					self.checkEventOpen()
+					self.checkEventValid()
 					self.loadedSuccessfully = true
 				})
 				.finally(function() {
@@ -248,7 +253,7 @@ export default {
 					self.assignEventData(response.data.data.event)
 					self.assignPollData(response.data.data, self.eventWeekdays)
 					self.eventIdFromPoll = response.data.data.event_id
-					self.checkEventOpen()
+					self.checkEventValid()
 					self.loadedSuccessfully = true
 					self.groupVisibility['calendar-ranker-group'] = true
 				})
@@ -258,9 +263,10 @@ export default {
 		}
 	},
 	methods: {
-		checkEventOpen() {
-			if (!this.eventOpen) {
-				this.$refs.eventNoLongerOpenModal.show();
+		checkEventValid() {
+			if (!this.eventOpen || this.emptyDomain) {
+				this.eventError = this.$i18n.t('poll_editor.event_invalid')
+				this.$refs.eventErrorModal.show();
 			}
 		},
 		cleardatesSelection() {
@@ -284,9 +290,7 @@ export default {
 				if (error.response && error.response.status == 422) {
 					self.setServerErrors(error.response.data.errors);
 					if (self.eventError) {
-						// not really checking for the errror, but so far this is the only possible
-						// cause for a global error
-						self.$refs.eventNoLongerOpenModal.show();
+						self.$refs.eventErrorModal.show();
 					}
 					self.wasServerValidated = true;
 				} else {

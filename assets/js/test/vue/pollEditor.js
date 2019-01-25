@@ -153,7 +153,7 @@ describe('pollEditor', () => {
 			})
 
 			it('shows an error modal', () => {
-				expect(wrapper.find('#eventNoLongerOpenModal').isVisible()).toBeTruthy()
+				expect(wrapper.find('#eventErrorModal').isVisible()).toBeTruthy()
 			})
 		})
 
@@ -341,7 +341,7 @@ describe('pollEditor', () => {
 			})
 
 			it('shows an error modal', () => {
-				expect(wrapper.find('#eventNoLongerOpenModal').isVisible()).toBeTruthy()
+				expect(wrapper.find('#eventErrorModal').isVisible()).toBeTruthy()
 			})
 		})
 
@@ -481,7 +481,7 @@ describe('pollEditor', () => {
 				})
 
 				it('renders errors', () => {
-					expect(wrapper.find('div[name="event-error"]').text()).toBe("no longer open")
+					expect(wrapper.vm.eventError).toBe("no longer open")
 					expect(wrapper.find('#pollSavedModal').isVisible()).toBeFalsy()
 				})
 			})
@@ -497,7 +497,7 @@ describe('pollEditor', () => {
 				})
 
 				it('there should be no errors', () => {
-					expect(wrapper.find('div[name="event-error"]').text()).toBeFalsy()
+					expect(wrapper.vm.eventError).toBeFalsy()
 				})
 
 				it('shows the modal to go back to the event', () => {

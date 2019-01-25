@@ -75,7 +75,7 @@ export default {
 			weekday_ranker_help_modal_content: "Give us an idea of your typical week. For example, \
 			you might go to the gym every Wednesday and might therefore want to mark it with {bad}. On the other hand, a Friday might be a good day for this event\
 			and you might want to mark it with {good}. The remaining days might be just ok, and you can leave them as {ok}.",
-			event_no_longer_open: "The event is no longer open."
+			event_invalid: "The event is invalid or already scheduled"
 		},
 		event_viewer: {
 			organizer: "Organizer:",
@@ -87,13 +87,14 @@ export default {
 			no_participants: "{icon} The event has not been scheduled and nobody entered their availabiliy yet. Be the first one to answer!",
 			no_participants_organizer: "{icon} The event has not been scheduled and nobody entered their availabiliy yet.",
 			schedule_not_found: "We were unable to fetch the current schedule for this event",
-			welcome: "{organizer} has invited you to this event.",
-			welcome_organizer: "You are the organizer of this event.",
+			welcome: "{organizer} has invited you to this event",
+			welcome_organizer: "You are the organizer of this event",
 			event_open: "{calendar_icon} The event has not been scheduled yet. Below are the candidate dates so far, based on {answers}. If you haven't yet, please enter your availability",
 			event_open_organizer: "{calendar_icon} You haven't scheduled the event yet. Below are the candidate dates so far, based on the answers from {participants}.",
 			answers: "one answer|{count} answers",
 			event_canceled: "This event has been canceled",
 			event_canceled_organizer: "You canceled this event",
+			empty_domain: "This event does not specify any selectable dates",
 			event_scheduled: "{organizer} has scheduled this event to happen on: {datetime}. {time_distance}.",
 			event_scheduled_organizer: "You have scheduled this event to happen on: {datetime}. {time_distance}.",
 			time_distance_future: "It will take place {time_distance}",
@@ -206,7 +207,8 @@ export default {
 			cancel: "Cancel",
 			tell_me_more: "Tell me more",
 			back_home: "Back home",
-			ok: "Ok"
+			ok: "Ok",
+			do_not_cancel: "Skip"
 		},
 		trimmed_list: "{list} and {others} others"
 	},
@@ -282,7 +284,7 @@ export default {
 			weekday_ranker_help_modal_content: "Wie sieht deine typische Woche aus? Zum Beispiel, \
 			gehst du vielleicht mittwochs ins Fittnessstudio und möchtest deswegen diesen Wochentag als {bad} markieren. Ein Freitag könnte aber ein guter Tag sein für das Event\
 			und du kannst ihn mit {good} markieren. Die restlichen Tage sind vielleicht nur ok, und du kannst sie als {ok} lassen.",
-			event_no_longer_open: "Das Event ist nicht mehr offen.",
+			event_invalid: "Das Event ist ungültig oder schon festgelet",
 		},
 		event_viewer: {
 			organizer: "Organisator:",
@@ -294,13 +296,14 @@ export default {
 			no_participants: "{icon} Für das Event wurde noch kein Datum festgelet und es liegt keine Verfügbarkeit vor. Sei der Erste, der antwortet!",
 			no_participants_organizer: "{icon} Für das Event wurde noch kein Datum festgelet und es liegt keine Verfügbarkeit vor.",
 			schedule_not_found: "Die Planung für dieses Event konnte nicht gefunden werden.",
-			welcome: "{organizer} hat dich zu diesem Event eingeladen.",
-			welcome_organizer: "Du organisierst dieses Event.",
+			welcome: "{organizer} hat dich zu diesem Event eingeladen",
+			welcome_organizer: "Du organisierst dieses Event",
 			event_open: "{calendar_icon} Der Organisator hat noch kein Datum festgelegt. Hier unten sind die möglichen Daten, basierend auf {answers}. Gib deine Verfügbarkeit an, falls du es noch nicht getan hast.",
 			event_open_organizer: "{calendar_icon} Du hast dich noch nicht für ein Datum entschieden. Hier unten sind die möglichen Daten, basierend auf den Antworten von {participants}.",
 			answers: "eine Antwort|{count} Antworten",
 			event_canceled: "Dieses Event wurde abgesagt",
 			event_canceled_organizer: "Du hast dieses Event abgesagt",
+			empty_domain: "Dieses Event gibt keine Daten an",
 			event_scheduled: "{organizer} hat den {datetime} für dieses Event festgelegt. {time_distance}.",
 			event_scheduled_organizer: "Du hast den {datetime} für dieses Event festgelegt. {time_distance}.",
 			time_distance_future: "Das wird {time_distance} stattfinden",
@@ -411,7 +414,8 @@ export default {
 		actions: {
 			cancel: "Abbrechen",
 			tell_me_more: "Ich will mehr wissen",
-			back_home: "Zur Homepage"
+			back_home: "Zur Homepage",
+			do_not_cancel: "Abbrechen"
 		},
 		trimmed_list: "{list} und {others} andere"
 	},
@@ -487,7 +491,7 @@ export default {
 			weekday_ranker_help_modal_content: "Com'è la tua settimana tipica? Per esempio, \
 			magari vai ogni Mercoledì a fare sport e vuoi perciò marcare questo giorno con {bad}. Il Venerdì però in genere potrebbe andare bene \
 			e lo potresti marcare con {good}. I rimanenti giorni sono semplicemente ok, e puoi lasciarli con {ok}.",
-			event_no_longer_open: "L'evento non è più aperto."
+			event_invalid: "L'evento è invalido o già fissato"
 		},
 		event_viewer: {
 			organizer: "Organizzatore:",
@@ -499,13 +503,14 @@ export default {
 			no_participants: "{icon} Per l'evento non è stata fissata nessuna data e nessuna disponibilità è stata comunicata. Sii il primo a rispondere!",
 			no_participants_organizer: "{icon} Per l'evento non è stata fissata nessuna data e nessuna disponibilità è stata comunicata.",
 			schedule_not_found: "Le date per questo evento non sono state trovate.",
-			welcome: "{organizer} ti ha invitato a questo evento.",
-			welcome_organizer: "Sei l'organizzatore di quest'evento.",
+			welcome: "{organizer} ti ha invitato a questo evento",
+			welcome_organizer: "Sei l'organizzatore di quest'evento",
 			event_open: "{calendar_icon} L'organizzatore non ha ancora fissato una data. Qui sotto ci sono le possibili date, in base a {answers}. Comunica la tua disponibilità nel caso non l'abbia ancora fatto.",
 			event_open_organizer: "{calendar_icon} Non hai ancora fissato una data. Qui sotto ci sono le possibili date, in base alle risposte di {participants}.",
 			answers: "una risposta|{count} risposte",
 			event_canceled: "Questo evento è stato disdetto",
 			event_canceled_organizer: "Hai disdetto l'evento",
+			empty_domain: "Questo evento non ha date selezionabili",
 			event_scheduled: "{organizer} ha fissato l'evento per {datetime}. {time_distance}.",
 			event_scheduled_organizer: "Hai fissato l'evento per {datetime}. {time_distance}.",
 			time_distance_future: "Avrà luogo {time_distance}",
@@ -616,7 +621,8 @@ export default {
 		actions: {
 			cancel: "Annulla",
 			tell_me_more: "Dimmi di più.",
-			back_home: "Alla homepage"
+			back_home: "Alla homepage",
+			do_not_cancel: "Annulla"
 		},
 		trimmed_list: "{list} e {others} altri"
 	}

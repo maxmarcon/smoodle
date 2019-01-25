@@ -1,4 +1,5 @@
-// import 'babel-polyfill';
+// import '@babel/polyfill';
+// Let's try to readd this!
 // This would enable IE11 compatibility, in case we ever need it.
 import EventEditor from './vue/eventEditor.vue'
 import PollEditor from './vue/pollEditor.vue'

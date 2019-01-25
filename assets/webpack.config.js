@@ -1,5 +1,4 @@
 const path = require('path')
-const webpack = require('webpack');
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
@@ -14,19 +13,12 @@ const cssPath = 'css'
 const fontsPath = 'fonts'
 const imagesPath = 'images'
 
-if (process.env.NODE_ENV == undefined) {
-	throw 'You need to set NODE_ENV for this configuration to work.'
-}
-
-const devMode = process.env.NODE_ENV == 'development';
-
 module.exports = {
 	mode: 'development',
 	entry: {
 		bundle: './webpack-entry.js',
 		testSuite: './js/test/suite.js'
 	},
-	devtool: devMode ? 'eval-source-map' : false,
 	output: {
 		filename: (chunkData) => {
 			return path.join((chunkData.chunk.name.match(/^test/) ? testPath : jsPath), '[name].js')
@@ -105,9 +97,6 @@ module.exports = {
 		], {
 			allowExternal: true
 		}),
-		new CssUrlRelativePlugin(),
-		new webpack.DefinePlugin({
-			'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
-		})
+		new CssUrlRelativePlugin()
 	]
 };

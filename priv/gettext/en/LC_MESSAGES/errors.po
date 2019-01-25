@@ -119,7 +119,7 @@ msgstr ""
 #, elixir-format
 #: lib/smoodle/scheduler/poll.ex:69
 msgid "event is no longer open"
-msgstr ""
+msgstr "The event is no longer open"
 
 #, elixir-format
 #: lib/smoodle/scheduler/utils.ex:102
@@ -149,4 +149,4 @@ msgstr ""
 #, elixir-format
 #: lib/smoodle/scheduler/poll.ex:54
 msgid "the event has no valid dates"
-msgstr ""
+msgstr "The event has no valid dates"

@@ -1,4 +1,4 @@
-<template lang="pug">
+	<template lang="pug">
 	div
 		message-bar(ref="errorBar" variant="danger")
 		b-modal#updateAnswerModal(
@@ -25,7 +25,7 @@
 		b-modal#cancelEventModal(
 			:title="$t('event_viewer.cancel_event')"
 			:ok-title="$t('event_viewer.cancel_event')"
-			:cancel-title="$t('actions.cancel')"
+			:cancel-title="$t('actions.do_not_cancel')"
 			@ok="cancelEvent"
 		)
 			p {{ $t('event_viewer.really_cancel_event') }}
@@ -113,7 +113,7 @@
 					p(name="event-intro")
 						em.text-muted {{ isOrganizer ? $t('event_viewer.description') : $t('event_viewer.organizer_says', {organizer: eventOrganizer}) }} &nbsp;
 						| {{ eventDesc }}
-				li.list-group-item(v-if="isOrganizer && eventOpen")
+				li.list-group-item(v-if="isOrganizer && eventOpen && !emptyDomain")
 					.alert.alert-success
 						i.fas.fa-key
 						| &nbsp; {{ $t('event_viewer.welcome_organizer', {organizer: eventOrganizer}) }}
@@ -140,63 +140,67 @@
 							.alert.alert-warning(v-if="eventModified")
 								i.fas.fa-cut
 								| &nbsp; {{ $t('event_viewer.event_modified', {time_distance: eventModifiedRelative, organizer: eventOrganizer}) }}
-							.alert.alert-success(v-else)
+							.alert.alert-success
 								i.fas.fa-share-alt
 								| &nbsp; {{ $t('event_viewer.welcome', {organizer: eventOrganizer}) }}
-						div(v-if="eventScheduleParticipantsCount")
-							.alert.alert-info
-								i18n(path="event_viewer.event_open_organizer" v-if="isOrganizer")
-									i.fas.fa-calendar-check.fa-lg(place="calendar_icon")
-									a(href="#" place="participants" v-b-modal.participantsListModal="")
-										| {{ $tc('event_viewer.nof_participants', eventScheduleParticipantsCount, {participants: eventScheduleParticipantsCount}) }}
+						.alert.alert-danger(v-if="emptyDomain")
+								i.fas.fa-exclamation-triangle
+								| &nbsp; {{ $t('event_viewer.empty_domain') }}
+						div(v-else)
+							div(v-if="eventScheduleParticipantsCount")
+								.alert.alert-info
+									i18n(path="event_viewer.event_open_organizer" v-if="isOrganizer")
+										i.fas.fa-calendar-check.fa-lg(place="calendar_icon")
+										a(href="#" place="participants" v-b-modal.participantsListModal="")
+											| {{ $tc('event_viewer.nof_participants', eventScheduleParticipantsCount, {participants: eventScheduleParticipantsCount}) }}
 
-								i18n(path="event_viewer.event_open" v-else)
-									i.fas.fa-calendar-check.fa-lg(place="calendar_icon")
-									span(place="answers") {{ $tc('event_viewer.answers', eventScheduleParticipantsCount, {count: eventScheduleParticipantsCount}) }}
-							.row.justify-content-md-between.justify-content-lg-center
-								.col-md-3.offset-md-1.order-md-last.text-justify
-									.form-group
-										i18n.small.text-muted(
-											:path="isOrganizer ? 'event_viewer.date_selection_help_organizer' : 'event_viewer.date_selection_help'"
-											tag="p"
-										)
-											span.text-success(place="best") {{ $t('event_viewer.best') }}
-											span.text-danger(place="worst") {{ $t('event_viewer.worst') }}
-											span.text-success(place="green") {{ $t('event_viewer.green') }}
-											span.text-danger(place="red") {{ $t('event_viewer.red') }}
+									i18n(path="event_viewer.event_open" v-else)
+										i.fas.fa-calendar-check.fa-lg(place="calendar_icon")
+										span(place="answers") {{ $tc('event_viewer.answers', eventScheduleParticipantsCount, {count: eventScheduleParticipantsCount}) }}
+								.row.justify-content-md-between.justify-content-lg-center
+									.col-md-3.offset-md-1.order-md-last.text-justify
+										.form-group
+											i18n.small.text-muted(
+												:path="isOrganizer ? 'event_viewer.date_selection_help_organizer' : 'event_viewer.date_selection_help'"
+												tag="p"
+											)
+												span.text-success(place="best") {{ $t('event_viewer.best') }}
+												span.text-danger(place="worst") {{ $t('event_viewer.worst') }}
+												span.text-success(place="green") {{ $t('event_viewer.green') }}
+												span.text-danger(place="red") {{ $t('event_viewer.red') }}
 
-								.col-md-6.text-center
-									.form-group
-										v-date-picker(
-											v-if="isOrganizer"
-											mode="single"
-											v-model="selectedDate"
-											:attributes="scheduleCalendarAttributes"
-											:is-inline="true"
-											:is-linked="true"
-											:from-page="fromPage"
-											:min-page="fromPage"
-											:max-page="toPage"
-											:available-dates="eventDomain"
-											:is-double-paned="differentMonths"
-											:select-attribute="selectAttrubute"
-											nav-visibility="hidden"
-										)
-										v-calendar(
-											v-else
-											:is-linked="true"
-											nav-visibility="hidden"
-											:attributes="scheduleCalendarAttributes"
-											:min-page="fromPage"
-											:max-page="toPage"
-											:is-double-paned="differentMonths"
-										)
+									.col-md-6.text-center
+										.form-group
+											v-date-picker(
+												v-if="isOrganizer"
+												mode="single"
+												v-model="selectedDate"
+												:attributes="scheduleCalendarAttributes"
+												:is-inline="true"
+												:is-linked="true"
+												:from-page="fromPage"
+												:min-page="fromPage"
+												:max-page="toPage"
+												:available-dates="eventDomain"
+												:is-double-paned="differentMonths"
+												:select-attribute="selectAttrubute"
+												nav-visibility="hidden"
+											)
+											v-calendar(
+												v-else
+												:is-linked="true"
+												nav-visibility="hidden"
+												:attributes="scheduleCalendarAttributes"
+												:min-page="fromPage"
+												:max-page="toPage"
+												:is-double-paned="differentMonths"
+											)
 
-						div.alert.alert-primary(v-else-if="loaded")
-							i18n(path="event_viewer.no_participants_organizer" v-if="isOrganizer")
-								i.fas.fa-thermometer-empty.fa-lg(place="icon")
-							i18n(path="event_viewer.no_participants" v-else)
-								i.fas.fa-trophy.fa-lg(place="icon")
+							div.alert.alert-primary(v-else-if="loaded")
+								i18n(path="event_viewer.no_participants_organizer" v-if="isOrganizer")
+									i.fas.fa-thermometer-empty.fa-lg(place="icon")
+								i18n(path="event_viewer.no_participants" v-else)
+									i.fas.fa-trophy.fa-lg(place="icon")
 
 					div(v-else-if="eventScheduled")
 						.alert.alert-success
@@ -232,7 +236,7 @@
 
 			.card-footer(v-if="eventOpen || isOrganizer")
 				.row.justify-content-center
-					.col-12.col-sm-auto.mt-1(v-if="eventOpen && isOrganizer && eventScheduleParticipantsCount")
+					.col-12.col-sm-auto.mt-1(v-if="eventOpen && !emptyDomain && isOrganizer && eventScheduleParticipantsCount")
 						button.btn.btn-block.btn-primary(v-b-modal.scheduleEventModal="" :disabled="requestOngoing" name="schedule-button")
 							i.fas.fa-clock
 							| &nbsp; {{ $t('event_viewer.schedule_event') }}
@@ -244,19 +248,19 @@
 						)
 							i.fas.fa-edit
 							| &nbsp; {{ $t('event_viewer.edit_event') }}
-					.col-12.col-sm-auto.mt-1(v-if="eventOpen && isOrganizer")
+					.col-12.col-sm-auto.mt-1(v-if="eventOpen && !emptyDomain && isOrganizer")
 						button.btn.btn-block.btn-block.btn-warning(v-b-modal.cancelEventModal="" :disabled="requestOngoing"
 							name="cancel-button"
 						)
 							i.fas.fa-ban
 							| &nbsp; {{ $t('event_viewer.cancel_event') }}
-					.col-12.col-sm-auto.mt-1(v-if="!eventOpen && isOrganizer")
+					.col-12.col-sm-auto.mt-1(v-if="!eventOpen && !emptyDomain && isOrganizer")
 						button.btn.btn-block.btn-warning(@click="openEvent" :disabled="requestOngoing"
 							name="open-button"
 						)
 							i.fas.fa-undo
 							| &nbsp; {{ $t('event_viewer.open_event') }}
-					.col-12.col-sm-auto.mt-1(v-if="eventOpen && !isOrganizer")
+					.col-12.col-sm-auto.mt-1(v-if="eventOpen && !emptyDomain && !isOrganizer")
 						router-link.btn.btn-block.btn-success(
 							name="new-poll-button"
 							role="button"
@@ -264,7 +268,7 @@
 						)
 							i.fas.fa-question
 							| &nbsp; {{ $t('event_viewer.create_poll') }}
-					.col-12.col-sm-auto.mt-1(v-if="eventOpen && !isOrganizer && eventScheduleParticipantsCount")
+					.col-12.col-sm-auto.mt-1(v-if="eventOpen && !emptyDomain && !isOrganizer && eventScheduleParticipantsCount")
 						button.btn.btn-block.btn-primary(v-b-modal.updateAnswerModal="" :disabled="requestOngoing" name="edit-poll-button")
 							i.fas.fa-edit
 							| &nbsp; {{ $t('event_viewer.update_poll') }}
