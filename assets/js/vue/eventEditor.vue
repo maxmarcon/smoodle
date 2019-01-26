@@ -165,7 +165,7 @@
 										:min-date="today"
 										:is-inline="true"
 										:is-double-paned="true"
-										:from-page="fromPage"
+										:from-page="initialFromPage"
 										:is-linked="true"
 										:show-caps="true"
 										:is-required="true"
@@ -305,6 +305,7 @@ export default {
 		today,
 		loadedSuccessfully: false,
 		loaded: false,
+		initialFromPage: null,
 		eventCreated: false,
 		createdEventId: null,
 		createdEventSecret: null,
@@ -337,6 +338,10 @@ export default {
 				this.loaded = true
 			}
 		}
+		// we compute fromPage only once at the very beginning, because we don't want
+		// adding/removing dates to bring the user back to the first calendar page containing
+		// the event dates
+		this.initialFromPage = this.fromPage
 	},
 	computed: {
 		computedEventId() {
