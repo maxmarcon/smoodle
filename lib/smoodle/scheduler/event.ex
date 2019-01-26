@@ -18,7 +18,7 @@ defmodule Smoodle.Scheduler.Event do
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @secret_len 8
-  @valid_states ["OPEN", "SCHEDULED", "CANCELED"]
+  @valid_states ~W(OPEN SCHEDULED CANCELED)
 
   schema "events" do
     field(:name, :string)
