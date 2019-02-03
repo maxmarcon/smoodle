@@ -114,7 +114,7 @@ defmodule Smoodle.Scheduler do
 
   def create_poll(%Event{} = event, attrs) do
     Ecto.build_assoc(event, :polls)
-    |> Map.put(:event, Repo.preload(event, :possible_dates))
+    |> Repo.preload(event: :possible_dates)
     |> Poll.changeset(attrs)
     |> Repo.insert()
   end
