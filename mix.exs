@@ -21,7 +21,7 @@ defmodule Smoodle.Mixfile do
     [
       mod: {Smoodle.Application, []},
       extra_applications: [:logger, :runtime_tools, :dotenv, :bamboo, :phoenix_ecto],
-      included_applications: [:expug, :parse_trans]
+      included_applications: [:expug]
     ]
   end
 
