@@ -113,10 +113,10 @@
 					p(name="event-intro")
 						em.text-muted {{ isOrganizer ? $t('event_viewer.description') : $t('event_viewer.organizer_says', {organizer: eventOrganizer}) }} &nbsp;
 						| {{ eventDesc }}
-				li.list-group-item(v-if="isOrganizer && eventOpen && !emptyDomain")
+				li.list-group-item(v-if="isOrganizer && !emptyDomain && (eventOpen || eventScheduled)")
 					.alert.alert-success
 						i.fas.fa-key
-						| &nbsp; {{ $t('event_viewer.welcome_organizer', {organizer: eventOrganizer}) }}
+						| &nbsp; {{ $t('event_viewer.welcome_organizer') }}
 					.form-group.row.justify-content-center
 						label.col-md-auto.col-form-label {{ $t('event_viewer.share_link') }}
 						.col-md
