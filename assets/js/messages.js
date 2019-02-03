@@ -4,7 +4,7 @@ import date_fns_it from 'date-fns/locale/it'
 
 export default {
 	en: {
-		app_name: "Lets meet!",
+		app_name: "Let's meet!",
 		navbar: {
 			language: "Language"
 		},
@@ -151,14 +151,14 @@ export default {
 			},
 			step2: {
 				title: '{step} : Let your friends decide',
-				part1: 'Your friends can say if a date is {good}, just ok {indifferent}, or {bad} for them.',
+				part1: 'Your friends can say if a date is {good}, {indifferent}, or {bad} for them.',
 				part2: 'They can select weekdays or specific dates.'
 			},
 			step3: {
 				title: '{step} : Manage the event',
 				part1: 'As an organizer, you always have a clear overview of your friends decisions.',
-				part2: '{good} and {bad} dates are cleary visible on the calendar.',
-				part3: 'When you are ready, pick a date, schedule the event and let your crowd now!'
+				part2: '{good} and {bad} dates are clearly visible on the calendar.',
+				part3: 'When you are ready, pick a date, schedule the event and let your guests now.'
 			},
 			create_new_event: 'Create an event now!',
 			good: 'good|good',
@@ -359,14 +359,14 @@ export default {
 			},
 			step2: {
 				title: '{step} : Lass deine Freunde entscheiden',
-				part1: 'Deine Freunde können angeben, ob ein Datum {good}, gleichgültig {indifferent}, oder {bad} für sie ist.',
+				part1: 'Deine Freunde können angeben, ob ein Datum {good}, {indifferent}, oder {bad} für sie ist.',
 				part2: 'Sie können einzelne Tage oder einen Zeitraum auswählen.'
 			},
 			step3: {
 				title: '{step} : Event verwalten',
 				part1: 'Als Organisator hast du immer einen klaren Überblick über die Entscheidungen deiner Freunde.',
 				part2: '{good} und {bad} Daten sind deutlich im Kalendar sichtbar.',
-				part3: 'Wenn du bereit bist, wähle ein Datum aus, lege es fest und sage deiner Crowd Bescheid!'
+				part3: 'Wenn du bereit bist, wähle ein Datum aus, lege es fest und sage deinen Gästen Bescheid.'
 			},
 			create_new_event: 'Jetzt neues Event planen!',
 			good: 'passend|passende',
@@ -566,14 +566,14 @@ export default {
 			},
 			step2: {
 				title: '{step} : Fai decidere ai tuoi amici',
-				part1: 'I tuoi amici decidono se una data è {good}, indifferente {indifferent}, oppure {bad}.',
+				part1: 'I tuoi amici decidono se una data è {good}, {indifferent}, oppure {bad}.',
 				part2: 'Possono scegliere singole date o giorni della settimana.'
 			},
 			step3: {
 				title: '{step} : Gestisci l\'evento',
 				part1: 'Come organizzatore hai sempre una chiara panoramica sulle decisioni dei tuoi invitati.',
 				part2: 'Date {good} e che {bad} sono chiaramente visibili nel calendario.',
-				part3: 'Quando sei pronto, fissa una data e dillo alla tua gang!'
+				part3: 'Quando sei pronto, fissa una data e comunicalo ai tuoi ospiti.'
 			},
 			create_new_event: 'Crea un evento adesso!',
 			good: 'buona|buone',
