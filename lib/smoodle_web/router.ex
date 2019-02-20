@@ -40,7 +40,7 @@ defmodule SmoodleWeb.Router do
     get("/", PageController, :redirect_to_home)
   end
 
-  if Application.get_env(:smoodle, :env) == :dev do
+  if Application.get_env(:smoodle, :env) in [:dev, :docker] do
     forward("/sent_emails", Bamboo.EmailPreviewPlug)
   end
 

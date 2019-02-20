@@ -1,0 +1,16 @@
+version: "3"
+services:
+  smoodle:
+    image: smoodle
+    ports:
+      - "80:4000"
+    env_file: docker.env
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: secret
+      POSTGRES_USER: docker
+    ports:
+      - "5432:5432"
+    volumes:
+      - "/tmp/dockerdata:/var/lib/postgresql/data"
