@@ -1,6 +1,6 @@
 FROM elixir:1.7.4
 
-ENV MIX_ENV docker
+ENV MIX_ENV=docker REPLACE_OS_VARS=true
 
 WORKDIR /app
 
