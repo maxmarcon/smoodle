@@ -7,7 +7,7 @@ WORKDIR /app
 COPY . /app
 
 RUN apt-get update -y
-RUN apt-get -y install curl gnupg
+RUN apt-get -y install curl gnupg wait-for-it gawk
 RUN curl -sL https://deb.nodesource.com/setup_11.x  | bash -
 RUN apt-get -y install nodejs
 
