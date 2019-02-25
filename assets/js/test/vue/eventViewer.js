@@ -302,7 +302,7 @@ describe('eventViewer', () => {
 
 
 					it('opens modal', () => {
-						expect(wrapper.find('#updateAnswerModal').visible()).toBeTruthy()
+						expect(wrapper.find('#updateAnswerModal').isVisible()).toBeTruthy()
 					})
 
 					describe('clicking on the load button', () => {
@@ -631,7 +631,7 @@ describe('eventViewer', () => {
 					})
 
 					it('opens modal', () => {
-						expect(wrapper.find('#scheduleEventModal').visible()).toBeTruthy()
+						expect(wrapper.find('#scheduleEventModal').isVisible()).toBeTruthy()
 					})
 
 					describe('clicking on the primary button in the modal without a selected date', () => {
@@ -645,7 +645,7 @@ describe('eventViewer', () => {
 
 						it('only closes the modal', () => {
 							expect(restRequest).toHaveBeenCalledTimes(2)
-							expect(wrapper.find('#scheduleEventModal').visible()).toBeFalsy()
+							expect(wrapper.find('#scheduleEventModal').isVisible()).toBeFalsy()
 						})
 					})
 
@@ -673,7 +673,7 @@ describe('eventViewer', () => {
 									}
 								}
 							});
-							expect(wrapper.find('#scheduleEventModal').visible()).toBeFalsy()
+							expect(wrapper.find('#scheduleEventModal').isVisible()).toBeFalsy()
 						})
 					})
 				})
@@ -688,7 +688,7 @@ describe('eventViewer', () => {
 					})
 
 					it('opens modal', () => {
-						expect(wrapper.find('#cancelEventModal').visible()).toBeTruthy()
+						expect(wrapper.find('#cancelEventModal').isVisible()).toBeTruthy()
 					})
 
 					describe('clicking on primary button within the modal', () => {
@@ -941,7 +941,7 @@ describe('eventViewer', () => {
 			})
 
 			it('renders one alert', () => {
-				expect(wrapper.findAll('.alert').length).toBe(1)
+				expect(wrapper.findAll('.alert').length).toBe(2)
 			})
 
 			it('does not render the date picker', () => {
