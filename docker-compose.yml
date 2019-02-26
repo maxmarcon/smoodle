@@ -9,7 +9,10 @@ services:
       - node_modules:/app/assets/node_modules
     ports:
       - "80:4000"
-    env_file: .docker.env
+    environment:
+      DATABASE_URL: postgresql://docker:secret@db:5432/docker
+      PORT: 4000
+      HOST_NAME: localhost
   db:
     image: postgres
     environment:
