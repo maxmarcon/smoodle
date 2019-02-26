@@ -3,3 +3,4 @@ deps
 test
 assets/node_modules
 *.env
+.git
