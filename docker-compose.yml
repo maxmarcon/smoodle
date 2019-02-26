@@ -4,9 +4,6 @@ services:
     image: smoodle
     build:
       context: ./
-    volumes:
-      - deps:/app/deps
-      - node_modules:/app/assets/node_modules
     ports:
       - "80:4000"
     environment:
@@ -23,6 +20,4 @@ services:
     volumes:
       - "data:/var/lib/postgresql/data"
 volumes:
-  deps:
-  node_modules:
   data:
