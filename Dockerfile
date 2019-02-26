@@ -2,25 +2,26 @@ FROM elixir:1.8.1
 
 ENV MIX_ENV=docker REPLACE_OS_VARS=true
 
-WORKDIR /app
-
-COPY . /app
-
 RUN apt-get update -y
 RUN apt-get -y install curl gnupg wait-for-it gawk
 RUN curl -sL https://deb.nodesource.com/setup_11.x  | bash -
 RUN apt-get -y install nodejs
 
-WORKDIR /app/assets
-
-RUN npm install
-RUN npm run deploy
-
+COPY ./mix.exs ./mix.lock /app/
 WORKDIR /app
-
 RUN mix local.hex --force
 RUN mix local.rebar --force
 RUN mix deps.get
+
+COPY ./assets/package.json ./assets/package-lock.json /app/assets/
+WORKDIR /app/assets
+RUN npm install
+
+COPY . /app
+
+RUN npm run deploy
+
+WORKDIR /app
 
 RUN mix phx.digest
 
