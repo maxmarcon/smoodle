@@ -2,10 +2,15 @@ FROM elixir:1.8.1
 
 ENV MIX_ENV=docker REPLACE_OS_VARS=true
 
-RUN apt-get update -y
-RUN apt-get -y install curl gnupg wait-for-it gawk
-RUN curl -sL https://deb.nodesource.com/setup_11.x  | bash -
-RUN apt-get -y install nodejs
+RUN apt-get update -y && \
+  apt-get -y install \
+  curl \
+  gnupg \
+  wait-for-it \
+  gawk
+RUN curl -sL https://deb.nodesource.com/setup_11.x  | bash - && \
+	apt-get -y install \
+	nodejs
 
 COPY ./mix.exs ./mix.lock /app/
 WORKDIR /app
