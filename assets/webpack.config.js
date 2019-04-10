@@ -88,15 +88,7 @@ module.exports = {
 			filename: path.join(cssPath, '[name].css'),
 			chunkFilename: path.join(cssPath, '[id].css')
 		}),
-		new CleanWebpackPlugin([
-			path.join(distPath, '*.*'),
-			path.join(distPath, jsPath),
-			path.join(distPath, cssPath),
-			path.join(distPath, fontsPath),
-			path.join(distPath, imagesPath)
-		], {
-			allowExternal: true
-		}),
+		new CleanWebpackPlugin(),
 		new CssUrlRelativePlugin()
 	]
 };

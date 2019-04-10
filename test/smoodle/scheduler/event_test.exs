@@ -117,7 +117,8 @@ defmodule Smoodle.Scheduler.EventTest do
         Map.replace!(@valid_attrs, :name, String.pad_trailing("Party", 51, "123"))
       )
 
-    assert [name: {_, [count: 50, validation: :length, kind: :max]}] = changeset.errors
+    assert [name: {_, [count: 50, validation: :length, kind: :max, type: :string]}] =
+             changeset.errors
   end
 
   test "changeset with organizer too long" do
@@ -127,7 +128,8 @@ defmodule Smoodle.Scheduler.EventTest do
         Map.replace!(@valid_attrs, :organizer, String.pad_trailing("Trump", 51, "123"))
       )
 
-    assert [organizer: {_, [count: 50, validation: :length, kind: :max]}] = changeset.errors
+    assert [organizer: {_, [count: 50, validation: :length, kind: :max, type: :string]}] =
+             changeset.errors
   end
 
   test "changeset with description too long" do
@@ -137,7 +139,8 @@ defmodule Smoodle.Scheduler.EventTest do
         Map.replace!(@valid_attrs, :desc, String.pad_trailing("Yeah!", 251, "123"))
       )
 
-    assert [desc: {_, [count: 250, validation: :length, kind: :max]}] = changeset.errors
+    assert [desc: {_, [count: 250, validation: :length, kind: :max, type: :string]}] =
+             changeset.errors
   end
 
   test "changeset with organizer_message too long" do
@@ -147,7 +150,7 @@ defmodule Smoodle.Scheduler.EventTest do
         Map.put(@valid_attrs, :organizer_message, String.pad_trailing("Yeah!", 251, "123"))
       )
 
-    assert [organizer_message: {_, [count: 250, validation: :length, kind: :max]}] =
+    assert [organizer_message: {_, [count: 250, validation: :length, kind: :max, type: :string]}] =
              changeset.errors
   end
 

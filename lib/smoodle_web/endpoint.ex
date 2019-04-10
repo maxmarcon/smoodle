@@ -30,7 +30,7 @@ defmodule SmoodleWeb.Endpoint do
     Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
-    json_decoder: Jason
+    json_decoder: Poison
   )
 
   plug(Plug.MethodOverride)

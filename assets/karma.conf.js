@@ -12,8 +12,9 @@ module.exports = function(config) {
     frameworks: ['jasmine', 'detectBrowsers'],
 
     detectBrowsers: {
-      enabled: false,
-      preferHeadless: true
+      enabled: true,
+      preferHeadless: true,
+      usePhantomJS: false
     },
 
     plugins: [
@@ -68,7 +69,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['FirefoxHeadless', 'ChromeHeadless'],
+    // browsers: ['FirefoxHeadless', 'ChromeHeadless'],
 
 
     // Continuous Integration mode

@@ -127,8 +127,8 @@
 									.d-flex.mt-2.justify-content-center.align-items-end(@click="cleardatesSelection")
 											.form-check
 												p-radio.p-icon.p-plain(name="selectedDateRank" :value="1" v-model="selectedDateRank" toggle)
-													i.icon.fas.fa-heart.text-success(slot="extra")
-													i.icon.far.fa-heart(slot="off-extra")
+													i.icon.fas.fa-thumbs-up.text-success(slot="extra")
+													i.icon.far.fa-thumbs-up(slot="off-extra")
 													label(slot="off-label")
 											.form-check
 												p-radio.p-icon.p-plain(name="selectedDateRank" :value="-1" v-model="selectedDateRank" toggle)
