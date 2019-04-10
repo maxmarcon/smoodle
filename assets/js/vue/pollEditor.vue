@@ -97,7 +97,7 @@
 							.form-group.row
 								.col.text-center.text-justify
 									i18n.small.text-muted(path="poll_editor.date_ranker_helper" tag="p")
-										i.fas.fa-heart.text-success(place="good")
+										i.fas.fa-thumbs-up.text-success(place="good")
 										i.fas.fa-thumbs-down.text-danger(place="bad")
 										i.fas.fa-circle.text-warning(place="indifferent")
 
