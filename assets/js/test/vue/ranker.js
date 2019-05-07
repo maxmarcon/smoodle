@@ -1,4 +1,5 @@
 import ranker from '../../vue/ranker.vue'
+import PrettyCheckbox from 'pretty-checkbox-vue'
 
 import {
 	mount,
@@ -6,6 +7,7 @@ import {
 } from '@vue/test-utils'
 
 const localVue = createLocalVue()
+localVue.use(PrettyCheckbox)
 
 const ELEMENTS = [{
 	name: 'ABC',
@@ -40,7 +42,8 @@ function mountRanker(boolean) {
 		propsData: {
 			elements: boolean ? ELEMENTS_BOOLEAN : ELEMENTS,
 			boolean
-		}
+		},
+		localVue
 	})
 }
 
@@ -67,18 +70,18 @@ describe('ranker', () => {
 
 				expect(element.find('h6').text()).toBe(el.name)
 
-				let radios = element.findAll('p-radio')
+				let radios = element.findAll('input[type="radio"]')
 				expect(radios.at(0).attributes('name')).toBe(el.name)
-				expect(radios.at(0).attributes('value')).toBe(el.disabled ? undefined : "1")
-				expect(radios.at(0).attributes('disabled')).toBe(el.disabled ? 'true' : undefined)
+				expect(radios.at(0).attributes('value')).toBe(el.disabled ? '' : "1")
+				expect(radios.at(0).attributes('disabled')).toBe(el.disabled ? 'disabled' : undefined)
 
 				expect(radios.at(1).attributes('name')).toBe(el.name)
-				expect(radios.at(1).attributes('value')).toBe(el.disabled ? undefined : "0")
-				expect(radios.at(1).attributes('disabled')).toBe(el.disabled ? 'true' : undefined)
+				expect(radios.at(1).attributes('value')).toBe(el.disabled ? '' : "0")
+				expect(radios.at(1).attributes('disabled')).toBe(el.disabled ? 'disabled' : undefined)
 
 				expect(radios.at(2).attributes('name')).toBe(el.name)
-				expect(radios.at(2).attributes('value')).toBe(el.disabled ? undefined : "-1")
-				expect(radios.at(2).attributes('disabled')).toBe(el.disabled ? 'true' : undefined)
+				expect(radios.at(2).attributes('value')).toBe(el.disabled ? '' : "-1")
+				expect(radios.at(2).attributes('disabled')).toBe(el.disabled ? 'disabled' : undefined)
 			})
 		})
 
@@ -89,7 +92,7 @@ describe('ranker', () => {
 			ELEMENTS.forEach((el, index) => {
 				let element = elements.at(index)
 
-				let radios = element.findAll('p-radio')
+				let radios = element.findAll('input[type="radio"]')
 				radios.at(0).trigger('change')
 				radios.at(1).trigger('change')
 				radios.at(2).trigger('change')
@@ -118,9 +121,9 @@ describe('ranker', () => {
 
 				expect(element.find('h6').text()).toBe(el.name)
 
-				let toggle = element.findAll('p-check')
+				let toggle = element.findAll('input[type="checkbox"]')
 				expect(toggle.length).toBe(1)
-				expect(toggle.at(0).attributes('disabled')).toBe(el.disabled ? 'true' : undefined)
+				expect(toggle.at(0).attributes('disabled')).toBe(el.disabled ? 'disabled' : undefined)
 			})
 		})
 
@@ -131,7 +134,7 @@ describe('ranker', () => {
 			ELEMENTS_BOOLEAN.forEach((el, index) => {
 				let element = elements.at(index)
 
-				let toggle = element.findAll('p-check')
+				let toggle = element.findAll('input[type="checkbox"]')
 				toggle.at(0).trigger('change')
 			})
 

@@ -2,11 +2,9 @@ import messageBar from '../../vue/messageBar.vue'
 import BootstrapVue from 'bootstrap-vue'
 
 import {
-	mount,
 	createLocalVue,
 	shallowMount
 } from '@vue/test-utils'
-
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue)
@@ -22,7 +20,7 @@ describe('messageBar', () => {
 
 	describe('without countdown', () => {
 
-		beforeEach(() => {
+		beforeEach((done) => {
 
 			wrapper = shallowMount(messageBar, {
 				localVue,
@@ -34,11 +32,12 @@ describe('messageBar', () => {
 
 			wrapper.vm.show(MESSAGE)
 
-			alert = wrapper.find('b-alert-stub')
+			setTimeout(done, 0)
 		})
 
 		it('shows a permanent dismissable message', () => {
-			console.log(wrapper.html())
+			alert = wrapper.find('b-alert-stub')
+
 			expect(alert.attributes('show')).toBe('true')
 			expect(alert.attributes('dismissible')).toBeTruthy()
 			expect(alert.attributes('variant')).toBe(VARIANT)
@@ -48,7 +47,7 @@ describe('messageBar', () => {
 
 	describe('with countdown', () => {
 
-		beforeEach(() => {
+		beforeEach((done) => {
 
 			wrapper = shallowMount(messageBar, {
 				localVue,
@@ -60,42 +59,16 @@ describe('messageBar', () => {
 
 			wrapper.vm.show(MESSAGE)
 
-			alert = wrapper.find('b-alert-stub')
+			setTimeout(done, 0)
 		})
 
 		it('shows a message with countdown', () => {
+			alert = wrapper.find('b-alert-stub')
+
 			expect(alert.attributes('show')).toEqual(SECONDS.toString())
 			expect(alert.attributes('dismissible')).toBeFalsy()
 			expect(alert.attributes('variant')).toBe(VARIANT)
 			expect(alert.text()).toBe(MESSAGE)
-		})
-	})
-
-	describe('the countdoown', () => {
-
-		beforeEach(() => {
-
-			jasmine.clock().install();
-
-			wrapper = mount(messageBar, {
-				localVue,
-				propsData: {
-					seconds: SECONDS,
-					variant: VARIANT
-				}
-			})
-
-			wrapper.vm.show(MESSAGE)
-
-			jasmine.clock().tick(SECONDS * 1010)
-		})
-
-		afterEach(() => {
-			jasmine.clock().uninstall()
-		})
-
-		it('counts down to 0', () => {
-			expect(wrapper.vm.dismissCountDown).toBeFalsy()
 		})
 	})
 })

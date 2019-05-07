@@ -8,6 +8,7 @@ export default {
 		navbar: {
 			language: "Language"
 		},
+		step: "Step {step} of {total}",
 		event_editor: {
 			title: 'New event',
 			welcome: 'Here you can create a new event and share it with participants.',
@@ -208,7 +209,9 @@ export default {
 			tell_me_more: "Tell me more",
 			back_home: "Back home",
 			ok: "Ok",
-			do_not_cancel: "Skip"
+			do_not_cancel: "Skip",
+			next: "Next",
+			prev: "Back"
 		},
 		trimmed_list: "{list} and {others} others"
 	},
@@ -217,6 +220,7 @@ export default {
 		navbar: {
 			language: "Sprache"
 		},
+		step: "Schritt {step} von {total}",
 		event_editor: {
 			title: 'Neues Event',
 			welcome: 'Hier kannst du ein neues Event planen und mit Freunden teilen.',
@@ -343,7 +347,8 @@ export default {
 			red: "Rot",
 			green: "Grün",
 			edit_event: "Event editieren",
-			event_modified: '{organizer} hat {time_distance} dieses Event aktualisiert.'
+			event_modified: '{organizer} hat {time_distance} dieses Event aktualisiert.',
+			organizer_message: 'Nachricht an die Teilnehmer:'
 		},
 		home: {
 			title: 'Events leicht gemacht',
@@ -415,7 +420,9 @@ export default {
 			cancel: "Abbrechen",
 			tell_me_more: "Ich will mehr wissen",
 			back_home: "Zur Homepage",
-			do_not_cancel: "Abbrechen"
+			do_not_cancel: "Abbrechen",
+			next: "Weiter",
+			prev: "Zurück"
 		},
 		trimmed_list: "{list} und {others} andere"
 	},
@@ -424,6 +431,7 @@ export default {
 		navbar: {
 			language: "Lingua"
 		},
+		step: "Passo {step} di {total}",
 		event_editor: {
 			title: 'Nuovo evento',
 			welcome: 'Qui puoi pianificare un nuovo evento e condividerlo con i tuoi amici.',
@@ -550,7 +558,8 @@ export default {
 			edit_event: "Modifica l'evento",
 			red: "Rosso",
 			green: "verde",
-			event_modified: '{organizer} ha aggiornato questo evento {time_distance}.'
+			event_modified: '{organizer} ha aggiornato questo evento {time_distance}.',
+			organizer_message: 'Messaggio per gli invitiati:'
 		},
 		home: {
 			title: 'Eventi con facilità',
@@ -622,7 +631,9 @@ export default {
 			cancel: "Annulla",
 			tell_me_more: "Dimmi di più.",
 			back_home: "Alla homepage",
-			do_not_cancel: "Annulla"
+			do_not_cancel: "Annulla",
+			next: "Avanti",
+			prev: "Indietro"
 		},
 		trimmed_list: "{list} e {others} altri"
 	}

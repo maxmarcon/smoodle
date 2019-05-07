@@ -4,6 +4,8 @@
        "targets": {
          "browsers": ["last 1 version", "not dead", "> 0.2%"]
        },
+       "useBuiltIns": "usage",
+       "corejs": 2
      }]
    ],
    "plugins": ["@babel/plugin-transform-runtime"]

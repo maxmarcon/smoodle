@@ -1,10 +1,10 @@
-// import '@babel/polyfill'
-// Let's try to readd this!
-// This would enable IE11 compatibility, in case we ever need it.
 import EventEditor from './vue/eventEditor.vue'
 import PollEditor from './vue/pollEditor.vue'
 import EventViewer from './vue/eventViewer.vue'
 import Home from './vue/home.vue'
+import {
+	InitialLocale
+} from './globals.js'
 
 import datePicker from 'vue-bootstrap-datetimepicker'
 import VueRouter from 'vue-router'
@@ -21,6 +21,7 @@ import messageBar from './vue/messageBar.vue'
 import messages from './messages'
 import ranker from './vue/ranker.vue'
 import eventHeader from './vue/eventHeader.vue'
+import progressHeader from './vue/progressHeader.vue'
 import errorPage from './vue/errorPage.vue'
 import PrettyCheckbox from 'pretty-checkbox-vue'
 import Vue from 'vue/dist/vue.runtime.esm'
@@ -69,7 +70,7 @@ const router = new VueRouter({
 
 Vue.use(VueI18n)
 const i18n = new VueI18n({
-	locale: smoodle_locale,
+	locale: InitialLocale,
 	fallbackLocale: 'en',
 	messages
 })
@@ -87,7 +88,7 @@ Vue.use(VueScrollTo)
 Vue.use(VueLoading)
 
 Vue.use(VCalendar, {
-	locale: smoodle_locale
+	locale: InitialLocale
 })
 
 Vue.use(datePicker)
@@ -100,8 +101,10 @@ Vue.component('event-header', eventHeader)
 
 Vue.component('error-page', errorPage)
 
-new Vue({
+Vue.component('progress-header', progressHeader)
+
+export default new Vue({
 	i18n,
 	router,
 	render: h => h(rootVue)
-}).$mount('#app')
+})

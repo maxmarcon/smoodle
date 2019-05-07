@@ -202,20 +202,17 @@ defmodule SmoodleWeb.EventControllerTest do
       assert event_count == max_emails
     end
 
-    # test "returns empty ok response when validating valid data", %{conn: conn} do
-    #   conn = post conn, event_path(conn, :create), event: @create_attrs_1, dry_run: true
-    #   assert "" = response(conn, 200)
-    # end
+    test "returns empty ok response when validating valid data", %{conn: conn} do
+      conn = post(conn, event_path(conn, :create), event: @create_attrs_1, dry_run: true)
+      assert "" = response(conn, 204)
 
-    # test "renders errors when validating invalid data", %{conn: conn} do
-    #   conn = post conn, event_path(conn, :create), event: @invalid_attrs, dry_run: true
-    #   assert json_response(conn, 422)["errors"] != %{}
-    # end
+      refute Repo.exists?(Event)
+    end
 
-    # test "returns empty ok response for partially valid data and partial validation", %{conn: conn} do
-    #  conn = post conn, event_path(conn, :create), event: @partial_valid_data, dry_run: true, partial: true
-    #  assert "" = response(conn, 200)
-    # end
+    test "renders errors when validating invalid data", %{conn: conn} do
+      conn = post(conn, event_path(conn, :create), event: @invalid_attrs, dry_run: true)
+      assert json_response(conn, 422)["errors"] != %{}
+    end
   end
 
   describe "update event" do
@@ -259,6 +256,28 @@ defmodule SmoodleWeb.EventControllerTest do
           event: Map.merge(@update_attrs, %{secret: "wrong_secret"})
         )
       end)
+    end
+
+    test "returns empty ok response when validating valid data", %{conn: conn, event: event} do
+      conn =
+        put(conn, event_path(conn, :update, event),
+          event: Map.merge(@update_attrs, %{secret: event.secret}),
+          dry_run: true
+        )
+
+      assert "" = response(conn, 204)
+
+      assert event == Repo.preload(Scheduler.get_event!(event.id), :possible_dates)
+    end
+
+    test "renders errors when validating invalid data", %{conn: conn, event: event} do
+      conn =
+        put(conn, event_path(conn, :update, event),
+          event: Map.merge(@invalid_attrs, %{secret: event.secret}),
+          dry_run: true
+        )
+
+      assert json_response(conn, 422)["errors"] != %{}
     end
   end
 

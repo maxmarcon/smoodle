@@ -31,8 +31,8 @@
 			p {{ $t('event_viewer.really_cancel_event') }}
 
 			.form-group
-				label(for=organizerMessage) {{ $t('event_viewer.organizer_message') }}
-				textarea#organizerMessage.form-control(v-model.trim="eventOrganizerMessage")
+				label(for=cancelOrganizerMessage) {{ $t('event_viewer.organizer_message') }}
+				textarea#cancelOrganizerMessage.form-control(v-model.trim="eventOrganizerMessage")
 
 		b-modal(ref="eventCanceledModal"
 			:title="$t('event_viewer.cancel_event')"
@@ -84,8 +84,8 @@
 							:config="timePickerOptions"
 						)
 				.form-group
-					label(for=organizerMessage) {{ $t('event_viewer.organizer_message') }}
-					textarea#organizerMessage.form-control(v-model.trim="eventOrganizerMessage")
+					label(for=scheduleOrganizerMessage) {{ $t('event_viewer.organizer_message') }}
+					textarea#scheduleOrganizerMessage.form-control(v-model.trim="eventOrganizerMessage")
 
 			div(v-else)
 				p {{ $t('event_viewer.select_date_first') }}

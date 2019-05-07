@@ -6,7 +6,6 @@ import {
 } from '@vue/test-utils'
 
 const localVue = createLocalVue()
-
 const EVENT_DATA = {
 	"time_window": "2019-12-01 - 2019-06-01",
 	"scheduled_to": null,
@@ -24,7 +23,6 @@ const OPEN_EVENT = {
 	eventState: "OPEN"
 }
 
-
 const SCHEDULED_EVENT = {
 	eventName: EVENT_DATA.name,
 	eventOrganizer: EVENT_DATA.organizer,
@@ -34,7 +32,6 @@ const SCHEDULED_EVENT = {
 	eventState: "SCHEDULED"
 }
 
-
 const CANCELED_EVENT = {
 	eventName: EVENT_DATA.name,
 	eventOrganizer: EVENT_DATA.organizer,
@@ -43,7 +40,6 @@ const CANCELED_EVENT = {
 	eventScheduledTo: EVENT_DATA.scheduled_to,
 	eventState: "CANCELED"
 }
-
 
 describe('eventHeader', () => {
 

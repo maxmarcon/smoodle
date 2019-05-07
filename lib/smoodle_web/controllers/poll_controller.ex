@@ -20,6 +20,12 @@ defmodule SmoodleWeb.PollController do
     render(conn, :show, poll: poll)
   end
 
+  def create(_conn, %{"event_id" => event_id, "poll" => poll_params, "dry_run" => true}) do
+    event = Scheduler.get_event!(event_id)
+
+    Scheduler.create_poll(event, poll_params, dry_run: true)
+  end
+
   def create(conn, %{"event_id" => event_id, "poll" => poll_params}) do
     event = Scheduler.get_event!(event_id)
 
@@ -39,6 +45,12 @@ defmodule SmoodleWeb.PollController do
       |> Repo.preload([:date_ranks, [event: :possible_dates]])
 
     render(conn, :show, poll: poll)
+  end
+
+  def update(_conn, %{"id" => id, "poll" => poll_params, "dry_run" => true}) do
+    poll = Scheduler.get_poll!(id)
+
+    Scheduler.update_poll(poll, poll_params, dry_run: true)
   end
 
   def update(conn, %{"id" => id, "poll" => poll_params}) do

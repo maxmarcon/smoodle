@@ -39,13 +39,19 @@ defmodule Smoodle.Scheduler do
   Creates an event.
 
   """
-  #  def create_event(attrs, opts \\ [])
+  def create_event(attrs, opts \\ [])
 
-  #  def create_event(attrs, dry_run: true) do
-  #    Event.changeset_insert(attrs)
-  #  end
+  def create_event(attrs, dry_run: true) do
+    changeset = Event.changeset_insert(attrs)
 
-  def create_event(attrs) do
+    if changeset.valid? do
+      :ok
+    else
+      {:error, changeset}
+    end
+  end
+
+  def create_event(attrs, _opts) do
     Event.changeset_insert(attrs)
     |> Repo.insert()
   end
@@ -54,7 +60,22 @@ defmodule Smoodle.Scheduler do
   Updates a event.
 
   """
-  def update_event(%Event{} = event, attrs) do
+  def update_event(event, attrs, opts \\ [])
+
+  def update_event(%Event{} = event, attrs, dry_run: true) do
+    changeset =
+      event
+      |> Repo.preload(:possible_dates)
+      |> Event.changeset(attrs)
+
+    if changeset.valid? do
+      :ok
+    else
+      {:error, changeset}
+    end
+  end
+
+  def update_event(%Event{} = event, attrs, _opts) do
     event
     |> Repo.preload(:possible_dates)
     |> Event.changeset(attrs)
@@ -105,14 +126,22 @@ defmodule Smoodle.Scheduler do
   @doc """
   Creates a poll.
   """
-  #  def create_poll(event, attrs, opts \\ [])
+  def create_poll(event, attrs, opts \\ [])
 
-  #  def create_poll(%Event{} = event, attrs, dry_run: true) do
-  #    Ecto.build_assoc(event, :polls)
-  #    |> Poll.changeset(attrs)
-  #  end
+  def create_poll(%Event{} = event, attrs, dry_run: true) do
+    changeset =
+      Ecto.build_assoc(event, :polls)
+      |> Repo.preload(event: :possible_dates)
+      |> Poll.changeset(attrs)
 
-  def create_poll(%Event{} = event, attrs) do
+    if changeset.valid? do
+      :ok
+    else
+      {:error, changeset}
+    end
+  end
+
+  def create_poll(%Event{} = event, attrs, _opts) do
     Ecto.build_assoc(event, :polls)
     |> Repo.preload(event: :possible_dates)
     |> Poll.changeset(attrs)
@@ -123,15 +152,22 @@ defmodule Smoodle.Scheduler do
   Updates a poll.
 
   """
-  # def update_poll(poll, attrs, opts \\ [])
+  def update_poll(poll, attrs, opts \\ [])
 
-  #  def update_poll(%Poll{} = poll, attrs, dry_run: true) do
-  #    poll
-  #    |> Repo.preload([:event, :date_ranks])
-  #    |> Poll.changeset(attrs)
-  #  end
+  def update_poll(%Poll{} = poll, attrs, dry_run: true) do
+    changeset =
+      poll
+      |> Repo.preload([[event: :possible_dates], :date_ranks])
+      |> Poll.changeset(attrs)
 
-  def update_poll(%Poll{} = poll, attrs) do
+    if changeset.valid? do
+      :ok
+    else
+      {:error, changeset}
+    end
+  end
+
+  def update_poll(%Poll{} = poll, attrs, _opts) do
     poll
     |> Repo.preload([[event: :possible_dates], :date_ranks])
     |> Poll.changeset(attrs)

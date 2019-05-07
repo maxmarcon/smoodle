@@ -2,6 +2,8 @@ defmodule SmoodleWeb.PollControllerTest do
   use SmoodleWeb.ConnCase
 
   alias Smoodle.Scheduler
+  alias Smoodle.Repo
+  alias Smoodle.Scheduler.Poll
 
   @event_attrs_1 %{
     name: "Party",
@@ -257,6 +259,35 @@ defmodule SmoodleWeb.PollControllerTest do
       errors = json_response(conn, 422)["errors"]
       assert Enum.count(errors["participant"]) == 1
     end
+
+    test "for dry run, poll creation successful with valid parameters but no poll is created", %{
+      conn: conn,
+      event: event
+    } do
+      conn =
+        post(conn, event_poll_path(conn, :create, event), %{
+          poll: @poll_valid_attrs_1,
+          dry_run: true
+        })
+
+      assert "" == response(conn, 204)
+
+      refute Repo.exists?(Poll)
+    end
+
+    test "for dry run, poll creation fails with invalid parameters", %{
+      conn: conn,
+      event: event
+    } do
+      conn =
+        post(conn, event_poll_path(conn, :create, event.id), %{
+          poll: @poll_invalid_attrs,
+          dry_run: true
+        })
+
+      errors = json_response(conn, 422)["errors"]
+      assert Enum.count(errors["participant"]) == 1
+    end
   end
 
   describe "update" do
@@ -273,6 +304,19 @@ defmodule SmoodleWeb.PollControllerTest do
       assert Map.has_key?(data, "updated_at")
 
       check_poll(data, Map.take(@poll_update_attrs_1, [:participant]))
+    end
+
+    test "for dry_run, poll update with valid parameters does not update", %{
+      conn: conn,
+      polls: [poll | _]
+    } do
+      conn =
+        put(conn, poll_path(conn, :update, poll), %{poll: @poll_update_attrs_1, dry_run: true})
+
+      assert "" = response(conn, 204)
+
+      assert poll ==
+               Repo.preload(Scheduler.get_poll!(poll.id), [:date_ranks, [event: :possible_dates]])
     end
 
     test "date ranks can be deleted when passing an empty array", %{conn: conn, polls: [poll | _]} do
@@ -346,6 +390,21 @@ defmodule SmoodleWeb.PollControllerTest do
       polls: [poll | _]
     } do
       conn = put(conn, poll_path(conn, :update, poll.id), %{poll: @poll_update_invalid_attrs_1})
+      errors = json_response(conn, 422)["errors"]
+      assert Enum.count(errors["date_ranks"]) == 1
+      assert Enum.count(errors["preferences"]["weekday_ranks"]) == 1
+    end
+
+    test "for dry_run, attempt to update a poll with invalid parameters renders errors", %{
+      conn: conn,
+      polls: [poll | _]
+    } do
+      conn =
+        put(conn, poll_path(conn, :update, poll.id), %{
+          poll: @poll_update_invalid_attrs_1,
+          dry_run: true
+        })
+
       errors = json_response(conn, 422)["errors"]
       assert Enum.count(errors["date_ranks"]) == 1
       assert Enum.count(errors["preferences"]["weekday_ranks"]) == 1

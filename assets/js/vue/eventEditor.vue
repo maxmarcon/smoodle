@@ -7,7 +7,7 @@
 			p {{ $t('event_editor.event_created_short') }}
 		b-modal#eventUpdatedModal(ref="eventUpdatedModal" hide-header ok-only :ok-title="$t('event_editor.back_to_event')" @ok="backToEvent")
 			p {{ $t('event_editor.event_updated') }}
-		.card(v-if="!eventId || loadedSuccessfully || eventCreated")
+		.card(v-if="!eventId || loadedSuccessfully || eventCreated" name="main-card")
 			.card-header
 				event-header#event-header(
 					:eventName="eventName"
@@ -41,182 +41,177 @@
 			.card-body(v-else)
 				.alert.alert-info(v-if="eventId")
 					i.fas.fa-edit.fa-lg
-					| &nbsp; {{ $t('event_editor.welcome_again', {organizer: eventOrganizer}) }}
+					| &nbsp {{ $t('event_editor.welcome_again', {organizer: eventOrganizer}) }}
 				.alert.alert-info(v-else)
 					i.fas.fa-calendar-alt.fa-lg
-					| &nbsp; {{ $t('event_editor.welcome') }}
+					| &nbsp {{ $t('event_editor.welcome') }}
 
 				hr.mb-3
-				form(ref="form" @submit.prevent="" novalidate)
-					b-btn.btn-block.d-flex(
-						v-b-toggle.organizer-group=""
-						:variant="groupVariant('organizer-group')"
-						v-if="!eventId"
+				div(@keyup.enter="nextStep")
+					progress-header.mb-1(
+						:step="step"
+						:maxStep="maxStep"
+						:minStep="minStep"
 					)
-						span.fas.fa-chevron-up(v-if="groupVisibility['organizer-group']")
-						span.fas.fa-chevron-down(v-else)
-						span.ml-2.mr-auto {{ $t('event_editor.organizer_group') }}
-						div(v-if="showGroupErrorIcon('organizer-group')").fas.fa-exclamation
-						div(v-else-if="showGroupOkIcon('organizer-group')").fas.fa-check
-					b-collapse#organizer-group(
-						accordion="event-creation"
-						v-model="groupVisibility['organizer-group']"
-						v-if="!eventId"
+					b-card(
+						v-if="!eventId && step == errorsMap['organizer-group'].step"
+						:header-bg-variant="groupBgVariant('organizer-group')"
+						header-text-variant="white"
 					)
-						b-card
-							.form-group.row
-								label.col-md-3.col-form-label(for="eventOrganizer") {{ $t('event_editor.event.organizer') }}
-								.col-md-9
-									small.form-text.text-muted {{ $t('event_editor.event.organizer_help') }}
-									input#eventOrganizer.form-control(
-										v-model.trim="eventOrganizer"
-										@change="localValidation"
-										@blur="localValidation"
-										:disabled="eventCreated"
-										:class="inputFieldClass('eventOrganizer')"
-									)
-									.invalid-feedback(name="event-organizer-error") {{ eventOrganizerError }}
-
-							.form-group.row
-								label.col-md-3.col-form-label(for="eventOrganizerEmail") {{ $t('event_editor.event.organizer_email') }}
-								.col-md-9
-									small.form-text.text-muted {{ $t('event_editor.event.organizer_email_help') }}
-									input#eventOrganizerEmail.form-control(
-										v-model.trim="eventOrganizerEmail"
-										@change="localValidation"
-										@blur="localValidation"
-										:disabled="eventCreated"
-										:class="inputFieldClass('eventOrganizerEmail')"
-									)
-									.invalid-feedback(name="event-organizer-email-error") {{ eventOrganizerEmailError }}
-
-									small.form-text.text-muted {{ $t('event_editor.event.organizer_email_confirmation_help') }}
-									input#eventOrganizerEmailConfirmation.form-control(
-										v-model.trim="eventOrganizerEmail_confirmation"
-										@change="localValidation"
-										@blur="localValidation"
-										:disabled="eventCreated"
-										:class="inputFieldClass('eventOrganizerEmail_confirmation')"
-									)
-									.invalid-feedback(name="event-organizer-email-confirmation-error") {{ eventOrganizerEmailError_confirmation }}
-
-
-					b-btn.btn-block.d-flex.mt-2(
-						v-b-toggle.general-info-group=""
-						:variant="groupVariant('general-info-group')"
-					)
-						span.fas.fa-chevron-up(v-if="groupVisibility['general-info-group']")
-						span.fas.fa-chevron-down(v-else)
-						span.ml-2.mr-auto {{ $t('event_editor.general_info_group') }}
-						div(v-if="showGroupErrorIcon('general-info-group')").fas.fa-exclamation
-						div(v-else-if="showGroupOkIcon('general-info-group')").fas.fa-check
-					b-collapse#general-info-group(
-						accordion="event-creation"
-						v-model="groupVisibility['general-info-group']"
-					)
-						b-card
-							.form-group.row
-								label.col-md-3.col-form-label(for="eventName") {{ $t('event_editor.event.name') }}
-								.col-md-9
-									small.form-text.text-muted {{ $t('event_editor.event.name_help') }}
-									input#eventName.form-control(v-model.trim="eventName" type="text"
-									:disabled="eventCreated"
+						.d-flex(slot="header")
+							.flex-grow-1 {{ $t('event_editor.organizer_group') }}
+							.fas.fa-exclamation(v-if="showGroupErrorIcon('organizer-group')")
+							.fas.fa-check(v-else-if="showGroupOkIcon('organizer-group')")
+						.form-group.row
+							label.col-md-3.col-form-label(for="eventOrganizer") {{ $t('event_editor.event.organizer') }}
+							.col-md-9
+								small.form-text.text-muted {{ $t('event_editor.event.organizer_help') }}
+								input#eventOrganizer.form-control(
+									v-model.trim="eventOrganizer"
 									@change="localValidation"
 									@blur="localValidation"
-									:class="inputFieldClass('eventName')"
-									)
-									.invalid-feedback(name="event-name-error") {{ eventNameError }}
-							.form-group.row
-								label.col-md-3.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
-								.col-md-9
-									small.form-text.text-muted {{ $t('event_editor.event.desc_help') }}
-									textarea#eventDesc.form-control(v-model.trim="eventDesc"
 									:disabled="eventCreated"
+									:class="inputFieldClass('eventOrganizer')"
+								)
+								.invalid-feedback(name="event-organizer-error") {{ eventOrganizerError }}
+
+						.form-group.row
+							label.col-md-3.col-form-label(for="eventOrganizerEmail") {{ $t('event_editor.event.organizer_email') }}
+							.col-md-9
+								small.form-text.text-muted {{ $t('event_editor.event.organizer_email_help') }}
+								input#eventOrganizerEmail.form-control(
+									v-model.trim="eventOrganizerEmail"
 									@change="localValidation"
 									@blur="localValidation"
-									:class="inputFieldClass('eventDesc')"
-									)
-									.invalid-feedback(name="event-desc-error") {{ eventDescError }}
+									:disabled="eventCreated"
+									:class="inputFieldClass('eventOrganizerEmail')"
+								)
+								.invalid-feedback(name="event-organizer-email-error") {{ eventOrganizerEmailError }}
 
+								small.form-text.text-muted {{ $t('event_editor.event.organizer_email_confirmation_help') }}
+								input#eventOrganizerEmailConfirmation.form-control(
+									v-model.trim="eventOrganizerEmail_confirmation"
+									@change="localValidation"
+									@blur="localValidation"
+									:disabled="eventCreated"
+									:class="inputFieldClass('eventOrganizerEmail_confirmation')"
+								)
+								.invalid-feedback(name="event-organizer-email-confirmation-error") {{ eventOrganizerEmailError_confirmation }}
 
-					b-btn.btn-block.d-flex.mt-2(
-						v-b-toggle.dates-group=""
-						:variant="groupVariant('dates-group')"
+					b-card(
+						v-if="step == errorsMap['general-info-group'].step"
+						:header-bg-variant="groupBgVariant('general-info-group')"
+						header-text-variant="white"
 					)
-						span.fas.fa-chevron-up(v-if="groupVisibility['dates-group']")
-						span.fas.fa-chevron-down(v-else)
-						span.ml-2.mr-auto {{ $t('event_editor.dates_group') }}
-						div(v-if="showGroupErrorIcon('dates-group')").fas.fa-exclamation
-						div(v-else-if="showGroupOkIcon('dates-group')").fas.fa-check
-					b-collapse#dates-group(
-						accordion="event-creation"
-						v-model="groupVisibility['dates-group']"
+						.d-flex(slot="header")
+							.flex-grow-1 {{ $t('event_editor.general_info_group') }}
+							.fas.fa-exclamation(v-if="showGroupErrorIcon('general-info-group')")
+							.fas.fa-check(v-else-if="showGroupOkIcon('general-info-group')")
+
+						.form-group.row
+							label.col-md-3.col-form-label(for="eventName") {{ $t('event_editor.event.name') }}
+							.col-md-9
+								small.form-text.text-muted {{ $t('event_editor.event.name_help') }}
+								input#eventName.form-control(v-model.trim="eventName" type="text"
+								:disabled="eventCreated"
+								@change="localValidation"
+								@blur="localValidation"
+								:class="inputFieldClass('eventName')"
+								)
+								.invalid-feedback(name="event-name-error") {{ eventNameError }}
+						.form-group.row
+							label.col-md-3.col-form-label(for="eventDesc") {{ $t('event_editor.event.desc') }}
+							.col-md-9
+								small.form-text.text-muted {{ $t('event_editor.event.desc_help') }}
+								textarea#eventDesc.form-control(v-model.trim="eventDesc"
+								:disabled="eventCreated"
+								@change="localValidation"
+								@blur="localValidation"
+								:class="inputFieldClass('eventDesc')"
+								)
+								.invalid-feedback(name="event-desc-error") {{ eventDescError }}
+
+					b-card(
+						v-if="step == errorsMap['dates-group'].step"
+						:header-bg-variant="groupBgVariant('dates-group')"
+						header-text-variant="white"
 					)
-						b-card
-							.form-group.row.justify-content-center.justify-content-md-between.justify-content-lg-center
-								.col-md-6.mb-3.text-center
-									.d-flex.justify-content-center.align-items-end
-										label {{ $t(selectedDateRank == 0 ? 'event_editor.event.dates_range' : 'event_editor.event.dates_single') }}
+						.d-flex(slot="header")
+							.flex-grow-1 {{ $t('event_editor.dates_group') }}
+							.fas.fa-exclamation(v-if="showGroupErrorIcon('dates-group')")
+							.fas.fa-check(v-else-if="showGroupOkIcon('dates-group')")
 
-									v-date-picker#eventPossibleDates(
-										:mode="selectedDateRank == 0 ? 'range' : 'single'"
-										v-model="datesSelection"
-										nav-visibility="hidden"
-										:min-date="today"
-										:is-inline="true"
-										:is-double-paned="true"
-										:from-page="initialFromPage"
-										:is-linked="true"
-										:show-caps="true"
-										:is-required="true"
-										:attributes="datePickerAttributes"
-										popover-visibility="hidden"
-										:select-attribute="selectAttribute"
-										:drag-attribute="selectAttribute"
-										@input="newDate"
-									)
-									.small.text-danger(name="event-possible-dates-error") {{ eventPossibleDatesError }}
+						.form-group.row.justify-content-center.justify-content-md-between.justify-content-lg-center
+							.col-md-6.mb-3.text-center
+								.d-flex.justify-content-center.align-items-end
+									label {{ $t(selectedDateRank == 0 ? 'event_editor.event.dates_range' : 'event_editor.event.dates_single') }}
 
-									.d-flex.mt-2.justify-content-center.align-items-end(@click="clearDateSelection")
-										.form-check
-											p-radio.p-icon.p-plain(:disabled="selectedDateRank == 0" name="selectedDateRank" :value="1" v-model="selectedDateRank" toggle)
-												i.icon.fas.fa-thumbs-up.text-success(slot="extra")
-												i.icon.far.fa-thumbs-up(slot="off-extra")
-												label(slot="off-label")
-										.form-check
-											p-radio.p-icon.p-plain(:disabled="selectedDateRank == 0" name="selectedDateRank" :value="-1" v-model="selectedDateRank" toggle)
-												i.icon.fas.fa-thumbs-down.text-danger(slot="extra")
-												i.icon.far.fa-thumbs-down(slot="off-extra")
-												label(slot="off-label")
-										.form-check
-											button.btn.btn-sm.btn-outline-secondary(@click="clearDateInfo" :disabled="selectedDateRank == 0 && !undoData")
-												i.fas.fa-undo(v-if="undoData")
-												i.fas.fa-trash-alt(v-else)
+								v-date-picker#eventPossibleDates(
+									:mode="selectedDateRank == 0 ? 'range' : 'single'"
+									v-model="datesSelection"
+									nav-visibility="hidden"
+									:min-date="today"
+									:is-inline="true"
+									:is-double-paned="true"
+									:from-page="initialFromPage"
+									:is-linked="true"
+									:show-caps="true"
+									:is-required="true"
+									:attributes="datePickerAttributes"
+									popover-visibility="hidden"
+									:select-attribute="selectAttribute"
+									:drag-attribute="selectAttribute"
+									@input="newDate"
+								)
+								.small.text-danger(name="event-possible-dates-error") {{ eventPossibleDatesError }}
 
-								.col-11.col-md-3.offset-md-1
-									ranker#eventWeekdays(:elements="eventWeekdays" boolean=true :disabled="selectedDateRank == 0" @change="eventWeekdaysChanged")
-									.small.text-danger(name="event-weekdays-error") {{ eventWeekdaysError }}
+								.d-flex.mt-2.justify-content-center.align-items-end(@click="clearDateSelection")
+									.form-check
+										p-radio.p-icon.p-plain(:disabled="selectedDateRank == 0" name="selectedDateRank" :value="1" v-model="selectedDateRank" toggle)
+											i.icon.fas.fa-thumbs-up.text-success(slot="extra")
+											i.icon.far.fa-thumbs-up(slot="off-extra")
+											label(slot="off-label")
+									.form-check
+										p-radio.p-icon.p-plain(:disabled="selectedDateRank == 0" name="selectedDateRank" :value="-1" v-model="selectedDateRank" toggle)
+											i.icon.fas.fa-thumbs-down.text-danger(slot="extra")
+											i.icon.far.fa-thumbs-down(slot="off-extra")
+											label(slot="off-label")
+									.form-check
+										button.btn.btn-sm.btn-outline-secondary(@click="clearDateInfo" :disabled="selectedDateRank == 0 && !undoData")
+											i.fas.fa-undo(v-if="undoData")
+											i.fas.fa-trash-alt(v-else)
+
+							.col-11.col-md-3.offset-md-1
+								ranker#eventWeekdays(:elements="eventWeekdays" boolean=true :disabled="selectedDateRank == 0" @change="eventWeekdaysChanged")
+								.small.text-danger(name="event-weekdays-error") {{ eventWeekdaysError }}
 
 			.card-footer
-				.row.justify-content-center(v-if="!eventCreated")
-					.col-12.col-sm-auto.mt-1
-						button.btn.btn-block.btn-primary(@click="saveEvent" :disabled="requestOngoing" name="save-event")
-							i.fas(v-bind:class="{'fa-save': eventId, 'fa-plus': !eventId}")
-							| &nbsp; {{ $t(eventId ? 'event_editor.update_event' : 'event_editor.create_event') }}
-					.col-12.col-sm-auto.mt-1(v-if="eventId")
-						button.btn.btn-block.btn-secondary(@click="backToEvent" :disabled="requestOngoing" name="cancel")
+				.row.justify-content-around(v-if="!eventCreated")
+					.col-12.col-sm-2.order-sm-last.mt-1
+						button.btn.btn-block.btn-primary(@click="nextStep" :disabled="requestOngoing")
+							span(v-if="step < maxStep" name="forward-button")
+								i.fas.fa-arrow-circle-right
+								| &nbsp {{ $t('actions.next')}}
+							span(v-else name="save-event-button")
+								i.fas(:class="{'fa-save': eventId, 'fa-plus': !eventId}")
+								| &nbsp {{ $t(eventId ? 'event_editor.update_event' : 'event_editor.create_event') }}
+					.col-12.col-sm-2.mt-1(v-if="(!eventId && maxStep > minStep) || step > minStep")
+						button.btn.btn-block.btn-secondary(@click="prevStep" :disabled="step == minStep || requestOngoing" name="back-button")
+							i.fas.fa-arrow-circle-left
+							| &nbsp {{ $t('actions.prev')}}
+					.col-12.col-sm-2.mt-1(v-if="eventId && step == minStep")
+						button.btn.btn-block.btn-secondary(@click="backToEvent" :disabled="requestOngoing" name="cancel-button")
 							i.fas.fa-ban
-							| &nbsp; {{ $t('actions.cancel') }}
-
+							| &nbsp {{ $t('actions.cancel') }}
 				.row.justify-content-center(v-else)
 					.col-12.col-sm-auto.mt-1
 						router-link.btn.btn-block.btn-success(
 							role="button"
-							name="manage-event"
+							name="manage-event-button"
 							:to="{ name: 'event', params: {eventId: computedEventId, secret: computedSecret}, query: {s: computedSecret}}"
 						)
 							i.fas.fa-key
-							| &nbsp; {{ $t('event_editor.manage_event') }}
+							| &nbsp {{ $t('event_editor.manage_event') }}
 
 		error-page(
 			v-else-if="loaded"
@@ -226,8 +221,9 @@
 <script>
 import dateFns from 'date-fns'
 import {
-	accordionGroupsMixin,
+	stepValidationMixin,
 	scrollToTopMixin,
+	errorBarMixin,
 	restMixin,
 	eventDataMixin,
 	eventHelpersMixin,
@@ -235,84 +231,94 @@ import {
 	colorCodes
 } from '../globals'
 
-const today = new Date();
+const today = new Date()
 
 export default {
-	mixins: [accordionGroupsMixin, restMixin, scrollToTopMixin, eventDataMixin, eventHelpersMixin,whatsAppHelpersMixin],
+	mixins: [stepValidationMixin, restMixin, scrollToTopMixin, errorBarMixin, eventDataMixin, eventHelpersMixin, whatsAppHelpersMixin],
 	props: {
 		eventId: String,
-		secret: String
+		secret: String,
+		forceStep: Number // for testing
 	},
-	data: () => ({
-		errorsMap: {
-			// maps, for each input group, the fields in the vue model to
-			// the error fields and the error keys received by the back end
-			'organizer-group': {
-				eventOrganizer: {
-					required: true,
-					errorField: 'eventOrganizerError',
-					errorKeys: 'organizer'
+	data() {
+		return {
+			errorsMap: {
+				// maps, for each input group, the fields in the vue model to
+				// the error fields and the error keys received by the back end
+				'organizer-group': {
+					step: 1,
+					fields: {
+						eventOrganizer: {
+							required: true,
+							errorField: 'eventOrganizerError',
+							errorKeys: 'organizer'
+						},
+						eventOrganizerEmail: {
+							required: true,
+							confirmation: true,
+							errorField: 'eventOrganizerEmailError',
+							errorKeys: 'email'
+						},
+						eventOrganizerEmail_confirmation: {
+							required: true,
+							errorField: 'eventOrganizerEmailError_confirmation',
+							errorKeys: 'email_confirmation'
+						}
+					}
 				},
-				eventOrganizerEmail: {
-					required: true,
-					confirmation: true,
-					errorField: 'eventOrganizerEmailError',
-					errorKeys: 'email'
+				'general-info-group': {
+					step: 2,
+					fields: {
+						eventName: {
+							required: true,
+							errorField: 'eventNameError',
+							errorKeys: 'name'
+						},
+						eventDesc: {
+							required: false,
+							errorField: 'eventDescError',
+							errorKeys: 'desc'
+						}
+					}
 				},
-				eventOrganizerEmail_confirmation: {
-					required: true,
-					errorField: 'eventOrganizerEmailError_confirmation',
-					errorKeys: 'email_confirmation'
+				'dates-group': {
+					step: 3,
+					fields: {
+						eventPossibleDates: {
+							required: true,
+							errorField: 'eventPossibleDatesError',
+							errorKeys: ['possible_dates']
+						},
+						eventWeekdays: {
+							errorField: 'eventWeekdaysError',
+							errorKeys: 'preferences.weekdays',
+							customValidation: true
+						}
+					}
 				}
 			},
-			'general-info-group': {
-				eventName: {
-					required: true,
-					errorField: 'eventNameError',
-					errorKeys: 'name'
-				},
-				eventDesc: {
-					required: false,
-					errorField: 'eventDescError',
-					errorKeys: 'desc'
-				}
-			},
-			'dates-group': {
-				eventPossibleDates: {
-					required: true,
-					errorField: 'eventPossibleDatesError',
-					errorKeys: ['possible_dates']
-				},
-				eventWeekdays: {
-					errorField: 'eventWeekdaysError',
-					errorKeys: 'preferences.weekdays',
-					customValidation: true
-				}
-			}
-		},
-		groupVisibility: {
-			'general-info-group': false,
-			'dates-group': false,
-			'organizer-group': true
-		},
-		eventNameError: null,
-		eventOrganizerError: null,
-		eventOrganizerEmailError: null,
-		eventOrganizerEmailError_confirmation: null,
-		eventDescError: null,
-		eventPossibleDatesError: null,
-		eventWeekdaysError: null,
-		today,
-		loadedSuccessfully: false,
-		loaded: false,
-		initialFromPage: null,
-		eventCreated: false,
-		createdEventId: null,
-		createdEventSecret: null,
-		selectedDateRank: 0,
-		datesSelection: null,
-		undoData: null,
-	}),
+			eventNameError: null,
+			eventOrganizerError: null,
+			eventOrganizerEmailError: null,
+			eventOrganizerEmailError_confirmation: null,
+			eventDescError: null,
+			eventPossibleDatesError: null,
+			eventWeekdaysError: null,
+			today,
+			loadedSuccessfully: false,
+			loaded: false,
+			initialFromPage: null,
+			eventCreated: false,
+			createdEventId: null,
+			createdEventSecret: null,
+			selectedDateRank: 0,
+			datesSelection: null,
+			undoData: null,
+			step: this.forceStep || 1,
+			minStep: 1,
+			maxStep: 3
+		}
+	},
 	created() {
 		if (this.eventId) {
 			if (this.secret) {
@@ -330,7 +336,9 @@ export default {
 						self.selectedDateRank = 1
 					}
 					self.loadedSuccessfully = true
-					self.groupVisibility['dates-group'] = true
+					self.minStep = 2
+					self.step = self.forceStep || self.minStep
+
 				}).finally(function() {
 					self.loaded = true
 				})
@@ -388,7 +396,7 @@ export default {
 			}])
 		},
 		selectedDateRankColor() {
-			return this.colorForRank(this.selectedDateRank);
+			return this.colorForRank(this.selectedDateRank)
 		},
 		selectAttribute() {
 			return {
@@ -405,7 +413,9 @@ export default {
 		colorForRank: (rank) => (rank >= 0 ? colorCodes.green : colorCodes.red),
 		customValidate(fieldName, fieldVal) {
 			if (fieldName == 'eventWeekdays') {
-				if (fieldVal.every(({value}) => !value)) {
+				if (fieldVal.every(({
+						value
+					}) => !value)) {
 					return this.$i18n.t('errors.enable_at_least_one_weekday')
 				}
 			}
@@ -415,7 +425,7 @@ export default {
 			this.localValidation()
 		},
 		clearDateSelection() {
-			this.datesSelection = null;
+			this.datesSelection = null
 		},
 		clearDateInfo() {
 			if (this.undoData) {
@@ -506,53 +516,66 @@ export default {
 		clipboard() {
 			this.$refs.copiedToClipboardModal.show()
 		},
-		saveEvent() {
-			let self = this;
-			let dataForRequest = self.eventDataForRequest;
+		saveEvent(dry_run = false) {
+			let self = this
+			let dataForRequest = self.eventDataForRequest
 			if (self.eventId) {
 				/// updating, let us not resent email or organizer
-				delete dataForRequest['organizer'];
-				delete dataForRequest['email'];
+				delete dataForRequest['organizer']
+				delete dataForRequest['email']
 			}
-			this.restRequest(
+			return this.restRequest(
 				(this.eventId ? ["events", this.eventId].join('/') : "events"), {
 					data: {
 						event: Object.assign(dataForRequest, {
 							secret: this.secret
-						})
+						}),
+						dry_run
 					},
 					method: (this.eventId ? 'patch' : 'post'),
 					ignoreErrorCodes: [429]
 				}).then(function(result) {
-				self.setServerErrors();
-				self.collapseAllGroups();
-				self.$scrollTo('#event-header');
-				self.wasServerValidated = true;
+				self.setServerErrors()
+				self.$scrollTo('#event-header')
 
-				if (self.eventId) {
-					self.$refs.eventUpdatedModal.show();
-				} else {
-					self.eventCreated = true;
-					self.createdEventId = result.data.data.id
-					self.createdEventSecret = result.data.data.secret
-					self.assignEventData(result.data.data)
-					self.$refs.eventCreatedModal.show();
+				if (result.status != 204) {
+					// not just validating...
+					if (self.eventId) {
+						self.$refs.eventUpdatedModal.show()
+					} else {
+						self.eventCreated = true
+						self.createdEventId = result.data.data.id
+						self.createdEventSecret = result.data.data.secret
+						self.assignEventData(result.data.data)
+						self.$refs.eventCreatedModal.show()
+					}
 				}
 			}, function(error) {
 				if (error.response) {
 					if (error.response.status == 422) {
-						self.setServerErrors(error.response.data.errors);
-						self.wasServerValidated = true;
+						self.setServerErrors(error.response.data.errors)
+						if (self.firstStepWithErrors && self.firstStepWithErrors <= self.step) {
+							self.showErrorCodeInErrorBar(error.response.status)
+						}
 					} else if (error.response.status == 429) {
-						self.$refs.errorBar.show(self.$i18n.t('event_editor.too_many_requests_error', {
+						self.showInErrorBar(self.$i18n.t('event_editor.too_many_requests_error', {
 							email: dataForRequest["email"]
-						}));
-						self.scrollToTop();
+						}))
 					}
 				} else {
-					throw error;
+					throw error
 				}
-			});
+			})
+		},
+		nextStep() {
+			this.saveEvent(this.step < this.maxStep).then(() => {
+				this.step = this.firstStepWithErrors || Math.min(this.step + 1, this.maxStep)
+			})
+		},
+		prevStep() {
+			if (this.step > this.minStep) {
+				this.step--
+			}
 		},
 		backToEvent() {
 			this.$router.push({
@@ -564,7 +587,7 @@ export default {
 				query: {
 					s: this.computedSecret
 				}
-			});
+			})
 		}
 	}
 }

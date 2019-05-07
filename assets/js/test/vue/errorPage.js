@@ -4,20 +4,12 @@ import VueRouter from 'vue-router'
 
 import {
 	mount,
-	createLocalVue
+	createLocalVue,
+	RouterLinkStub
 } from '@vue/test-utils'
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
-localVue.use(VueRouter);
-
-const router = new VueRouter({
-	mode: 'history',
-	routes: [{
-		path: '/home',
-		name: 'home'
-	}]
-});
 
 const ERROR_MSG = "This is an error"
 
@@ -31,10 +23,12 @@ describe('errorPage', () => {
 			mocks: {
 				$t: (k) => k
 			},
-			router,
 			localVue,
 			propsData: {
 				message: ERROR_MSG
+			},
+			stubs: {
+				'router-link': RouterLinkStub
 			}
 		})
 	})
@@ -44,6 +38,8 @@ describe('errorPage', () => {
 	})
 
 	it('displays a link to the home route', () => {
-		expect(wrapper.find('.card-footer a[href="/home"]').exists()).toBeTruthy()
+		expect(wrapper.find(RouterLinkStub).props('to')).toEqual({
+			'name': 'home'
+		})
 	})
 })

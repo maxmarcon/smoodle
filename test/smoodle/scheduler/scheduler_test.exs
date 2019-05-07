@@ -127,7 +127,7 @@ defmodule Smoodle.SchedulerTest do
   end
 
   describe "when creating an event" do
-    test "create_event/2 with valid data creates an event" do
+    test "create_event/1 with valid data creates an event" do
       assert {:ok, %Event{} = event} = Scheduler.create_event(@event_valid_attrs_1)
       check_new_event(@event_valid_attrs_1, event)
       assert String.length(event.secret) == 16
@@ -136,18 +136,22 @@ defmodule Smoodle.SchedulerTest do
       assert Repo.preload(Scheduler.get_event!(event.id), :possible_dates) == event
     end
 
-    # test "create_event/2 with valid data for validation does not create an event and returns valid changeset" do
-    #  assert %{valid?: true} = Scheduler.create_event(@event_valid_attrs_1, dry_run: true)
-    #  assert Scheduler.list_events() == []
-    # end
-
-    test "create_event/2 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Scheduler.create_event(@event_invalid_attrs)
+    test "create_event/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{valid?: false}} =
+               Scheduler.create_event(@event_invalid_attrs)
     end
 
-    # test "create_event/2 with invalid data for validation returns invalid changeset" do
-    #  assert %Ecto.Changeset{valid?: false} = Scheduler.create_event(@event_invalid_attrs, dry_run: true)
-    # end
+    test "create_event/2 with valid data for validation does not create an event" do
+      assert :ok ==
+               Scheduler.create_event(@event_valid_attrs_1, dry_run: true)
+
+      assert Scheduler.list_events() == []
+    end
+
+    test "create_event/2 with invalid data for validation returns invalid changeset" do
+      assert {:error, %Ecto.Changeset{valid?: false}} =
+               Scheduler.create_event(@event_invalid_attrs, dry_run: true)
+    end
   end
 
   describe "when updating events" do
@@ -202,6 +206,20 @@ defmodule Smoodle.SchedulerTest do
       event = context[:event]
       assert {:error, %Ecto.Changeset{}} = Scheduler.update_event(event, @event_invalid_attrs)
       assert event == Repo.preload(Scheduler.get_event!(event.id), :possible_dates)
+    end
+
+    test "update_event/3 with valid data for validation does not update an event", %{event: event} do
+      assert :ok ==
+               Scheduler.update_event(event, @event_update_attrs, dry_run: true)
+
+      assert Repo.preload(Scheduler.get_event!(event.id), :possible_dates) == event
+    end
+
+    test "update_event/3 with invalid data for validation returns invalid changeset", %{
+      event: event
+    } do
+      assert {:error, %Ecto.Changeset{valid?: false}} =
+               Scheduler.update_event(event, @event_invalid_attrs, dry_run: true)
     end
   end
 
@@ -354,11 +372,10 @@ defmodule Smoodle.SchedulerTest do
       assert poll.event_id == event.id
     end
 
-    # test "create_poll/3 valid data for dry run does not create poll and returns valid changeset", context do
-    #  assert changeset = Scheduler.create_poll(context[:event], @poll_valid_attrs_1, dry_run: true)
-    #  assert changeset.valid?
-    #  assert 1 = Repo.one(from p in Poll, select: count(p.id))
-    # end
+    test "create_poll/3 valid data for dry run does not create poll", %{event: event} do
+      assert :ok == Scheduler.create_poll(event, @poll_valid_attrs_1, dry_run: true)
+      assert 1 == Repo.one(from(p in Poll, select: count(p.id)))
+    end
 
     test "create_poll/3 with invalid data returns changeset with errors", %{event: event} do
       assert {:error, changeset} =
@@ -370,11 +387,17 @@ defmodule Smoodle.SchedulerTest do
       assert [participant: {_, validation: :required}] = changeset.errors
     end
 
-    # test "create_poll/3 with invalid data for dry run returns changeset with errors", context do
-    #  changeset = Scheduler.create_poll(context[:event], Map.delete(@poll_valid_attrs_2, :participant), dry_run: true)
-    #  refute changeset.valid?
-    #  assert %{participant: [{_, validation: :required}]} = traverse_errors(changeset, &(&1))
-    # end
+    test "create_poll/3 with invalid data for dry run returns changeset with errors", %{
+      event: event
+    } do
+      assert {:error, changeset} =
+               Scheduler.create_poll(event, Map.delete(@poll_valid_attrs_2, :participant),
+                 dry_run: true
+               )
+
+      refute changeset.valid?
+      assert %{participant: [{_, validation: :required}]} = traverse_errors(changeset, & &1)
+    end
 
     test "create_poll/3 with weekday ranks", %{event: event} do
       update = Map.delete(@poll_valid_attrs_2, :date_ranks)
@@ -433,11 +456,14 @@ defmodule Smoodle.SchedulerTest do
       assert %{participant: "Mike"} = updated_poll
     end
 
-    # test "update_poll/3 with invalid data for dry run does not update the poll and returns invalid changeset", context do
-    #  changeset = Scheduler.update_poll(context[:poll], %{participant: 1}, dry_run: true)
-    #  refute changeset.valid?
-    #  assert %{participant: [{_, [type: :string, validation: :cast]}]} = traverse_errors(changeset, &(&1))
-    # end
+    test "update_poll/3 with invalid data for dry run does not update the poll and returns invalid changeset",
+         %{poll: poll} do
+      assert {:error, changeset} = Scheduler.update_poll(poll, %{participant: 1}, dry_run: true)
+      refute changeset.valid?
+
+      assert %{participant: [{_, [type: :string, validation: :cast]}]} =
+               traverse_errors(changeset, & &1)
+    end
 
     test "update_poll/3 with weekday_ranks", %{poll: poll} do
       assert {:ok, poll = %Poll{}} =
@@ -449,11 +475,11 @@ defmodule Smoodle.SchedulerTest do
       assert Enum.count(@new_weekday_ranks) == Enum.count(poll.preferences.weekday_ranks)
     end
 
-    # test "update_poll/3 valid data for dry run does not update the poll and returns valid changeset", context do
-    #  changeset = Scheduler.update_poll(context[:poll], %{participant: "Mike"}, dry_run: true)
-    #  assert changeset.valid?
-    #  assert context[:poll].participant == Repo.get!(Poll, context[:poll].id).participant
-    # end
+    test "update_poll/3 valid data for dry run does not update the poll and returns valid changeset",
+         %{poll: poll} do
+      assert :ok == Scheduler.update_poll(poll, %{participant: "Mike"}, dry_run: true)
+      assert poll.participant == Repo.get!(Poll, poll.id).participant
+    end
 
     test "update_poll/3 with invalid data returns changeset with errors", %{poll: poll} do
       assert {:error, changeset} = Scheduler.update_poll(poll, %{participant: 1})
@@ -461,12 +487,6 @@ defmodule Smoodle.SchedulerTest do
 
       assert [participant: {_, [type: :string, validation: :cast]}] = changeset.errors
     end
-
-    # test "update_poll/3 with invalid data returns error changeset", context do
-    #  changeset = Scheduler.update_poll(context[:poll], %{participant: 1}, dry_run: true)
-    #  refute changeset.valid?
-    #  assert %{participant: [{_, [type: :string, validation: :cast]}]} = traverse_errors(changeset, &(&1))
-    # end
 
     test "update_poll/3 with date ranks", %{poll: poll} do
       assert {:ok, poll = %Poll{}} = Scheduler.update_poll(poll, %{date_ranks: @new_date_ranks})

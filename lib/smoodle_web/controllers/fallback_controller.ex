@@ -14,7 +14,7 @@ defmodule SmoodleWeb.FallbackController do
   end
 
   def call(conn, :ok) do
-    send_resp(conn, :ok, "")
+    send_resp(conn, :no_content, "")
   end
 
   def call(conn, {:error, reason_atom}) when is_atom(reason_atom) do

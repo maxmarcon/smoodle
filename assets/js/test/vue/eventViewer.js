@@ -30,12 +30,14 @@ function mountEventViewer(restRequest, propsData) {
 			$scrollTo: () => null
 		},
 		propsData,
-		localVue
+		localVue,
+		stubs: ['message-bar', 'event-header', 'v-calendar',
+			'router-link', 'v-date-picker', 'i18n', 'date-picker', 'error-page'
+		]
 	}
 
 	return mount(eventViewer, config)
 }
-
 
 const EVENT_ID = "bf6747d5-7b32-4bde-8e2d-c055d9bb02d3"
 const EVENT_SECRET = "NGQ4NkdBQWVTd0U9"
@@ -118,8 +120,8 @@ const SCHEDULE_DATA_SECRET = {
 const POLL_PARTICIPANT = 'Fritz'
 const POLL_ID = "599a1056-3cea-4c4e-b54c-5fd376f0f632";
 
-const NEW_POLL_BUTTON = 'router-link[name="new-poll-button"]'
-const EDIT_EVENT_BUTTON = 'router-link[name="edit-button"]'
+const NEW_POLL_BUTTON = 'router-link-stub[name="new-poll-button"]'
+const EDIT_EVENT_BUTTON = 'router-link-stub[name="edit-button"]'
 const CANCEL_EVENT_BUTTON = 'button[name="cancel-button"]'
 const EDIT_POLL_BUTTON = 'button[name="edit-poll-button"]'
 const OPEN_EVENT_BUTTON = 'button[name="open-button"]'
@@ -205,7 +207,7 @@ describe('eventViewer', () => {
 		})
 
 		it('shows the error page', () => {
-			expect(wrapper.find('error-page').exists()).toBeTruthy()
+			expect(wrapper.find('error-page-stub').exists()).toBeTruthy()
 		})
 	})
 
@@ -250,7 +252,7 @@ describe('eventViewer', () => {
 				})
 
 				it('renders event header', () => {
-					let eventHeader = wrapper.find('event-header')
+					let eventHeader = wrapper.find('event-header-stub')
 					expect(eventHeader.exists).toBeTruthy();
 					expect(eventHeader.attributes('eventname')).toBe(EVENT_DATA.name)
 					expect(eventHeader.attributes('eventorganizer')).toBe(EVENT_DATA.organizer)
@@ -285,7 +287,7 @@ describe('eventViewer', () => {
 				})
 
 				it('renders calendar', () => {
-					expect(wrapper.find('v-calendar').exists()).toBeTruthy()
+					expect(wrapper.find('v-calendar-stub').exists()).toBeTruthy()
 				})
 
 				it('it computes scheduleCalendarAttributes', () => {
@@ -299,7 +301,6 @@ describe('eventViewer', () => {
 						wrapper.find(EDIT_POLL_BUTTON).trigger("click")
 						setTimeout(done, 0)
 					})
-
 
 					it('opens modal', () => {
 						expect(wrapper.find('#updateAnswerModal').isVisible()).toBeTruthy()
@@ -354,7 +355,7 @@ describe('eventViewer', () => {
 				})
 
 				it('renders event header', () => {
-					let eventHeader = wrapper.find('event-header')
+					let eventHeader = wrapper.find('event-header-stub')
 					expect(eventHeader.exists).toBeTruthy();
 					expect(eventHeader.attributes('eventname')).toBe(EVENT_DATA.name)
 					expect(eventHeader.attributes('eventorganizer')).toBe(EVENT_DATA.organizer)
@@ -375,7 +376,6 @@ describe('eventViewer', () => {
 				it('it computes scheduleCalendarAttributes', () => {
 					expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(0)
 				})
-
 
 				buttonSelectors.all.forEach(selector => {
 					if (buttonSelectors.guest.open.indexOf(selector) > -1) {
@@ -398,7 +398,7 @@ describe('eventViewer', () => {
 				})
 
 				it('does not render calendar', () => {
-					expect(wrapper.find('v-calendar').exists()).toBeFalsy()
+					expect(wrapper.find('v-calendar-stub').exists()).toBeFalsy()
 				})
 			})
 		})
@@ -430,7 +430,7 @@ describe('eventViewer', () => {
 			})
 
 			it('renders event header', () => {
-				let eventHeader = wrapper.find('event-header')
+				let eventHeader = wrapper.find('event-header-stub')
 				expect(eventHeader.exists).toBeTruthy();
 				expect(eventHeader.attributes('eventname')).toBe(EVENT_DATA.name)
 				expect(eventHeader.attributes('eventorganizer')).toBe(EVENT_DATA.organizer)
@@ -494,7 +494,7 @@ describe('eventViewer', () => {
 			})
 
 			it('renders event header', () => {
-				let eventHeader = wrapper.find('event-header')
+				let eventHeader = wrapper.find('event-header-stub')
 				expect(eventHeader.exists).toBeTruthy();
 				expect(eventHeader.attributes('eventname')).toBe(EVENT_DATA.name)
 				expect(eventHeader.attributes('eventorganizer')).toBe(EVENT_DATA.organizer)
@@ -521,7 +521,7 @@ describe('eventViewer', () => {
 			})
 
 			it('renders the calendar', () => {
-				expect(wrapper.find('v-calendar').exists()).toBeTruthy()
+				expect(wrapper.find('v-calendar-stub').exists()).toBeTruthy()
 			})
 
 			buttonSelectors.all.forEach(selector => {
@@ -566,7 +566,7 @@ describe('eventViewer', () => {
 				})
 
 				it('renders event header', () => {
-					let eventHeader = wrapper.find('event-header')
+					let eventHeader = wrapper.find('event-header-stub')
 					expect(eventHeader.exists).toBeTruthy();
 					expect(eventHeader.attributes('eventname')).toBe(EVENT_DATA.name)
 					expect(eventHeader.attributes('eventorganizer')).toBe(EVENT_DATA.organizer)
@@ -606,7 +606,7 @@ describe('eventViewer', () => {
 				})
 
 				it('renders date picker', () => {
-					expect(wrapper.find('v-date-picker').exists()).toBeTruthy()
+					expect(wrapper.find('v-date-picker-stub').exists()).toBeTruthy()
 				})
 
 				it('renders the share link input field', () => {
@@ -654,25 +654,31 @@ describe('eventViewer', () => {
 						beforeEach((done) => {
 
 							wrapper.vm.selectedDate = wrapper.vm.scheduleCalendarAttributes[0].dates
-							wrapper.find('#scheduleEventModal textarea#organizerMessage').setValue(ORGANIZER_MESSAGE)
-							wrapper.find('#scheduleEventModal button.btn-primary').trigger('click')
 
-							setTimeout(done, 0)
+							setTimeout(() => {
+								wrapper.find('#scheduleEventModal textarea#scheduleOrganizerMessage').setValue(ORGANIZER_MESSAGE)
+								wrapper.find('#scheduleEventModal button.btn-primary').trigger('click')
+
+								setTimeout(done, 0)
+							}, 0)
 						})
 
 						it('schedules the event', () => {
-							expect(restRequest).toHaveBeenCalledWith(`events/${EVENT_ID}`, {
-								method: 'patch',
-								data: {
-									event: {
-										state: 'SCHEDULED',
-										secret: EVENT_SECRET,
-										organizer_message: ORGANIZER_MESSAGE,
-										scheduled_from: '2018-09-29T19:30:00.000Z',
-										scheduled_to: '2018-09-30T01:30:00.000Z'
-									}
-								}
-							});
+
+							expect(restRequest).toHaveBeenCalledTimes(3)
+							// must use regex and not exact time match because the value sent by the browser
+							// depends on the time zone
+							const TIME_REGEX = /2018-09-(29|30)T\d{2}:\d{2}:\d{2}\.\d{3}Z/
+
+							let scheduleCallbackArgs = restRequest.calls.mostRecent().args
+							expect(scheduleCallbackArgs[0]).toEqual('events/bf6747d5-7b32-4bde-8e2d-c055d9bb02d3')
+							expect(scheduleCallbackArgs[1].method).toEqual('patch')
+							expect(scheduleCallbackArgs[1].data.event.state).toEqual('SCHEDULED')
+							expect(scheduleCallbackArgs[1].data.event.secret).toEqual(EVENT_SECRET)
+							expect(scheduleCallbackArgs[1].data.event.scheduled_from).toMatch(TIME_REGEX)
+							expect(scheduleCallbackArgs[1].data.event.scheduled_to).toMatch(TIME_REGEX)
+							expect(scheduleCallbackArgs[1].data.event.organizer_message).toEqual(ORGANIZER_MESSAGE)
+
 							expect(wrapper.find('#scheduleEventModal').isVisible()).toBeFalsy()
 						})
 					})
@@ -695,7 +701,7 @@ describe('eventViewer', () => {
 
 						beforeEach((done) => {
 
-							wrapper.find('#cancelEventModal textarea#organizerMessage').setValue(ORGANIZER_MESSAGE)
+							wrapper.find('#cancelEventModal textarea#cancelOrganizerMessage').setValue(ORGANIZER_MESSAGE)
 							wrapper.find('#cancelEventModal button.btn-primary').trigger('click')
 
 							setTimeout(done, 0)
@@ -745,7 +751,7 @@ describe('eventViewer', () => {
 				})
 
 				it('renders event header', () => {
-					let eventHeader = wrapper.find('event-header')
+					let eventHeader = wrapper.find('event-header-stub')
 					expect(eventHeader.exists).toBeTruthy();
 					expect(eventHeader.attributes('eventname')).toBe(EVENT_DATA.name)
 					expect(eventHeader.attributes('eventorganizer')).toBe(EVENT_DATA.organizer)
@@ -766,7 +772,6 @@ describe('eventViewer', () => {
 				it('it computes scheduleCalendarAttributes', () => {
 					expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(0)
 				})
-
 
 				buttonSelectors.all.forEach(selector => {
 					if (buttonSelectors.organizer.open.indexOf(selector) > -1) {
@@ -789,7 +794,7 @@ describe('eventViewer', () => {
 				})
 
 				it('does not render date picker', () => {
-					expect(wrapper.find('v-date-picker').exists()).toBeFalsy()
+					expect(wrapper.find('v-date-picker-stub').exists()).toBeFalsy()
 				})
 			})
 		})
@@ -822,7 +827,7 @@ describe('eventViewer', () => {
 			})
 
 			it('renders event header', () => {
-				let eventHeader = wrapper.find('event-header')
+				let eventHeader = wrapper.find('event-header-stub')
 				expect(eventHeader.exists).toBeTruthy();
 				expect(eventHeader.attributes('eventname')).toBe(EVENT_DATA.name)
 				expect(eventHeader.attributes('eventorganizer')).toBe(EVENT_DATA.organizer)
@@ -849,7 +854,7 @@ describe('eventViewer', () => {
 			})
 
 			it('does not render the date picker', () => {
-				expect(wrapper.find('v-date-picker').exists()).toBeFalsy()
+				expect(wrapper.find('v-date-picker-stub').exists()).toBeFalsy()
 			})
 
 			buttonSelectors.all.forEach(selector => {
@@ -918,7 +923,7 @@ describe('eventViewer', () => {
 			})
 
 			it('renders event header', () => {
-				let eventHeader = wrapper.find('event-header')
+				let eventHeader = wrapper.find('event-header-stub')
 				expect(eventHeader.exists).toBeTruthy();
 				expect(eventHeader.attributes('eventname')).toBe(EVENT_DATA.name)
 				expect(eventHeader.attributes('eventorganizer')).toBe(EVENT_DATA.organizer)
@@ -945,7 +950,7 @@ describe('eventViewer', () => {
 			})
 
 			it('does not render the date picker', () => {
-				expect(wrapper.find('v-date-picker').exists()).toBeFalsy()
+				expect(wrapper.find('v-date-picker-stub').exists()).toBeFalsy()
 			})
 
 			buttonSelectors.all.forEach(selector => {

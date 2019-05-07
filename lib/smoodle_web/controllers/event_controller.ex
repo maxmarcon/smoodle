@@ -19,6 +19,10 @@ defmodule SmoodleWeb.EventController do
     end
   end
 
+  def create(_conn, %{"event" => event_params, "dry_run" => true}) do
+    Scheduler.create_event(event_params, dry_run: true)
+  end
+
   def create(conn, %{"event" => event_params}) do
     with {:ok, event} <-
            Repo.transaction(fn ->
@@ -48,6 +52,16 @@ defmodule SmoodleWeb.EventController do
   def show(conn, %{"id" => id}) do
     event = Repo.preload(Scheduler.get_event!(id), :possible_dates)
     render(conn, :show, event: Map.delete(event, :secret))
+  end
+
+  def update(_conn, %{
+        "id" => id,
+        "event" => event_params = %{"secret" => secret},
+        "dry_run" => true
+      }) do
+    event = Scheduler.get_event!(id, secret)
+
+    Scheduler.update_event(event, event_params, dry_run: true)
   end
 
   def update(conn, %{"id" => id, "event" => event_params = %{"secret" => secret}}) do
