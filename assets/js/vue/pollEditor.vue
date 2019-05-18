@@ -337,7 +337,7 @@ export default {
     },
     nextStep() {
       this.savePoll(this.step < this.maxStep).then(() => {
-        this.step = this.firstStepWithErrors || Math.min(this.step + 1, this.maxStep)
+        this.step = Math.min(this.step + 1, this.maxStep, this.firstStepWithErrors || this.maxStep)
       })
     },
     prevStep() {
