@@ -1,6 +1,6 @@
 import dateFns from 'date-fns'
 
-export const InitialLocale = window.smoodle_locale
+export const InitialLocale = window.smoodle_locale || 'en'
 
 export function dotAccessObject(obj, deep_key) {
   if (!(obj instanceof Object)) {

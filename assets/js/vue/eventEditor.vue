@@ -85,6 +85,7 @@
 									@blur="localValidation"
 									:disabled="eventCreated"
 									:class="inputFieldClass('eventOrganizerEmail')"
+									type="email"
 								)
 								.invalid-feedback(name="event-organizer-email-error") {{ eventOrganizerEmailError }}
 
@@ -95,6 +96,7 @@
 									@blur="localValidation"
 									:disabled="eventCreated"
 									:class="inputFieldClass('eventOrganizerEmail_confirmation')"
+									type="email"
 								)
 								.invalid-feedback(name="event-organizer-email-confirmation-error") {{ eventOrganizerEmailError_confirmation }}
 
