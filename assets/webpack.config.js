@@ -71,7 +71,7 @@ module.exports = {
 			// Options similar to the same options in webpackOptions.output
 			// both options are optional
 			filename: path.join('css', '[name].css'),
-			chunkFilename: path.join('css', '[id].css')
+			chunkFilename: path.join('css', '[name].css')
 		}),
 		new CleanWebpackPlugin(),
 		new CssUrlRelativePlugin()
