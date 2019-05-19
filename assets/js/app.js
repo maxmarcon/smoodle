@@ -1,9 +1,11 @@
 const EventEditor = () =>
-	import ( /* webpackChunkName: "event-editor" */ './vue/eventEditor.vue')
+	import ( /* webpackChunkName: "eventEditor" */ './vue/eventEditor.vue')
 const PollEditor = () =>
-	import ( /* webpackChunkName: "poll-editor" */ './vue/pollEditor.vue')
-const EventViewer = () => import(/* webpackChunkName: "event-viewer" */ './vue/eventViewer.vue')
-const Home  = () => import(/* webpackChunkName: "home" */ './vue/home.vue')
+	import ( /* webpackChunkName: "pollEditor" */ './vue/pollEditor.vue')
+const EventViewer = () =>
+	import ( /* webpackChunkName: "eventViewer" */ './vue/eventViewer.vue')
+const Home = () =>
+	import ( /* webpackChunkName: "home" */ './vue/home.vue')
 import {
 	InitialLocale
 } from './globals.js'
