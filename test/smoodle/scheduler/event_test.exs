@@ -219,7 +219,7 @@ defmodule Smoodle.Scheduler.EventTest do
         Map.drop(Map.put(@valid_attrs, :state, "INVALID_STATE"), [:scheduled_from, :scheduled_to])
       )
 
-    assert [state: {_, [validation: :inclusion]}] = changeset.errors
+    assert [state: {_, [validation: :inclusion, enum: _]}] = changeset.errors
   end
 
   test "scheduled fields cleared if state is not scheduled" do
