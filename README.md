@@ -27,7 +27,7 @@ what is required is a compact overview of how many people can attend or prefer a
 
 Elixir/Phoenix in the backend, Vue.js in the frontend.
 
-## How to run it locally
+## How to run the application locally
 
 ### With docker in "almost production" mode
 
