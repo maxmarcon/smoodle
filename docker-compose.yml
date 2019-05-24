@@ -5,7 +5,7 @@ services:
     build:
       context: ./
     ports:
-      - "80:4000"
+      - "4000:4000"
     environment:
       DATABASE_URL: postgresql://docker:secret@db:5432/docker
       PORT: 4000
