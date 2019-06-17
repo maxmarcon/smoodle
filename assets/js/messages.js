@@ -141,7 +141,7 @@ export default {
 		home: {
 			title: 'Events made easy',
 			subtitle_1: '{app_name} helps you find the best date for the events in your social circle',
-			subtitle_2: 'No account needed. We only require your email to send you a link',
+			subtitle_2: 'No account needed. We only need your email to send you a link',
 			step: 'Step {step}',
 			how_it_works: 'Your event in 3 easy steps:',
 			step1: {
