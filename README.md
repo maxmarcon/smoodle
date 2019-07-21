@@ -61,7 +61,7 @@ The application comes with extensive unit testing for both back and front-end.
 
 ### Running the back end tests
 
-1. Start the local postgres test db with `docker-compose -f docker-postgres-test.yaml up`
+1. Start the local postgres dev db with `docker-compose -f docker-postgres-dev.yaml up`
 2. Run: `mix test`
 
 Note: as usual, if you want to use an existing postgres server, then skip step 1 and update config/test.exs with the credentials and database name for your server.
