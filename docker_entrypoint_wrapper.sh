@@ -13,7 +13,7 @@ if [ -z $DB_ENDPOINT ]; then
 	exit 1
 fi
 
-if (wait-for-it db:5432 -t $DB_TIMEOUT); then
+if (wait-for-it $DB_ENDPOINT -t $DB_TIMEOUT); then
 	mix ecto.migrate
 	exec $*
 else
