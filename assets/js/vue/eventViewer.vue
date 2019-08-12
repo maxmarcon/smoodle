@@ -388,7 +388,7 @@ export default {
       let limit = (SCHEDULE_DATES_LIMIT != null ? SCHEDULE_DATES_LIMIT : this.eventScheduleDates.length);
       let is_top_rank = (date_entry) => {
         if (this.eventScheduleDates.length > 0) {
-          if (this.eventScheduleDates[0].negative_rank > 0 && this.eventScheduleDates[0].negative_rank == date_entry.negative_rank) {
+          if (this.eventScheduleDates[0].negative_rank < 0 && this.eventScheduleDates[0].negative_rank == date_entry.negative_rank) {
             return true
           }
           return this.eventScheduleDates[0].positive_rank == date_entry.positive_rank
