@@ -216,7 +216,7 @@
                   em.text-muted {{ $t('event_viewer.organizer_says', {organizer: eventOrganizer}) }} &nbsp;
                   | {{ eventOrganizerMessage }}
 
-              .text-center(:class="eventOrganizerMessage ? 'col-md-6' : 'col'")
+              .col-md-6
                 .form-group
                   v-calendar(
                     :is-linked="true"
@@ -225,6 +225,7 @@
                     :max-page="toPage"
                     :attributes="scheduledEventCalendarAttributes"
                     :is-double-paned="differentMonths"
+                    :is-expanded="true"
                   )
 
           div(v-else-if="eventCanceled")
