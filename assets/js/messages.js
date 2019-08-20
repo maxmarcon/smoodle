@@ -553,7 +553,7 @@ export default {
       select_date_first: "Prima devi selezionare una data dal calendario.",
       warning_bad_date: "Attenzione! Una persona non può venire a questa data|Attenzione {participants} persone non possono venire a questa data",
       select_time: "Fissa un'ora per l'evento:",
-      date_selection_help: "Le date sono classificate da {best} a {worst}. Clicca una data per vedere quanti possono venire. {red} significa che almeno una persona non può venire, {green} che tuti possono venire. Date {blue_underlined} sone le migliori.",
+      date_selection_help: "Le date sono classificate da {best} a {worst}. Clicca una data per vedere quanti possono venire. {red} significa che almeno una persona non può venire, {green} che tuti possono venire. Date {blue_underlined} sone le migliori fin'ora.",
       date_selection_help_organizer: "Le date sono classificate da {best} a {worst}. Clicca una data per vedere chi può venire. {red} significa che almeno una persona non può venire, {green} che tuti possono venire. Date {blue_underlined} sone le migliori.",
       best: "migliori",
       worst: "peggiori",
