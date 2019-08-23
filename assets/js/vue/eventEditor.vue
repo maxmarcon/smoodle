@@ -165,6 +165,7 @@
                   :drag-attribute="selectAttribute"
                   @input="newDate"
                   :is-expanded="true"
+                  :theme-styles="calThemeStyles"
                 )
                 .small.text-danger(name="event-possible-dates-error") {{ eventPossibleDatesError }}
 
@@ -231,7 +232,8 @@ import {
   eventDataMixin,
   eventHelpersMixin,
   whatsAppHelpersMixin,
-  colorCodes
+  colorCodes,
+  calThemeStyles
 } from '../globals'
 
 const today = new Date()
@@ -319,7 +321,8 @@ export default {
       undoData: null,
       step: this.forceStep || 1,
       minStep: 1,
-      maxStep: 3
+      maxStep: 3,
+      calThemeStyles
     }
   },
   created() {

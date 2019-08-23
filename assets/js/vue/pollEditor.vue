@@ -118,6 +118,7 @@
                   :available-dates="eventDomain"
                   @input="newDate"
                   :is-expanded="true"
+                  :theme-styles="calThemeStyles"
                 )
                 .small.text-danger(name="poll-date-ranks-error") {{ pollDateRanksError }}
 
@@ -179,7 +180,8 @@ import {
   colorCodes,
   eventHelpersMixin,
   eventDataMixin,
-  scrollToTopMixin
+  scrollToTopMixin,
+  calThemeStyles
 } from '../globals'
 import dateFns from 'date-fns'
 
@@ -244,7 +246,8 @@ export default {
       },
       step: this.forceStep || 1,
       minStep: 1,
-      maxStep: 2
+      maxStep: 2,
+      calThemeStyles
     }
   },
   created() {

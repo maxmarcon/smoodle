@@ -187,6 +187,7 @@
                         :select-attribute="selectAttrubute"
                         nav-visibility="hidden"
                         :is-expanded="true"
+                        :theme-styles="calThemeStyles"
                       )
                       v-calendar(
                         v-else
@@ -197,6 +198,7 @@
                         :max-page="toPage"
                         :is-double-paned="differentMonths"
                         :is-expanded="true"
+                        :theme-styles="calThemeStyles"
                       )
 
               div.alert.alert-primary(v-else-if="loaded")
@@ -226,6 +228,7 @@
                     :attributes="scheduledEventCalendarAttributes"
                     :is-double-paned="differentMonths"
                     :is-expanded="true"
+                    :theme-styles="calThemeStyles"
                   )
 
           div(v-else-if="eventCanceled")
@@ -291,7 +294,8 @@ import {
   scrollToTopMixin,
   restMixin,
   whatsAppHelpersMixin,
-  nameListTrimmerMixin
+  nameListTrimmerMixin,
+  calThemeStyles
 } from '../globals'
 import dateFns from 'date-fns'
 
@@ -339,7 +343,8 @@ export default {
         borderColor: colorCodes.black,
         borderWidth: "2px"
       }
-    }
+    },
+    calThemeStyles
   }),
   created() {
     let self = this;

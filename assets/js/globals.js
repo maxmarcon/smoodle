@@ -682,3 +682,9 @@ export const colorCodes = {
   info: '#17a2b8',
   blue: '#007bff'
 }
+
+export const calThemeStyles = {
+  dayCellNotInMonth: {
+    opacity: '0.2'
+  }
+}
