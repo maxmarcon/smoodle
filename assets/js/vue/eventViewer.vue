@@ -300,6 +300,7 @@ import {
 import dateFns from 'date-fns'
 
 const SCHEDULE_DATES_LIMIT = null;
+const EVENT_RELOAD_INTERVAL_MSEC = 15000;
 
 export default {
   mixins: [
@@ -325,6 +326,7 @@ export default {
     pollParticipantError: null,
     loaded: false,
     loadedSuccessfully: false,
+    loading: false,
     requestOngoing: false,
     selectedDate: null,
     selectedTime: "19:30",
@@ -344,33 +346,15 @@ export default {
         borderWidth: "2px"
       }
     },
-    calThemeStyles
+    calThemeStyles,
+    reloadIntervalId: null
   }),
   created() {
-    let self = this;
-    Promise.all([
-        this.restRequest(['events', this.eventId].join('/'), {
-          params: {
-            secret: this.secret
-          }
-        }),
-        this.restRequest(['events', this.eventId, 'schedule'].join('/'), {
-          params: {
-            limit: SCHEDULE_DATES_LIMIT,
-            secret: this.secret
-          }
-        })
-      ])
-      .then(function([eventResult, scheduleResult]) {
-        self.assignEventData(eventResult.data.data);
-        self.eventScheduleDates = scheduleResult.data.data.dates;
-        self.eventScheduleParticipants = scheduleResult.data.data.participants;
-        self.eventScheduleParticipantsCount = scheduleResult.data.data.participants_count;
-        self.loadedSuccessfully = true;
-      })
-      .finally(function() {
-        self.loaded = true
-      });
+    this.loadEvent()
+    this.reloadIntervalId = setInterval(() => this.loadEvent(), EVENT_RELOAD_INTERVAL_MSEC)
+  },
+  beforeDestroy() {
+    clearInterval(this.reloadIntervalId)
   },
   computed: {
     isOrganizer() {
@@ -438,6 +422,38 @@ export default {
     }
   },
   methods: {
+    loadEvent() {
+      if (this.loading) {
+        return
+      }
+      this.loading = true
+      Promise.all([
+          this.restRequest(['events', this.eventId].join('/'), {
+            params: {
+              secret: this.secret,
+            },
+            background: this.loadedSuccessfully
+          }),
+          this.restRequest(['events', this.eventId, 'schedule'].join('/'), {
+            params: {
+              limit: SCHEDULE_DATES_LIMIT,
+              secret: this.secret
+            },
+            background: this.loadedSuccessfully
+          })
+        ])
+        .then(([eventResult, scheduleResult]) => {
+          this.assignEventData(eventResult.data.data);
+          this.eventScheduleDates = scheduleResult.data.data.dates;
+          this.eventScheduleParticipants = scheduleResult.data.data.participants;
+          this.eventScheduleParticipantsCount = scheduleResult.data.data.participants_count;
+          this.loadedSuccessfully = true;
+        })
+        .finally(() => {
+          this.loaded = true
+          this.loading = false
+        });
+    },
     opacityForDate(date_entry, minNegativeRank, maxPositiveRank) {
       return (date_entry.negative_rank < 0
         ? date_entry.negative_rank / minNegativeRank

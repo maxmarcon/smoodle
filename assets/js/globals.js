@@ -173,17 +173,22 @@ export const restMixin = {
           'Accept-Language': this.$i18n.locale
         },
         showErrors: true,
-        spinnerDelay: 100
+        spinnerDelay: 100,
+        background: false
       }, config);
 
       let self = this;
 
       let loader = null;
-      let timeout = setTimeout(function() {
-        loader = self.$loading.show();
-      }, config.spinnerDelay);
-
-      this.requestOngoing = true;
+      let timeout = null
+      if (!config.background) {
+        if (config.spinnerDelay) {
+          timeout = setTimeout(function() {
+            loader = self.$loading.show();
+          }, config.spinnerDelay)
+        }
+        this.requestOngoing = true;
+      }
 
       return this.$http.request(
         config
@@ -201,11 +206,15 @@ export const restMixin = {
         }
         throw error;
       }).finally(function() {
-        clearTimeout(timeout);
+        if (timeout) {
+          clearTimeout(timeout)
+        }
         if (loader) {
           loader.hide();
         }
-        self.requestOngoing = false;
+        if (!config.background) {
+          self.requestOngoing = false;
+        }
       });
     }
   }
