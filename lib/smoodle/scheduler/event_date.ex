@@ -1,9 +1,13 @@
 defmodule Smoodle.Scheduler.EventDate do
   use Ecto.Schema
+
+  alias Smoodle.Scheduler.Event
+  alias __MODULE__
+
   import Ecto.Changeset
   import Smoodle.Scheduler.Utils
-  alias Smoodle.Scheduler.EventDate
-  alias Smoodle.Scheduler.Event
+
+  @derive {Jason.Encoder, only: [:date_to, :date_from, :rank]}
 
   schema "event_dates" do
     field(:date_from, :date)

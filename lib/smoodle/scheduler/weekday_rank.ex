@@ -6,6 +6,8 @@ defmodule Smoodle.Scheduler.WeekDayRank do
 
   @primary_key false
 
+  @derive Jason.Encoder
+
   embedded_schema do
     field(:day, :integer)
     field(:rank, :float)

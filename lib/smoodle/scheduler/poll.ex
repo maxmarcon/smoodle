@@ -1,9 +1,14 @@
 defmodule Smoodle.Scheduler.Poll do
   use Ecto.Schema
-  import Ecto.Changeset
-  alias Smoodle.Scheduler.Event
+
+  alias __MODULE__
   alias Smoodle.Scheduler.DateRank
+  alias Smoodle.Scheduler.Event
   alias Smoodle.Scheduler.WeekDayRank
+
+  require Protocol
+
+  import Ecto.Changeset
   import SmoodleWeb.Gettext
   import Smoodle.Scheduler.Utils
 
@@ -22,6 +27,7 @@ defmodule Smoodle.Scheduler.Poll do
     embeds_one :preferences, Preferences, primary_key: false, on_replace: :delete do
       embeds_many(:weekday_ranks, WeekDayRank)
     end
+    Protocol.derive(Jason.Encoder, Poll.Preferences)
 
     belongs_to(:event, Event, type: :binary_id)
 

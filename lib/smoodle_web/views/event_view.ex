@@ -1,30 +1,25 @@
 defmodule SmoodleWeb.EventView do
   use SmoodleWeb, :view
   alias SmoodleWeb.EventView
-  alias SmoodleWeb.EventDateView
 
   def render("index.json", %{events: events}) do
-    %{data: render_many(Enum.map(events, &Map.delete(&1, :secret)), EventView, "event.json")}
+    %{data: render_many(Enum.map(events, &(%{&1 | secret: nil, email: nil})), EventView, "event.json")}
   end
 
   def render("show.json", %{event: event}) do
     %{data: render_one(event, EventView, "event.json")}
   end
 
-  def render("event.json", %{event: event = %{secret: _}}) do
+  def render("event.json", %{event: event = %{secret: secret}}) when not is_nil(secret) do
     event
-    |> Map.drop([:__meta__, :polls])
-    |> Map.update(:possible_dates, [], &render_many(&1, EventDateView, "event_date.json"))
+    |> render_common_fields
     |> Map.merge(%{
       owner_link: owner_link(event),
       share_link: share_link(event)
     })
   end
 
-  def render("event.json", %{event: event}) do
-    Map.drop(event, [:__meta__, :polls, :email, :secret])
-    |> Map.update(:possible_dates, [], &render_many(&1, EventDateView, "event_date.json"))
-  end
+  def render("event.json", %{event: event}), do: render_common_fields(event)
 
   def render("schedule.json", %{schedule: schedule}) do
     %{data: schedule}
@@ -36,5 +31,29 @@ defmodule SmoodleWeb.EventView do
 
   def share_link(event) do
     page_url(SmoodleWeb.Endpoint, :event, event.id)
+  end
+
+  defp render_common_fields(event) do
+    event
+    |> Map.from_struct
+    |> Map.drop([:__meta__, :polls])
+    |> maybe_drop_secret
+    |> maybe_drop_email
+  end
+
+  defp maybe_drop_secret(event) do
+    if is_nil(event[:secret]) do
+      Map.delete(event, :secret)
+    else
+      event
+    end
+  end
+
+  defp maybe_drop_email(event) do
+    if is_nil(event[:email]) do
+      Map.delete(event, :email)
+    else
+      event
+    end
   end
 end

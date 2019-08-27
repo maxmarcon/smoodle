@@ -51,10 +51,6 @@ defmodule Smoodle.Mixfile do
       {:bamboo_mailjet, "~> 0.0.1"},
       {:cachex, "~> 3.0"},
       {:distillery, "~> 2.0"},
-      # need to use this version of poison for Phoenix to work. The alternative is using Jason,
-      # but that requires updating all structs
-      {:poison, "~> 3.1"},
-      # Jason is used by Postgres
       {:jason, "~> 1.1"}
     ]
   end

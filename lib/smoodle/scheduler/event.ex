@@ -1,14 +1,17 @@
 defmodule Smoodle.Scheduler.Event do
   use Ecto.Schema
-  require Integer
-  import Ecto.Changeset
-  import SmoodleWeb.Gettext
 
-  alias Smoodle.Scheduler.Event
+  alias __MODULE__
   alias Smoodle.Scheduler.Poll
   alias Smoodle.Scheduler.EventDate
-  import Smoodle.Scheduler.Utils
   alias Smoodle.Scheduler.WeekdayConfig
+
+  require Integer
+  require Protocol
+
+  import Ecto.Changeset
+  import SmoodleWeb.Gettext
+  import Smoodle.Scheduler.Utils
 
   defimpl String.Chars, for: Smoodle.Scheduler.Event do
     def to_string(event) do
@@ -19,6 +22,9 @@ defmodule Smoodle.Scheduler.Event do
   @primary_key {:id, :binary_id, autogenerate: true}
   @secret_len 8
   @valid_states ~W(OPEN SCHEDULED CANCELED)
+
+  # Can't use "@derive Jason.Encoder" here becuase the field "secret" and "email"
+  # must be encoded only sometimes, requiring conversion to a Map in event_view.ex
 
   schema "events" do
     field(:name, :string)
@@ -38,6 +44,7 @@ defmodule Smoodle.Scheduler.Event do
     embeds_one(:preferences, Preferences, primary_key: false, on_replace: :delete) do
       embeds_many(:weekdays, WeekdayConfig)
     end
+    Protocol.derive(Jason.Encoder, Event.Preferences)
 
     timestamps(type: :utc_datetime, usec: false)
   end

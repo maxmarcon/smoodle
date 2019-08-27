@@ -70,6 +70,8 @@ defmodule SmoodleWeb.EventControllerTest do
   defp check_event(data = %{}, verify = %{} \\ %{}) do
     assert Map.has_key?(data, "id")
     assert Map.has_key?(data, "preferences")
+    refute Map.has_key?(data, "__meta__")
+    refute Map.has_key?(data, "__struct__")
 
     unless is_nil(data["preferences"]) do
       assert is_map(data["preferences"])
@@ -114,6 +116,8 @@ defmodule SmoodleWeb.EventControllerTest do
 
       Enum.each(event_list, fn data ->
         check_event(data)
+        refute Map.has_key?(data, "secret")
+        refute Map.has_key?(data, "email")
       end)
     end
   end

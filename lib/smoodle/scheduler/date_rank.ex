@@ -5,6 +5,8 @@ defmodule Smoodle.Scheduler.DateRank do
   alias Smoodle.Scheduler.Poll
   import Smoodle.Scheduler.Utils
 
+  @derive {Jason.Encoder, only: [:date_from, :date_to, :rank]}
+
   schema "date_ranks" do
     field(:date_from, :date)
     field(:date_to, :date)

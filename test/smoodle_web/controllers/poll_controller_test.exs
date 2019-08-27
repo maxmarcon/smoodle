@@ -162,6 +162,8 @@ defmodule SmoodleWeb.PollControllerTest do
     assert Map.has_key?(poll, "participant")
     assert Map.has_key?(poll, "preferences")
     assert Map.has_key?(poll, "event_id")
+    refute Map.has_key?(poll, "__meta__")
+    refute Map.has_key?(poll, "__struct__")
 
     unless is_nil(poll["preferences"]) do
       assert is_map(poll["preferences"])

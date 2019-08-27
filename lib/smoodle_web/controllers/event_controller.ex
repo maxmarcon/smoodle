@@ -51,7 +51,7 @@ defmodule SmoodleWeb.EventController do
 
   def show(conn, %{"id" => id}) do
     event = Repo.preload(Scheduler.get_event!(id), :possible_dates)
-    render(conn, :show, event: Map.delete(event, :secret))
+    render(conn, :show, event: %{event | secret: nil, email: nil})
   end
 
   def update(_conn, %{
