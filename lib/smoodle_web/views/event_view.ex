@@ -3,7 +3,10 @@ defmodule SmoodleWeb.EventView do
   alias SmoodleWeb.EventView
 
   def render("index.json", %{events: events}) do
-    %{data: render_many(Enum.map(events, &(%{&1 | secret: nil, email: nil})), EventView, "event.json")}
+    %{
+      data:
+        render_many(Enum.map(events, &%{&1 | secret: nil, email: nil}), EventView, "event.json")
+    }
   end
 
   def render("show.json", %{event: event}) do
@@ -35,7 +38,7 @@ defmodule SmoodleWeb.EventView do
 
   defp render_common_fields(event) do
     event
-    |> Map.from_struct
+    |> Map.from_struct()
     |> Map.drop([:__meta__, :polls])
     |> maybe_drop_secret
     |> maybe_drop_email

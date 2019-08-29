@@ -13,14 +13,18 @@ defmodule SmoodleWeb.PollView do
 
   def render("poll.json", %{poll: poll}) do
     poll
-    |> Map.from_struct
+    |> Map.from_struct()
     |> Map.drop([:__meta__])
-    |> drop_or_encode_event
+    |> drop_or_render_event
   end
 
-  defp drop_or_encode_event(poll) do
+  defp drop_or_render_event(poll) do
     if Ecto.assoc_loaded?(poll.event) do
-      Map.update!(poll, :event, &(render_one(%{&1 | secret: nil, email: nil}, EventView, "event.json")))
+      Map.update!(
+        poll,
+        :event,
+        &render_one(%{&1 | secret: nil, email: nil}, EventView, "event.json")
+      )
     else
       Map.delete(poll, :event)
     end

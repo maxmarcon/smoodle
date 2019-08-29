@@ -13,8 +13,12 @@ defmodule Smoodle.Application do
       # Start your own worker by calling: Smoodle.Worker.start_link(arg1, arg2, arg3)
       # worker(Smoodle.Worker, [arg1, arg2, arg3]),
       %{
-        id: Cachex,
-        start: {Cachex, :start_link, [:mailer_cache, []]}
+        id: MailerChache,
+        start: {Cachex, :start_link, [:mailer, []]}
+      },
+      %{
+        id: ScheduleCache,
+        start: {Cachex, :start_link, [:schedule, []]}
       }
     ]
 

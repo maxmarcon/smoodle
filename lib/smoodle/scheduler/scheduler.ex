@@ -8,6 +8,17 @@ defmodule Smoodle.Scheduler do
 
   alias Smoodle.Scheduler.Event
 
+  @schedule_cache :schedule
+  @ttl 3600_000
+
+  def schedule_cache do
+    @schedule_cache
+  end
+
+  def ttl do
+    @ttl
+  end
+
   @doc """
   Returns the list of events.
 

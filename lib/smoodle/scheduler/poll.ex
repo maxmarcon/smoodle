@@ -27,6 +27,7 @@ defmodule Smoodle.Scheduler.Poll do
     embeds_one :preferences, Preferences, primary_key: false, on_replace: :delete do
       embeds_many(:weekday_ranks, WeekDayRank)
     end
+
     Protocol.derive(Jason.Encoder, Poll.Preferences)
 
     belongs_to(:event, Event, type: :binary_id)

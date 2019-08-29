@@ -2,7 +2,7 @@ defmodule Smoodle.Mailer do
   use Bamboo.Mailer, otp_app: :smoodle
   require Logger
 
-  @cache :mailer_cache
+  @cache :mailer
   @default_time_bucket_sec 3600
   @default_max_emails 10
 
@@ -11,7 +11,7 @@ defmodule Smoodle.Mailer do
   end
 
   def reset_counters do
-    {:ok, _} = Cachex.reset(cache_name())
+    {:ok, _} = Cachex.reset(cache())
   end
 
   def max_emails do
@@ -23,7 +23,7 @@ defmodule Smoodle.Mailer do
       (Kernel.get_in(get_config(), [:rate_limit, :time_bucket_sec]) || @default_time_bucket_sec)
   end
 
-  def cache_name do
+  def cache do
     @cache
   end
 
@@ -33,10 +33,10 @@ defmodule Smoodle.Mailer do
   @spec deliver_with_rate_limit(email :: %Bamboo.Email{}, cache_key :: String.t()) ::
           tuple() | atom()
   def deliver_with_rate_limit(%Bamboo.Email{} = email, cache_key) do
-    {:ok, counter} = Cachex.incr(cache_name(), cache_key)
+    {:ok, counter} = Cachex.incr(cache(), cache_key)
 
     if counter == 1 do
-      {:ok, _} = Cachex.expire(cache_name(), cache_key, time_bucket_msec())
+      {:ok, _} = Cachex.expire(cache(), cache_key, time_bucket_msec())
     end
 
     if counter > max_emails() do

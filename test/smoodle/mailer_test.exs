@@ -19,7 +19,7 @@ defmodule Smoodle.MailerTest do
     assert {:ok, _} = deliver_with_rate_limit(email, email.to)
     assert_delivered_email(email)
 
-    assert {:ok, ttl} = Cachex.ttl(cache_name(), email.to)
+    assert {:ok, ttl} = Cachex.ttl(cache(), email.to)
     assert ttl <= time_bucket_msec()
   end
 

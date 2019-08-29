@@ -44,6 +44,7 @@ defmodule Smoodle.Scheduler.Event do
     embeds_one(:preferences, Preferences, primary_key: false, on_replace: :delete) do
       embeds_many(:weekdays, WeekdayConfig)
     end
+
     Protocol.derive(Jason.Encoder, Event.Preferences)
 
     timestamps(type: :utc_datetime, usec: false)

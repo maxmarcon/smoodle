@@ -202,6 +202,14 @@ defmodule Smoodle.SchedulerTest do
       assert event.id == old_id
     end
 
+    test "update_event/2 with valid data invalidates the cache best_schedule", %{event: event} do
+      {:ok, true} = Cachex.put(Scheduler.schedule_cache(), event.id, "XXX")
+
+      assert {:ok, updated_event} = Scheduler.update_event(event, @event_update_attrs)
+
+      refute Cachex.exists?(Scheduler.schedule_cache(), event.id)
+    end
+
     test "update_event/2 with invalid data returns error changeset", context do
       event = context[:event]
       assert {:error, %Ecto.Changeset{}} = Scheduler.update_event(event, @event_invalid_attrs)
@@ -372,6 +380,14 @@ defmodule Smoodle.SchedulerTest do
       assert poll.event_id == event.id
     end
 
+    test "create_poll/3 invalidates the cached best_schedule", %{event: event} do
+      {:ok, true} = Cachex.put(Scheduler.schedule_cache(), event.id, "XXX")
+
+      assert {:ok, poll = %Poll{}} = Scheduler.create_poll(event, @poll_valid_attrs_1)
+
+      refute Cachex.exists?(Scheduler.schedule_cache(), event.id)
+    end
+
     test "create_poll/3 valid data for dry run does not create poll", %{event: event} do
       assert :ok == Scheduler.create_poll(event, @poll_valid_attrs_1, dry_run: true)
       assert 1 == Repo.one(from(p in Poll, select: count(p.id)))
@@ -456,6 +472,14 @@ defmodule Smoodle.SchedulerTest do
       assert %{participant: "Mike"} = updated_poll
     end
 
+    test "update_poll/3 invalidates the cached best_schedule", %{poll: poll, event: event} do
+      {:ok, true} = Cachex.put(Scheduler.schedule_cache(), event.id, "XXX")
+
+      assert {:ok, updated_poll = %Poll{}} = Scheduler.update_poll(poll, %{participant: "Mike"})
+
+      refute Cachex.exists?(Scheduler.schedule_cache(), event.id)
+    end
+
     test "update_poll/3 with invalid data for dry run does not update the poll and returns invalid changeset",
          %{poll: poll} do
       assert {:error, changeset} = Scheduler.update_poll(poll, %{participant: 1}, dry_run: true)
@@ -515,6 +539,14 @@ defmodule Smoodle.SchedulerTest do
       {:ok, poll} = Scheduler.delete_poll(poll)
       assert_raise Ecto.NoResultsError, fn -> Scheduler.get_poll!(poll.id) end
       assert 0 = Repo.one(from(p in DateRank, select: count(p.id)))
+    end
+
+    test "delete_poll/3 invalidates the cached best_schedule", %{poll: poll, event: event} do
+      {:ok, true} = Cachex.put(Scheduler.schedule_cache(), event.id, "XXX")
+
+      {:ok, _} = Scheduler.delete_poll(poll)
+
+      refute Cachex.exists?(Scheduler.schedule_cache(), event.id)
     end
   end
 
@@ -602,6 +634,22 @@ defmodule Smoodle.SchedulerTest do
     test "get_best_schedule returns a shortened list when a limit is passed", %{event: event} do
       best_schedule = Scheduler.get_best_schedule(event, limit: 1)
       assert Enum.count(best_schedule.dates) == 1
+    end
+
+    test "the result of get_best_schedule is cached", %{event: event} do
+      best_schedule = Scheduler.get_best_schedule(event)
+
+      assert {:ok, true} == Cachex.exists?(Scheduler.schedule_cache(), event.id)
+      assert {:ok, best_schedule} == Cachex.get(Scheduler.schedule_cache(), event.id)
+      {:ok, ttl} = Cachex.ttl(Scheduler.schedule_cache(), event.id)
+      assert ttl <= Scheduler.ttl()
+    end
+
+    test "get_best_schedule returned cached results if these are present", %{event: event} do
+      cached_schedule = %{dates: [], participants: [], participants_count: 10}
+      Cachex.put(Scheduler.schedule_cache(), event.id, cached_schedule)
+
+      assert cached_schedule == Scheduler.get_best_schedule(event)
     end
   end
 
