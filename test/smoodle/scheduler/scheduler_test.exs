@@ -631,12 +631,32 @@ defmodule Smoodle.SchedulerTest do
                Enum.map(polls, &Map.get(&1, :participant)) |> Enum.sort()
     end
 
+    test "get_best_schedule called from owner and then from non-owner does not include participant names",
+         %{
+           event: event,
+           polls: polls
+         } do
+      best_schedule = Scheduler.get_best_schedule(event, is_owner: true)
+      assert Enum.any?(best_schedule.dates, &Enum.any?(&1.negative_participants))
+      assert Enum.any?(best_schedule.dates, &Enum.any?(&1.positive_participants))
+
+      assert Enum.sort(best_schedule.participants) ==
+               Enum.map(polls, &Map.get(&1, :participant)) |> Enum.sort()
+
+      best_schedule = Scheduler.get_best_schedule(event)
+      assert Enum.all?(best_schedule.dates, &(!Map.has_key?(&1, :negative_participants)))
+      assert Enum.all?(best_schedule.dates, &(!Map.has_key?(&1, :positive_participants)))
+      assert Enum.empty?(best_schedule.participants)
+    end
+
     test "get_best_schedule returns a shortened list when a limit is passed", %{event: event} do
       best_schedule = Scheduler.get_best_schedule(event, limit: 1)
       assert Enum.count(best_schedule.dates) == 1
     end
 
     test "the result of get_best_schedule is cached", %{event: event} do
+      assert {:ok, false} == Cachex.exists?(Scheduler.schedule_cache(), event.id)
+
       best_schedule = Scheduler.get_best_schedule(event)
 
       assert {:ok, true} == Cachex.exists?(Scheduler.schedule_cache(), event.id)
