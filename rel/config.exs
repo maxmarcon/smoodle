@@ -7,10 +7,10 @@
 |> Path.wildcard()
 |> Enum.map(&Code.eval_file(&1))
 
-use Mix.Releases.Config,
-    # This sets the default release built by `mix release`
+use Distillery.Releases.Config,
+    # This sets the default release built by `mix distillery.release`
     default_release: :default,
-    # This sets the default environment used by `mix release`
+    # This sets the default environment used by `mix distillery.release`
     default_environment: Mix.env()
 
 # For a full list of config options for both releases
@@ -31,19 +31,19 @@ environment :dev do
   # dev mode.
   set dev_mode: true
   set include_erts: false
-  set cookie: :"xU2ZYb%%2SPUnJfl$tDfB>8k&Gx!(h=~z01;!EPvh&Z>TB}CBr9gedUP/p0)ebRB"
+  set cookie: :"&gj/C0|tHn6sEy<!V83S(mB/`A^iISY6p/Kgq_SXBd?O.d3_Gt}w4uy):hj9JVtQ"
 end
 
 environment :prod do
   set include_erts: true
   set include_src: false
-  set cookie: :"S@KTJk5;mvNO)jJ0jSVVjFYIQDRz&*JN[Mhtrv%Ki99A;RJkI5^>W%mZwC6Jgbz2"
+  set cookie: :"&:FgilEVR:|Yl)>!Lw^<Yr^nLZ:Hnlfw>wD>kqGucAhA/c0H8ScAC=@?EL|k)wtE"
   set vm_args: "rel/vm.args"
 end
 
 # You may define one or more releases in this file.
 # If you have not set a default release, or selected one
-# when running `mix release`, the first release in the file
+# when running `mix distillery.release`, the first release in the file
 # will be used by default
 
 release :smoodle do
