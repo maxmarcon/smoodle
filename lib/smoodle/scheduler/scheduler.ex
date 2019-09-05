@@ -9,15 +9,13 @@ defmodule Smoodle.Scheduler do
   alias Smoodle.Scheduler.Event
 
   @schedule_cache :schedule
-  @ttl 3600_000
+  @default_ttl_sec 3600
 
-  def schedule_cache do
-    @schedule_cache
-  end
+  def get_config, do: Application.get_env(:smoodle, __MODULE__)
 
-  def ttl do
-    @ttl
-  end
+  def schedule_cache, do: @schedule_cache
+
+  def ttl, do: 1_000 * (get_in(get_config(), [:cache, :ttl]) || @default_ttl_sec)
 
   @doc """
   Returns the list of events.
@@ -87,6 +85,8 @@ defmodule Smoodle.Scheduler do
   end
 
   def update_event(%Event{} = event, attrs, _opts) do
+    Cachex.del(schedule_cache(), event.id)
+
     event
     |> Repo.preload(:possible_dates)
     |> Event.changeset(attrs)
@@ -153,6 +153,8 @@ defmodule Smoodle.Scheduler do
   end
 
   def create_poll(%Event{} = event, attrs, _opts) do
+    Cachex.del(schedule_cache(), event.id)
+
     Ecto.build_assoc(event, :polls)
     |> Repo.preload(event: :possible_dates)
     |> Poll.changeset(attrs)
@@ -179,6 +181,8 @@ defmodule Smoodle.Scheduler do
   end
 
   def update_poll(%Poll{} = poll, attrs, _opts) do
+    Cachex.del(schedule_cache(), poll.event_id)
+
     poll
     |> Repo.preload([[event: :possible_dates], :date_ranks])
     |> Poll.changeset(attrs)
@@ -190,41 +194,57 @@ defmodule Smoodle.Scheduler do
 
   """
   def delete_poll(%Poll{} = poll) do
+    Cachex.del(schedule_cache(), poll.event_id)
+
     Repo.delete(poll)
   end
 
   def get_best_schedule(%Event{} = event, opts \\ []) do
+    case Cachex.get(schedule_cache(), event.id) do
+      {:ok, nil} ->
+        compute_and_cache_best_schedule(event, opts)
+
+      {:ok, schedule} ->
+        schedule
+    end
+    |> maybe_remove_participants(!opts[:is_owner])
+  end
+
+  defp maybe_remove_participants(schedule, false) do
+    schedule
+  end
+
+  defp maybe_remove_participants(schedule, true) do
+    schedule
+    |> Map.update!(:participants, fn _ -> [] end)
+    |> Map.update!(:dates, fn dates ->
+      Enum.map(dates, &mask_participants/1)
+    end)
+  end
+
+  defp compute_and_cache_best_schedule(%Event{} = event, opts) do
+    schedule_cache()
+    |> Cachex.put(event.id, compute_best_schedule(event, opts), ttl: ttl())
+
+    {:ok, cached_schedule} = Cachex.get(schedule_cache(), event.id)
+
+    cached_schedule
+  end
+
+  defp compute_best_schedule(%Event{} = event, opts) do
     polls =
       Repo.all(Ecto.assoc(event, :polls))
       |> Repo.preload(:date_ranks)
       |> Enum.map(&transform_poll_for_ranking/1)
 
-    is_owner = opts[:is_owner]
-    limit = opts[:limit]
-
     %{
-      dates:
-        Enum.map(
-          date_ranking(Event.domain(event), polls, limit),
-          fn date_entry ->
-            if is_owner do
-              date_entry
-            else
-              mask_participants(date_entry)
-            end
-          end
-        ),
-      participants:
-        if is_owner do
-          Enum.map(polls, &Map.get(&1, :participant))
-        else
-          []
-        end,
+      dates: date_ranking(Event.domain(event), polls, opts[:limit]),
+      participants: Enum.map(polls, &Map.get(&1, :participant)),
       participants_count: Enum.count(polls)
     }
   end
 
-  defp date_ranking(date_domain, polls, limit \\ nil) do
+  defp date_ranking(date_domain, polls, limit) do
     if Enum.any?(polls) do
       date_domain
       |> Enum.map(fn date -> Enum.reduce(polls, initial_date_rank(date), &accumulate_poll/2) end)

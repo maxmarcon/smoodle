@@ -207,7 +207,7 @@ defmodule Smoodle.SchedulerTest do
 
       assert {:ok, updated_event} = Scheduler.update_event(event, @event_update_attrs)
 
-      refute Cachex.exists?(Scheduler.schedule_cache(), event.id)
+      assert {:ok, false} == Cachex.exists?(Scheduler.schedule_cache(), event.id)
     end
 
     test "update_event/2 with invalid data returns error changeset", context do
@@ -385,7 +385,7 @@ defmodule Smoodle.SchedulerTest do
 
       assert {:ok, poll = %Poll{}} = Scheduler.create_poll(event, @poll_valid_attrs_1)
 
-      refute Cachex.exists?(Scheduler.schedule_cache(), event.id)
+      assert {:ok, false} == Cachex.exists?(Scheduler.schedule_cache(), event.id)
     end
 
     test "create_poll/3 valid data for dry run does not create poll", %{event: event} do
@@ -477,7 +477,7 @@ defmodule Smoodle.SchedulerTest do
 
       assert {:ok, updated_poll = %Poll{}} = Scheduler.update_poll(poll, %{participant: "Mike"})
 
-      refute Cachex.exists?(Scheduler.schedule_cache(), event.id)
+      assert {:ok, false} == Cachex.exists?(Scheduler.schedule_cache(), event.id)
     end
 
     test "update_poll/3 with invalid data for dry run does not update the poll and returns invalid changeset",
@@ -546,7 +546,7 @@ defmodule Smoodle.SchedulerTest do
 
       {:ok, _} = Scheduler.delete_poll(poll)
 
-      refute Cachex.exists?(Scheduler.schedule_cache(), event.id)
+      assert {:ok, false} == Cachex.exists?(Scheduler.schedule_cache(), event.id)
     end
   end
 
@@ -657,7 +657,7 @@ defmodule Smoodle.SchedulerTest do
     test "the result of get_best_schedule is cached", %{event: event} do
       assert {:ok, false} == Cachex.exists?(Scheduler.schedule_cache(), event.id)
 
-      best_schedule = Scheduler.get_best_schedule(event)
+      best_schedule = Scheduler.get_best_schedule(event, is_owner: true)
 
       assert {:ok, true} == Cachex.exists?(Scheduler.schedule_cache(), event.id)
       assert {:ok, best_schedule} == Cachex.get(Scheduler.schedule_cache(), event.id)

@@ -6,26 +6,18 @@ defmodule Smoodle.Mailer do
   @default_time_bucket_sec 3600
   @default_max_emails 10
 
-  def get_config do
-    Application.get_env(:smoodle, __MODULE__)
-  end
+  def get_config, do: Application.get_env(:smoodle, __MODULE__)
 
   def reset_counters do
     {:ok, _} = Cachex.reset(cache())
   end
 
-  def max_emails do
-    Kernel.get_in(get_config(), [:rate_limit, :max_emails]) || @default_max_emails
-  end
+  def max_emails, do: get_in(get_config(), [:rate_limit, :max_emails]) || @default_max_emails
 
-  def time_bucket_msec do
-    1000 *
-      (Kernel.get_in(get_config(), [:rate_limit, :time_bucket_sec]) || @default_time_bucket_sec)
-  end
+  def time_bucket_msec,
+    do: 1000 * (get_in(get_config(), [:rate_limit, :time_bucket_sec]) || @default_time_bucket_sec)
 
-  def cache do
-    @cache
-  end
+  def cache, do: @cache
 
   @doc """
 

@@ -36,6 +36,8 @@ config :phoenix, :template_engines, pug: PhoenixExpug.Engine
 
 config :phoenix, :json_library, Jason
 
+config :smoodle, Smoodle.Scheduler, cache: [ttl: 3_600 * 12]
+
 config :smoodle, Smoodle.Mailer, rate_limit: [max_emails: 20, time_bucket_sec: 3600]
 
 # Import environment specific config. This must remain at the bottom
