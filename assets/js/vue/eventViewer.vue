@@ -375,12 +375,13 @@ export default {
         maxPositiveRank = this.eventScheduleDates[0].positive_rank;
       }
       let limit = (SCHEDULE_DATES_LIMIT != null ? SCHEDULE_DATES_LIMIT : this.eventScheduleDates.length);
-      let is_top_rank = (date_entry) => {
+      let is_top_rank = ({negative_rank, positive_rank}) => {
         if (this.eventScheduleDates.length > 0) {
-          if (this.eventScheduleDates[0].negative_rank < 0 && this.eventScheduleDates[0].negative_rank == date_entry.negative_rank) {
-            return true
+          if (this.eventScheduleDates[0].negative_rank < 0) {
+            return this.eventScheduleDates[0].negative_rank == negative_rank
+          } else {
+            return negative_rank == 0 && this.eventScheduleDates[0].positive_rank == positive_rank 
           }
-          return this.eventScheduleDates[0].positive_rank == date_entry.positive_rank
         } else {
           return false
         }
