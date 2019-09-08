@@ -232,6 +232,8 @@ defmodule Smoodle.Scheduler do
   end
 
   defp compute_best_schedule(%Event{} = event, opts) do
+    event = Repo.preload(event, :possible_dates)
+
     polls =
       Repo.all(Ecto.assoc(event, :polls))
       |> Repo.preload(:date_ranks)

@@ -85,7 +85,7 @@ defmodule SmoodleWeb.EventController do
   end
 
   def schedule(conn, %{"id" => id, "secret" => secret} = params) do
-    event = Repo.preload(Scheduler.get_event!(id, secret), :possible_dates)
+    event = Scheduler.get_event!(id, secret)
 
     render(conn, :schedule, %{
       schedule:
@@ -97,7 +97,7 @@ defmodule SmoodleWeb.EventController do
   end
 
   def schedule(conn, %{"id" => id} = params) do
-    event = Repo.preload(Scheduler.get_event!(id), :possible_dates)
+    event = Scheduler.get_event!(id)
 
     render(conn, :schedule, %{
       schedule: Scheduler.get_best_schedule(event, schedule_parse_params(params))
