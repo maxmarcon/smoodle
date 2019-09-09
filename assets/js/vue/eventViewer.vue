@@ -367,20 +367,21 @@ export default {
       // allowing live locale changes on the client side
       let _hack_dependency_on_locale = this.$i18n.locale;
 
-      let scheduleDates = this.eventScheduleDates.length;
+      const scheduleDates = this.eventScheduleDates.length;
       let minNegativeRank;
       let maxPositiveRank;
       if (scheduleDates > 0) {
         minNegativeRank = this.eventScheduleDates[scheduleDates-1].negative_rank;
         maxPositiveRank = this.eventScheduleDates[0].positive_rank;
       }
-      let limit = (SCHEDULE_DATES_LIMIT != null ? SCHEDULE_DATES_LIMIT : this.eventScheduleDates.length);
+      const limit = (SCHEDULE_DATES_LIMIT != null ? SCHEDULE_DATES_LIMIT : this.eventScheduleDates.length);
       let is_top_rank = ({negative_rank, positive_rank}) => {
         if (this.eventScheduleDates.length > 0) {
-          if (this.eventScheduleDates[0].negative_rank < 0) {
-            return this.eventScheduleDates[0].negative_rank == negative_rank
+          const {negative_rank: top_negative_rank, positive_rank: top_positive_rank} = this.eventScheduleDates[0]
+          if (top_negative_rank < 0) {
+            return top_negative_rank === negative_rank
           } else {
-            return negative_rank == 0 && this.eventScheduleDates[0].positive_rank == positive_rank 
+            return negative_rank === 0 && top_positive_rank === positive_rank 
           }
         } else {
           return false
