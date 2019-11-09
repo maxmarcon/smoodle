@@ -11,6 +11,7 @@ import VueAxios from 'vue-axios'
 import datePicker from 'vue-bootstrap-datetimepicker'
 import VueScrollTo from 'vue-scrollto'
 import PrettyCheckbox from 'pretty-checkbox-vue'
+import VueClipboard from 'vue-clipboard2'
 
 import 'bootstrap/scss/bootstrap.scss'
 import 'flag-icon-css/sass/flag-icon.scss';
@@ -40,7 +41,7 @@ Vue.use(VCalendar)
 Vue.use(PrettyCheckbox)
 Vue.use(VueScrollTo)
 Vue.use(datePicker)
-
+Vue.use(VueClipboard)
 
 Vue.component('message-bar', MessageBar);
 Vue.component('event-header', EventHeader);

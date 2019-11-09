@@ -444,10 +444,18 @@
                         })
                     ])
                     this.assignEventData(eventResult.data.data);
-                    this.eventScheduleDates = scheduleResult.data.data.dates.map(({date, positive_rank, negative_rank}) => ({
+                    this.eventScheduleDates = scheduleResult.data.data.dates.map(({
+                                                                                      date,
+                                                                                      positive_rank,
+                                                                                      positive_participants,
+                                                                                      negative_rank,
+                                                                                      negative_participants
+                                                                                  }) => ({
                         date: dateFns.parseISO(date),
                         positive_rank,
-                        negative_rank
+                        positive_participants,
+                        negative_rank,
+                        negative_participants
                     }));
                     this.eventScheduleParticipants = scheduleResult.data.data.participants;
                     this.eventScheduleParticipantsCount = scheduleResult.data.data.participants_count;
