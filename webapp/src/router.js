@@ -47,5 +47,9 @@ export default new Router({
         name: 'edit_poll',
         component: PollEditor,
         props: true
+    }, {
+        path: '/*',
+        redirect: '/home'
     }]
 })
+

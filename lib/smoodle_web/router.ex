@@ -27,13 +27,8 @@ defmodule SmoodleWeb.Router do
     # Use the default browser stack
     pipe_through(:browser)
 
-    get("/home", PageController, :home)
-    get("/events/new", PageController, :event_new)
-    get("/events/:event_id/edit", PageController, :event_edit)
-    get("/events/:event_id/polls/new", PageController, :poll)
     get("/events/:event_id", PageController, :event)
-    get("/polls/:poll_id/edit", PageController, :poll)
-    get("/", PageController, :redirect_to_home)
+    get("/*path", PageController, :app)
   end
 
   if Application.get_env(:smoodle, :env) in [:dev, :docker] do

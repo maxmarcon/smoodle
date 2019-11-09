@@ -1,6 +1,6 @@
 _build
 deps
 test
-assets/node_modules
+webapp/node_modules
 *.env
 .git
