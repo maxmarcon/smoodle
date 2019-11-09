@@ -51,7 +51,8 @@ defmodule Smoodle.Mixfile do
       {:bamboo_mailjet, "~> 0.1.0"},
       {:cachex, "~> 3.0"},
       {:distillery, "~> 2.0"},
-      {:jason, "~> 1.1"}
+      {:jason, "~> 1.1"},
+      {:cors_plug, "~> 1.5"}
     ]
   end
 

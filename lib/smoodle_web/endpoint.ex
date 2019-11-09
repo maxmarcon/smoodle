@@ -12,7 +12,7 @@ defmodule SmoodleWeb.Endpoint do
     at: "/",
     from: :smoodle,
     gzip: true,
-    only: ~w(css fonts images js favicon.ico robots.txt)
+    only: ~w(css fonts img js favicon.ico robots.txt)
   )
 
   # Code reloading can be explicitly enabled under the
@@ -36,16 +36,9 @@ defmodule SmoodleWeb.Endpoint do
   plug(Plug.MethodOverride)
   plug(Plug.Head)
 
-  # The session will be stored in the cookie and signed,
-  # this means its contents can be read but not tampered with.
-  # Set :encryption_salt if you would also like to encrypt it.
-  plug(
-    Plug.Session,
-    store: :cookie,
-    key: "_smoodle_key",
-    encryption_salt: "B27mXwze",
-    signing_salt: "B27mXwze"
-  )
+  if Application.get_env(:smoodle, :env) == :dev do
+    plug CORSPlug, origin: "*"
+  end
 
   plug(SmoodleWeb.Router)
 

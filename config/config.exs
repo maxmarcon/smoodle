@@ -24,7 +24,7 @@ config :smoodle, SmoodleWeb.Endpoint,
   pubsub: [name: Smoodle.PubSub, adapter: Phoenix.PubSub.PG2]
 
 config :smoodle, SmoodleWeb.Plugs.Locale,
-  use_session: true,
+  use_session: false,
   available_locales: ~w(en de it)
 
 # Configures Elixir's Logger

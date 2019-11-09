@@ -1,8 +1,6 @@
 defmodule SmoodleWeb.PageControllerTest do
   use SmoodleWeb.ConnCase
 
-  import Phoenix.View
-
   @app_paths [
     "/home",
     "/events/new",
@@ -12,10 +10,17 @@ defmodule SmoodleWeb.PageControllerTest do
     "/polls/:poll_id/edit"
   ]
 
+  setup_all do
+    index_file_path = Application.app_dir(:smoodle, "priv/static/index.html")
+    unless File.exists?(index_file_path) do
+      :ok = File.write(index_file_path, "<html></html>")
+    end
+  end
+
   test "app pages are rendered", %{conn: conn} do
     for path <- @app_paths do
       conn = get(conn, path)
-      assert html_response(conn, :ok) =~ render_to_string(SmoodleWeb.PageView, "app.html", [])
+      assert html_response(conn, :ok)
     end
   end
 

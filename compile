@@ -1,3 +1,2 @@
-cd ${phoenix_dir}
-npm --prefix ./assets run deploy
-mix "${phoenix_ex}.digest"
+cd ${phoenix_dir}/webapp
+yarn build

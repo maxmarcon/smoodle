@@ -3,11 +3,7 @@ defmodule SmoodleWeb.Router do
 
   pipeline :browser do
     plug(:accepts, ["html"])
-    plug(:fetch_session)
-    plug(:fetch_flash)
-    plug(:protect_from_forgery)
     plug(:put_secure_browser_headers)
-    plug(SmoodleWeb.Plugs.Locale)
   end
 
   pipeline :api do
@@ -41,7 +37,7 @@ defmodule SmoodleWeb.Router do
   end
 
   if Application.get_env(:smoodle, :env) in [:dev, :docker] do
-    forward("/sent_emails", Bamboo.EmailPreviewPlug)
+    forward("/sent_emails", Bamboo.SentEmailViewerPlug)
   end
 
   # Other scopes may use custom stacks.
