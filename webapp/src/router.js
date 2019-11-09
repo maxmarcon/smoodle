@@ -8,7 +8,7 @@ const EventEditor = () =>
 const PollEditor = () =>
     import ( /* webpackChunkName: "poll-editor" */ './components/poll-editor.vue')
 const EventViewer = () =>
-    import ( /* webpackChunkName: "poll-editor" */ './components/event-viewer.vue')
+    import ( /* webpackChunkName: "event-viewer" */ './components/event-viewer.vue')
 
 Vue.use(Router)
 
