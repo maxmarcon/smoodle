@@ -1,2 +1,3 @@
 cd ${phoenix_dir}/webapp
+yarn install
 yarn build
