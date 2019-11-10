@@ -23,16 +23,16 @@ defmodule SmoodleWeb.Router do
     resources("/polls", PollController, only: [:update, :delete, :show])
   end
 
+  if Application.get_env(:smoodle, :env) in [:dev, :docker] do
+    forward("/sent_emails", Bamboo.SentEmailViewerPlug)
+  end
+
   scope "/", SmoodleWeb do
     # Use the default browser stack
     pipe_through(:browser)
 
     get("/events/:event_id", PageController, :event)
     get("/*path", PageController, :app)
-  end
-
-  if Application.get_env(:smoodle, :env) in [:dev, :docker] do
-    forward("/sent_emails", Bamboo.SentEmailViewerPlug)
   end
 
   # Other scopes may use custom stacks.
