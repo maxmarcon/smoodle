@@ -28,6 +28,10 @@ jobs:
     docker:
       - image: circleci/elixir:1.9.1
       - image: circleci/postgres
+        environment:
+          POSTGRES_PASSWORD: secret
+          POSTGRES_USER: homestead
+          POSTGRES_DB: smoodle_dev
     environment:
       MIX_ENV: test
     steps:
