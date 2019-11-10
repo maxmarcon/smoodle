@@ -40,13 +40,14 @@ And be patient :) After a while, the application will be available at (http://lo
 
 ### Dev mode with mix
 
-1. Install npm packages: `cd assets && npm install`
-2. Install hex packages: `cd ../ && mix deps.get`
-3. Start the local postgres dev db with `docker-compose -f docker-postgres-dev.yaml up`
-4. Set up the database and run the migrations: `mix ecto.setup`
-5. Start the server with `mix phx.server`. This will also compile the app and build the front-end assets (it will need some time...)
+1. Install webapp packages: `cd webapp && yarn install`
+2. Start the webapp: `yarn serve`
+3. Install hex packages: `cd ../ && mix deps.get`
+4. Start the local postgres dev db with `docker-compose -f docker-postgres-dev.yaml up`
+5. Set up the database and run the migrations: `mix ecto.setup`
+6. Start the server with `mix phx.server`.
 
-The application will be available at (http://localhost:4000)
+The application will be available at (http://localhost:8080)
 
 Note: if you want to use an existing postgres server, then skip step 3 and update `config/dev.exs` with the credentials
 and database name for your server.
@@ -68,4 +69,4 @@ Note: as usual, if you want to use an existing postgres server, then skip step 1
 
 ### Running the front end tests
 
-Run: `cd assets && npm run test`
+Run: `cd webapp && yarn test-once`
