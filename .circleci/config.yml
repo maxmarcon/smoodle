@@ -7,7 +7,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: elixir-deps-{{ .Branch }}-{ checksum "mix.lock" }}
+          key: elixir-deps-{{ .Branch }}-{{ checksum "mix.lock" }}
       - run:
           command: |
             mix local.hex --force
@@ -19,9 +19,10 @@ jobs:
           paths:
             - ./deps
       - persist_to_workspace:
-          root: ./
+          root: ~/
           paths:
-            - ./
+            - project
+            - .mix
 
   backend_unit_tests:
     docker:
@@ -30,7 +31,7 @@ jobs:
       MIX_ENV: test
     steps:
       - attach_workspace:
-          at: ./
+          at: ~/
       - run:
           command: |
             ls -al
