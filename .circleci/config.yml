@@ -17,7 +17,7 @@ jobs:
       - save_cache:
           key: elixir-deps-{{ checksum "mix.lock" }}
           paths:
-            - ~/deps
+            - ./deps
       - persist_to_workspace:
           root: ./
           paths:
@@ -31,6 +31,9 @@ jobs:
     steps:
       - attach_workspace:
           at: ./
+      - run:
+          command: |
+            ls -al
       - run: mix test --trace
 
 workflows:
