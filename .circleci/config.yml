@@ -8,16 +8,13 @@ jobs:
       - checkout
       - restore_cache:
           key: elixir-deps-{{ checksum "mix.lock" }}
-      #      - run:
-      #          command: |
-      #            mix local.hex --force
-      #            mix local.rebar --force
-      #            mix deps.get
-      #            mix compile
       - run:
           command: |
+            mix local.hex --force
+            mix local.rebar --force
             mix deps.get
             mix compile
+      - save_cache:
           key: elixir-deps-{{ checksum "mix.lock" }}
           paths:
             - ~/deps
