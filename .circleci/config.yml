@@ -21,7 +21,7 @@ jobs:
       - checkout
       - restore_cache:
           key: elixir-deps-{{ checksum "mix.lock" }}
-      - mix compile
+      - run: mix compile
 
 workflows:
   version: 2
