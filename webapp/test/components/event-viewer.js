@@ -289,7 +289,14 @@ describe('eventViewer', () => {
 
                 it('it computes scheduleCalendarAttributes', () => {
                     expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(SCHEDULE_DATA.dates.length)
-                    wrapper.vm.scheduleCalendarAttributes.forEach((attr) => expect(attr.dates instanceof Date).toBeTruthy())
+                    wrapper.vm.scheduleCalendarAttributes.forEach((attr) => {
+                        expect(attr.dates instanceof Date).toBeTruthy()
+                        expect(attr.customData.positive_participants).toBeUndefined()
+                        expect(typeof (attr.customData.positive_rank)).toEqual("number")
+                        expect(attr.customData.negative_participants).toBeUndefined()
+                        expect(typeof (attr.customData.negative_rank)).toEqual("number")
+
+                    });
                 })
 
                 describe('clicking on update availability', () => {
@@ -582,7 +589,13 @@ describe('eventViewer', () => {
 
                 it('it computes scheduleCalendarAttributes', () => {
                     expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(SCHEDULE_DATA.dates.length)
-                    wrapper.vm.scheduleCalendarAttributes.forEach((attr) => expect(attr.dates instanceof Date).toBeTruthy())
+                    wrapper.vm.scheduleCalendarAttributes.forEach((attr) => {
+                        expect(attr.dates instanceof Date).toBeTruthy()
+                        expect(attr.customData.positive_participants instanceof Array).toBeTruthy()
+                        expect(typeof (attr.customData.positive_rank)).toEqual("number")
+                        expect(attr.customData.negative_participants instanceof Array).toBeTruthy()
+                        expect(typeof (attr.customData.negative_rank)).toEqual("number")
+                    })
                 })
 
                 buttonSelectors.all.forEach(selector => {
