@@ -1,27 +1,40 @@
 jobs:
   build_back_end:
     docker:
-      - image: elixir:1.9.1
-    steps:
-      - checkout
-      - run:
-          command: |
-            mix local.hex --force
-            mix local.rebar --force
-            mix deps.get
-      - save_cache:
-          key: elixir-deps-{{ checksum "mix.lock" }}
-          paths:
-            - ~/deps
-
-  backend_unit_tests:
-    docker:
-      - image: elixir:1.9.1
+      - image: circleci/elixir:1.9.1
+    environment:
+      MIX_ENV: test
     steps:
       - checkout
       - restore_cache:
           key: elixir-deps-{{ checksum "mix.lock" }}
-      - run: mix compile
+      #      - run:
+      #          command: |
+      #            mix local.hex --force
+      #            mix local.rebar --force
+      #            mix deps.get
+      #            mix compile
+      - run:
+          command: |
+            mix deps.get
+            mix compile
+          key: elixir-deps-{{ checksum "mix.lock" }}
+          paths:
+            - ~/deps
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - ./
+
+  backend_unit_tests:
+    docker:
+      - image: elixir:1.9.1
+    environment:
+      MIX_ENV: test
+    steps:
+      - attach_workspace:
+          at: ./
+      - run: mix test --trace
 
 workflows:
   version: 2
