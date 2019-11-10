@@ -7,7 +7,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: elixir-deps-{{{ .Branch }}-{ checksum "mix.lock" }}
+          key: elixir-deps-{{ .Branch }}-{ checksum "mix.lock" }}
       - run:
           command: |
             mix local.hex --force
@@ -34,6 +34,7 @@ jobs:
       - run:
           command: |
             ls -al
+            ls _build/test/lib -al
       - run: mix test --trace
 
 workflows:
