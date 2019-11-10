@@ -27,15 +27,12 @@ jobs:
   backend_unit_tests:
     docker:
       - image: circleci/elixir:1.9.1
+      - image: circleci/postgres
     environment:
       MIX_ENV: test
     steps:
       - attach_workspace:
           at: ~/
-      - run:
-          command: |
-            ls -al
-            ls _build/test/lib -al
       - run: mix test --trace
 
 workflows:
