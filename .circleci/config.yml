@@ -1,3 +1,4 @@
+version: 2
 jobs:
   build_back_end:
     docker:
@@ -32,12 +33,12 @@ jobs:
           POSTGRES_PASSWORD: secret
           POSTGRES_USER: homestead
           POSTGRES_DB: smoodle_dev
-    environment:
-      MIX_ENV: test
     steps:
       - attach_workspace:
           at: ~/
       - run: mix test --trace
+      - store_test_results:
+          path: test-results
 
 workflows:
   version: 2

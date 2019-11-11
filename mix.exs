@@ -52,7 +52,8 @@ defmodule Smoodle.Mixfile do
       {:cachex, "~> 3.0"},
       {:distillery, "~> 2.0"},
       {:jason, "~> 1.1"},
-      {:cors_plug, "~> 1.5"}
+      {:cors_plug, "~> 1.5"},
+      {:junit_formatter, "~> 3.0", only: [:test]}
     ]
   end
 
