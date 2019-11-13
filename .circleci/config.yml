@@ -76,6 +76,8 @@ jobs:
     docker:
       - image: circleci/elixir:1.9.1
     steps:
+      - attach_workspace:
+          at: ~/
       - run:
           command: git push https://${GIGALIXIR_USER}:${GIGALIXIR_PASSWORD}@git.gigalixir.com/smoodle.git
 
