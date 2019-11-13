@@ -79,7 +79,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          command: git push https://${GIGALIXIR_USER}:${GIGALIXIR_PASSWORD}@git.gigalixir.com/smoodle.git
+          command: git push https://${GIGALIXIR_USER}:${GIGALIXIR_PASSWORD}@git.gigalixir.com/smoodle.git master
 
 workflows:
   version: 2
