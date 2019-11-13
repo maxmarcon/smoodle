@@ -36,7 +36,7 @@ module.exports = function(config) {
     reporters: ['progress', 'kjhtml'],
 
     junitReporter: {
-      outputDir: '../test-results/karma'
+      outputDir: 'test-results/karma'
     },
 
     // web server port
