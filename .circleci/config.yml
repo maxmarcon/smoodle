@@ -28,7 +28,7 @@ jobs:
   build_front_end:
     docker:
       - image: circleci/node:12.11.0
-    working_directory: webapp
+    working_directory: ~/project/webapp
     steps:
       - attach_workspace:
           at: ~/
@@ -60,7 +60,7 @@ jobs:
   front_end_unit_tests:
     docker:
       - image: circleci/node:12.11.0
-    working_directory: webapp
+    working_directory: ~/project/webapp
     steps:
       - attach_workspace:
           at: ~/
