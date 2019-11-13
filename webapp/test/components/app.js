@@ -45,7 +45,7 @@ describe('app', () => {
 
   it('renders a link to the home route', () => {
     expect(wrapper.findAll(RouterLinkStub).at(0).props().to).toEqual({
-      name: 'home'
+      name: 'homeXXX'
     })
   });
 
