@@ -57,7 +57,7 @@ jobs:
       - store_test_results:
           path: test-results
 
-  front_end_unit_tests:
+  frontend_unit_tests:
     docker:
       - image: circleci/node:12.11.0
     working_directory: ~/project/webapp
