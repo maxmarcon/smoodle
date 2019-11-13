@@ -79,7 +79,9 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          command: git push https://${GIGALIXIR_USER}:${GIGALIXIR_PASSWORD}@git.gigalixir.com/smoodle.git master
+          command: |
+            git remote add gigalixir https://${GIGALIXIR_USER}:${GIGALIXIR_PASSWORD}@git.gigalixir.com/smoodle.git
+            git push gigalixir master
 
 workflows:
   version: 2
@@ -101,7 +103,6 @@ workflows:
             - frontend_unit_tests
           filters:
             tags:
-              only:
-                - /^v.*/
+              only: /^v.*/
 
 
