@@ -30,10 +30,10 @@ jobs:
       - image: circleci/node:12.11.0
     working_directory: webapp
     steps:
-      - restore_cache:
-          key: node-modules-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - attach_workspace:
           at: ~/
+      - restore_cache:
+          key: node-modules-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           command: |
             yarn install
@@ -64,6 +64,8 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
+      - restore_cache:
+          key: node-modules-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           command: |
             yarn test-once
