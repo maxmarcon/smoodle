@@ -18,12 +18,29 @@ jobs:
       - save_cache:
           key: elixir-deps-{{ .Branch }}-{{ checksum "mix.lock" }}
           paths:
-            - ./deps
+            - deps
       - persist_to_workspace:
           root: ~/
           paths:
             - project
             - .mix
+
+  build_front_end:
+    docker:
+      - image: circleci/node:12.11.0
+    working_directory: webapp
+    steps:
+      - restore_cache:
+          key: node-modules-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      - attach_workspace:
+          at: ~/
+      - run:
+          command: |
+            yarn install
+      - save_cache:
+          key: node-modules-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
 
   backend_unit_tests:
     docker:
@@ -40,14 +57,29 @@ jobs:
       - store_test_results:
           path: test-results
 
+  front_end_unit_tests:
+    docker:
+      - image: circleci/node:12.11.0
+    working_directory: webapp
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          command: |
+            yarn test-once
+      - store_test_results:
+          path: test-results
+
 workflows:
   version: 2
   build_and_test:
     jobs:
-      - build_back_end:
-          filters:
-            branches:
-              only: master
+      - build_back_end
       - backend_unit_tests:
           requires:
             - build_back_end
+      - build_front_end
+      - frontend_unit_tests:
+          requires:
+            - build_front_end
+
