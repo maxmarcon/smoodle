@@ -78,7 +78,9 @@ workflows:
       - backend_unit_tests:
           requires:
             - build_back_end
-      - build_front_end
+      - build_front_end:
+          requires:
+            - build_back_end
       - frontend_unit_tests:
           requires:
             - build_front_end
