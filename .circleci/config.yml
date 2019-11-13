@@ -100,11 +100,8 @@ workflows:
             - backend_unit_tests
             - frontend_unit_tests
           filters:
-            branches:
-              only:
-                - master
             tags:
               only:
-                - /$v\d\.\d\.\d/
+                - /^v.*/
 
 
