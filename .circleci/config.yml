@@ -81,7 +81,7 @@ jobs:
       - run:
           command: |
             echo -e "machine git.gigalixir.com\nlogin ${GIGALIXIR_USER}\npassword ${GIGALIXIR_PASSWORD}" > ~/.netrc
-            git push gigalixir https://git.gigalixir.com/smoodle.git master
+            git push https://git.gigalixir.com/smoodle.git master
 
 workflows:
   version: 2
