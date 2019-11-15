@@ -80,8 +80,8 @@ jobs:
           at: ~/
       - run:
           command: |
-            git remote add gigalixir https://${GIGALIXIR_USER}:${GIGALIXIR_PASSWORD}@git.gigalixir.com/smoodle.git
-            git push gigalixir master
+            echo -e "machine git.gigalixir.com\nlogin ${GIGALIXIR_USER}\npassword ${GIGALIXIR_PASSWORD}" > ~/.netrc
+            git push gigalixir https://git.gigalixir.com/smoodle.git master
 
 workflows:
   version: 2
