@@ -91,12 +91,21 @@ workflows:
       - backend_unit_tests:
           requires:
             - build_back_end
+          filters:
+            tags:
+              only: /^v.*/
       - build_front_end:
           requires:
             - build_back_end
+          filters:
+            tags:
+              only: /^v.*/
       - frontend_unit_tests:
           requires:
             - build_front_end
+          filters:
+            tags:
+              only: /^v.*/
       - deploy:
           requires:
             - backend_unit_tests
