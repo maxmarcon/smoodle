@@ -87,7 +87,10 @@ workflows:
   version: 2
   build_and_test:
     jobs:
-      - build_back_end
+      - build_back_end:
+          filters:
+            tags:
+              only: /^v.*/
       - backend_unit_tests:
           requires:
             - build_back_end
