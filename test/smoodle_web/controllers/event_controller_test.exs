@@ -110,7 +110,8 @@ defmodule SmoodleWeb.EventControllerTest do
 
     test "lists all events", %{conn: conn, events: events} do
       conn = get(conn, event_path(conn, :index))
-      event_list = json_response(conn, 200)["data"]
+      event_list = Enum.sort(json_response(conn, 200)["data"], &(&1["id"] <= &2["id"]))
+      events = Enum.sort(events, &(&1.id <= &2.id))
 
       assert for(event <- events, do: event.id) == for(data <- event_list, do: data["id"])
 
