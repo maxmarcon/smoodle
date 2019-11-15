@@ -90,25 +90,25 @@ workflows:
       - build_back_end:
           filters:
             tags:
-              only: /^v.*/
+              only: /.*/
       - backend_unit_tests:
           requires:
             - build_back_end
           filters:
             tags:
-              only: /^v.*/
+              only: /.*/
       - build_front_end:
           requires:
             - build_back_end
           filters:
             tags:
-              only: /^v.*/
+              only: /.*/
       - frontend_unit_tests:
           requires:
             - build_front_end
           filters:
             tags:
-              only: /^v.*/
+              only: /.*/
       - deploy:
           requires:
             - backend_unit_tests
