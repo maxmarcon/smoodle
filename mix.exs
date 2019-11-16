@@ -4,7 +4,7 @@ defmodule Smoodle.Mixfile do
   def project do
     [
       app: :smoodle,
-      version: "1.2.16",
+      version: "1.3.0",
       elixir: "~> 1.7",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
