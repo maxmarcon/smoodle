@@ -19,10 +19,11 @@ commands:
           key: node-modules-{{ .Branch }}-{{ checksum "yarn.lock" }}
 
   save_yarn_cache:
-    - save_cache:
-        key: node-modules-{{ .Branch }}-{{ checksum "yarn.lock" }}
-        paths:
-          - node_modules
+    steps:
+      - save_cache:
+          key: node-modules-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
 
 jobs:
   build_back_end:
@@ -82,7 +83,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
-      - restore_yarn_cache:
+      - restore_yarn_cache
       - run:
           command: |
             yarn test-once
