@@ -1,4 +1,29 @@
 version: 2
+
+commands:
+  restore_mix_cache:
+    steps:
+      - restore_cache:
+          key: elixir-deps-{{ .Branch }}-{{ checksum "mix.lock" }}
+
+  save_mix_cache:
+    steps:
+      - save_cache:
+          key: elixir-deps-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths:
+            - deps
+
+  restore_yarn_cache:
+    steps:
+      - restore_cache:
+          key: node-modules-{{ .Branch }}-{{ checksum "yarn.lock" }}
+
+  save_yarn_cache:
+    - save_cache:
+        key: node-modules-{{ .Branch }}-{{ checksum "yarn.lock" }}
+        paths:
+          - node_modules
+
 jobs:
   build_back_end:
     docker:
@@ -7,18 +32,15 @@ jobs:
       MIX_ENV: test
     steps:
       - checkout
-      - restore_cache:
-          key: elixir-deps-{{ .Branch }}-{{ checksum "mix.lock" }}
+      - restore_mix_cache
       - run:
           command: |
+            env
             mix local.hex --force
             mix local.rebar --force
             mix deps.get
             mix compile
-      - save_cache:
-          key: elixir-deps-{{ .Branch }}-{{ checksum "mix.lock" }}
-          paths:
-            - deps
+      - save_mix_cache
       - persist_to_workspace:
           root: ~/
           paths:
@@ -32,15 +54,11 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
-      - restore_cache:
-          key: node-modules-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      - restore_yarn_cache
       - run:
           command: |
             yarn install
-      - save_cache:
-          key: node-modules-{{ .Branch }}-{{ checksum "yarn.lock" }}
-          paths:
-            - node_modules
+      - save_yarn_cache
 
   backend_unit_tests:
     docker:
@@ -64,8 +82,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
-      - restore_cache:
-          key: node-modules-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      - restore_yarn_cache:
       - run:
           command: |
             yarn test-once
@@ -79,6 +96,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
+          name: deploy to gigalixir
           command: |
             echo -e "machine git.gigalixir.com\nlogin ${GIGALIXIR_USER}\npassword ${GIGALIXIR_PASSWORD}" > ~/.netrc
             git push https://git.gigalixir.com/smoodle.git master
