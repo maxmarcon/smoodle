@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 
 commands:
   restore_mix_cache:
@@ -102,7 +102,7 @@ jobs:
             git push https://git.gigalixir.com/smoodle.git master
 
 workflows:
-  version: 2
+  version: 2.1
   build_and_test:
     jobs:
       - build_back_end:
