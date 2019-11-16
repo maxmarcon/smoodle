@@ -4,24 +4,24 @@ commands:
   restore_mix_cache:
     steps:
       - restore_cache:
-          key: elixir-deps-{{ .Branch }}-{{ checksum "mix.lock" }}
+          key: mix-deps-{{ checksum "mix.lock" }}
 
   save_mix_cache:
     steps:
       - save_cache:
-          key: elixir-deps-{{ .Branch }}-{{ checksum "mix.lock" }}
+          key: mix-deps-{{ checksum "mix.lock" }}
           paths:
             - deps
 
   restore_yarn_cache:
     steps:
       - restore_cache:
-          key: node-modules-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          key: node-modules-{{ checksum "yarn.lock" }}
 
   save_yarn_cache:
     steps:
       - save_cache:
-          key: node-modules-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          key: node-modules-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
 
@@ -85,6 +85,7 @@ jobs:
       - restore_yarn_cache
       - run:
           command: |
+            yarn lint
             yarn test-once
       - store_test_results:
           path: test-results

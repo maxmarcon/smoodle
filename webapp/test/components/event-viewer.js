@@ -7,11 +7,11 @@ import {createLocalVue, mount} from '@vue/test-utils'
 
 const routerSpy = jasmine.createSpyObj("routerSpy", ["push"])
 
-const localVue = createLocalVue();
-localVue.use(BootstrapVue);
-localVue.use(VueClipboard)
-
 function mountEventViewer(restRequest, propsData) {
+
+    const localVue = createLocalVue();
+    localVue.use(BootstrapVue);
+    localVue.use(VueClipboard)
 
     const config = {
         mixins: [{
@@ -307,7 +307,7 @@ describe('eventViewer', () => {
                     })
 
                     it('opens modal', () => {
-                        expect(wrapper.find('#updateAnswerModal').isVisible()).toBeTruthy()
+                        expect(wrapper.find('#update-answer-modal').isVisible()).toBeTruthy()
                     })
 
                     describe('clicking on the load button', () => {
@@ -318,7 +318,7 @@ describe('eventViewer', () => {
                         })
 
                         beforeEach(async () => {
-                            wrapper.find('#updateAnswerModal button.btn.btn-primary').trigger('click')
+                            wrapper.find('#update-answer-modal button.btn.btn-primary').trigger('click')
                             await wait()
                         })
 
@@ -644,19 +644,19 @@ describe('eventViewer', () => {
                     })
 
                     it('opens modal', () => {
-                        expect(wrapper.find('#scheduleEventModal').isVisible()).toBeTruthy()
+                        expect(wrapper.find('#schedule-event-modal').isVisible()).toBeTruthy()
                     })
 
                     describe('clicking on the primary button in the modal without a selected date', () => {
 
                         beforeEach(async () => {
-                            wrapper.find('#scheduleEventModal button.btn-primary').trigger('click')
+                            wrapper.find('#schedule-event-modal button.btn-primary').trigger('click')
                             await wait()
                         })
 
                         it('only closes the modal', () => {
                             expect(restRequest).toHaveBeenCalledTimes(2)
-                            expect(wrapper.find('#scheduleEventModal').isVisible()).toBeFalsy()
+                            expect(wrapper.find('#schedule-event-modal').isVisible()).toBeFalsy()
                         })
                     })
 
@@ -668,8 +668,8 @@ describe('eventViewer', () => {
                         })
 
                         beforeEach(async () => {
-                            wrapper.find('#scheduleEventModal textarea#scheduleOrganizerMessage').setValue(ORGANIZER_MESSAGE)
-                            wrapper.find('#scheduleEventModal button.btn-primary').trigger('click')
+                            wrapper.find('#schedule-event-modal textarea#scheduleOrganizerMessage').setValue(ORGANIZER_MESSAGE)
+                            wrapper.find('#schedule-event-modal button.btn-primary').trigger('click')
                             await wait()
                         })
 
@@ -688,7 +688,7 @@ describe('eventViewer', () => {
                             expect(scheduleCallbackArgs[1].data.event.scheduled_to).toMatch(TIME_REGEX)
                             expect(scheduleCallbackArgs[1].data.event.organizer_message).toEqual(ORGANIZER_MESSAGE)
 
-                            expect(wrapper.find('#scheduleEventModal').isVisible()).toBeFalsy()
+                            expect(wrapper.find('#schedule-event-modal').isVisible()).toBeFalsy()
                         })
                     })
                 })
@@ -703,15 +703,15 @@ describe('eventViewer', () => {
                     })
 
                     it('opens modal', () => {
-                        expect(wrapper.find('#cancelEventModal').isVisible()).toBeTruthy()
+                        expect(wrapper.find('#cancel-event-modal').isVisible()).toBeTruthy()
                     })
 
                     describe('clicking on primary button within the modal', () => {
 
                         beforeEach(async () => {
 
-                            wrapper.find('#cancelEventModal textarea#cancelOrganizerMessage').setValue(ORGANIZER_MESSAGE)
-                            wrapper.find('#cancelEventModal button.btn-primary').trigger('click')
+                            wrapper.find('#cancel-event-modal textarea#cancelOrganizerMessage').setValue(ORGANIZER_MESSAGE)
+                            wrapper.find('#cancel-event-modal button.btn-primary').trigger('click')
 
                             await wait()
                         })

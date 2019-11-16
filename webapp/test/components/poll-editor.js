@@ -1,13 +1,10 @@
 import pollEditor from '../../src/components/poll-editor.vue'
-import BootstrapVue from 'bootstrap-vue'
 import messageBar from '../../src/components/message-bar.vue'
 import i18nMock from '../test-utils/i18n-mock'
 import wait from '../test-utils/wait'
-
 import {createLocalVue, mount} from '@vue/test-utils'
+import BootstrapVue from 'bootstrap-vue'
 
-const localVue = createLocalVue()
-localVue.use(BootstrapVue)
 
 const CANT_BE_BLANK = "can't be blank"
 const NO_LONGER_OPEN = "no longer open"
@@ -110,6 +107,9 @@ const newDateSpy = jasmine.createSpy("newDate")
 
 function mountPollEditor(restRequest, propsData) {
 
+    const localVue = createLocalVue()
+    localVue.use(BootstrapVue)
+
     return mount(pollEditor, {
         mixins: [{
             methods: {
@@ -124,7 +124,7 @@ function mountPollEditor(restRequest, propsData) {
             $tc: i18nMock.t,
             $i18n: i18nMock,
             $scrollTo: () => null,
-            $router: routerSpy
+            $router: routerSpy,
         },
         stubs: {
             'progress-header': true,
@@ -175,7 +175,7 @@ describe('pollEditor', () => {
             })
 
             it('shows an error modal', () => {
-                expect(wrapper.find('#eventErrorModal').isVisible()).toBeTruthy()
+                expect(wrapper.find('#event-error-modal').isVisible()).toBeTrue();
             })
         })
 
@@ -422,7 +422,7 @@ describe('pollEditor', () => {
                 })
 
                 it('shows the modal to go back to the event', () => {
-                    expect(wrapper.find('#pollSavedModal').isVisible()).toBeTruthy()
+                    expect(wrapper.find('#poll-saved-modal').isVisible()).toBeTrue()
                 })
             })
         })
@@ -478,7 +478,7 @@ describe('pollEditor', () => {
             })
 
             it('shows an error modal', () => {
-                expect(wrapper.find('#eventErrorModal').isVisible()).toBeTruthy()
+                expect(wrapper.find('#event-error-modal').isVisible()).toBeTrue()
             })
         })
 
@@ -629,7 +629,7 @@ describe('pollEditor', () => {
 
                 it('renders errors', () => {
                     expect(wrapper.vm.eventError).toBe(NO_LONGER_OPEN)
-                    expect(wrapper.find('#pollSavedModal').isVisible()).toBeFalsy()
+                    expect(wrapper.find('#poll-saved-modal').isVisible()).toBeFalse()
                 })
             })
 
@@ -650,7 +650,7 @@ describe('pollEditor', () => {
                 })
 
                 it('shows the modal to go back to the event', () => {
-                    expect(wrapper.find('#pollSavedModal').isVisible()).toBeTruthy()
+                    expect(wrapper.find('#poll-saved-modal').isVisible()).toBeTrue();
                 })
             })
 
@@ -663,13 +663,13 @@ describe('pollEditor', () => {
                 })
 
                 it('shows the confirmation modal', () => {
-                    expect(wrapper.find('#pollDeleteModal').isVisible()).toBeTruthy()
+                    expect(wrapper.find('#poll-delete-modal').isVisible()).toBeTrue();
                 })
 
                 describe('when the user clicks delete', () => {
 
                     it('deletes the poll', () => {
-                        wrapper.find('#pollDeleteModal button.btn-danger').trigger('click')
+                        wrapper.find('#poll-delete-modal button.btn-danger').trigger('click');
                         expect(restRequest).toHaveBeenCalledWith(`polls/${POLL_ID}`, {
                             method: 'delete'
                         })

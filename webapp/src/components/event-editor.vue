@@ -1,11 +1,11 @@
 <template lang="pug">
     div
         message-bar(ref="errorBar" variant="danger")
-        b-modal(ref="copiedToClipboardModal" hide-header ok-only)
+        b-modal#clipboard-modal(static=true hide-header ok-only)
             p {{ $t('event_editor.link_copied') }}
-        b-modal(ref="eventCreatedModal" hide-header ok-only)
+        b-modal#event-created-modal(static=true hide-header ok-only)
             p {{ $t('event_editor.event_created_short') }}
-        b-modal#eventUpdatedModal(ref="eventUpdatedModal" hide-header ok-only :ok-title="$t('event_editor.back_to_event')" @ok="backToEvent")
+        b-modal#event-updated-modal(static=true hide-header ok-only :ok-title="$t('event_editor.back_to_event')" @ok="backToEvent")
             p {{ $t('event_editor.event_updated') }}
         .card(v-if="!eventId || loadedSuccessfully || eventCreated" name="main-card")
             .card-header
@@ -146,10 +146,10 @@
                         .form-group.row.justify-content-center.justify-content-md-between.justify-content-lg-center
                             .col-md-6.mb-3.text-center
                                 .d-flex.justify-content-center.align-items-end
-                                    label {{ $t(selectedDateRank === 0 ? 'event_editor.event.dates_range' : 'event_editor.event.dates_single') }}
+                                    label {{ $t(!hasDateRange ? 'event_editor.event.dates_range' : 'event_editor.event.dates_single') }}
 
                                 v-date-picker#eventPossibleDates(
-                                    :mode="selectedDateRank === 0 ? 'range' : 'single'"
+                                    :mode="!hasDateRange ? 'range' : 'single'"
                                     v-model="datesSelection"
                                     nav-visibility="hidden"
                                     :min-date="today"
@@ -169,24 +169,14 @@
                                 )
                                 .small.text-danger(name="event-possible-dates-error") {{ eventPossibleDatesError }}
 
-                                .d-flex.mt-2.justify-content-center.align-items-end(@click="clearDateSelection")
+                                .d-flex.mt-2.justify-content-center.align-items-center
                                     .form-check
-                                        p-radio.p-icon.p-plain(:disabled="selectedDateRank === 0" name="selectedDateRank" :value="1" v-model="selectedDateRank" toggle)
-                                            i.icon.fas.fa-thumbs-up.text-success(slot="extra")
-                                            i.icon.far.fa-thumbs-up(slot="off-extra")
-                                            label(slot="off-label")
-                                    .form-check
-                                        p-radio.p-icon.p-plain(:disabled="selectedDateRank === 0" name="selectedDateRank" :value="-1" v-model="selectedDateRank" toggle)
-                                            i.icon.fas.fa-thumbs-down.text-danger(slot="extra")
-                                            i.icon.far.fa-thumbs-down(slot="off-extra")
-                                            label(slot="off-label")
-                                    .form-check
-                                        button.btn.btn-sm.btn-outline-secondary(@click="clearDateInfo" :disabled="selectedDateRank === 0 && !undoData")
+                                        button.btn.btn-sm.btn-outline-secondary(@click="clearDateInfo" :disabled="!hasDateRange && !undoData")
                                             i.fas.fa-undo(v-if="undoData")
                                             i.fas.fa-trash-alt(v-else)
 
                             .col-11.col-md-3.offset-md-1
-                                ranker#eventWeekdays(:elements="eventWeekdays" boolean=true :disabled="selectedDateRank === 0" @change="eventWeekdaysChanged")
+                                ranker#eventWeekdays(:elements="eventWeekdays" boolean=true :disabled="!hasDateRange" @change="eventWeekdaysChanged")
                                 .small.text-danger(name="event-weekdays-error") {{ eventWeekdaysError }}
 
             .card-footer
@@ -321,7 +311,7 @@
                 eventCreated: false,
                 createdEventId: null,
                 createdEventSecret: null,
-                selectedDateRank: 0,
+                hasDateRange: false,
                 datesSelection: null,
                 undoData: null,
                 step: this.forceStep || 1,
@@ -344,13 +334,13 @@
                             // this could happen if the original possible dates are all in the past
                             this.eventPossibleDates = []
                         } else {
-                            this.selectedDateRank = 1
+                            this.hasDateRange = true
                         }
                         this.loadedSuccessfully = true
                         this.minStep = 2
                         this.step = this.forceStep || this.minStep
                     } finally {
-                       this.loaded = true 
+                        this.loaded = true
                     }
                 } else {
                     this.loaded = true
@@ -405,13 +395,10 @@
                     order: 1
                 }])
             },
-            selectedDateRankColor() {
-                return this.colorForRank(this.selectedDateRank)
-            },
             selectAttribute() {
                 return {
                     highlight: {
-                        backgroundColor: this.selectedDateRankColor
+                        backgroundColor: colorCodes.green
                     },
                     popover: {
                         visibility: 'hidden'
@@ -438,10 +425,11 @@
                 this.datesSelection = null
             },
             clearDateInfo() {
+                this.clearDateSelection()
                 if (this.undoData) {
                     this.eventPossibleDates = this.undoData.eventPossibleDates
                     this.eventWeekdays = this.undoData.eventWeekdays
-                    this.selectedDateRank = -1
+                    this.hasDateRange = true
                     this.undoData = null
                 } else {
                     this.undoData = {
@@ -450,84 +438,81 @@
                     }
                     this.eventPossibleDates = []
                     this.eventWeekdays = this.initialWeekdays()
-                    this.selectedDateRank = 0
+                    this.hasDateRange = false
                 }
             },
             newDate(value) {
-                if (value) {
-                    if (this.selectedDateRank === 0 && value.start && value.end) {
+                if (!value) {
+                    return
+                }
 
-                        this.eventPossibleDates = [{
-                            date_from: value.start,
-                            date_to: value.end,
-                            rank: 0
-                        }]
-                        this.selectedDateRank = -1
-                        this.undoData = null
-                        this.clearDateSelection()
-                        this.localValidation()
+                if (!this.hasDateRange && value.start && value.end) {
 
-                    } else if (this.selectedDateRank !== 0 && value instanceof Date) {
+                    this.eventPossibleDates = [{
+                        date_from: value.start,
+                        date_to: value.end,
+                        rank: 0
+                    }]
+                    this.hasDateRange = true
+                    this.undoData = null
+                    this.clearDateSelection()
+                    this.localValidation()
 
-                        let containingIndex = this.eventPossibleDates.findIndex(
-                            ({
-                                 date_from,
-                                 date_to
-                             }) => dateFns.isWithinInterval(value, {
-                                start: date_from,
-                                end: date_to
-                            }))
+                } else if (value instanceof Date) {
 
-                        let insertElement = false
+                    let containingIndex = this.eventPossibleDates.findIndex(
+                        ({
+                             date_from,
+                             date_to
+                         }) => dateFns.isWithinInterval(value, {
+                            start: date_from,
+                            end: date_to
+                        }))
 
-                        if (containingIndex > -1) {
+                    const insertDay = !this.isInDomain(value);
 
-                            let containingElement = this.eventPossibleDates[containingIndex]
-                            if (containingElement.rank !== this.selectedDateRank) {
+                    if (containingIndex > -1) {
 
-                                insertElement = (this.selectedDateRank >= 0)
+                        let containingElement = this.eventPossibleDates[containingIndex]
 
-                                this.eventPossibleDates.splice(containingIndex, 1)
+                        this.eventPossibleDates.splice(containingIndex, 1)
 
-                                if (dateFns.isAfter(value, containingElement.date_from)) {
-                                    this.eventPossibleDates.push({
-                                        date_from: containingElement.date_from,
-                                        date_to: dateFns.subDays(value, 1),
-                                        rank: containingElement.rank
-                                    })
-                                }
-                                if (dateFns.isBefore(value, containingElement.date_to)) {
-                                    this.eventPossibleDates.push({
-                                        date_from: dateFns.addDays(value, 1),
-                                        date_to: containingElement.date_to,
-                                        rank: containingElement.rank
-                                    })
-                                }
-                            }
-                        } else {
-                            insertElement = (this.selectedDateRank >= 0)
-                        }
-
-                        if (insertElement) {
+                        if (dateFns.isAfter(value, containingElement.date_from)) {
                             this.eventPossibleDates.push({
-                                date_from: value,
-                                date_to: value,
-                                rank: this.selectedDateRank
+                                date_from: containingElement.date_from,
+                                date_to: dateFns.subDays(value, 1),
+                                rank: containingElement.rank
                             })
                         }
-
-                        this.clearDateSelection()
-
-                        this.normalizePossibleDates()
+                        if (dateFns.isBefore(value, containingElement.date_to)) {
+                            this.eventPossibleDates.push({
+                                date_from: dateFns.addDays(value, 1),
+                                date_to: containingElement.date_to,
+                                rank: containingElement.rank
+                            })
+                        }
                     }
 
-                    //DEBUG
-                    //console.dir(this.eventPossibleDates)
-                    //console.dir(this.eventDomain)
+                    if (insertDay) {
+                        this.eventPossibleDates.push({
+                            date_from: value,
+                            date_to: value,
+                            rank: 1
+                        })
+                    }
+
+                    this.clearDateSelection()
+
+                    this.normalizePossibleDates()
                 }
+
+                //DEBUG
+                //console.dir(this.eventPossibleDates)
+                //console.dir(this.eventDomain)
+
             },
             clipboard() {
-                this.$refs.copiedToClipboardModal.show()
+                this.$bvModal.show('clipboard-modal')
             },
             async saveEvent(dry_run = false) {
                 let dataForRequest = this.eventDataForRequest
@@ -554,13 +539,13 @@
                     if (result.status !== 204) {
                         // not just validating...
                         if (this.eventId) {
-                            this.$refs.eventUpdatedModal.show()
+                            this.$bvModal.show('event-updated-modal')
                         } else {
                             this.eventCreated = true
                             this.createdEventId = result.data.data.id
                             this.createdEventSecret = result.data.data.secret
                             this.assignEventData(result.data.data)
-                            this.$refs.eventCreatedModal.show()
+                            this.$bvModal.show('event-created-modal')
                         }
                     }
                 } catch (error) {

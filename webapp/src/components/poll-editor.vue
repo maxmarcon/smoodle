@@ -1,10 +1,17 @@
 <template lang="pug">
     div
         message-bar(ref="errorBar" variant="danger")
-        b-modal#pollSavedModal(ref="pollSavedModal" hide-header ok-only :ok-title="$t('poll_editor.back_to_event')" @hidden="backToEvent")
+        b-modal#poll-saved-modal(
+            static=true
+            hide-header
+            ok-only
+            :ok-title="$t('poll_editor.back_to_event')"
+            @hidden="backToEvent"
+        )
             p {{ $t('poll_editor.poll_saved') }}
 
-        b-modal#pollDeleteModal(
+        b-modal#poll-delete-modal(
+            static=true
             :title="$t('poll_editor.delete_poll')"
             @ok="deletePoll"
             :ok-title="$t('poll_editor.delete_poll')"
@@ -14,7 +21,8 @@
         )
             p {{ $t('poll_editor.really_delete') }}
 
-        b-modal(ref="pollDeletedModal"
+        b-modal(
+            static=true
             :title="$t('poll_editor.delete_poll')"
             ok-only
             :ok-title="$t('poll_editor.back_to_event')"
@@ -22,13 +30,15 @@
         )
             p {{ $t('poll_editor.poll_deleted') }}
 
-        b-modal(ref="pollDeleteErrorModal"
+        b-modal(
+            static=true
             :title="$t('errors.error')"
             ok-only
         )
             p {{ $t('poll_editor.poll_delete_error') }}
 
-        b-modal#eventErrorModal(ref="eventErrorModal"
+        b-modal#event-error-modal(
+            static=true
             hide-header
             :ok-title="$t('poll_editor.back_to_event')"
             ok-only
@@ -155,7 +165,7 @@
                                 i.fas.fa-save
                                 | &nbsp; {{ $t('poll_editor.save_poll') }}
                     .col-12.col-sm-2.mt-1(v-if="pollId && eventOpen && !emptyDomain")
-                        button.btn.btn-block.btn-danger(name="delete-poll-button" v-b-modal.pollDeleteModal="" :disabled="requestOngoing")
+                        button.btn.btn-block.btn-danger(name="delete-poll-button" v-b-modal.poll-delete-modal="" :disabled="requestOngoing")
                             i.fas.fa-trash-alt
                             | &nbsp; {{ $t('poll_editor.delete_poll') }}
                     .col-12.col-sm-2.order-sm-first.mt-1(v-if="step == minStep")
@@ -278,7 +288,7 @@
             checkEventValid() {
                 if (!this.eventOpen || this.emptyDomain) {
                     this.eventError = this.$i18n.t('poll_editor.event_invalid')
-                    this.$refs.eventErrorModal.show();
+                    this.$bvModal.show('event-error-modal')
                 }
             },
             cleardatesSelection() {
@@ -299,7 +309,7 @@
                     this.$scrollTo('#page-top')
 
                     if (result.status !== 204) {
-                        this.$refs.pollSavedModal.show();
+                        this.$bvModal.show('poll-saved-modal');
                     }
                 } catch (error) {
                     this.$scrollTo('#event-header')
@@ -310,7 +320,7 @@
                             this.showErrorCodeInErrorBar(error.response.status)
                         }
                         if (this.eventError) {
-                            this.$refs.eventErrorModal.show();
+                            this.$bvModal.show('event-error-modal');
                         }
                     } else {
                         throw error;
@@ -323,7 +333,7 @@
                         method: 'delete'
                     })
                 } catch (error) {
-                    this.$refs.pollDeleteErrorModal.show();
+                    this.$bvModal.show('pollDeleteErrorModal');
                     throw error;
                 }
             },

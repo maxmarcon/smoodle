@@ -3,13 +3,16 @@ import * as dateFns from "date-fns";
 export default {
   methods: {
     weekdayEnabled(date) {
-      let enabledWeekdays = this.eventWeekdays.filter(({
+      const enabledWeekdays = this.eventWeekdays.filter(({
                                                          value
                                                        }) => value).map(({
                                                                            day
                                                                          }) => (day + 1) % 7) // from 0=Mon...6=Sun to dateFns's 0=Sun...6=Sat
 
       return enabledWeekdays.indexOf(dateFns.getDay(date)) > -1
+    },
+    isInDomain(date) {
+      return this.eventDomain.find(d => dateFns.isEqual(d, date))
     },
     normalizePossibleDates() {
       // first, lower the rank to 0 if a rank higher than 0 is not needed...
@@ -81,7 +84,7 @@ export default {
       }
     },
     eventScheduledDateTime() {
-      let time = this.eventScheduledFrom;
+      const time = this.eventScheduledFrom;
 
       if (time) {
         return dateFns.format(time, this.$i18n.t('datetime_format'), {
@@ -90,7 +93,7 @@ export default {
       }
     },
     eventScheduledDateTimeRelative() {
-      let time = this.eventScheduledFrom;
+      const time = this.eventScheduledFrom;
 
       if (time) {
         let distance = dateFns.formatDistanceToNow(time, {
@@ -115,14 +118,14 @@ export default {
       return this.eventState === "SCHEDULED";
     },
     fromPage() {
-      let date = this.minDate || new Date()
+      const date = this.minDate || new Date()
       return {
         month: dateFns.getMonth(date) + 1, // from dateFns 0=Jan...11=Dec to v-calendar 1=Jan...12=Dec
         year: dateFns.getYear(date)
       }
     },
     toPage() {
-      let date = this.maxDate || new Date()
+      const date = this.maxDate || new Date()
       return {
         month: dateFns.getMonth(date) + 1, // from dateFns 0=Jan...11=Dec to v-calendar 1=Jan...12=Dec
         year: dateFns.getYear(date)

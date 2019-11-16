@@ -1,7 +1,8 @@
 <template lang="pug">
     div
         message-bar(ref="errorBar" variant="danger")
-        b-modal#updateAnswerModal(
+        b-modal#update-answer-modal(
+            static=true
             :title="$t('event_viewer.update.title')"
             :ok-title="$t('event_viewer.update.load')"
             :cancel-title="$t('actions.cancel')"
@@ -19,10 +20,11 @@
                 )
                 .invalid-feedback {{ pollParticipantError }}
 
-        b-modal(ref="copiedToClipboardModal" hide-header ok-only)
+        b-modal#clipboard-modal(staic=true hide-header ok-only)
             p {{ $t('event_editor.link_copied') }}
 
-        b-modal#cancelEventModal(
+        b-modal#cancel-event-modal(
+            static=true
             :title="$t('event_viewer.cancel_event')"
             :ok-title="$t('event_viewer.cancel_event')"
             :cancel-title="$t('actions.do_not_cancel')"
@@ -34,37 +36,43 @@
                 label(for=cancelOrganizerMessage) {{ $t('event_viewer.organizer_message') }}
                 textarea#cancelOrganizerMessage.form-control(v-model.trim="eventOrganizerMessage")
 
-        b-modal(ref="eventCanceledModal"
+        b-modal#event-canceled-modal(
+            static=true
             :title="$t('event_viewer.cancel_event')"
             ok-only
         )
             p {{ $t('event_viewer.event_canceled_ok') }}
 
-        b-modal(ref="eventCancelErrorModal"
+        b-modal#event-cancel-error-modal(
+            static=true
             :title="$t('errors.error')"
             ok-only
         )
             p {{ $t('event_viewer.cancel_event_error') }}
 
-        b-modal(ref="eventOpenedModal"
+        b-modal#event-opened-modal(
+            static=true
             :title="$t('event_viewer.open_event')"
             ok-only
         )
             p {{ $t('event_viewer.event_opened_ok') }}
 
-        b-modal(ref="eventOpenErrorModal"
+        b-modal#event-open-error-modal(
+            static=true
             :title="$t('errors.error')"
             ok-only
         )
             p {{ $t('event_viewer.open_event_error') }}
 
-        b-modal#participantsListModal(
+        b-modal#participants-list-modal(
+            static=true
             :title="$t('event_viewer.current_participants')"
             ok-only
         )
             p {{ trimmedNameList(eventScheduleParticipants, 25) }}
 
-        b-modal#scheduleEventModal(
+        b-modal#schedule-event-modal(
+            static=true
             :title="$t('event_viewer.schedule_event')"
             :cancel-title="$t('actions.cancel')"
             :ok-disabled="requestOngoing"
@@ -90,14 +98,15 @@
             div(v-else)
                 p {{ $t('event_viewer.select_date_first') }}
 
-        b-modal#scheduledEventModal(
-            ref="scheduledEventModal"
+        b-modal#scheduled-event-modal(
+            satic=true
             :title="$t('event_viewer.schedule_event')"
             ok-only
         )
             p {{ $t('event_viewer.event_scheduled_organizer', {datetime: eventScheduledDateTime, time_distance: eventScheduledDateTimeRelative}) }}
 
-        b-modal(ref="scheduleEventErrorModal"
+        b-modal#schedule-rvent-rrror-modal(
+            static=true
             :title="$t('errors.error')"
             ok-only
         )
@@ -151,7 +160,7 @@
                                 .alert.alert-info
                                     i18n(path="event_viewer.event_open_organizer" v-if="isOrganizer")
                                         i.fas.fa-calendar-check.fa-lg(place="calendar_icon")
-                                        a(href="#" place="participants" v-b-modal.participantsListModal="")
+                                        a(href="#" place="participants" v-b-modal.participants-list-modal="")
                                             | {{ $tc('event_viewer.nof_participants', eventScheduleParticipantsCount, {participants: eventScheduleParticipantsCount}) }}
 
                                     i18n(path="event_viewer.event_open" v-else)
@@ -244,7 +253,7 @@
             .card-footer(v-if="eventOpen || isOrganizer")
                 .row.justify-content-center
                     .col-12.col-sm-auto.mt-1(v-if="eventOpen && !emptyDomain && isOrganizer && eventScheduleParticipantsCount")
-                        button.btn.btn-block.btn-primary(v-b-modal.scheduleEventModal="" :disabled="requestOngoing" name="schedule-button")
+                        button.btn.btn-block.btn-primary(v-b-modal.schedule-event-modal="" :disabled="requestOngoing" name="schedule-button")
                             i.fas.fa-clock
                             | &nbsp; {{ $t('event_viewer.schedule_event') }}
                     .col-12.col-sm-auto.mt-1(v-if="eventOpen && isOrganizer")
@@ -256,7 +265,7 @@
                             i.fas.fa-edit
                             | &nbsp; {{ $t('event_viewer.edit_event') }}
                     .col-12.col-sm-auto.mt-1(v-if="eventOpen && !emptyDomain && isOrganizer")
-                        button.btn.btn-block.btn-block.btn-warning(v-b-modal.cancelEventModal="" :disabled="requestOngoing"
+                        button.btn.btn-block.btn-block.btn-warning(v-b-modal.cancel-event-modal="" :disabled="requestOngoing"
                             name="cancel-button"
                         )
                             i.fas.fa-ban
@@ -276,7 +285,7 @@
                             i.fas.fa-question
                             | &nbsp; {{ $t('event_viewer.create_poll') }}
                     .col-12.col-sm-auto.mt-1(v-if="eventOpen && !emptyDomain && !isOrganizer && eventScheduleParticipantsCount")
-                        button.btn.btn-block.btn-primary(v-b-modal.updateAnswerModal="" :disabled="requestOngoing" name="edit-poll-button")
+                        button.btn.btn-block.btn-primary(v-b-modal.update-answer-modal="" :disabled="requestOngoing" name="edit-poll-button")
                             i.fas.fa-edit
                             | &nbsp; {{ $t('event_viewer.update_poll') }}
 
@@ -490,7 +499,7 @@
                 }
             },
             clipboard() {
-                this.$refs.copiedToClipboardModal.show();
+                this.$bvModal.show('clipboard-modal');
             },
             async loadPoll(bvEvt) {
                 bvEvt.preventDefault();
@@ -526,9 +535,9 @@
                         }
                     })
                     this.assignEventData(result.data.data);
-                    this.$refs.eventOpenedModal.show();
+                    this.$bvModal.show('event-opened-modal');
                 } catch (error) {
-                    this.$refs.eventOpenErrorModal.show();
+                    this.$bvModal.show('event-open-error-modal');
                     throw error;
                 }
             },
@@ -545,10 +554,10 @@
                         }
                     })
                     this.assignEventData(result.data.data);
-                    this.$refs.eventCanceledModal.show();
+                    this.$bvModal.show('event-canceled-modal');
                 } catch
                     (error) {
-                    this.$refs.eventCancelErrorModal.show();
+                    this.$bvModal.show('event-cancel-error-modal');
                     throw error;
                 }
             },
@@ -577,9 +586,9 @@
                         }
                     });
                     this.assignEventData(result.data.data);
-                    this.$refs.scheduledEventModal.show();
+                    this.$bvModal.show('scheduled-event-modal');
                 } catch (error) {
-                    this.$refs.scheduleEventErrorModal.show();
+                    this.$bvModal.show('schedule-event-error-modal');
                     throw error;
                 }
             }

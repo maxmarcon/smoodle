@@ -4,20 +4,17 @@ import VueClipboard from 'vue-clipboard2'
 import messageBar from '../../src/components/message-bar.vue'
 import i18nMock from '../test-utils/i18n-mock'
 import wait from '../test-utils/wait'
-import {
-    mount,
-    createLocalVue,
-    RouterLinkStub
-} from '@vue/test-utils'
+import {createLocalVue, mount, RouterLinkStub} from '@vue/test-utils'
 
 const routerSpy = jasmine.createSpyObj("routerSpy", ["push"])
-const localVue = createLocalVue();
-localVue.use(BootstrapVue);
-localVue.use(VueClipboard)
 
 const CANT_BE_BLANK = 'can\'t be blank'
 
 function mountEventEditor(restRequest, propsData) {
+
+    const localVue = createLocalVue();
+    localVue.use(BootstrapVue);
+    localVue.use(VueClipboard)
 
     const config = {
         mixins: [{
@@ -617,12 +614,12 @@ describe('eventEditor', () => {
                 })
             })
 
-            it('opens the eventUpdatedModal modal', () => {
-                expect(wrapper.find('#eventUpdatedModal').isVisible()).toBeTruthy()
+            it('opens the eventu-updated-modal modal', () => {
+                expect(wrapper.find('#event-updated-modal').isVisible()).toBeTruthy()
             })
 
-            it('the eventUpdatedModal has a button that takes the user back to the event', () => {
-                wrapper.find('#eventUpdatedModal button.btn-primary').trigger('click')
+            it('the event-updated-modal has a button that takes the user back to the event', () => {
+                wrapper.find('#event-updated-modal button.btn-primary').trigger('click')
 
                 expect(routerSpy.push).toHaveBeenCalledWith({
                     name: 'event',
