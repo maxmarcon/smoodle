@@ -36,7 +36,6 @@ jobs:
       - restore_mix_cache
       - run:
           command: |
-            env
             mix local.hex --force
             mix local.rebar --force
             mix deps.get
