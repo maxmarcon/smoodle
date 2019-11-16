@@ -63,10 +63,6 @@ defmodule SmoodleWeb.EventControllerTest do
     scheduled_from: "2117-04-05T22:10:00Z"
   }
 
-  # @partial_valid_data %{
-  #  name: "Event"
-  # }
-
   defp check_event(data = %{}, verify = %{} \\ %{}) do
     assert Map.has_key?(data, "id")
     assert Map.has_key?(data, "preferences")
@@ -84,9 +80,12 @@ defmodule SmoodleWeb.EventControllerTest do
     assert is_list(data["possible_dates"])
     refute Enum.empty?(data["possible_dates"])
 
-    Enum.each(verify, fn {key, value} ->
-      assert data[to_string(key)] == value
-    end)
+    Enum.each(
+      verify,
+      fn {key, value} ->
+        assert data[to_string(key)] == value
+      end
+    )
   end
 
   defp create_event(_) do
@@ -110,16 +109,24 @@ defmodule SmoodleWeb.EventControllerTest do
 
     test "lists all events", %{conn: conn, events: events} do
       conn = get(conn, event_path(conn, :index))
-      event_list = Enum.sort(json_response(conn, 200)["data"], &(&1["id"] <= &2["id"]))
-      events = Enum.sort(events, &(&1.id <= &2.id))
+      event_list = json_response(conn, 200)["data"]
+      event_list_ids = event_list
+                       |> Enum.map(&(&1["id"]))
+                       |> Enum.sort
+      event_ids = events
+                  |> Enum.map(&(&1.id))
+                  |> Enum.sort
 
-      assert for(event <- events, do: event.id) == for(data <- event_list, do: data["id"])
+      assert event_ids == event_list_ids
 
-      Enum.each(event_list, fn data ->
-        check_event(data)
-        refute Map.has_key?(data, "secret")
-        refute Map.has_key?(data, "email")
-      end)
+      Enum.each(
+        event_list,
+        fn data ->
+          check_event(data)
+          refute Map.has_key?(data, "secret")
+          refute Map.has_key?(data, "email")
+        end
+      )
     end
   end
 
@@ -127,9 +134,12 @@ defmodule SmoodleWeb.EventControllerTest do
     setup :create_event
 
     test "returns 404 if called with the wrong secret", %{conn: conn, event: event} do
-      assert_error_sent(404, fn ->
-        get(conn, event_path(conn, :show, event.id, %{secret: "wrong secret"}))
-      end)
+      assert_error_sent(
+        404,
+        fn ->
+          get(conn, event_path(conn, :show, event.id, %{secret: "wrong secret"}))
+        end
+      )
     end
 
     test "fetches the event when called with the right secret", %{conn: conn, event: event} do
@@ -254,18 +264,23 @@ defmodule SmoodleWeb.EventControllerTest do
     end
 
     test "renders errors when secret is wrong", %{conn: conn, event: event} do
-      assert_error_sent(404, fn ->
-        put(
-          conn,
-          event_path(conn, :update, event),
-          event: Map.merge(@update_attrs, %{secret: "wrong_secret"})
-        )
-      end)
+      assert_error_sent(
+        404,
+        fn ->
+          put(
+            conn,
+            event_path(conn, :update, event),
+            event: Map.merge(@update_attrs, %{secret: "wrong_secret"})
+          )
+        end
+      )
     end
 
     test "returns empty ok response when validating valid data", %{conn: conn, event: event} do
       conn =
-        put(conn, event_path(conn, :update, event),
+        put(
+          conn,
+          event_path(conn, :update, event),
           event: Map.merge(@update_attrs, %{secret: event.secret}),
           dry_run: true
         )
@@ -277,7 +292,9 @@ defmodule SmoodleWeb.EventControllerTest do
 
     test "renders errors when validating invalid data", %{conn: conn, event: event} do
       conn =
-        put(conn, event_path(conn, :update, event),
+        put(
+          conn,
+          event_path(conn, :update, event),
           event: Map.merge(@invalid_attrs, %{secret: event.secret}),
           dry_run: true
         )
@@ -293,15 +310,21 @@ defmodule SmoodleWeb.EventControllerTest do
       conn = delete(conn, event_path(conn, :delete, event), secret: event.secret)
       assert response(conn, 204)
 
-      assert_error_sent(404, fn ->
-        get(conn, event_path(conn, :show, event))
-      end)
+      assert_error_sent(
+        404,
+        fn ->
+          get(conn, event_path(conn, :show, event))
+        end
+      )
     end
 
     test "does not delete and render error if secret is wrong", %{conn: conn, event: event} do
-      assert_error_sent(404, fn ->
-        delete(conn, event_path(conn, :delete, event), secret: "wrong secret")
-      end)
+      assert_error_sent(
+        404,
+        fn ->
+          delete(conn, event_path(conn, :delete, event), secret: "wrong secret")
+        end
+      )
 
       conn = get(conn, event_path(conn, :show, event))
       assert response(conn, 200)
@@ -318,9 +341,12 @@ defmodule SmoodleWeb.EventControllerTest do
     end
 
     test "returns 404 if called with wrong secret", %{conn: conn, event: event} do
-      assert_error_sent(404, fn ->
-        get(conn, event_path(conn, :schedule, event), %{secret: "wrong_secret"})
-      end)
+      assert_error_sent(
+        404,
+        fn ->
+          get(conn, event_path(conn, :schedule, event), %{secret: "wrong_secret"})
+        end
+      )
     end
 
     test "returns the best schedule if called with the right secret", %{conn: conn, event: event} do
