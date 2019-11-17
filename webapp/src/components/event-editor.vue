@@ -501,6 +501,10 @@
                         })
                     }
 
+                    if (this.eventPossibleDates.length === 0) {
+                        this.hasDateRange = false
+                    }
+
                     this.clearDateSelection()
 
                     this.normalizePossibleDates()
