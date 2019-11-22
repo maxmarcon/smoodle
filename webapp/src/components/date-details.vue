@@ -40,6 +40,7 @@
                 if (this.calendarAttribute.bar) {
                     return "primary"
                 }
+                return null;
             },
             header() {
                 return dateFns.format(this.dateEntry.date, this.$i18n.t('date_format_long'), {locale: this.$i18n.t('date_fns_locale')});
