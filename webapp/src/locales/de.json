@@ -118,7 +118,7 @@
     "select_date_first": "Du musst zuerst ein Datum im Kalendar auswählen.",
     "warning_bad_date": "Achtung! Eine Person kann an diesem Tag nicht kommen|Achtung! {participants} Personen können an diesem Tag nicht kommen",
     "select_time": "Leg eine Uhrzeit für das Event fest:",
-    "date_selection_help": "Die Daten sind von {best} bis {worst} gekennzeichnet. Klicke ein Datum an, um zu erfahren, wie viele Leute an dem Tag kommen können. {red} bedeutet, dass mindestens eine Person nicht kommen kann. {green} bedeutet, dass alle Leute kommen können. {blue_underlined} Daten sind die bisher Besten.",
+    "date_selection_help": "Die Daten sind von {best} bis {worst} gekennzeichnet. Klick ein Datum an, um zu erfahren, wie viele Leute an dem Tag kommen können. {red} bedeutet, dass mindestens eine Person nicht kommen kann. {green} bedeutet, dass alle Leute kommen können. {blue_underlined} Daten sind die bisher Besten.",
     "date_selection_help_organizer": "Daten sind von {best} zu {worst} bewertet. Klick ein Datum an, um zu erfahren, wer an dem Tag kommen kann. {red} bedeutet, dass mindestens eine Person nicht kommen kann. {green} bedeutet, dass alle kommen können. {blue_underlined} Daten sind die bisher Besten.",
     "best": "gut",
     "worst": "schlecht",
@@ -159,8 +159,9 @@
     "bad": "unpassend|unpassende"
   },
   "date_format": "dd/MM/yyyy",
+  "date_format_long": "dd/MM/yyyy, EEEE",
   "time_format": "HH:mm",
-  "datetime_format": "dd/MM/yyyy HH:mm",
+  "datetime_format": "dd/MM/yyyy, EEEE HH:mm",
   "week_days": {
     "mo": "Montag",
     "tu": "Dienstag",

@@ -158,8 +158,9 @@
     "bad": "non va bene|non vanno bene"
   },
   "date_format": "dd/MM/yyyy",
+  "date_format_long": "dd/MM/yyyy, EEEE",
   "time_format": "HH:mm",
-  "datetime_format": "dd/MM/yyyy HH:mm",
+  "datetime_format": "dd/MM/yyyy, EEEE HH:mm",
   "week_days": {
     "mo": "Lunedì",
     "tu": "Martedì",

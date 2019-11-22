@@ -8,11 +8,14 @@ export default {
         if (key === 'date_format') {
             return 'MM/dd/yyyy';
         }
+        if (key === 'date_format_long') {
+            return 'MM/dd/yyyy, EEEE';
+        }
         if (key === 'time_format') {
             return "h:mm a"
         }
         if (key === 'datetime_format') {
-            return "MM/dd/yyyy h:mm a"
+            return "MM/dd/yyyy, EEEE h:mm a"
         }
         return key;
     }

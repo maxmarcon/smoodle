@@ -34,7 +34,7 @@
 
             .form-group
                 label(for=cancelOrganizerMessage) {{ $t('event_viewer.organizer_message') }}
-                textarea#cancelOrganizerMessage.form-control(v-model.trim="eventOrganizerMessage")
+                textarea#cancelOrganizerMessage.form-control(v-model.trim="organizerMessage")
 
         b-modal#event-canceled-modal(
             static=true
@@ -76,7 +76,6 @@
             :title="$t('event_viewer.schedule_event')"
             :cancel-title="$t('actions.cancel')"
             :ok-disabled="requestOngoing"
-            :ok-only="!selectedDate"
             @ok="scheduleEvent"
         )
             div(v-if="selectedDate")
@@ -93,10 +92,8 @@
                         )
                 .form-group
                     label(for=scheduleOrganizerMessage) {{ $t('event_viewer.organizer_message') }}
-                    textarea#scheduleOrganizerMessage.form-control(v-model.trim="eventOrganizerMessage")
+                    textarea#scheduleOrganizerMessage.form-control(v-model.trim="organizerMessage")
 
-            div(v-else)
-                p {{ $t('event_viewer.select_date_first') }}
 
         b-modal#scheduled-event-modal(
             satic=true
@@ -159,13 +156,17 @@
                             div(v-if="eventScheduleParticipantsCount")
                                 .alert.alert-info
                                     i18n(path="event_viewer.event_open_organizer" v-if="isOrganizer")
-                                        i.fas.fa-calendar-check.fa-lg(place="calendar_icon")
-                                        a(href="#" place="participants" v-b-modal.participants-list-modal="")
-                                            | {{ $tc('event_viewer.nof_participants', eventScheduleParticipantsCount, {participants: eventScheduleParticipantsCount}) }}
+                                        template(v-slot:calendar_icon)
+                                            i.fas.fa-calendar-check.fa-lg
+                                        template(v-slot:participants)
+                                            a(href="#" v-b-modal.participants-list-modal="")
+                                                | {{ $tc('event_viewer.nof_participants', eventScheduleParticipantsCount, {participants: eventScheduleParticipantsCount}) }}
 
                                     i18n(path="event_viewer.event_open" v-else)
-                                        i.fas.fa-calendar-check.fa-lg(place="calendar_icon")
-                                        span(place="answers") {{ $tc('event_viewer.answers', eventScheduleParticipantsCount, {count: eventScheduleParticipantsCount}) }}
+                                        template(v-slot:calendar_icon)
+                                            i.fas.fa-calendar-check.fa-lg
+                                        template(v-slot:answers)
+                                            span {{ $tc('event_viewer.answers', eventScheduleParticipantsCount, {count: eventScheduleParticipantsCount}) }}
                                 .row.justify-content-md-between.justify-content-lg-center
                                     .col-md-3.offset-md-1.order-md-last.text-justify
                                         .form-group
@@ -173,42 +174,38 @@
                                                 :path="isOrganizer ? 'event_viewer.date_selection_help_organizer' : 'event_viewer.date_selection_help'"
                                                 tag="p"
                                             )
-                                                span.text-success(place="best") {{ $t('event_viewer.best') }}
-                                                span.text-danger(place="worst") {{ $t('event_viewer.worst') }}
-                                                span.text-success(place="green") {{ $t('event_viewer.green') }}
-                                                span.text-danger(place="red") {{ $t('event_viewer.red') }}
-                                                span.text-primary(place="blue_underlined") {{ $t('event_viewer.blue_underlined') }}
+                                                template(v-slot:best)
+                                                    span.text-success {{ $t('event_viewer.best') }}
+                                                template(v-slot:worst)
+                                                    span.text-danger {{ $t('event_viewer.worst') }}
+                                                template(v-slot:green)
+                                                    span.text-success {{ $t('event_viewer.green') }}
+                                                template(v-slot:red)
+                                                    span.text-danger {{ $t('event_viewer.red') }}
+                                                template(v-slot:blue_underlined)
+                                                    span.text-primary {{ $t('event_viewer.blue_underlined') }}
 
                                     .col-md-6.text-center
                                         .form-group
-                                            v-date-picker(
-                                                v-if="isOrganizer"
-                                                mode="single"
-                                                v-model="selectedDate"
-                                                :attributes="scheduleCalendarAttributes"
-                                                :is-inline="true"
-                                                :is-linked="true"
-                                                :from-page="fromPage"
-                                                :min-page="fromPage"
-                                                :max-page="toPage"
-                                                :available-dates="eventDomain"
-                                                :is-double-paned="differentMonths"
-                                                :select-attribute="selectAttrubute"
-                                                nav-visibility="hidden"
-                                                :is-expanded="true"
-                                                :theme-styles="calThemeStyles"
+                                            date-details(v-if="dayDetailsCalendarAttribute"
+                                                :isOrganizer="isOrganizer"
+                                                :calendarAttribute="dayDetailsCalendarAttribute"
+                                                @close="dayDetailsCalendarAttribute = null"
+                                                @schedule="openScheduleEventModal"
                                             )
-                                            v-calendar(
-                                                v-else
-                                                :is-linked="true"
-                                                nav-visibility="hidden"
-                                                :attributes="scheduleCalendarAttributes"
-                                                :min-page="fromPage"
-                                                :max-page="toPage"
-                                                :is-double-paned="differentMonths"
-                                                :is-expanded="true"
-                                                :theme-styles="calThemeStyles"
-                                            )
+                                            div(v-else)
+                                                v-calendar(
+                                                    :is-linked="true"
+                                                    nav-visibility="hidden"
+                                                    :attributes="scheduleCalendarAttributes"
+                                                    :min-page="fromPage"
+                                                    :max-page="toPage"
+                                                    :is-double-paned="differentMonths"
+                                                    :is-expanded="true"
+                                                    :theme-styles="calThemeStyles"
+                                                    @dayclick="dayclicked"
+                                                )
+
 
                             div.alert.alert-primary(v-else-if="loaded")
                                 i18n(path="event_viewer.no_participants_organizer" v-if="isOrganizer")
@@ -252,10 +249,6 @@
 
             .card-footer(v-if="eventOpen || isOrganizer")
                 .row.justify-content-center
-                    .col-12.col-sm-auto.mt-1(v-if="eventOpen && !emptyDomain && isOrganizer && eventScheduleParticipantsCount")
-                        button.btn.btn-block.btn-primary(v-b-modal.schedule-event-modal="" :disabled="requestOngoing" name="schedule-button")
-                            i.fas.fa-clock
-                            | &nbsp; {{ $t('event_viewer.schedule_event') }}
                     .col-12.col-sm-auto.mt-1(v-if="eventOpen && isOrganizer")
                         router-link.btn.btn-block.btn-success(
                             name="edit-button"
@@ -301,7 +294,8 @@
     import eventHelpersMixin from '../mixins/event-helpers'
     import eventDataMixin from '../mixins/event-data'
     import restMixin from '../mixins/rest'
-    import {nameListTrimmerMixin, scrollToTopMixin, whatsAppHelpersMixin} from '../mixins/utils'
+    import dateDetails from './date-details'
+    import {scrollToTopMixin, whatsAppHelpersMixin} from '../mixins/utils'
 
     const SCHEDULE_DATES_LIMIT = null;
     const EVENT_RELOAD_INTERVAL_MSEC = 15000;
@@ -312,9 +306,11 @@
             eventHelpersMixin,
             eventDataMixin,
             scrollToTopMixin,
-            whatsAppHelpersMixin,
-            nameListTrimmerMixin
+            whatsAppHelpersMixin
         ],
+        components: {
+            'date-details': dateDetails
+        },
         props: {
             eventId: {
                 type: String,
@@ -351,7 +347,9 @@
                 }
             },
             calThemeStyles,
-            reloadIntervalId: null
+            reloadIntervalId: null,
+            dayDetailsCalendarAttribute: null,
+            organizerMessage: null
         }),
         created() {
             this.loadEvent()
@@ -362,18 +360,9 @@
         },
         computed: {
             isOrganizer() {
-                return this.secret;
+                return !!this.secret;
             },
             scheduleCalendarAttributes() {
-                // Hack: we add this otherwise unused locale variable
-                // to triger a dependency on $i18n.locale. This will cause
-                // the scheduleCalendarAttributes to be recomputed whenever the locale changes, thus
-                // allowing live locale changes on the client side
-
-                // UPDATE: hopefully not needed anymore, hence commented out
-                // if still needed find an alternative solution
-                // let _hack_dependency_on_locale = this.$i18n.locale;
-
                 const scheduleDates = this.eventScheduleDates.length;
                 let minNegativeRank;
                 let maxPositiveRank;
@@ -404,7 +393,7 @@
                         backgroundColor: colorCodes.blue
                     } : false),
                     popover: {
-                        label: this.labelForDate
+                        label: (attribute) => this.textForDate(attribute.customData, this.isOrganizer, true)
                     },
                     customData: date_entry
                 }));
@@ -424,13 +413,18 @@
                 }]
             },
             selectedDateFormatted() {
-                return dateFns.format(this.selectedDate, this.$i18n.t('date_format'), {locale: this.$i18n.t('date_fns_locale')});
+                return dateFns.format(this.selectedDate, this.$i18n.t('date_format_long'), {locale: this.$i18n.t('date_fns_locale')});
             },
             selectedDateNegativeRank() {
                 return (this.eventScheduleDates.find(({date}) => dateFns.isEqual(date, this.selectedDate)) || {}).negative_rank
             }
         },
         methods: {
+            dayclicked(day) {
+                if (this.isInDomain(day.date)) {
+                    this.dayDetailsCalendarAttribute = day.attributes[0]
+                }
+            },
             async loadEvent() {
                 if (this.loading) {
                     return
@@ -478,25 +472,6 @@
                 return (date_entry.negative_rank < 0
                     ? date_entry.negative_rank / minNegativeRank
                     : Math.max(date_entry.positive_rank, 0.5) / maxPositiveRank);
-            },
-            labelForDate(attribute) {
-                let date_entry = attribute.customData;
-                if (date_entry.negative_rank < 0) {
-                    if (this.isOrganizer) {
-                        return this.$i18n.tc('event_viewer.negative_participants_list_date',
-                            date_entry.negative_participants.length,
-                            {participants: this.trimmedNameList(date_entry.negative_participants)});
-                    } else {
-                        return this.$i18n.tc('event_viewer.negative_participants_for_date', -date_entry.negative_rank);
-                    }
-                } else {
-                    if (this.isOrganizer && date_entry.positive_rank > 0) {
-                        return this.$i18n.tc('event_viewer.positive_participants_list_date', date_entry.positive_participants.length,
-                            {participants: this.trimmedNameList(date_entry.positive_participants)});
-                    } else {
-                        return this.$i18n.tc('event_viewer.positive_participants_for_date', date_entry.positive_rank);
-                    }
-                }
             },
             clipboard() {
                 this.$bvModal.show('clipboard-modal');
@@ -549,7 +524,7 @@
                             event: {
                                 state: "CANCELED",
                                 secret: this.secret,
-                                organizer_message: this.eventOrganizerMessage
+                                organizer_message: this.organizerMessage
                             }
                         }
                     })
@@ -561,10 +536,16 @@
                     throw error;
                 }
             },
+            openScheduleEventModal(date) {
+                this.selectedDate = date;
+                this.$bvModal.show('schedule-event-modal');
+            },
             async scheduleEvent() {
                 if (!this.selectedDate) {
                     return;
                 }
+
+                this.dayDetailsCalendarAttribute = null;
 
                 const [hours, minutes] = this.selectedTime.split(':');
                 this.selectedDate = dateFns.setHours(
@@ -581,7 +562,7 @@
                                 secret: this.secret,
                                 scheduled_from: this.selectedDate.toISOString(),
                                 scheduled_to: dateFns.addHours(this.selectedDate, 6).toISOString(),
-                                organizer_message: this.eventOrganizerMessage
+                                organizer_message: this.organizerMessage
                             }
                         }
                     });

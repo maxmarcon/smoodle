@@ -29,7 +29,7 @@ function mountEventViewer(restRequest, propsData) {
         propsData,
         localVue,
         stubs: ['message-bar', 'event-header', 'v-calendar',
-            'router-link', 'v-date-picker', 'i18n', 'date-picker', 'error-page'
+            'router-link', 'i18n', 'date-picker', 'error-page'
         ]
     }
 
@@ -122,14 +122,13 @@ const EDIT_EVENT_BUTTON = 'router-link-stub[name="edit-button"]'
 const CANCEL_EVENT_BUTTON = 'button[name="cancel-button"]'
 const EDIT_POLL_BUTTON = 'button[name="edit-poll-button"]'
 const OPEN_EVENT_BUTTON = 'button[name="open-button"]'
-const SCHEDULE_EVENT_BUTTON = 'button[name="schedule-button"]'
 const ORGANIZER_MESSAGE = 'this is a message from the organizer'
 
 const buttonSelectors = {
     organizer: {
         open: [EDIT_EVENT_BUTTON, CANCEL_EVENT_BUTTON],
         closed: [OPEN_EVENT_BUTTON],
-        openWithParticipants: [EDIT_EVENT_BUTTON, CANCEL_EVENT_BUTTON, SCHEDULE_EVENT_BUTTON]
+        openWithParticipants: [EDIT_EVENT_BUTTON, CANCEL_EVENT_BUTTON]
     },
     guest: {
         open: [
@@ -142,7 +141,7 @@ const buttonSelectors = {
     },
     all: [
         NEW_POLL_BUTTON, EDIT_EVENT_BUTTON, CANCEL_EVENT_BUTTON,
-        EDIT_POLL_BUTTON, OPEN_EVENT_BUTTON, SCHEDULE_EVENT_BUTTON
+        EDIT_POLL_BUTTON, OPEN_EVENT_BUTTON
     ]
 }
 
@@ -618,8 +617,8 @@ describe('eventViewer', () => {
                     expect(wrapper.findAll('.alert').length).toBe(2)
                 })
 
-                it('renders date picker', () => {
-                    expect(wrapper.find('v-date-picker-stub').exists()).toBeTruthy()
+                it('renders calendar', () => {
+                    expect(wrapper.find('v-calendar-stub').exists()).toBeTruthy()
                 })
 
                 it('renders the share link input field', () => {
@@ -634,12 +633,10 @@ describe('eventViewer', () => {
                     expect(wrapper.find(`a[href="https://wa.me/?text=http%3A%2F%2Flocalhost%3A4000%2Fevents%2F${EVENT_ID}"]`).exists()).toBeTruthy()
                 })
 
-                describe('clicking on schedule event', () => {
+                describe('when the schedule-event-modal is open', () => {
 
                     beforeEach(async () => {
-
-                        wrapper.find(SCHEDULE_EVENT_BUTTON).trigger('click')
-
+                        wrapper.vm.$bvModal.show('schedule-event-modal')
                         await wait()
                     })
 
