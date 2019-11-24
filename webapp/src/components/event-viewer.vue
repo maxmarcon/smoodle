@@ -393,9 +393,9 @@
                         backgroundColor: colorCodes.blue
                     } : false),
                     popover: {
-                        label: (attribute) => this.textForDate(attribute.customData, this.isOrganizer, true)
+                        label: (attribute) => this.textForDate(attribute.customData, true)
                     },
-                    customData: date_entry
+                    customData: Object.assign(date_entry, {optimal: is_top_rank(date_entry)})
                 }));
             },
             scheduledEventCalendarAttributes() {

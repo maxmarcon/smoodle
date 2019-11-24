@@ -47,15 +47,15 @@ export default {
           return output
         }, [])
     },
-    textForDate(date_entry, isOrganizer, trim = false) {
+    textForDate(date_entry, trim = false, countOnly = false) {
       if (date_entry.negative_rank < 0) {
-        return this.negativeParticipantsText(date_entry, isOrganizer, trim);
+        return this.negativeParticipantsText(date_entry, trim, countOnly);
       } else {
-        return this.positiveParticipantsText(date_entry, isOrganizer, trim);
+        return this.positiveParticipantsText(date_entry, trim, countOnly);
       }
     },
-    negativeParticipantsText(date_entry, isOrganizer, trim = false) {
-      if (isOrganizer) {
+    negativeParticipantsText(date_entry, trim = false, countOnly = false) {
+      if (date_entry.negative_participants && !countOnly) {
         return this.$i18n.tc('event_viewer.negative_participants_list_date',
             date_entry.negative_participants.length,
             {participants: trim ? this.trimmedNameList(date_entry.negative_participants) : date_entry.negative_participants.join(', ')});
@@ -63,8 +63,8 @@ export default {
         return this.$i18n.tc('event_viewer.negative_participants_for_date', -date_entry.negative_rank);
       }
     },
-    positiveParticipantsText(date_entry, isOrganizer, trim = false) {
-      if (isOrganizer && date_entry.positive_rank > 0) {
+    positiveParticipantsText(date_entry, trim = false, countOnly = false) {
+      if (date_entry.positive_participants && date_entry.positive_rank > 0 && !countOnly) {
         return this.$i18n.tc('event_viewer.positive_participants_list_date', date_entry.positive_participants.length,
             {participants: trim
                   ? this.trimmedNameList(date_entry.positive_participants) : date_entry.positive_participants.join(', ')});

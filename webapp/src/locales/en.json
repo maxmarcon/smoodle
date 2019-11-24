@@ -112,6 +112,7 @@
     "positive_participants_for_date": "Everybody can make it|One person prefers this date|{count} people prefer this date",
     "positive_participants_list_date": "{participants} likes this date|{participants} like this date",
     "negative_participants_list_date": "{participants} can't make it|{participants} can't make it",
+    "optimal_date": "This date is optimal",
     "schedule_event": "Schedule on this day",
     "about_to_schedule": "You are about to schedule the event to happen on {date}",
     "schedule_event_error": "An error has occurred, the event could not be scheduled",
