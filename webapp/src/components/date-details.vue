@@ -6,9 +6,9 @@
                     b-card-title {{ formattedDate }}
                     b-card-sub-title
                         b-badge.mr-1(v-if="dateEntry.optimal" variant="primary") {{ $i18n.t('event_viewer.optimal_date') }}
-                        b-badge(:variant="dateEntry.negative_rank < 0 ? 'danger' : 'success'") {{ this.textForDate(dateEntry, true, true) }}
+                        b-badge(:variant="dateEntry.negative_rank < 0 ? 'danger' : 'success'") {{ this.textForDate(dateEntry, 0) }}
                 button.btn.btn-outline-dark(@click="$emit('close')")
-                    i.fas.fa-times
+                    i.fa.fa-times
         b-row(no-gutters)
             b-col(v-if="dateEntry.negative_rank < 0")
                 b-card-body

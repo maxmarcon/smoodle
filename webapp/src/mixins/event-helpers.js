@@ -47,32 +47,31 @@ export default {
           return output
         }, [])
     },
-    textForDate(date_entry, trim = false, countOnly = false) {
+    textForDate(date_entry, maxVisible = Infinity) {
       if (date_entry.negative_rank < 0) {
-        return this.negativeParticipantsText(date_entry, trim, countOnly);
+        return this.negativeParticipantsText(date_entry, maxVisible);
       } else {
-        return this.positiveParticipantsText(date_entry, trim, countOnly);
+        return this.positiveParticipantsText(date_entry, maxVisible);
       }
     },
-    negativeParticipantsText(date_entry, trim = false, countOnly = false) {
-      if (date_entry.negative_participants && !countOnly) {
+    negativeParticipantsText(date_entry, maxVisible = Infinity) {
+      if (date_entry.negative_participants && maxVisible > 0) {
         return this.$i18n.tc('event_viewer.negative_participants_list_date',
             date_entry.negative_participants.length,
-            {participants: trim ? this.trimmedNameList(date_entry.negative_participants) : date_entry.negative_participants.join(', ')});
+            {participants: this.trimmedNameList(date_entry.negative_participants, maxVisible)});
       } else {
         return this.$i18n.tc('event_viewer.negative_participants_for_date', -date_entry.negative_rank);
       }
     },
-    positiveParticipantsText(date_entry, trim = false, countOnly = false) {
-      if (date_entry.positive_participants && date_entry.positive_rank > 0 && !countOnly) {
+    positiveParticipantsText(date_entry, maxVisible = Infinity) {
+      if (date_entry.positive_participants && date_entry.positive_rank > 0 && maxVisible > 0) {
         return this.$i18n.tc('event_viewer.positive_participants_list_date', date_entry.positive_participants.length,
-            {participants: trim
-                  ? this.trimmedNameList(date_entry.positive_participants) : date_entry.positive_participants.join(', ')});
+            {participants: this.trimmedNameList(date_entry.positive_participants, maxVisible)});
       } else {
         return this.$i18n.tc('event_viewer.positive_participants_for_date', date_entry.positive_rank);
       }
     },
-    trimmedNameList(list, maxVisible = 5) {
+    trimmedNameList(list, maxVisible) {
       if (!(list instanceof Array)) {
         throw 'trimmedNameList should be called with an array'
       }

@@ -393,7 +393,7 @@
                         backgroundColor: colorCodes.blue
                     } : false),
                     popover: {
-                        label: (attribute) => this.textForDate(attribute.customData, true)
+                        label: (attribute) => this.textForDate(attribute.customData, 5)
                     },
                     customData: Object.assign(date_entry, {optimal: is_top_rank(date_entry)})
                 }));
