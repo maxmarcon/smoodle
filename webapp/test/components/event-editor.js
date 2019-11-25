@@ -1,5 +1,6 @@
 import eventEditor from '../../src/components/event-editor.vue'
 import BootstrapVue from 'bootstrap-vue'
+import PrettyCheckbox from 'pretty-checkbox-vue'
 import VueClipboard from 'vue-clipboard2'
 import messageBar from '../../src/components/message-bar.vue'
 import i18nMock from '../test-utils/i18n-mock'
@@ -14,7 +15,8 @@ function mountEventEditor(restRequest, propsData) {
 
     const localVue = createLocalVue();
     localVue.use(BootstrapVue);
-    localVue.use(VueClipboard)
+    localVue.use(VueClipboard);
+    localVue.use(PrettyCheckbox);
 
     const config = {
         mixins: [{
@@ -52,7 +54,8 @@ const inputElements = [
         'input#eventOrganizerEmailConfirmation'
     ],
     ['input#eventName',
-        'textarea#eventDesc'
+        'textarea#eventDesc',
+        'div#publicParticipants[p-checkbox]'
     ],
     ['v-date-picker-stub#eventPossibleDates',
         'ranker-stub#eventWeekdays'
@@ -92,7 +95,8 @@ const EVENT_DATA = {
     "inserted_at": "2018-09-20T17:06:20.000000Z",
     "id": EVENT_ID,
     "email": "maxmarcon@gmx.net",
-    "desc": "Be our guest!"
+    "desc": "Be our guest!",
+    "public_participants": false
 }
 
 let wrapper

@@ -19,7 +19,9 @@
       "organizer_help": "Let your friends know who invitied them...",
       "organizer_email": "Please enter your email",
       "organizer_email_help": "We will use this email exclusively to send you a private link that you can use to manage the event",
-      "organizer_email_confirmation_help": "Please confirm your email here. Even the best make mistakes sometimes..."
+      "organizer_email_confirmation_help": "Please confirm your email here. Even the best make mistakes sometimes...",
+      "public_participants": "Public participants",
+      "public_participants_help": "If the participants names are public, participants of the event can see each other's names."
     },
     "general_info_group": "What kind of event is it?",
     "dates_group": "When should it roughly happen?",

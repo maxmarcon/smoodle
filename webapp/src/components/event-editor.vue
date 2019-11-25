@@ -132,6 +132,10 @@
                                     :class="inputFieldClass('eventDesc')"
                                 )
                                 .invalid-feedback(name="event-desc-error") {{ eventDescError }}
+                        .form-group.row
+                            .col-md-9.offset-md-3
+                                p-check#publicParticipants.p-switch.p-fill(color="success" v-model="eventPublicParticipants") {{ $t('event_editor.event.public_participants') }}
+                                small.form-text.text-muted {{ $t('event_editor.event.public_participants_help') }}
 
                     b-card(
                         v-if="step === errorsMap['dates-group'].step"
