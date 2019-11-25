@@ -187,24 +187,29 @@
 
                                     .col-md-6.text-center
                                         .form-group
-                                            date-details(v-if="dayDetailsCalendarAttribute"
-                                                :isOrganizer="isOrganizer"
-                                                :calendarAttribute="dayDetailsCalendarAttribute"
-                                                @close="dayDetailsCalendarAttribute = null"
-                                                @schedule="openScheduleEventModal"
-                                            )
-                                            div(v-else)
-                                                v-calendar(
-                                                    :is-linked="true"
-                                                    nav-visibility="hidden"
-                                                    :attributes="scheduleCalendarAttributes"
-                                                    :min-page="fromPage"
-                                                    :max-page="toPage"
-                                                    :is-double-paned="differentMonths"
-                                                    :is-expanded="true"
-                                                    :theme-styles="calThemeStyles"
-                                                    @dayclick="dayclicked"
-                                                )
+                                            b-carousel(ref="calendarCarousel" :interval="0")
+                                                b-carousel-slide
+                                                    template(v-slot:img)
+                                                        v-calendar(
+                                                            :is-linked="true"
+                                                            nav-visibility="hidden"
+                                                            :attributes="scheduleCalendarAttributes"
+                                                            :min-page="fromPage"
+                                                            :max-page="toPage"
+                                                            :is-double-paned="differentMonths"
+                                                            :is-expanded="true"
+                                                            :theme-styles="calThemeStyles"
+                                                            @dayclick="dayclicked"
+                                                        )
+                                                b-carousel-slide
+                                                    template(v-slot:img)
+                                                        date-details(
+                                                            v-if="dayDetailsCalendarAttribute"
+                                                            :isOrganizer="isOrganizer"
+                                                            :calendarAttribute="dayDetailsCalendarAttribute"
+                                                            @close="$refs.calendarCarousel.prev()"
+                                                            @schedule="openScheduleEventModal"
+                                                        )
 
 
                             div.alert.alert-primary(v-else-if="loaded")
@@ -423,6 +428,7 @@
             dayclicked(day) {
                 if (this.isInDomain(day.date)) {
                     this.dayDetailsCalendarAttribute = day.attributes[0]
+                    this.$refs.calendarCarousel.next()
                 }
             },
             async loadEvent() {
