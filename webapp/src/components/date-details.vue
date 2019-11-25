@@ -2,8 +2,9 @@
     b-card(no-body :border-variant="borderVariant")
         b-card-header
             .d-flex
-                button.mr-3.btn.btn-outline-dark(@click="$emit('close')")
-                    i.fas.fa-arrow-circle-left
+                b-button.mr-3(pill variant="light" @click="$emit('close')") &nbsp;
+                    i.fas.fa-2x.fa-arrow-circle-left
+                    | &nbsp;
                 div.text-left
                     b-card-title {{ formattedDate }}
                     b-card-sub-title
