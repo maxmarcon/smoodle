@@ -18,7 +18,9 @@
       "organizer_help": "Fai sapere ai tuoi amici chi li invita...",
       "organizer_email": "Immetti la tua email.",
       "organizer_email_help": "Usiamo la tua email unicamente per mandarti un link privato con il quale puoi gestire il tuo evento.",
-      "organizer_email_confirmation_help": "Per favore conferma la tua email. Anche i migliori fanno errori ogni tanto..."
+      "organizer_email_confirmation_help": "Per favore conferma la tua email. Anche i migliori fanno errori ogni tanto...",
+      "public_participants": "Partecipazione aperta",
+      "public_participants_help": "I partecipanti possono vedere i nomi degli altri partecipanti."
     },
     "general_info_group": "Che genere di evento è?",
     "dates_group": "Quando deve avere luogo?",

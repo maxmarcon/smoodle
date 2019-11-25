@@ -19,7 +19,9 @@
       "organizer_help": "Lass deine Freunde wissen, wer sie einlädt...",
       "organizer_email": "Bitte gib deine Email ein.",
       "organizer_email_help": "Wir benutzen deine Email lediglich, um dir einen privaten Link zu senden, mit dem du dein Event verwalten kannst.",
-      "organizer_email_confirmation_help": "Bitte bestätige deine Email. Sogar den Besten unterläuft manchmal ein Fehler..."
+      "organizer_email_confirmation_help": "Bitte bestätige deine Email. Sogar den Besten unterläuft manchmal ein Fehler...",
+      "public_participants": "Öffentliche Teilnahme",
+      "public_participants_help": "Teilnehmer können die Namen anderer Teilnehmer sehen."
     },
     "general_info_group": "Was ist das für ein Event?",
     "dates_group": "Wann soll es ungefähr stattfinden?",
