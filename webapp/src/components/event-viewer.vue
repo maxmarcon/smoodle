@@ -187,7 +187,7 @@
 
                                     .col-md-6.text-center
                                         .form-group
-                                            b-carousel(ref="calendarCarousel" :interval="0")
+                                            b-carousel(ref="calendarCarousel" :interval="0" no-touch)
                                                 b-carousel-slide
                                                     template(v-slot:img)
                                                         v-calendar(
