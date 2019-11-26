@@ -36,6 +36,7 @@ defmodule Smoodle.Scheduler.Event do
     field(:organizer_message, :string)
     field(:email, :string)
     field(:state, :string, default: "OPEN")
+    field(:public_participants, :boolean, default: false)
 
     has_many(:polls, Poll)
 
@@ -65,7 +66,8 @@ defmodule Smoodle.Scheduler.Event do
       :desc,
       :organizer_message,
       :email,
-      :state
+      :state,
+      :public_participants
     ])
     |> validate_required([:name, :organizer, :email])
     |> validate_length(:name, max: 50)

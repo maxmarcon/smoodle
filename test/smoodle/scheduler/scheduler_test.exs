@@ -44,7 +44,8 @@ defmodule Smoodle.SchedulerTest do
       ]
     },
     email: "bot1@fake.com",
-    email_confirmation: "bot1@fake.com"
+    email_confirmation: "bot1@fake.com",
+    public_participants: false
   }
 
   @event_valid_attrs_2 %{
@@ -60,14 +61,16 @@ defmodule Smoodle.SchedulerTest do
       }
     ],
     email: "bot2@fake.com",
-    email_confirmation: "bot2@fake.com"
+    email_confirmation: "bot2@fake.com",
+    public_participants: true
   }
 
   @event_update_attrs %{
     name: "New name",
     scheduled_from: "2117-03-20T20:10:00Z",
     scheduled_to: "2117-03-20T23:10:00Z",
-    state: "SCHEDULED"
+    state: "SCHEDULED",
+    public_participants: true
   }
 
   @event_invalid_attrs %{
@@ -174,6 +177,7 @@ defmodule Smoodle.SchedulerTest do
       assert {:ok, updated_event} = Scheduler.update_event(event, @event_update_attrs)
       assert @event_update_attrs.name == updated_event.name
       assert @event_update_attrs.state == updated_event.state
+      assert @event_update_attrs.public_participants == updated_event.public_participants
 
       {:ok, sfrom, _} = DateTime.from_iso8601(@event_update_attrs.scheduled_from)
       {:ok, sto, _} = DateTime.from_iso8601(@event_update_attrs.scheduled_to)
@@ -556,7 +560,13 @@ defmodule Smoodle.SchedulerTest do
       {:ok, poll1} = Scheduler.create_poll(event, @poll_valid_attrs_1)
       {:ok, poll2} = Scheduler.create_poll(event, @poll_valid_attrs_2)
       {:ok, poll3} = Scheduler.create_poll(event, @poll_valid_attrs_3)
-      %{event: event, polls: [poll2, poll3, poll1]}
+
+      {:ok, public_participants_event} = Scheduler.create_event(%{@event_valid_attrs_1 | public_participants: true})
+      {:ok, poll4} = Scheduler.create_poll(public_participants_event, @poll_valid_attrs_1)
+      {:ok, poll5} = Scheduler.create_poll(public_participants_event, @poll_valid_attrs_2)
+      {:ok, poll6} = Scheduler.create_poll(public_participants_event, @poll_valid_attrs_3)
+
+      %{event: event, polls: [poll2, poll3, poll1], public_participants_event: public_participants_event, public_polls: [poll4, poll5, poll6]}
     end
 
     test "get_best_schedule returns the best dates at the head of the list", %{event: event} do
@@ -624,6 +634,18 @@ defmodule Smoodle.SchedulerTest do
       polls: polls
     } do
       best_schedule = Scheduler.get_best_schedule(event, is_owner: true)
+      assert Enum.any?(best_schedule.dates, &Enum.any?(&1.negative_participants))
+      assert Enum.any?(best_schedule.dates, &Enum.any?(&1.positive_participants))
+
+      assert Enum.sort(best_schedule.participants) ==
+               Enum.map(polls, &Map.get(&1, :participant)) |> Enum.sort()
+    end
+
+    test "get_best_schedule called from non-owner does include participant names if participants are public", %{
+      public_participants_event: public_participants_event,
+      public_polls: polls
+    } do
+      best_schedule = Scheduler.get_best_schedule(public_participants_event)
       assert Enum.any?(best_schedule.dates, &Enum.any?(&1.negative_participants))
       assert Enum.any?(best_schedule.dates, &Enum.any?(&1.positive_participants))
 

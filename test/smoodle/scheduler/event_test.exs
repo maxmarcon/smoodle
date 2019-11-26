@@ -41,7 +41,8 @@ defmodule Smoodle.Scheduler.EventTest do
     },
     state: "SCHEDULED",
     email: "bot@fake.com",
-    email_confirmation: "bot@fake.com"
+    email_confirmation: "bot@fake.com",
+    public_participants: false
   }
 
   @past_event_scheduled %{
@@ -80,7 +81,8 @@ defmodule Smoodle.Scheduler.EventTest do
       ]
     },
     email: "bot@fake.com",
-    email_confirmation: "bot@fake.com"
+    email_confirmation: "bot@fake.com",
+    public_participants: true
   }
 
   test "changeset with valid attrs" do
@@ -271,26 +273,44 @@ defmodule Smoodle.Scheduler.EventTest do
     changeset =
       Event.changeset(
         %Event{},
-        Map.replace!(@valid_attrs, :possible_dates, [
-          %{date_from: "2118-01-10", date_to: "2119-01-11", rank: 0}
-        ])
+        Map.replace!(
+          @valid_attrs,
+          :possible_dates,
+          [
+            %{date_from: "2118-01-10", date_to: "2119-01-11", rank: 0}
+          ]
+        )
       )
 
     assert [possible_dates: {_, [validation: :time_interval_too_large]}] = changeset.errors
   end
 
   test "validate weekdays" do
-    changeset = Event.changeset(%Event{}, %{@valid_attrs | preferences: %{weekdays: [%{day: 0}]}})
+    changeset = Event.changeset(
+      %Event{},
+      %{
+        @valid_attrs |
+        preferences: %{
+          weekdays: [%{day: 0}]
+        }
+      }
+    )
     weekday_changeset = hd(changeset.changes.preferences.changes.weekdays)
     assert [rank: {_, [validation: :required]}] = weekday_changeset.errors
   end
 
   test "validate weekday duplicates" do
     changeset =
-      Event.changeset(%Event{}, %{
-        @valid_attrs
-        | preferences: %{weekdays: [%{day: 0, rank: 1}, %{day: 0, rank: 0}]}
-      })
+      Event.changeset(
+        %Event{},
+        %{
+          @valid_attrs
+        |
+          preferences: %{
+            weekdays: [%{day: 0, rank: 1}, %{day: 0, rank: 0}]
+          }
+        }
+      )
 
     assert [weekdays: {_, [validation: :weekday_listed_twice]}] =
              changeset.changes.preferences.errors
@@ -298,10 +318,22 @@ defmodule Smoodle.Scheduler.EventTest do
 
   test "validate at least one weekday enabled" do
     changeset =
-      Event.changeset(%Event{}, %{
-        @valid_attrs
-        | preferences: %{weekdays: for(d <- 0..6, do: %{day: d, rank: -1})}
-      })
+      Event.changeset(
+        %Event{},
+        %{
+          @valid_attrs
+        |
+          preferences: %{
+            weekdays: for(
+              d <- 0..6,
+              do: %{
+                day: d,
+                rank: -1
+              }
+            )
+          }
+        }
+      )
 
     assert [weekdays: {_, [validation: :no_weekdays_enabled]}] =
              changeset.changes.preferences.errors
@@ -309,10 +341,16 @@ defmodule Smoodle.Scheduler.EventTest do
 
   test "validate empty weekdays accepted" do
     changeset =
-      Event.changeset(%Event{}, %{
-        @valid_attrs
-        | preferences: %{weekdays: []}
-      })
+      Event.changeset(
+        %Event{},
+        %{
+          @valid_attrs
+        |
+          preferences: %{
+            weekdays: []
+          }
+        }
+      )
 
     assert changeset.valid?
   end
@@ -328,10 +366,14 @@ defmodule Smoodle.Scheduler.EventTest do
     changeset =
       Event.changeset(
         %Event{},
-        Map.replace!(@valid_attrs, :possible_dates, [
-          %{date_from: "2118-01-10", date_to: "2118-01-21"},
-          %{date_from: "2118-01-20", date_to: "2118-01-22"}
-        ])
+        Map.replace!(
+          @valid_attrs,
+          :possible_dates,
+          [
+            %{date_from: "2118-01-10", date_to: "2118-01-21"},
+            %{date_from: "2118-01-20", date_to: "2118-01-22"}
+          ]
+        )
       )
 
     assert [possible_dates: {_, [validation: :overlapping_dates]}] = changeset.errors

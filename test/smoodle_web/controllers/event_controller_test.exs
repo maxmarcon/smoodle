@@ -40,7 +40,8 @@ defmodule SmoodleWeb.EventControllerTest do
       ]
     },
     email: "bot@fake.com",
-    email_confirmation: "bot@fake.com"
+    email_confirmation: "bot@fake.com",
+    public_participants: false
   }
   @create_attrs_2 %{
     name: "Dinner",
@@ -49,13 +50,15 @@ defmodule SmoodleWeb.EventControllerTest do
     possible_dates: [%{date_from: "2117-04-01", date_to: "2117-08-20", rank: 0}],
     preferences: nil,
     email: "bot@fake.com",
-    email_confirmation: "bot@fake.com"
+    email_confirmation: "bot@fake.com",
+    public_participants: true
   }
 
   @update_attrs %{
     scheduled_from: "2117-04-05T21:10:00Z",
     scheduled_to: "2117-04-05T22:10:00Z",
-    state: "SCHEDULED"
+    state: "SCHEDULED",
+    public_participants: true
   }
   @invalid_attrs %{
     name: "",
@@ -79,6 +82,7 @@ defmodule SmoodleWeb.EventControllerTest do
     assert Map.has_key?(data, "possible_dates")
     assert is_list(data["possible_dates"])
     refute Enum.empty?(data["possible_dates"])
+    assert Map.has_key?(data, "public_participants")
 
     Enum.each(
       verify,
