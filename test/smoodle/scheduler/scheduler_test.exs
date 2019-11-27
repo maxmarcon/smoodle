@@ -653,6 +653,18 @@ defmodule Smoodle.SchedulerTest do
                Enum.map(polls, &Map.get(&1, :participant)) |> Enum.sort()
     end
 
+    test "get_best_schedule called from owner does include participant names if participants are public", %{
+      public_participants_event: public_participants_event,
+      public_polls: polls
+    } do
+      best_schedule = Scheduler.get_best_schedule(public_participants_event, is_owner: true)
+      assert Enum.any?(best_schedule.dates, &Enum.any?(&1.negative_participants))
+      assert Enum.any?(best_schedule.dates, &Enum.any?(&1.positive_participants))
+
+      assert Enum.sort(best_schedule.participants) ==
+               Enum.map(polls, &Map.get(&1, :participant)) |> Enum.sort()
+    end
+
     test "get_best_schedule called from owner and then from non-owner does not include participant names",
          %{
            event: event,
