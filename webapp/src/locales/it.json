@@ -202,7 +202,8 @@
     "back_home": "Alla homepage",
     "do_not_cancel": "Annulla",
     "next": "Avanti",
-    "prev": "Indietro"
+    "prev": "Indietro",
+    "show_all": "Mostra tutti"
   },
   "trimmed_list": "{list} e {others} altri"
 }

@@ -69,7 +69,7 @@
             :title="$t('event_viewer.current_participants')"
             ok-only
         )
-            p {{ trimmedNameList(eventScheduleParticipants, 25) }}
+            p {{ nameList(eventScheduleParticipants) }}
 
         b-modal#schedule-event-modal(
             static=true

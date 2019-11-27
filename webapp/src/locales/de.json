@@ -203,7 +203,8 @@
     "back_home": "Zur Homepage",
     "do_not_cancel": "Abbrechen",
     "next": "Weiter",
-    "prev": "Zurück"
+    "prev": "Zurück",
+    "show_all": "Alle zeigen"
   },
   "trimmed_list": "{list} und {others} andere"
 }

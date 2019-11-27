@@ -205,7 +205,8 @@
     "ok": "Ok",
     "do_not_cancel": "Skip",
     "next": "Next",
-    "prev": "Back"
+    "prev": "Back",
+    "show_all": "Show all"
   },
   "trimmed_list": "{list} and {others} others"
 }

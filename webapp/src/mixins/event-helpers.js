@@ -58,7 +58,7 @@ export default {
       if (date_entry.negative_participants && maxVisible > 0) {
         return this.$i18n.tc('event_viewer.negative_participants_list_date',
             date_entry.negative_participants.length,
-            {participants: this.trimmedNameList(date_entry.negative_participants, maxVisible)});
+            {participants: this.nameList(date_entry.negative_participants, maxVisible)});
       } else {
         return this.$i18n.tc('event_viewer.negative_participants_for_date', -date_entry.negative_rank);
       }
@@ -66,14 +66,14 @@ export default {
     positiveParticipantsText(date_entry, maxVisible = Infinity) {
       if (date_entry.positive_participants && date_entry.positive_rank > 0 && maxVisible > 0) {
         return this.$i18n.tc('event_viewer.positive_participants_list_date', date_entry.positive_participants.length,
-            {participants: this.trimmedNameList(date_entry.positive_participants, maxVisible)});
+            {participants: this.nameList(date_entry.positive_participants, maxVisible)});
       } else {
         return this.$i18n.tc('event_viewer.positive_participants_for_date', date_entry.positive_rank);
       }
     },
-    trimmedNameList(list, maxVisible) {
+    nameList(list, maxVisible = Infinity) {
       if (!(list instanceof Array)) {
-        throw 'trimmedNameList should be called with an array'
+        throw new Error(`nameList should be called with an array, it was instead called with: ${list}`)
       }
 
       if (list.length <= maxVisible) {

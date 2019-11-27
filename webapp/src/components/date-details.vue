@@ -1,5 +1,13 @@
 <template lang="pug">
     b-card(no-body :border-variant="borderVariant")
+        b-modal#name-list-modal(
+            v-if="participantsList"
+            static=true
+            hide-header
+            ok-only
+        )
+            p {{ nameList(participantsList) }}
+
         b-card-header
             .d-flex
                 b-button.mr-3(pill variant="light" @click="$emit('close')") &nbsp;
@@ -15,11 +23,19 @@
             b-col(v-if="dateEntry.negative_rank < 0")
                 b-card-body
                     i.icon.fas.fa-thumbs-down.text-danger
-                    | &nbsp; {{ negativeParticipantsText(dateEntry) }}
+                    | &nbsp; {{ negativeParticipantsText(dateEntry, MAX_NAMES) }}
+                    button.btn.btn-link(
+                        v-if="excessParticipants(dateEntry.negative_participants)"
+                        @click="showAllParticipants(dateEntry.negative_participants)"
+                    ) {{ $t('actions.show_all') }}
             b-col(v-if="dateEntry.positive_rank > 0 || dateEntry.negative_rank == 0")
                 b-card-body
                     i.icon.fas.fa-thumbs-up.text-success
-                    | &nbsp; {{ positiveParticipantsText(dateEntry) }}
+                    | &nbsp; {{ positiveParticipantsText(dateEntry, MAX_NAMES) }}
+                    button.btn.btn-sm.btn-link(
+                        v-if="excessParticipants(dateEntry.positive_participants)"
+                        @click="showAllParticipants(dateEntry.positive_participants)"
+                    ) {{ $t('actions.show_all') }}
 
         b-card-footer(v-if="isOrganizer")
             button.btn.btn-primary(@click="$emit('schedule', dateEntry.date)")
@@ -32,6 +48,8 @@
     import {colorCodes} from '../constants'
     import EventHelpersMixin from '../mixins/event-helpers'
 
+    const MAX_NAMES = 25
+
     export default {
         mixins: [EventHelpersMixin],
         props: {
@@ -39,7 +57,9 @@
             calendarAttribute: Object
         },
         data: () => ({
-            colorCodes
+            colorCodes,
+            participantsList: null,
+            MAX_NAMES
         }),
         computed: {
             backgroundColor() {
@@ -62,6 +82,15 @@
             },
             formattedDate() {
                 return dateFns.format(this.dateEntry.date, this.$i18n.t('date_format_long'), {locale: this.$i18n.t('date_fns_locale')});
+            }
+        },
+        methods: {
+            excessParticipants(participants) {
+                return participants && participants.length > MAX_NAMES
+            },
+            showAllParticipants(participants) {
+                this.participantsList = participants;
+                this.$bvModal.show('name-list-modal')
             }
         }
     }
