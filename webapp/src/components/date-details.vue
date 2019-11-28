@@ -18,21 +18,19 @@
                     b-card-sub-title
                         b-badge.mr-1(v-if="dateEntry.optimal" variant="primary") {{ $i18n.t('event_viewer.optimal_date') }}
                         b-badge(:variant="dateEntry.negative_rank < 0 ? 'danger' : 'success'") {{ this.textForDate(dateEntry, 0) }}
-
-        b-row(no-gutters)
-            b-col(v-if="dateEntry.negative_rank < 0")
-                b-card-body
+        b-card-body
+            b-row(no-gutters)
+                b-col(v-if="dateEntry.negative_rank < 0")
                     i.icon.fas.fa-thumbs-down.text-danger
                     | &nbsp; {{ negativeParticipantsText(dateEntry, MAX_NAMES) }}
                     button.btn.btn-link(
                         v-if="excessParticipants(dateEntry.negative_participants)"
                         @click="showAllParticipants(dateEntry.negative_participants)"
                     ) {{ $t('actions.show_all') }}
-            b-col(v-if="dateEntry.positive_rank > 0 || dateEntry.negative_rank == 0")
-                b-card-body
+                b-col(v-if="dateEntry.positive_rank > 0 || dateEntry.negative_rank == 0")
                     i.icon.fas.fa-thumbs-up.text-success
                     | &nbsp; {{ positiveParticipantsText(dateEntry, MAX_NAMES) }}
-                    button.btn.btn-sm.btn-link(
+                    button.btn.btn-link(
                         v-if="excessParticipants(dateEntry.positive_participants)"
                         @click="showAllParticipants(dateEntry.positive_participants)"
                     ) {{ $t('actions.show_all') }}
