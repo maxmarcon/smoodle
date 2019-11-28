@@ -113,6 +113,7 @@
     "positive_participants_for_date": "Tutti possono venire|Una persona preferisce questa data|{count} persone preferiscono questa data",
     "positive_participants_list_date": "{participants} preferisce qesta data|{participants} preferiscono questa data",
     "negative_participants_list_date": "{participants} non può venire|{participants} non possono venire",
+    "optimal_date": "Data ottimale",
     "schedule_event": "Fissa la data",
     "about_to_schedule": "Vuoi fissare l'evento per {date}",
     "schedule_event_error": "A causa di un errore la data non è stat fissata",

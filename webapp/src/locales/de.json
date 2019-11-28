@@ -114,6 +114,7 @@
     "positive_participants_for_date": "Alle können kommen|Eine Person bevorzugt dieses Datum|{count} Personen bevorzugen dieses Datum",
     "positive_participants_list_date": "{participants} bevorzugt dieses Datum|{participants} bevorzugen dieses Datum",
     "negative_participants_list_date": "{participants} kann nicht kommen|{participants} können nicht kommen",
+    "optimal_date": "Optimales Datum",
     "schedule_event": "Datum festlegen",
     "about_to_schedule": "Du willst das Event am {date} festlegen",
     "schedule_event_error": "Ein Fehler ist aufgetreten, das Datum konnte nicht festgelegt werden",
