@@ -207,7 +207,7 @@ defmodule Smoodle.Scheduler do
       {:ok, schedule} ->
         schedule
     end
-    |> maybe_remove_participants(!opts[:is_owner])
+    |> maybe_remove_participants(!opts[:is_owner] && !event.public_participants)
   end
 
   defp maybe_remove_participants(schedule, false) do
@@ -217,9 +217,12 @@ defmodule Smoodle.Scheduler do
   defp maybe_remove_participants(schedule, true) do
     schedule
     |> Map.update!(:participants, fn _ -> [] end)
-    |> Map.update!(:dates, fn dates ->
-      Enum.map(dates, &mask_participants/1)
-    end)
+    |> Map.update!(
+         :dates,
+         fn dates ->
+           Enum.map(dates, &mask_participants/1)
+         end
+       )
   end
 
   defp compute_and_cache_best_schedule(%Event{} = event, opts) do
@@ -295,34 +298,47 @@ defmodule Smoodle.Scheduler do
   defp accumulate_poll(poll, acc) do
     rank = compute_rank(poll, acc.date)
 
-    Map.update!(acc, :negative_rank, fn value ->
-      if rank < 0 do
-        value + rank
-      else
-        value
+    Map.update!(
+      acc,
+      :negative_rank,
+      fn value ->
+        if rank < 0 do
+          value + rank
+        else
+          value
+        end
       end
-    end)
-    |> Map.update!(:positive_rank, fn value ->
-      if rank > 0 do
-        value + rank
-      else
-        value
-      end
-    end)
-    |> Map.update!(:negative_participants, fn participants ->
-      if rank < 0 do
-        [poll.participant | participants]
-      else
-        participants
-      end
-    end)
-    |> Map.update!(:positive_participants, fn participants ->
-      if rank > 0 do
-        [poll.participant | participants]
-      else
-        participants
-      end
-    end)
+    )
+    |> Map.update!(
+         :positive_rank,
+         fn value ->
+           if rank > 0 do
+             value + rank
+           else
+             value
+           end
+         end
+       )
+    |> Map.update!(
+         :negative_participants,
+         fn participants ->
+           if rank < 0 do
+             [poll.participant | participants]
+           else
+             participants
+           end
+         end
+       )
+    |> Map.update!(
+         :positive_participants,
+         fn participants ->
+           if rank > 0 do
+             [poll.participant | participants]
+           else
+             participants
+           end
+         end
+       )
   end
 
   defp compute_rank(%{} = poll, %Date{} = date) do
@@ -341,25 +357,30 @@ defmodule Smoodle.Scheduler do
     poll
     |> Map.from_struct()
     |> Map.update!(
-      :date_ranks,
-      &(&1
-        |> Enum.map(fn %{date_from: date_from, date_to: date_to, rank: rank} ->
-          {Date.range(date_from, date_to), rank}
-        end))
-    )
+         :date_ranks,
+         &(&1
+           |> Enum.map(
+                fn %{date_from: date_from, date_to: date_to, rank: rank} ->
+                  {Date.range(date_from, date_to), rank}
+                end
+              ))
+       )
     |> Map.put(
-      :weekday_ranks,
-      case poll.preferences do
-        nil ->
-          %{}
+         :weekday_ranks,
+         case poll.preferences do
+           nil ->
+             %{}
 
-        _ ->
-          Map.new(poll.preferences.weekday_ranks, fn %{day: day, rank: rank} ->
-            # convert from 0-based, Monday-first to 1-based Monday-first
-            {day + 1, rank}
-          end)
-      end
-    )
+           _ ->
+             Map.new(
+               poll.preferences.weekday_ranks,
+               fn %{day: day, rank: rank} ->
+                 # convert from 0-based, Monday-first to 1-based Monday-first
+                 {day + 1, rank}
+               end
+             )
+         end
+       )
     |> Map.take([:date_ranks, :weekday_ranks, :participant])
   end
 end
