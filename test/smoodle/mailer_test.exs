@@ -9,7 +9,7 @@ defmodule Smoodle.MailerTest do
     :ok
   end
 
-  test "mailer sends email and set ttl" do
+  test "mailer sends email and sets ttl" do
     email = %Bamboo.Email{
       to: "to@google.com",
       from: "from@google.com",
@@ -23,7 +23,7 @@ defmodule Smoodle.MailerTest do
     assert ttl <= time_bucket_msec()
   end
 
-  test "mailer sends only up to the maximum number of emails in the bucket and sends again after the cache key as expired" do
+  test "mailer sends only up to the maximum number of emails in the bucket and sends again after the cache key is expired" do
     for n <- 0..(max_emails() - 1) do
       email = %Bamboo.Email{
         to: "to@google.com",
