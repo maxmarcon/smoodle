@@ -155,7 +155,7 @@
                         div(v-else)
                             div(v-if="eventScheduleParticipantsCount")
                                 .alert.alert-info
-                                    i18n(path="event_viewer.event_open_organizer" v-if="isOrganizer")
+                                    i18n(:path="isOrganizer ? 'event_viewer.event_open_organizer' : 'event_viewer.event_open_public_participants'" v-if="eventPublicParticipants || isOrganizer")
                                         template(v-slot:calendar_icon)
                                             i.fas.fa-calendar-check.fa-lg
                                         template(v-slot:participants)

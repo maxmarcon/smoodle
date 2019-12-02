@@ -83,6 +83,7 @@
     "welcome": "{organizer} hat dich zu diesem Event eingeladen",
     "welcome_organizer": "Du organisierst dieses Event",
     "event_open": "{calendar_icon} Der Organisator hat noch kein Datum festgelegt. Hier unten sind die möglichen Daten, basierend auf {answers}. Gib deine Verfügbarkeit an, falls du es noch nicht getan hast.",
+    "event_open_public_participants": "{calendar_icon} Der Organisator hat noch kein Datum festgelegt. Hier unten sind die möglichen Daten, basierend auf den Antworten von {participants}.",
     "event_open_organizer": "{calendar_icon} Du hast dich noch nicht für ein Datum entschieden. Hier unten sind die möglichen Daten, basierend auf den Antworten von {participants}.",
     "answers": "eine Antwort|{count} Antworten",
     "event_canceled": "Dieses Event wurde abgesagt",

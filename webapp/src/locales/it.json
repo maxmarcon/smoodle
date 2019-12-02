@@ -82,6 +82,7 @@
     "welcome": "{organizer} ti ha invitato a questo evento",
     "welcome_organizer": "Sei l'organizzatore di quest'evento",
     "event_open": "{calendar_icon} L'organizzatore non ha ancora fissato una data. Qui sotto ci sono le possibili date, in base a {answers}. Comunica la tua disponibilità nel caso non l'abbia ancora fatto.",
+    "event_open_public_participants": "{calendar_icon} L'organizzatore non ha ancora fissato una data. Qui sotto ci sono le possibili date, in base alle risposte di {participants}.",
     "event_open_organizer": "{calendar_icon} Non hai ancora fissato una data. Qui sotto ci sono le possibili date, in base alle risposte di {participants}.",
     "answers": "una risposta|{count} risposte",
     "event_canceled": "Questo evento è stato disdetto",
