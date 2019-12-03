@@ -152,71 +152,73 @@
                         .alert.alert-danger(v-if="emptyDomain")
                             i.fas.fa-exclamation-triangle
                             | &nbsp; {{ $t('event_viewer.empty_domain') }}
-                        div(v-else)
-                            div(v-if="eventScheduleParticipantsCount")
-                                .alert.alert-info
-                                    i18n(:path="isOrganizer ? 'event_viewer.event_open_organizer' : 'event_viewer.event_open_public_participants'" v-if="eventPublicParticipants || isOrganizer")
-                                        template(v-slot:calendar_icon)
-                                            i.fas.fa-calendar-check.fa-lg
-                                        template(v-slot:participants)
-                                            a(href="#" v-b-modal.participants-list-modal="")
-                                                | {{ $tc('event_viewer.nof_participants', eventScheduleParticipantsCount, {participants: eventScheduleParticipantsCount}) }}
+                        div(v-else-if="loaded")
+                            .alert.alert-info(v-if="eventScheduleParticipantsCount")
+                                i18n(:path="isOrganizer ? 'event_viewer.event_open_organizer' : 'event_viewer.event_open_public_participants'" v-if="eventPublicParticipants || isOrganizer")
+                                    template(v-slot:calendar_icon)
+                                        i.fas.fa-calendar-check.fa-lg
+                                    template(v-slot:participants)
+                                        a(href="#" v-b-modal.participants-list-modal="")
+                                            | {{ $tc('event_viewer.nof_participants', eventScheduleParticipantsCount, {participants: eventScheduleParticipantsCount}) }}
 
-                                    i18n(path="event_viewer.event_open" v-else)
-                                        template(v-slot:calendar_icon)
-                                            i.fas.fa-calendar-check.fa-lg
-                                        template(v-slot:answers)
-                                            span {{ $tc('event_viewer.answers', eventScheduleParticipantsCount, {count: eventScheduleParticipantsCount}) }}
-                                .row.justify-content-md-between.justify-content-lg-center
-                                    .col-md-3.offset-md-1.order-md-last.text-justify
-                                        .form-group
-                                            i18n.small.text-muted(
-                                                :path="isOrganizer ? 'event_viewer.date_selection_help_organizer' : 'event_viewer.date_selection_help'"
-                                                tag="p"
-                                            )
-                                                template(v-slot:best)
-                                                    span.text-success {{ $t('event_viewer.best') }}
-                                                template(v-slot:worst)
-                                                    span.text-danger {{ $t('event_viewer.worst') }}
-                                                template(v-slot:green)
-                                                    span.text-success {{ $t('event_viewer.green') }}
-                                                template(v-slot:red)
-                                                    span.text-danger {{ $t('event_viewer.red') }}
-                                                template(v-slot:blue_underlined)
-                                                    span.text-primary {{ $t('event_viewer.blue_underlined') }}
-
-                                    .col-md-6.text-center
-                                        .form-group
-                                            b-carousel(ref="calendarCarousel" :interval="0" no-touch)
-                                                b-carousel-slide
-                                                    template(v-slot:img)
-                                                        v-calendar(
-                                                            :is-linked="true"
-                                                            nav-visibility="hidden"
-                                                            :attributes="scheduleCalendarAttributes"
-                                                            :min-page="fromPage"
-                                                            :max-page="toPage"
-                                                            :is-double-paned="differentMonths"
-                                                            :is-expanded="true"
-                                                            :theme-styles="calThemeStyles"
-                                                            @dayclick="dayclicked"
-                                                        )
-                                                b-carousel-slide
-                                                    template(v-slot:img)
-                                                        date-details(
-                                                            v-if="dayDetailsCalendarAttribute"
-                                                            :isOrganizer="isOrganizer"
-                                                            :calendarAttribute="dayDetailsCalendarAttribute"
-                                                            @close="$refs.calendarCarousel.prev()"
-                                                            @schedule="openScheduleEventModal"
-                                                        )
-
-
-                            div.alert.alert-primary(v-else-if="loaded")
+                                i18n(path="event_viewer.event_open" v-else)
+                                    template(v-slot:calendar_icon)
+                                        i.fas.fa-calendar-check.fa-lg
+                                    template(v-slot:answers)
+                                        span {{ $tc('event_viewer.answers', eventScheduleParticipantsCount, {count: eventScheduleParticipantsCount}) }}
+                            div.alert.alert-primary(v-else)
                                 i18n(path="event_viewer.no_participants_organizer" v-if="isOrganizer")
-                                    i.fas.fa-thermometer-empty.fa-lg(place="icon")
+                                    template(v-slot="icon")
+                                        i.fas.fa-thermometer-empty.fa-lg
                                 i18n(path="event_viewer.no_participants" v-else)
-                                    i.fas.fa-trophy.fa-lg(place="icon")
+                                    template(v-slot="icon")
+                                        i.fas.fa-trophy.fa-lg
+                            .row.justify-content-md-between.justify-content-lg-center
+                                .col-md-3.offset-md-1.order-md-last.text-justify(v-if="eventScheduleParticipantsCount")
+                                    .form-group
+                                        i18n.small.text-muted(
+                                            :path="isOrganizer ? 'event_viewer.date_selection_help_organizer' : 'event_viewer.date_selection_help'"
+                                            tag="p"
+                                        )
+                                            template(v-slot:best)
+                                                span.text-success {{ $t('event_viewer.best') }}
+                                            template(v-slot:worst)
+                                                span.text-danger {{ $t('event_viewer.worst') }}
+                                            template(v-slot:green)
+                                                span.text-success {{ $t('event_viewer.green') }}
+                                            template(v-slot:red)
+                                                span.text-danger {{ $t('event_viewer.red') }}
+                                            template(v-slot:blue_underlined)
+                                                span.text-primary {{ $t('event_viewer.blue_underlined') }}
+
+                                .col-md-6.text-center
+                                    .form-group
+                                        b-carousel(ref="calendarCarousel" :interval="0" no-touch)
+                                            b-carousel-slide
+                                                template(v-slot:img)
+                                                    v-calendar(
+                                                        :is-linked="true"
+                                                        nav-visibility="hidden"
+                                                        :attributes="scheduleCalendarAttributes"
+                                                        :min-page="fromPage"
+                                                        :max-page="toPage"
+                                                        :is-double-paned="differentMonths"
+                                                        :is-expanded="true"
+                                                        :theme-styles="calThemeStyles"
+                                                        @dayclick="dayclicked"
+                                                    )
+                                            b-carousel-slide
+                                                template(v-slot:img)
+                                                    date-details(
+                                                        v-if="dayDetailsCalendarAttribute"
+                                                        :isOrganizer="isOrganizer"
+                                                        :calendarAttribute="dayDetailsCalendarAttribute"
+                                                        @close="$refs.calendarCarousel.prev()"
+                                                        @schedule="openScheduleEventModal"
+                                                    )
+
+
+
 
                     div(v-else-if="eventScheduled")
                         .alert.alert-success
@@ -368,6 +370,19 @@
                 return !!this.secret;
             },
             scheduleCalendarAttributes() {
+                // if (this.eventScheduleParticipantsCount === 0) {
+                //     return [{
+                //         dates: {
+                //             start: this.minDate,
+                //             end: this.maxDate
+                //         },
+                //         highlight: {
+                //             backgroundColor: colorCodes.green,
+                //             opacity: 0.6
+                //         }
+                //     }];
+                // }
+
                 const scheduleDates = this.eventScheduleDates.length;
                 let minNegativeRank;
                 let maxPositiveRank;
@@ -426,7 +441,7 @@
         },
         methods: {
             dayclicked(day) {
-                if (this.isInDomain(day.date)) {
+                if (this.isInDomain(day.date) && this.eventScheduleParticipantsCount) {
                     this.dayDetailsCalendarAttribute = day.attributes[0]
                     this.$refs.calendarCarousel.next()
                 }

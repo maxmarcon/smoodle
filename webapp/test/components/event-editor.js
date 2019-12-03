@@ -81,8 +81,8 @@ const EVENT_SECRET = "NGQ4NkdBQWVTd0U9"
 const EVENT_DATA = {
     "updated_at": "2018-09-20T17:06:20.000000Z",
     "possible_dates": [{
-        "date_to": "2019-12-01",
-        "date_from": "2019-06-01",
+        "date_to": "2119-12-01",
+        "date_from": "2119-06-01",
     }],
     "state": "OPEN",
     "share_link": "http://localhost:4000/events/bf6747d5-7b32-4bde-8e2d-c055d9bb02d3",
