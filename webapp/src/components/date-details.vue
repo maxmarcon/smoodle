@@ -3,9 +3,14 @@
         b-modal#name-list-modal(
             v-if="participantsList"
             static=true
-            hide-header
             ok-only
         )
+            template(v-slot:modal-header)
+                .d-flex
+                    b
+                        i.icon.fas.fa-thumbs-up.text-success(v-if="positive")
+                        i.icon.fas.fa-thumbs-down.text-danger(v-else)
+                        | &nbsp; {{ formattedDate }}
             p {{ nameList(participantsList) }}
 
         b-card-header
@@ -25,14 +30,14 @@
                     | &nbsp; {{ negativeParticipantsText(dateEntry, MAX_NAMES) }}
                     button.btn.btn-link(
                         v-if="excessParticipants(dateEntry.negative_participants)"
-                        @click="showAllParticipants(dateEntry.negative_participants)"
+                        @click="showAllParticipants(dateEntry.negative_participants, false)"
                     ) {{ $t('actions.show_all') }}
                 b-col(v-if="dateEntry.positive_rank > 0 || dateEntry.negative_rank == 0")
                     i.icon.fas.fa-thumbs-up.text-success
                     | &nbsp; {{ positiveParticipantsText(dateEntry, MAX_NAMES) }}
                     button.btn.btn-link(
                         v-if="excessParticipants(dateEntry.positive_participants)"
-                        @click="showAllParticipants(dateEntry.positive_participants)"
+                        @click="showAllParticipants(dateEntry.positive_participants, true)"
                     ) {{ $t('actions.show_all') }}
 
         b-card-footer(v-if="isOrganizer")
@@ -57,6 +62,7 @@
         data: () => ({
             colorCodes,
             participantsList: null,
+            positive: true,
             MAX_NAMES
         }),
         computed: {
@@ -86,8 +92,9 @@
             excessParticipants(participants) {
                 return participants && participants.length > MAX_NAMES
             },
-            showAllParticipants(participants) {
+            showAllParticipants(participants, positive) {
                 this.participantsList = participants;
+                this.positive = positive
                 this.$bvModal.show('name-list-modal')
             }
         }
