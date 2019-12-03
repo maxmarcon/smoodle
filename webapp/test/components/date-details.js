@@ -68,10 +68,10 @@ let wrapper;
 
 describe('dateDetails', () => {
 
-    describe('with no more than 25 negative or positive participants', () => {
+    describe('with no more than 5 negative or positive participants', () => {
 
         beforeEach(() => {
-            wrapper = mountComponent(nameList.slice(0, 25), -25, nameList.slice(0, 25), 25)
+            wrapper = mountComponent(nameList.slice(0, 5), -5, nameList.slice(0, 5), 5)
         })
 
         it('does not render show all buttons', () => {
@@ -79,7 +79,7 @@ describe('dateDetails', () => {
         })
     })
 
-    describe('with more than 25 negative or positive participants', () => {
+    describe('with more than 5 negative or positive participants', () => {
         beforeEach(() => {
             wrapper = mountComponent(nameList, -nameList.length, nameList, nameList.length)
         })
@@ -89,7 +89,7 @@ describe('dateDetails', () => {
         })
     })
 
-    describe('with more than 25 negative or positive participants but no names', () => {
+    describe('with more than 5 negative or positive participants but no names', () => {
         beforeEach(() => {
             wrapper = mountComponent(null, -nameList.length, null, nameList.length)
         })
