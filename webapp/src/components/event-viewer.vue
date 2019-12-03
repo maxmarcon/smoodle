@@ -370,18 +370,18 @@
                 return !!this.secret;
             },
             scheduleCalendarAttributes() {
-                // if (this.eventScheduleParticipantsCount === 0) {
-                //     return [{
-                //         dates: {
-                //             start: this.minDate,
-                //             end: this.maxDate
-                //         },
-                //         highlight: {
-                //             backgroundColor: colorCodes.green,
-                //             opacity: 0.6
-                //         }
-                //     }];
-                // }
+                if (this.eventScheduleParticipantsCount === 0) {
+                    return [{
+                        dates: {
+                            start: this.minDate,
+                            end: this.maxDate
+                        },
+                        highlight: {
+                            backgroundColor: colorCodes.green,
+                            opacity: 0.6
+                        }
+                    }];
+                }
 
                 const scheduleDates = this.eventScheduleDates.length;
                 let minNegativeRank;
