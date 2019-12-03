@@ -51,7 +51,7 @@
     import {colorCodes} from '../constants'
     import EventHelpersMixin from '../mixins/event-helpers'
 
-    const MAX_NAMES = 25
+    const MAX_NAMES = 5
 
     export default {
         mixins: [EventHelpersMixin],
