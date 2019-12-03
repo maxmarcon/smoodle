@@ -304,6 +304,8 @@
     import dateDetails from './date-details'
     import {scrollToTopMixin, whatsAppHelpersMixin} from '../mixins/utils'
 
+    const today = new Date()
+
     const SCHEDULE_DATES_LIMIT = null;
     const EVENT_RELOAD_INTERVAL_MSEC = 15000;
 
@@ -370,17 +372,8 @@
                 return !!this.secret;
             },
             scheduleCalendarAttributes() {
-                if (this.eventScheduleParticipantsCount === 0) {
-                    return [{
-                        dates: {
-                            start: this.minDate,
-                            end: this.maxDate
-                        },
-                        highlight: {
-                            backgroundColor: colorCodes.green,
-                            opacity: 0.6
-                        }
-                    }];
+                if (this.eventOpen && this.eventScheduleParticipantsCount === 0) {
+                    return this.noParticipantsCalendarAttributes;
                 }
 
                 const scheduleDates = this.eventScheduleDates.length;
@@ -432,6 +425,43 @@
                     }
                 }]
             },
+            noParticipantsCalendarAttributes() {
+                return this.eventPossibleDates.map(({
+                                                        date_from,
+                                                        date_to,
+                                                        rank
+                                                    }) => {
+                    return {
+                        dates: {
+                            start: date_from,
+                            end: date_to,
+                        },
+                        highlight: {
+                            animated: false,
+                            backgroundColor: this.colorForRank(rank),
+                            opacity: (rank === 0 ? 0.6 : 1)
+                        },
+                        order: (rank === 0 ? 0 : 2)
+                    }
+                }).concat([{
+                    dates: {
+                        start: today,
+                        end: null,
+                        weekdays: this.eventWeekdays.filter(({
+                                                                 value
+                                                             }) => !value).map(({
+                                                                                    day
+                                                                                }) => ((day + 1) % 7) + 1)
+                        // from 0=Mon...6=Sun to v-calendars's 1=Sun...7=Sat
+                    },
+                    highlight: {
+                        animated: false,
+                        backgroundColor: this.colorForRank(-1),
+                        opacity: 0.6
+                    },
+                    order: 1
+                }])
+            },
             selectedDateFormatted() {
                 return dateFns.format(this.selectedDate, this.$i18n.t('date_format_long'), {locale: this.$i18n.t('date_fns_locale')});
             },
@@ -446,6 +476,7 @@
                     this.$refs.calendarCarousel.next()
                 }
             },
+            colorForRank: (rank) => (rank >= 0 ? colorCodes.green : colorCodes.red),
             async loadEvent() {
                 if (this.loading) {
                     return

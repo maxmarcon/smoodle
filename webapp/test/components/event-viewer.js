@@ -372,15 +372,11 @@ describe('eventViewer', () => {
                 })
 
                 it('it computes scheduleCalendarAttributes', () => {
-                    expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(0)
+                    expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(2)
                 })
 
                 it('renders main card', () => {
                     expect(wrapper.find('div.card').exists()).toBeTruthy();
-                })
-
-                it('it computes scheduleCalendarAttributes', () => {
-                    expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(0)
                 })
 
                 buttonSelectors.all.forEach(selector => {
@@ -768,15 +764,11 @@ describe('eventViewer', () => {
                 })
 
                 it('it computes scheduleCalendarAttributes', () => {
-                    expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(0)
+                    expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(2)
                 })
 
                 it('renders main card', () => {
                     expect(wrapper.find('div.card').exists()).toBeTruthy();
-                })
-
-                it('it computes scheduleCalendarAttributes', () => {
-                    expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(0)
                 })
 
                 buttonSelectors.all.forEach(selector => {
