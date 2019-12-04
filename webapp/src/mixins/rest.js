@@ -17,14 +17,12 @@ export default {
                 background: false
             }, config);
 
-            let self = this;
-
             let loader = null;
             let timeout = null
-            if (!config.background && self.$loading) {
+            if (!config.background && this.$loading) {
                 if (config.spinnerDelay) {
-                    timeout = setTimeout(function () {
-                        loader = self.$loading.show();
+                    timeout = setTimeout( () => {
+                        loader = this.$loading.show();
                     }, config.spinnerDelay)
                 }
                 this.requestOngoing = true;
@@ -33,12 +31,12 @@ export default {
             try {
                 return await this.$http.request(config)
             } catch (error) {
-                if (config.errorHandling && self.showInErrorBar) {
+                if (config.errorHandling && this.showInErrorBar) {
                     if (!error.response) {
                         if (error.request) {
-                            self.showInErrorBar(self.$i18n.t('errors.network'))
+                            this.showInErrorBar(this.$i18n.t('errors.network'))
                         } else {
-                            self.showInErrorBar(self.$i18n.t('errors.generic', {
+                            this.showInErrorBar(this.$i18n.t('errors.generic', {
                                 message: error.message
                             }))
                         }
@@ -53,7 +51,7 @@ export default {
                     loader.hide();
                 }
                 if (!config.background) {
-                    self.requestOngoing = false;
+                    this.requestOngoing = false;
                 }
             }
         }

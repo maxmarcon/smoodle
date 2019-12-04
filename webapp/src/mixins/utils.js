@@ -2,7 +2,7 @@ export const scrollToTopMixin = {
   methods: {
     scrollToTop() {
       if (this.$scrollTo) {
-        return this.$scrollTo('main');
+        return this.$scrollTo('#page-top');
       }
     }
   }

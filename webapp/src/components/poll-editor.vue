@@ -21,7 +21,7 @@
         )
             p {{ $t('poll_editor.really_delete') }}
 
-        b-modal(
+        b-modal#poll-deleted-modal(
             static=true
             :title="$t('poll_editor.delete_poll')"
             ok-only
@@ -30,7 +30,7 @@
         )
             p {{ $t('poll_editor.poll_deleted') }}
 
-        b-modal(
+        b-modal#poll-delete-error-modal(
             static=true
             :title="$t('errors.error')"
             ok-only
@@ -335,8 +335,9 @@
                     await this.restRequest(['polls', this.pollId].join('/'), {
                         method: 'delete'
                     })
+                    this.$bvModal.show('poll-deleted-modal');
                 } catch (error) {
-                    this.$bvModal.show('pollDeleteErrorModal');
+                    this.$bvModal.show('poll-delete-error-modal');
                     throw error;
                 }
             },
