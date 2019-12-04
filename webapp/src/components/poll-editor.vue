@@ -309,20 +309,18 @@
                         }
                     )
                     this.setServerErrors()
-                    this.$scrollTo('#page-top')
+                    this.scrollToTop()
 
                     if (result.status !== 204) {
                         this.$bvModal.show('poll-saved-modal');
                     }
                 } catch (error) {
-                    this.$scrollTo('#event-header')
-
                     if (error.response && error.response.status === 422) {
                         this.setServerErrors(error.response.data.errors);
                         if (this.firstStepWithErrors && this.firstStepWithErrors <= this.step) {
                             this.showErrorCodeInErrorBar(error.response.status)
-                        }
-                        if (this.eventError) {
+                        } else if (this.eventError) {
+                            this.scrollToTop()
                             this.$bvModal.show('event-error-modal');
                         }
                     } else {

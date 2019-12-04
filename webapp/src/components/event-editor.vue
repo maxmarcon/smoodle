@@ -542,7 +542,7 @@
                             ignoreErrorCodes: [429]
                         })
                     this.setServerErrors()
-                    this.$scrollTo('#page-top')
+                    this.scrollToTop();
 
                     if (result.status !== 204) {
                         // not just validating...
@@ -557,8 +557,6 @@
                         }
                     }
                 } catch (error) {
-                    this.$scrollTo('#event-header')
-
                     if (error.response) {
                         if (error.response.status === 422) {
                             this.setServerErrors(error.response.data.errors)
