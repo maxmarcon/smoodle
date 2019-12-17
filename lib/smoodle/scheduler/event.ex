@@ -97,6 +97,7 @@ defmodule Smoodle.Scheduler.Event do
     |> change(%{secret: SecureRandom.urlsafe_base64(@secret_len)})
   end
 
+  @spec date_range(Event.t()) :: Date.Range.t()
   @doc """
   Returns the range of all the possible dates for this event
 
