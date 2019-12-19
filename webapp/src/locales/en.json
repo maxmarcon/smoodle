@@ -140,18 +140,18 @@
     "step": "Step {step}",
     "how_it_works": "Your event in 3 easy steps:",
     "step1": {
-      "title": "{step} : Create the event",
+      "title": "Create the event",
       "part1": "Describe your event.",
       "part2": "Select the time period suitable for the event.",
       "part3": "Finally, invite your friends by sharing a Web link."
     },
     "step2": {
-      "title": "{step} : Let your friends decide",
+      "title": "Let your friends decide",
       "part1": "Your friends can say if a date is {good}, {indifferent}, or {bad} for them.",
       "part2": "They can select weekdays or specific dates."
     },
     "step3": {
-      "title": "{step} : Manage the event",
+      "title": "Manage the event",
       "part1": "As an organizer, you always have a clear overview of your friends decisions.",
       "part2": "{good} and {bad} dates are clearly visible on the calendar.",
       "part3": "When you are ready, pick a date, schedule the event and let your guests now."

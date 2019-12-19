@@ -139,18 +139,18 @@
     "step": "Passo {step}",
     "how_it_works": "Organizza il tuo evento in 3 facili passi:",
     "step1": {
-      "title": "{step} : Crea l'evento",
+      "title": "Crea l'evento",
       "part1": "Descrivi l'evento.",
       "part2": "Scegli un periodo per l'evento.",
       "part3": "Invita i tuoi amici con un link."
     },
     "step2": {
-      "title": "{step} : Fai decidere ai tuoi amici",
+      "title": "Fai decidere ai tuoi amici",
       "part1": "I tuoi amici decidono se una data è {good}, {indifferent}, oppure {bad}.",
       "part2": "Possono scegliere singole date o giorni della settimana."
     },
     "step3": {
-      "title": "{step} : Gestisci l'evento",
+      "title": "Gestisci l'evento",
       "part1": "Come organizzatore hai sempre una chiara panoramica sulle decisioni dei tuoi invitati.",
       "part2": "Date {good} e che {bad} sono chiaramente visibili nel calendario.",
       "part3": "Quando sei pronto, fissa una data e comunicalo ai tuoi ospiti."

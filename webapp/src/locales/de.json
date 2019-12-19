@@ -140,18 +140,18 @@
     "step": "Schritt {step}",
     "how_it_works": "Dein Event in 3 einfachen Schritten organisieren:",
     "step1": {
-      "title": "{step} : Event planen",
+      "title": "Event planen",
       "part1": "Beschreibe dein Event.",
       "part2": "Wähle die passende Zeitspanne für dein Event aus.",
       "part3": "Lade deine Freunde mit einem Weblink ein."
     },
     "step2": {
-      "title": "{step} : Lass deine Freunde entscheiden",
+      "title": "Lass deine Freunde entscheiden",
       "part1": "Deine Freunde können angeben, ob ein Datum {good}, {indifferent}, oder {bad} für sie ist.",
       "part2": "Sie können einzelne Tage oder einen Zeitraum auswählen."
     },
     "step3": {
-      "title": "{step} : Event verwalten",
+      "title": "Event verwalten",
       "part1": "Als Organisator hast du immer einen klaren Überblick über die Entscheidungen deiner Freunde.",
       "part2": "{good} und {bad} Daten sind deutlich im Kalendar sichtbar.",
       "part3": "Wenn du bereit bist, wähle ein Datum aus, lege es fest und sage deinen Gästen Bescheid."
