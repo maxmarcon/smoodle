@@ -27,12 +27,12 @@
                 b-card.text-center
                     b-card-title
                         h2 {{ $t('home.step2.title') }}
-                    img.img-fluid.border.border-primary.rounded(src="../assets/single-day-details.png")
                     b-card-text(text-tag="h5")
                         i18n.text-muted(path="home.step2.part1" tag="em")
                             span.text-success(place="good") {{ $tc('home.good', 1) }}
                             span.text-warning(place="indifferent") {{ $tc('home.indifferent', 1) }}
                             span.text-danger(place="bad") {{ $tc('home.bad', 1) }}
+                    img.img-fluid.border.border-primary.rounded(src="../assets/single-day-details.png")
                 b-card.text-center
                     b-card-title
                         h2 {{ $t('home.step3.title') }}
