@@ -25,16 +25,19 @@ defmodule SmoodleWeb.EventController do
 
   def create(conn, %{"event" => event_params}) do
     with {:ok, event} <-
-           Repo.transaction(fn ->
-             with {:ok, %Event{} = event} <- Scheduler.create_event(event_params),
-                  {:ok, _} <-
-                    Email.new_event_email(event) |> Mailer.deliver_with_rate_limit(event.email) do
-               event
-             else
-               {:error, :rate_limit_exceeded} -> Repo.rollback(:too_many_requests)
-               {:error, error} -> Repo.rollback(error)
+           Repo.transaction(
+             fn ->
+               with {:ok, %Event{} = event} <- Scheduler.create_event(event_params),
+                    {:ok, _} <-
+                      Email.new_event_email(event)
+                      |> Mailer.deliver_with_rate_limit(event.email) do
+                 event
+               else
+                 {:error, :rate_limit_exceeded} -> Repo.rollback(:too_many_requests)
+                 {:error, error} -> Repo.rollback(error)
+               end
              end
-           end) do
+           ) do
       Logger.info("Created event: #{event}")
 
       conn
@@ -51,14 +54,25 @@ defmodule SmoodleWeb.EventController do
 
   def show(conn, %{"id" => id}) do
     event = Repo.preload(Scheduler.get_event!(id), :possible_dates)
-    render(conn, :show, event: %{event | secret: nil, email: nil})
+    render(
+      conn,
+      :show,
+      event: %{
+        event |
+        secret: nil,
+        email: nil
+      }
+    )
   end
 
-  def update(_conn, %{
-        "id" => id,
-        "event" => event_params = %{"secret" => secret},
-        "dry_run" => true
-      }) do
+  def update(
+        _conn,
+        %{
+          "id" => id,
+          "event" => event_params = %{"secret" => secret},
+          "dry_run" => true
+        }
+      ) do
     event = Scheduler.get_event!(id, secret)
 
     Scheduler.update_event(event, event_params, dry_run: true)
@@ -87,21 +101,29 @@ defmodule SmoodleWeb.EventController do
   def schedule(conn, %{"id" => id, "secret" => secret} = params) do
     event = Scheduler.get_event!(id, secret)
 
-    render(conn, :schedule, %{
-      schedule:
-        Scheduler.get_best_schedule(
-          event,
-          Keyword.merge(schedule_parse_params(params), is_owner: true)
-        )
-    })
+    render(
+      conn,
+      :schedule,
+      %{
+        schedule:
+          Scheduler.get_best_schedule(
+            event,
+            Keyword.merge(schedule_parse_params(params), is_owner: true)
+          )
+      }
+    )
   end
 
   def schedule(conn, %{"id" => id} = params) do
     event = Scheduler.get_event!(id)
 
-    render(conn, :schedule, %{
-      schedule: Scheduler.get_best_schedule(event, schedule_parse_params(params))
-    })
+    render(
+      conn,
+      :schedule,
+      %{
+        schedule: Scheduler.get_best_schedule(event, schedule_parse_params(params))
+      }
+    )
   end
 
   defp schedule_parse_params(params) do
