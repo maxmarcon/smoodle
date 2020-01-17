@@ -1,6 +1,6 @@
 <template lang="pug">
 ul.list-group
-	li.d-flex.list-group-item.p-2.align-items-center(v-for="el in elements" :class="{disabled: el.disabled}")
+	li.d-flex.list-group-item.p-2.align-items-center(v-for="el in elements" :class="{disabled: el.disabled}" @click="clicked(el)")
 		h6.mr-auto {{ $t(el.name) }}
 		p-check.p-switch.p-fill(v-if="boolean" v-model="el.value" color="success" :disabled="el.disabled || disabled" @change="changed")
 		.d-flex(v-else)
@@ -42,7 +42,12 @@ export default {
 	methods: {
 		changed() {
 			this.$emit('change')
-		}
+		},
+        clicked(el) {
+		    if (!el.disabled && !this.disabled && this.boolean) {
+		        el.value = !el.value
+            }
+        }
 	}
 }
 </script>
