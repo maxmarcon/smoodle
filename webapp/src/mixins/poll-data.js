@@ -58,6 +58,12 @@ export default {
                        },
                        eventWeekdays) {
             this.pollParticipant = participant;
+            if (preferences === null) {
+                preferences = { weekday_ranks: [] }
+            }
+            if (date_ranks === null) {
+                date_ranks = []
+            }
 
             eventWeekdays.forEach(({
                                        day: event_day,

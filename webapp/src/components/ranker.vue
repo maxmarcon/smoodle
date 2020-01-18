@@ -34,7 +34,8 @@
                 required: true,
                 validator: (value) => {
                     return value.every((el) =>
-                        el instanceof Object && el.hasOwnProperty('value') && el.hasOwnProperty('name')
+                        Object.prototype.hasOwnProperty.call(el,'value')
+                        && Object.prototype.hasOwnProperty.call(el, 'name')
                     );
                 }
             }

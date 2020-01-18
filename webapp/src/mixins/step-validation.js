@@ -5,7 +5,7 @@ function dotAccessObject(obj, deep_key) {
   let retval = undefined;
   let keys = deep_key.split('.');
   keys.every(function (key) {
-    if (obj.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
       obj = obj[key]
       if (!(obj instanceof Object) || (obj instanceof Array)) {
         retval = obj
