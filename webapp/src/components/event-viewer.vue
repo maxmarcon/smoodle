@@ -250,7 +250,7 @@
                             | &nbsp; {{ $t(isOrganizer ? 'event_viewer.event_canceled_organizer' : 'event_viewer.event_canceled') }}
 
                         div(v-if="eventOrganizerMessage")
-                            .d-flex.text-justify
+                            p
                                 em.text-muted {{ $t('event_viewer.organizer_says', {organizer: eventOrganizer}) }} &nbsp;
                                 | {{ eventOrganizerMessage }}
 
