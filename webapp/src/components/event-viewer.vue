@@ -143,9 +143,6 @@
                 li.list-group-item
                     div(v-if="eventOpen")
                         div(v-if="!isOrganizer")
-                            .alert.alert-warning(v-if="eventModified")
-                                i.fas.fa-cut
-                                | &nbsp; {{ $t('event_viewer.event_modified', {time_distance: eventModifiedRelative, organizer: eventOrganizer}) }}
                             .alert.alert-success
                                 i.fas.fa-share-alt
                                 | &nbsp; {{ $t('event_viewer.welcome', {organizer: eventOrganizer}) }}
