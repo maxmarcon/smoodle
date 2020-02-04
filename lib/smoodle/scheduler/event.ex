@@ -97,7 +97,7 @@ defmodule Smoodle.Scheduler.Event do
     |> change(%{secret: SecureRandom.urlsafe_base64(@secret_len)})
   end
 
-  @spec date_range(Event.t()) :: Date.Range.t()
+  @spec date_range(%Event{}) :: Date.Range
   @doc """
   Returns the range of all the possible dates for this event
 
@@ -113,7 +113,7 @@ defmodule Smoodle.Scheduler.Event do
     )
   end
 
-  @spec domain(%Event{preferences: map, possible_dates: list}) :: [Date.t()]
+  @spec domain(%Event{preferences: map, possible_dates: list}) :: [Date]
   @doc """
 
   iex> Event.domain(%Event{preferences: %{weekdays: []}, possible_dates: [%{date_from: ~D[2118-01-03], date_to: ~D[2118-01-09], rank: 0}]})

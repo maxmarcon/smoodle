@@ -22,7 +22,7 @@ defmodule Smoodle.Mailer do
   @doc """
 
   """
-  @spec deliver_with_rate_limit(email :: %Bamboo.Email{}, cache_key :: String.t()) ::
+  @spec deliver_with_rate_limit(email :: %Bamboo.Email{}, cache_key :: String.t) ::
           tuple() | atom()
   def deliver_with_rate_limit(%Bamboo.Email{} = email, cache_key) do
     {:ok, counter} = Cachex.incr(cache(), cache_key)

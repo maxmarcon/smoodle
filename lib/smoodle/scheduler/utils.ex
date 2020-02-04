@@ -137,7 +137,7 @@ defmodule Smoodle.Scheduler.Utils do
     end
   end
 
-  @spec validate_no_overlapping_dates(Ecto.Changeset.t(), atom) :: list
+  @spec validate_no_overlapping_dates(Ecto.Changeset, atom) :: list
   @doc """
   Validates that a list of date ranges accessed via "key" do not overlap
 
