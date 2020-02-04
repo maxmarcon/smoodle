@@ -194,15 +194,13 @@
                                             b-carousel-slide
                                                 template(v-slot:img)
                                                     v-calendar(
-                                                        :is-linked="true"
                                                         nav-visibility="hidden"
                                                         :attributes="scheduleCalendarAttributes"
-                                                        :min-page="fromPage"
-                                                        :max-page="toPage"
-                                                        :is-double-paned="differentMonths"
+                                                        :min-date="minDate"
+                                                        :max-date="maxDate"
                                                         :is-expanded="true"
-                                                        :theme-styles="calThemeStyles"
                                                         @dayclick="dayclicked"
+                                                        theme=""
                                                     )
                                             b-carousel-slide
                                                 template(v-slot:img)
@@ -231,14 +229,12 @@
                             .col-md-6
                                 .form-group
                                     v-calendar(
-                                        :is-linked="true"
                                         nav-visibility="hidden"
-                                        :min-page="fromPage"
-                                        :max-page="toPage"
+                                        :min-date="minDate"
+                                        :max-date="maxDate"
                                         :attributes="scheduledEventCalendarAttributes"
-                                        :is-double-paned="differentMonths"
                                         :is-expanded="true"
-                                        :theme-styles="calThemeStyles"
+                                        :theme="calThemeStyles"
                                     )
 
                     div(v-else-if="eventCanceled")
