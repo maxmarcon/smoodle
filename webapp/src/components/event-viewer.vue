@@ -198,10 +198,13 @@
                                                         :attributes="scheduleCalendarAttributes"
                                                         :min-date="minDate"
                                                         :max-date="maxDate"
+                                                        :locale="$i18n.locale"
                                                         :is-expanded="true"
                                                         @dayclick="dayclicked"
-                                                        theme=""
                                                     )
+                                                        template(v-slot:day-popover="{attributes: [attr]}")
+                                                            popover-row(v-if="attr" :attribute="attr")
+                                                                span {{ textForDate(attr.customData, 2) }}
                                             b-carousel-slide
                                                 template(v-slot:img)
                                                     date-details(
@@ -296,6 +299,7 @@
     import restMixin from '../mixins/rest'
     import dateDetails from './date-details'
     import {scrollToTopMixin, whatsAppHelpersMixin} from '../mixins/utils'
+    import popoverRow from 'v-calendar/lib/components/popover-row.umd.min'
 
     const today = new Date()
 
@@ -311,7 +315,8 @@
             whatsAppHelpersMixin
         ],
         components: {
-            'date-details': dateDetails
+            dateDetails,
+            popoverRow
         },
         props: {
             eventId: {
@@ -392,14 +397,14 @@
                 return this.eventScheduleDates.slice(0, limit).map((date_entry) => ({
                     dates: date_entry.date,
                     highlight: {
-                        backgroundColor: (date_entry.negative_rank < 0 ? colorCodes.red : colorCodes.green),
-                        opacity: this.opacityForDate(date_entry, minNegativeRank, maxPositiveRank)
+                        color: (date_entry.negative_rank < 0 ? 'red' : 'green'),
+                        class: this.opacityClassForDate(date_entry, minNegativeRank, maxPositiveRank)
                     },
                     bar: (is_top_rank(date_entry) ? {
-                        backgroundColor: colorCodes.blue
+                        color: 'blue'
                     } : false),
                     popover: {
-                        label: (attribute) => this.textForDate(attribute.customData, 5)
+                        visibility: "hover"
                     },
                     customData: Object.assign(date_entry, {optimal: is_top_rank(date_entry)})
                 }));
@@ -513,10 +518,12 @@
                     this.loading = false
                 }
             },
-            opacityForDate(date_entry, minNegativeRank, maxPositiveRank) {
-                return (date_entry.negative_rank < 0
+            opacityClassForDate(date_entry, minNegativeRank, maxPositiveRank) {
+                const opacityValue = (date_entry.negative_rank < 0
                     ? date_entry.negative_rank / minNegativeRank
-                    : Math.max(date_entry.positive_rank, 0.5) / maxPositiveRank);
+                    : date_entry.positive_rank / maxPositiveRank);
+
+                return `smoodle-opacity-${Math.max(Math.floor(opacityValue*20)*5, 5)}`
             },
             clipboard() {
                 this.$bvModal.show('clipboard-modal');

@@ -24,6 +24,7 @@ import 'vue-loading-overlay/dist/vue-loading.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import 'pretty-checkbox/src/pretty-checkbox.scss';
 import './scss/app.scss';
+import './scss/opacity.scss';
 
 import MessageBar from './components/message-bar'
 import EventHeader from './components/event-header'
