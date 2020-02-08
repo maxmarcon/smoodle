@@ -1,10 +1,14 @@
 version: 2.1
 
+&elixir_image: circleci/elixir:1.10.0
+&node_image: circleci/node:13.7.0
+&node_image_browsers: circleci/node:13.7.0-browsers
+
 commands:
   restore_mix_cache:
     steps:
       - restore_cache:
-          key: mix-deps-{{ checksum "mix.lock" }}
+              key: mix-deps-{{ checksum "mix.lock" }}
 
   save_mix_cache:
     steps:
@@ -28,7 +32,7 @@ commands:
 jobs:
   build_back_end:
     docker:
-      - image: circleci/elixir:1.10.0
+      - image: *elixir_image
     environment:
       MIX_ENV: test
     steps:
@@ -49,7 +53,7 @@ jobs:
 
   build_front_end:
     docker:
-      - image: circleci/node:13.7.0
+      - image: *node_image
     working_directory: ~/project/webapp
     steps:
       - attach_workspace:
@@ -62,7 +66,7 @@ jobs:
 
   backend_unit_tests:
     docker:
-      - image: circleci/elixir:1.9.1
+      - image: *elixir_image
       - image: circleci/postgres
         environment:
           POSTGRES_PASSWORD: secret
@@ -77,7 +81,7 @@ jobs:
 
   frontend_unit_tests:
     docker:
-      - image: circleci/node:12.11.0-browsers
+      - image: *node_image_browsers
     working_directory: ~/project/webapp
     steps:
       - attach_workspace:
@@ -92,7 +96,7 @@ jobs:
 
   deploy:
     docker:
-      - image: circleci/elixir:1.9.1
+      - image: *elixir_image
     steps:
       - attach_workspace:
           at: ~/
