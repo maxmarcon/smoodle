@@ -25,19 +25,17 @@ defmodule SmoodleWeb.EventController do
 
   def create(conn, %{"event" => event_params}) do
     with {:ok, event} <-
-           Repo.transaction(
-             fn ->
-               with {:ok, %Event{} = event} <- Scheduler.create_event(event_params),
-                    {:ok, _} <-
-                      Email.new_event_email(event)
-                      |> Mailer.deliver_with_rate_limit(event.email) do
-                 event
-               else
-                 {:error, :rate_limit_exceeded} -> Repo.rollback(:too_many_requests)
-                 {:error, error} -> Repo.rollback(error)
-               end
+           Repo.transaction(fn ->
+             with {:ok, %Event{} = event} <- Scheduler.create_event(event_params),
+                  {:ok, _} <-
+                    Email.new_event_email(event)
+                    |> Mailer.deliver_with_rate_limit(event.email) do
+               event
+             else
+               {:error, :rate_limit_exceeded} -> Repo.rollback(:too_many_requests)
+               {:error, error} -> Repo.rollback(error)
              end
-           ) do
+           end) do
       Logger.info("Created event: #{event}")
 
       conn
@@ -54,13 +52,14 @@ defmodule SmoodleWeb.EventController do
 
   def show(conn, %{"id" => id}) do
     event = Repo.preload(Scheduler.get_event!(id), :possible_dates)
+
     render(
       conn,
       :show,
       event: %{
-        event |
-        secret: nil,
-        email: nil
+        event
+        | secret: nil,
+          email: nil
       }
     )
   end

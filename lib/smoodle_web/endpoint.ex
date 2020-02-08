@@ -37,7 +37,7 @@ defmodule SmoodleWeb.Endpoint do
   plug(Plug.Head)
 
   if Application.get_env(:smoodle, :env) == :dev do
-    plug CORSPlug, origin: "*"
+    plug(CORSPlug, origin: "*")
   end
 
   plug(SmoodleWeb.Router)

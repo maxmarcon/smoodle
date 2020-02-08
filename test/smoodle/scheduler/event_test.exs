@@ -286,15 +286,17 @@ defmodule Smoodle.Scheduler.EventTest do
   end
 
   test "validate weekdays" do
-    changeset = Event.changeset(
-      %Event{},
-      %{
-        @valid_attrs |
-        preferences: %{
-          weekdays: [%{day: 0}]
+    changeset =
+      Event.changeset(
+        %Event{},
+        %{
+          @valid_attrs
+          | preferences: %{
+              weekdays: [%{day: 0}]
+            }
         }
-      }
-    )
+      )
+
     weekday_changeset = hd(changeset.changes.preferences.changes.weekdays)
     assert [rank: {_, [validation: :required]}] = weekday_changeset.errors
   end
@@ -305,10 +307,9 @@ defmodule Smoodle.Scheduler.EventTest do
         %Event{},
         %{
           @valid_attrs
-        |
-          preferences: %{
-            weekdays: [%{day: 0, rank: 1}, %{day: 0, rank: 0}]
-          }
+          | preferences: %{
+              weekdays: [%{day: 0, rank: 1}, %{day: 0, rank: 0}]
+            }
         }
       )
 
@@ -322,16 +323,16 @@ defmodule Smoodle.Scheduler.EventTest do
         %Event{},
         %{
           @valid_attrs
-        |
-          preferences: %{
-            weekdays: for(
-              d <- 0..6,
-              do: %{
-                day: d,
-                rank: -1
-              }
-            )
-          }
+          | preferences: %{
+              weekdays:
+                for(
+                  d <- 0..6,
+                  do: %{
+                    day: d,
+                    rank: -1
+                  }
+                )
+            }
         }
       )
 
@@ -345,10 +346,9 @@ defmodule Smoodle.Scheduler.EventTest do
         %Event{},
         %{
           @valid_attrs
-        |
-          preferences: %{
-            weekdays: []
-          }
+          | preferences: %{
+              weekdays: []
+            }
         }
       )
 

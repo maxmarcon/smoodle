@@ -218,11 +218,11 @@ defmodule Smoodle.Scheduler do
     schedule
     |> Map.update!(:participants, fn _ -> [] end)
     |> Map.update!(
-         :dates,
-         fn dates ->
-           Enum.map(dates, &mask_participants/1)
-         end
-       )
+      :dates,
+      fn dates ->
+        Enum.map(dates, &mask_participants/1)
+      end
+    )
   end
 
   defp compute_and_cache_best_schedule(%Event{} = event, opts) do
@@ -310,35 +310,35 @@ defmodule Smoodle.Scheduler do
       end
     )
     |> Map.update!(
-         :positive_rank,
-         fn value ->
-           if rank > 0 do
-             value + rank
-           else
-             value
-           end
-         end
-       )
+      :positive_rank,
+      fn value ->
+        if rank > 0 do
+          value + rank
+        else
+          value
+        end
+      end
+    )
     |> Map.update!(
-         :negative_participants,
-         fn participants ->
-           if rank < 0 do
-             [poll.participant | participants]
-           else
-             participants
-           end
-         end
-       )
+      :negative_participants,
+      fn participants ->
+        if rank < 0 do
+          [poll.participant | participants]
+        else
+          participants
+        end
+      end
+    )
     |> Map.update!(
-         :positive_participants,
-         fn participants ->
-           if rank > 0 do
-             [poll.participant | participants]
-           else
-             participants
-           end
-         end
-       )
+      :positive_participants,
+      fn participants ->
+        if rank > 0 do
+          [poll.participant | participants]
+        else
+          participants
+        end
+      end
+    )
   end
 
   defp compute_rank(%{} = poll, %Date{} = date) do
@@ -357,30 +357,28 @@ defmodule Smoodle.Scheduler do
     poll
     |> Map.from_struct()
     |> Map.update!(
-         :date_ranks,
-         &(&1
-           |> Enum.map(
-                fn %{date_from: date_from, date_to: date_to, rank: rank} ->
-                  {Date.range(date_from, date_to), rank}
-                end
-              ))
-       )
+      :date_ranks,
+      &(&1
+        |> Enum.map(fn %{date_from: date_from, date_to: date_to, rank: rank} ->
+          {Date.range(date_from, date_to), rank}
+        end))
+    )
     |> Map.put(
-         :weekday_ranks,
-         case poll.preferences do
-           nil ->
-             %{}
+      :weekday_ranks,
+      case poll.preferences do
+        nil ->
+          %{}
 
-           _ ->
-             Map.new(
-               poll.preferences.weekday_ranks,
-               fn %{day: day, rank: rank} ->
-                 # convert from 0-based, Monday-first to 1-based Monday-first
-                 {day + 1, rank}
-               end
-             )
-         end
-       )
+        _ ->
+          Map.new(
+            poll.preferences.weekday_ranks,
+            fn %{day: day, rank: rank} ->
+              # convert from 0-based, Monday-first to 1-based Monday-first
+              {day + 1, rank}
+            end
+          )
+      end
+    )
     |> Map.take([:date_ranks, :weekday_ranks, :participant])
   end
 end

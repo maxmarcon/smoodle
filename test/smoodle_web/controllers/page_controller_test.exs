@@ -3,10 +3,12 @@ defmodule SmoodleWeb.PageControllerTest do
 
   setup_all do
     index_file_path = Application.app_dir(:smoodle, "priv/static/index.html")
+
     unless File.exists?(index_file_path) do
       File.mkdir_p!("priv/static")
       File.write!(index_file_path, "<html></html>")
     end
+
     :ok
   end
 

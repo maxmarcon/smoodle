@@ -561,12 +561,19 @@ defmodule Smoodle.SchedulerTest do
       {:ok, poll2} = Scheduler.create_poll(event, @poll_valid_attrs_2)
       {:ok, poll3} = Scheduler.create_poll(event, @poll_valid_attrs_3)
 
-      {:ok, public_participants_event} = Scheduler.create_event(%{@event_valid_attrs_1 | public_participants: true})
+      {:ok, public_participants_event} =
+        Scheduler.create_event(%{@event_valid_attrs_1 | public_participants: true})
+
       {:ok, poll4} = Scheduler.create_poll(public_participants_event, @poll_valid_attrs_1)
       {:ok, poll5} = Scheduler.create_poll(public_participants_event, @poll_valid_attrs_2)
       {:ok, poll6} = Scheduler.create_poll(public_participants_event, @poll_valid_attrs_3)
 
-      %{event: event, polls: [poll2, poll3, poll1], public_participants_event: public_participants_event, public_polls: [poll4, poll5, poll6]}
+      %{
+        event: event,
+        polls: [poll2, poll3, poll1],
+        public_participants_event: public_participants_event,
+        public_polls: [poll4, poll5, poll6]
+      }
     end
 
     test "get_best_schedule returns the best dates at the head of the list", %{event: event} do
@@ -641,10 +648,11 @@ defmodule Smoodle.SchedulerTest do
                Enum.map(polls, &Map.get(&1, :participant)) |> Enum.sort()
     end
 
-    test "get_best_schedule called from non-owner does include participant names if participants are public", %{
-      public_participants_event: public_participants_event,
-      public_polls: polls
-    } do
+    test "get_best_schedule called from non-owner does include participant names if participants are public",
+         %{
+           public_participants_event: public_participants_event,
+           public_polls: polls
+         } do
       best_schedule = Scheduler.get_best_schedule(public_participants_event)
       assert Enum.any?(best_schedule.dates, &Enum.any?(&1.negative_participants))
       assert Enum.any?(best_schedule.dates, &Enum.any?(&1.positive_participants))
@@ -653,10 +661,11 @@ defmodule Smoodle.SchedulerTest do
                Enum.map(polls, &Map.get(&1, :participant)) |> Enum.sort()
     end
 
-    test "get_best_schedule called from owner does include participant names if participants are public", %{
-      public_participants_event: public_participants_event,
-      public_polls: polls
-    } do
+    test "get_best_schedule called from owner does include participant names if participants are public",
+         %{
+           public_participants_event: public_participants_event,
+           public_polls: polls
+         } do
       best_schedule = Scheduler.get_best_schedule(public_participants_event, is_owner: true)
       assert Enum.any?(best_schedule.dates, &Enum.any?(&1.negative_participants))
       assert Enum.any?(best_schedule.dates, &Enum.any?(&1.positive_participants))

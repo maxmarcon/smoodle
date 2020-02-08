@@ -24,5 +24,5 @@ config :smoodle,
 config :smoodle, Smoodle.Mailer, adapter: Bamboo.TestAdapter
 
 config :junit_formatter,
-       print_report_file: true,
-       report_dir: "./test-results/exunit"
+  print_report_file: true,
+  report_dir: "./test-results/exunit"
