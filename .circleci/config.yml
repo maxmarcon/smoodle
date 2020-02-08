@@ -1,8 +1,8 @@
 version: 2.1
 
-&elixir_image: circleci/elixir:1.10.0
-&node_image: circleci/node:13.7.0
-&node_image_browsers: circleci/node:13.7.0-browsers
+elixir_image: &elixir_image circleci/elixir:1.10.0
+node_image: &node_image circleci/node:13.7.0
+node_image_browsers: &node_image_browsers circleci/node:13.7.0-browsers
 
 commands:
   restore_mix_cache:
