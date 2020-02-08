@@ -28,7 +28,7 @@ commands:
 jobs:
   build_back_end:
     docker:
-      - image: circleci/elixir:1.9.1
+      - image: circleci/elixir:1.10.0
     environment:
       MIX_ENV: test
     steps:
@@ -137,5 +137,3 @@ workflows:
               only: /^v.*/
             branches:
               ignore: /.*/
-
-
