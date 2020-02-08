@@ -48,7 +48,6 @@
 </template>
 <script>
     import * as dateFns from 'date-fns'
-    import {colorCodes} from '../constants'
     import EventHelpersMixin from '../mixins/event-helpers'
 
     const MAX_NAMES = 5
@@ -60,15 +59,11 @@
             calendarAttribute: Object
         },
         data: () => ({
-            colorCodes,
             participantsList: null,
             positive: true,
             MAX_NAMES
         }),
         computed: {
-            backgroundColor() {
-                return this.calendarAttribute.highlight.backgroundColor
-            },
             opacity() {
                 return this.calendarAttribute.highlight.opacity
             },

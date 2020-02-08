@@ -37,7 +37,14 @@ Vue.config.productionTip = false;
 Vue.use(BootstrapVue);
 Vue.use(VueLoading);
 Vue.use(VueAxios, axios);
-Vue.use(VCalendar)
+Vue.use(VCalendar, {
+  screens: {
+    "sm": "576px",
+    "md": "768px",
+    "lg": "992px",
+    "xl": "1200px"
+  }
+})
 Vue.use(PrettyCheckbox)
 Vue.use(VueScrollTo)
 Vue.use(datePicker)

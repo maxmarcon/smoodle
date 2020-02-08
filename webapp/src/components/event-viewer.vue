@@ -198,6 +198,7 @@
                                                         :attributes="scheduleCalendarAttributes"
                                                         :min-date="minDate"
                                                         :max-date="maxDate"
+                                                        :columns="calendarColumns"
                                                         :locale="$i18n.locale"
                                                         :is-expanded="true"
                                                         @dayclick="dayclicked"
@@ -235,9 +236,10 @@
                                         nav-visibility="hidden"
                                         :min-date="minDate"
                                         :max-date="maxDate"
+                                        :columns="calendarColumns"
                                         :attributes="scheduledEventCalendarAttributes"
+                                        :locale="$i18n.locale"
                                         :is-expanded="true"
-                                        :theme="calThemeStyles"
                                     )
 
                     div(v-else-if="eventCanceled")
@@ -293,15 +295,12 @@
 </template>
 <script>
     import * as dateFns from 'date-fns'
-    import {calThemeStyles, colorCodes} from '../constants'
     import eventHelpersMixin from '../mixins/event-helpers'
     import eventDataMixin from '../mixins/event-data'
     import restMixin from '../mixins/rest'
     import dateDetails from './date-details'
     import {scrollToTopMixin, whatsAppHelpersMixin} from '../mixins/utils'
     import popoverRow from 'v-calendar/lib/components/popover-row.umd.min'
-
-    const today = new Date()
 
     const SCHEDULE_DATES_LIMIT = null;
     const EVENT_RELOAD_INTERVAL_MSEC = 15000;
@@ -345,15 +344,6 @@
                     down: "fas fa-sort-down fa-2x"
                 }
             },
-            selectAttrubute: {
-                highlight: {
-                    backgroundColor: colorCodes.blue,
-                    opacity: 1,
-                    borderColor: colorCodes.black,
-                    borderWidth: "2px"
-                }
-            },
-            calThemeStyles,
             reloadIntervalId: null,
             dayDetailsCalendarAttribute: null,
             organizerMessage: null
@@ -369,11 +359,10 @@
             isOrganizer() {
                 return !!this.secret;
             },
+            calendarColumns() {
+              return this.$screens({default: 1, lg: this.differentMonths ? 2 : 1})
+            },
             scheduleCalendarAttributes() {
-                if (this.eventOpen && this.eventScheduleParticipantsCount === 0) {
-                    return this.noParticipantsCalendarAttributes;
-                }
-
                 const scheduleDates = this.eventScheduleDates.length;
                 let minNegativeRank;
                 let maxPositiveRank;
@@ -397,8 +386,7 @@
                 return this.eventScheduleDates.slice(0, limit).map((date_entry) => ({
                     dates: date_entry.date,
                     highlight: {
-                        color: (date_entry.negative_rank < 0 ? 'red' : 'green'),
-                        class: this.opacityClassForDate(date_entry, minNegativeRank, maxPositiveRank)
+                        class: this.classForDate(date_entry, minNegativeRank, maxPositiveRank)
                     },
                     bar: (is_top_rank(date_entry) ? {
                         color: 'blue'
@@ -416,49 +404,9 @@
                         label: this.eventScheduledTime
                     },
                     highlight: {
-                        borderColor: colorCodes.black,
-                        opacity: 0.6,
-                        borderWidth: "2px",
-                        backgroundColor: colorCodes.blue
+                        class: 'bg-primary'
                     }
                 }]
-            },
-            noParticipantsCalendarAttributes() {
-                return this.eventPossibleDates.map(({
-                                                        date_from,
-                                                        date_to,
-                                                        rank
-                                                    }) => {
-                    return {
-                        dates: {
-                            start: date_from,
-                            end: date_to,
-                        },
-                        highlight: {
-                            animated: false,
-                            backgroundColor: this.colorForRank(rank),
-                            opacity: (rank === 0 ? 0.6 : 1)
-                        },
-                        order: (rank === 0 ? 0 : 2)
-                    }
-                }).concat([{
-                    dates: {
-                        start: today,
-                        end: null,
-                        weekdays: this.eventWeekdays.filter(({
-                                                                 value
-                                                             }) => !value).map(({
-                                                                                    day
-                                                                                }) => ((day + 1) % 7) + 1)
-                        // from 0=Mon...6=Sun to v-calendars's 1=Sun...7=Sat
-                    },
-                    highlight: {
-                        animated: false,
-                        backgroundColor: this.colorForRank(-1),
-                        opacity: 0.6
-                    },
-                    order: 1
-                }])
             },
             selectedDateFormatted() {
                 return dateFns.format(this.selectedDate, this.$i18n.t('date_format_long'), {locale: this.$i18n.t('date_fns_locale')});
@@ -474,7 +422,6 @@
                     this.$refs.calendarCarousel.next()
                 }
             },
-            colorForRank: (rank) => (rank >= 0 ? colorCodes.green : colorCodes.red),
             async loadEvent() {
                 if (this.loading) {
                     return
@@ -518,12 +465,14 @@
                     this.loading = false
                 }
             },
-            opacityClassForDate(date_entry, minNegativeRank, maxPositiveRank) {
+            classForDate(date_entry, minNegativeRank, maxPositiveRank) {
                 const opacityValue = (date_entry.negative_rank < 0
                     ? date_entry.negative_rank / minNegativeRank
                     : date_entry.positive_rank / maxPositiveRank);
 
-                return `smoodle-opacity-${Math.max(Math.floor(opacityValue*20)*5, 5)}`
+                const opacityClass = `smoodle-opacity-${Math.max(Math.floor(opacityValue*20)*5, 5)}`
+                const colorClass = (date_entry.negative_rank < 0 ? 'bg-danger' : 'bg-success')
+                return `${opacityClass} ${colorClass}`
             },
             clipboard() {
                 this.$bvModal.show('clipboard-modal');
@@ -613,7 +562,7 @@
                                 state: 'SCHEDULED',
                                 secret: this.secret,
                                 scheduled_from: this.selectedDate.toISOString(),
-                                scheduled_to: dateFns.addHours(this.selectedDate, 6).toISOString(),
+                                scheduled_to: this.selectedDate.toISOString(),
                                 organizer_message: this.organizerMessage
                             }
                         }

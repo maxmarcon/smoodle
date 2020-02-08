@@ -1,3 +1,4 @@
+// Remove as soon as not used anymore
 export const colorCodes = {
   green: '#28a745',
   red: '#dc3545',
