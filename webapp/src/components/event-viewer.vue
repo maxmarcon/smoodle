@@ -170,8 +170,8 @@
                 i18n(path="event_viewer.no_participants" v-else)
                   template(v-slot:icon)
                     i.fas.fa-trophy.fa-lg
-              .row.justify-content-md-between.justify-content-lg-center
-                .col-md-3.offset-md-1.order-md-last.text-justify(v-if="eventScheduleParticipantsCount")
+              .row.justify-content-center
+                .col-md-3.order-md-last.text-justify(v-if="eventScheduleParticipantsCount")
                   .form-group
                     i18n.small.text-muted(
                       :path="isOrganizer ? 'event_viewer.date_selection_help_organizer' : 'event_viewer.date_selection_help'"
@@ -188,7 +188,7 @@
                       template(v-slot:blue_underlined)
                         span.text-primary {{ $t('event_viewer.blue_underlined') }}
 
-                .col-md-6.text-center
+                .col-md-9.text-center
                   .form-group
                     b-carousel(ref="calendarCarousel" :interval="0" no-touch)
                       b-carousel-slide
