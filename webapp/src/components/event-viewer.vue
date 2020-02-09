@@ -493,11 +493,12 @@
         }
       },
       classForDate(date_entry, minNegativeRank, maxPositiveRank) {
-        const opacityValue = (date_entry.negative_rank < 0 ?
+        const relativeRank = (date_entry.negative_rank < 0 ?
           date_entry.negative_rank / minNegativeRank :
           date_entry.positive_rank / maxPositiveRank);
+        const relativeRankBetween10and100 = (relativeRank * 90) + 10
 
-        const opacityClass = `smoodle-opacity-${Math.max(Math.floor(opacityValue * 20) * 5, 10)}`
+        const opacityClass = `smoodle-opacity-${Math.floor(relativeRankBetween10and100 / 5) * 5}`
         const colorClass = (date_entry.negative_rank < 0 ? 'bg-danger' : 'bg-success')
         return `${opacityClass} ${colorClass}`
       },
