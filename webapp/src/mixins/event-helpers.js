@@ -101,17 +101,6 @@ export default {
           });
       }
     },
-    eventModified() {
-      return this.eventInsertedAt && this.eventModifiedAt && !dateFns.isEqual(this.eventInsertedAt, this.eventModifiedAt);
-    },
-    eventModifiedRelative() {
-      if (this.eventModified) {
-        return dateFns.formatDistanceToNow(this.eventModifiedAt, {
-          locale: this.$i18n.t('date_fns_locale'),
-          addSuffix: true
-        });
-      }
-    },
     eventScheduledTime() {
       let time = this.eventScheduledFrom;
 

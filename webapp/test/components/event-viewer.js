@@ -3,10 +3,7 @@ import BootstrapVue from 'bootstrap-vue'
 import VueClipboard from 'vue-clipboard2'
 import i18nMock from '../test-utils/i18n-mock'
 import wait from '../test-utils/wait'
-import {
-  createLocalVue,
-  mount
-} from '@vue/test-utils'
+import {createLocalVue, mount} from '@vue/test-utils'
 
 const routerSpy = jasmine.createSpyObj("routerSpy", ["push"])
 
@@ -294,9 +291,9 @@ describe('eventViewer', () => {
           wrapper.vm.scheduleCalendarAttributes.forEach((attr) => {
             expect(attr.dates instanceof Date).toBeTruthy()
             expect(attr.customData.positive_participants).toBeUndefined()
-            expect(typeof(attr.customData.positive_rank)).toEqual("number")
+            expect(typeof (attr.customData.positive_rank)).toEqual("number")
             expect(attr.customData.negative_participants).toBeUndefined()
-            expect(typeof(attr.customData.negative_rank)).toEqual("number")
+            expect(typeof (attr.customData.negative_rank)).toEqual("number")
 
           });
         })
@@ -376,6 +373,10 @@ describe('eventViewer', () => {
           expect(eventHeader.attributes('eventtimewindow')).toBeDefined()
         })
 
+        it('it computes scheduleCalendarAttributes', () => {
+          expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(1)
+        })
+
         it('renders main card', () => {
           expect(wrapper.find('div.card').exists()).toBeTruthy();
         })
@@ -444,7 +445,7 @@ describe('eventViewer', () => {
       })
 
       it('it computes scheduleCalendarAttributes', () => {
-        expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(0)
+        expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(1)
       })
 
       it('renders main card', () => {
@@ -460,7 +461,7 @@ describe('eventViewer', () => {
       })
 
       it('does not render calendar', () => {
-        expect(wrapper.find('v-calendar').exists()).toBeFalsy()
+        expect(wrapper.find('v-calendar').exists()).toBeFalse()
       })
 
       buttonSelectors.all.forEach(selector => {
@@ -508,7 +509,7 @@ describe('eventViewer', () => {
       })
 
       it('it computes scheduleCalendarAttributes', () => {
-        expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(0)
+        expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(1)
       })
 
       it('renders main card', () => {
@@ -588,9 +589,9 @@ describe('eventViewer', () => {
           wrapper.vm.scheduleCalendarAttributes.forEach((attr) => {
             expect(attr.dates instanceof Date).toBeTruthy()
             expect(attr.customData.positive_participants instanceof Array).toBeTruthy()
-            expect(typeof(attr.customData.positive_rank)).toEqual("number")
+            expect(typeof (attr.customData.positive_rank)).toEqual("number")
             expect(attr.customData.negative_participants instanceof Array).toBeTruthy()
-            expect(typeof(attr.customData.negative_rank)).toEqual("number")
+            expect(typeof (attr.customData.negative_rank)).toEqual("number")
           })
         })
 
@@ -770,6 +771,10 @@ describe('eventViewer', () => {
           expect(eventHeader.attributes('eventtimewindow')).toBeDefined()
         })
 
+        it('it computes scheduleCalendarAttributes', () => {
+          expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(1)
+        })
+
         it('renders main card', () => {
           expect(wrapper.find('div.card').exists()).toBeTruthy();
         })
@@ -796,6 +801,10 @@ describe('eventViewer', () => {
 
         it('does not render date picker', () => {
           expect(wrapper.find('v-date-picker-stub').exists()).toBeFalsy()
+        })
+
+        it('renders calendar', () => {
+          expect(wrapper.find('v-calendar-stub').exists()).toBeTrue()
         })
       })
     })
@@ -839,7 +848,7 @@ describe('eventViewer', () => {
       })
 
       it('it computes scheduleCalendarAttributes', () => {
-        expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(0)
+        expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(1)
       })
 
       it('renders main card', () => {
@@ -935,7 +944,7 @@ describe('eventViewer', () => {
       })
 
       it('it computes scheduleCalendarAttributes', () => {
-        expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(0)
+        expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(1)
       })
 
       it('renders main card', () => {
