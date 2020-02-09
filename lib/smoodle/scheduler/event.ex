@@ -58,17 +58,20 @@ defmodule Smoodle.Scheduler.Event do
   @doc false
   def changeset(%Event{} = event, attrs) do
     event
-    |> cast(attrs, [
-      :name,
-      :organizer,
-      :scheduled_from,
-      :scheduled_to,
-      :desc,
-      :organizer_message,
-      :email,
-      :state,
-      :public_participants
-    ])
+    |> cast(
+      attrs,
+      [
+        :name,
+        :organizer,
+        :scheduled_from,
+        :scheduled_to,
+        :desc,
+        :organizer_message,
+        :email,
+        :state,
+        :public_participants
+      ]
+    )
     |> validate_required([:name, :organizer, :email])
     |> validate_length(:name, max: 50)
     |> validate_length(:organizer, max: 50)
@@ -141,10 +144,13 @@ defmodule Smoodle.Scheduler.Event do
       if is_nil(preferences) do
         %{}
       else
-        Map.new(preferences.weekdays, fn %{day: day, rank: rank} ->
-          # convert from 0-based, Monday-first to 1-based Monday-first
-          {day + 1, rank}
-        end)
+        Map.new(
+          preferences.weekdays,
+          fn %{day: day, rank: rank} ->
+            # convert from 0-based, Monday-first to 1-based Monday-first
+            {day + 1, rank}
+          end
+        )
       end
 
     possible_dates
@@ -233,20 +239,24 @@ defmodule Smoodle.Scheduler.Event do
   end
 
   defp validate_scheduled_in_the_future(changeset) do
-    Enum.reduce([:scheduled_from, :scheduled_to], changeset, fn key, changeset ->
-      with {:ok, datetime} <- fetch_change(changeset, key),
-           false <- is_nil(datetime),
-           :gt <- DateTime.compare(DateTime.utc_now(), datetime) do
-        add_error(
-          changeset,
-          key,
-          dgettext("errors", "you cannot schedule an event in the past"),
-          validation: :in_the_past
-        )
-      else
-        _ -> changeset
+    Enum.reduce(
+      [:scheduled_from, :scheduled_to],
+      changeset,
+      fn key, changeset ->
+        with {:ok, datetime} <- fetch_change(changeset, key),
+             false <- is_nil(datetime),
+             :gt <- DateTime.compare(DateTime.utc_now(), datetime) do
+          add_error(
+            changeset,
+            key,
+            dgettext("errors", "you cannot schedule an event in the past"),
+            validation: :in_the_past
+          )
+        else
+          _ -> changeset
+        end
       end
-    end)
+    )
   end
 
   defp validate_domain_not_empty(changeset) do
@@ -274,7 +284,9 @@ defmodule Smoodle.Scheduler.Event do
       add_error(
         changeset,
         :possible_dates,
-        dgettext("errors", "you cannot select a time window larger than %{max_days} days",
+        dgettext(
+          "errors",
+          "you cannot select a time window larger than %{max_days} days",
           max_days: max_days
         ),
         validation: :time_interval_too_large
