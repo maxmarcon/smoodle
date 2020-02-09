@@ -151,13 +151,6 @@ export default {
         year: dateFns.getYear(date)
       }
     },
-    toPage() {
-      const date = this.maxDate || new Date()
-      return {
-        month: dateFns.getMonth(date) + 1, // from dateFns 0=Jan...11=Dec to v-calendar 1=Jan...12=Dec
-        year: dateFns.getYear(date)
-      }
-    },
     minDate() {
       if (this.eventScheduled) {
         return this.eventScheduledFrom

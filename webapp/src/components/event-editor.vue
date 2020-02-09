@@ -148,13 +148,13 @@
               .fas.fa-check(v-else-if="showGroupOkIcon('dates-group')")
 
             .form-group.row.justify-content-center.justify-content-md-between.justify-content-lg-center
-              .col-md-6.mb-3.text-center
+              .col-md-9.mb-3.text-center
                 .d-flex.justify-content-center.align-items-end
                   label {{ $t(!hasDateRange ? 'event_editor.event.dates_range' : 'event_editor.event.dates_single') }}
 
                 v-date-picker#eventPossibleDates(
                   :mode="!hasDateRange ? 'range' : 'single'"
-                  v-model="datesSelection"
+                  v-model="dateSelection"
                   nav-visibility="hidden"
                   :min-date="today"
                   :is-inline="true"
@@ -166,7 +166,7 @@
                   popover-visibility="hidden"
                   @input="newDate"
                   :is-expanded="true"
-                  :theme="{color: 'green'}"
+                  :locale="$i18n.locale"
                 )
                 .small.text-danger(name="event-possible-dates-error") {{ eventPossibleDatesError }}
 
@@ -176,7 +176,7 @@
                       i.fas.fa-undo(v-if="undoData")
                       i.fas.fa-trash-alt(v-else)
 
-              .col-11.col-md-3.offset-md-1
+              .col-11.col-md-3
                 ranker#eventWeekdays(:elements="eventWeekdays" boolean=true :disabled="!hasDateRange" @change="eventWeekdaysChanged")
                 .small.text-danger(name="event-weekdays-error") {{ eventWeekdaysError }}
 
@@ -312,7 +312,7 @@
         createdEventId: null,
         createdEventSecret: null,
         hasDateRange: false,
-        datesSelection: null,
+        dateSelection: null,
         undoData: null,
         step: this.forceStep || 1,
         minStep: 1,
@@ -414,7 +414,7 @@
       clearDateSelection() {
         // done in the next update cycle otherwise ineffective
         // when called from the newDate handler
-        setTimeout(() => this.datesSelection = null, 0)
+        setTimeout(() => this.dateSelection = null, 0)
       },
       clearDateInfo() {
         this.clearDateSelection()
@@ -435,7 +435,7 @@
       },
       newDate(value) {
         // console.log("newDate = " + value)
-        // console.log("datesSelection = " + this.datesSelection)
+        // console.log("dateSelection = " + this.dateSelection)
 
         if (!value) {
           return
@@ -508,7 +508,7 @@
         //DEBUG
         // console.dir(this.eventPossibleDates)
         // console.dir(this.eventDomain)
-        // console.log("datesSelection = " + this.datesSelection)
+        // console.log("dateSelection = " + this.dateSelection)
       },
       clipboard() {
         this.$bvModal.show('clipboard-modal')
