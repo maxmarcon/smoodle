@@ -8,7 +8,7 @@ commands:
   restore_mix_cache:
     steps:
       - restore_cache:
-              key: mix-deps-{{ checksum "mix.lock" }}
+          key: mix-deps-{{ checksum "mix.lock" }}
 
   save_mix_cache:
     steps:
