@@ -162,11 +162,11 @@
                   :is-required="true"
                   :columns="$screens({default: 1, md: 2})"
                   :attributes="datePickerAttributes"
-                  :selectAttribute="selectAttribute"
                   popover-visibility="hidden"
                   @input="newDate"
                   :is-expanded="true"
                   :locale="$i18n.locale"
+                  :drag-attribute="dragAttribute"
                 )
                 .small.text-danger(name="event-possible-dates-error") {{ eventPossibleDatesError }}
 
@@ -317,9 +317,9 @@
         step: this.forceStep || 1,
         minStep: 1,
         maxStep: 3,
-        selectAttribute: {
+        dragAttribute: {
           highlight: {
-            class: 'bg-light'
+            class: 'bg-success smoodle-opacity-60'
           }
         }
       }
