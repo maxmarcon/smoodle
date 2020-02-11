@@ -34,7 +34,7 @@
                 required: true,
                 validator: (value) => {
                     return value.every((el) =>
-                        Object.prototype.hasOwnProperty.call(el,'value')
+                        Object.prototype.hasOwnProperty.call(el, 'value')
                         && Object.prototype.hasOwnProperty.call(el, 'name')
                     );
                 }
@@ -47,6 +47,7 @@
             clicked(el) {
                 if (!el.disabled && !this.disabled && this.boolean) {
                     el.value = !el.value
+                    this.changed()
                 }
             }
         }

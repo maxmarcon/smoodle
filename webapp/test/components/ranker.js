@@ -1,144 +1,136 @@
 import ranker from '../../src/components/ranker.vue'
 import PrettyCheckbox from 'pretty-checkbox-vue'
 
-import {
-	mount,
-	createLocalVue
-} from '@vue/test-utils'
+import {createLocalVue, mount} from '@vue/test-utils'
 
 const localVue = createLocalVue()
 localVue.use(PrettyCheckbox)
 
 const ELEMENTS = [{
-	name: 'ABC',
-	value: 1
+  name: 'ABC',
+  value: 1
 }, {
-	name: 'DEF',
-	value: -1
+  name: 'DEF',
+  value: -1
 }, {
-	name: 'GHI',
-	value: 1,
-	disabled: true
+  name: 'GHI',
+  value: 1,
+  disabled: true
 }]
 
 const ELEMENTS_BOOLEAN = [{
-	name: 'ABC',
-	value: true
+  name: 'ABC',
+  value: true
 }, {
-	name: 'DEF',
-	value: false
+  name: 'DEF',
+  value: false
 }, {
-	name: 'GHI',
-	value: true,
-	disabled: true
+  name: 'GHI',
+  value: true,
+  disabled: true
 }]
 
 function mountRanker(boolean) {
 
-	return mount(ranker, {
-		mocks: {
-			$t: (k) => k
-		},
-		propsData: {
-			elements: boolean ? ELEMENTS_BOOLEAN : ELEMENTS,
-			boolean
-		},
-		localVue
-	})
+  return mount(ranker, {
+    mocks: {
+      $t: (k) => k
+    },
+    propsData: {
+      elements: boolean ? ELEMENTS_BOOLEAN : ELEMENTS,
+      boolean
+    },
+    localVue
+  })
 }
 
 describe('ranker', () => {
 
-	let wrapper
+  let wrapper
 
-	describe('in non-boolean mode', () => {
+  describe('in non-boolean mode', () => {
 
-		beforeEach(() => {
-			wrapper = mountRanker(false)
-		})
+    beforeEach(() => {
+      wrapper = mountRanker(false)
+    })
 
-		it('renders the right number of elements', () => {
-			let elements = wrapper.findAll('li')
-			expect(elements.length).toBe(ELEMENTS.length)
-		})
+    it('renders the right number of elements', () => {
+      let elements = wrapper.findAll('li')
+      expect(elements.length).toBe(ELEMENTS.length)
+    })
 
-		it('renders the right elements in the right order', () => {
-			let elements = wrapper.findAll('li')
+    it('renders the right elements in the right order', () => {
 
-			ELEMENTS.forEach((el, index) => {
-				let element = elements.at(index)
+      ELEMENTS.forEach((el, index) => {
+        expect(wrapper.find(`li:nth-child(${index + 1}) h6`).text()).toBe(el.name)
 
-				expect(element.find('h6').text()).toBe(el.name)
+        let radios = wrapper.findAll(`li:nth-child(${index + 1}) input[type="radio"]`)
+        expect(radios.at(0).attributes('name')).toBe(el.name)
+        expect(radios.at(0).attributes('value')).toBe(el.disabled ? '' : "1")
+        expect(radios.at(0).attributes('disabled')).toBe(el.disabled ? 'disabled' : undefined)
 
-				let radios = element.findAll('input[type="radio"]')
-				expect(radios.at(0).attributes('name')).toBe(el.name)
-				expect(radios.at(0).attributes('value')).toBe(el.disabled ? '' : "1")
-				expect(radios.at(0).attributes('disabled')).toBe(el.disabled ? 'disabled' : undefined)
+        expect(radios.at(1).attributes('name')).toBe(el.name)
+        expect(radios.at(1).attributes('value')).toBe(el.disabled ? '' : "0")
+        expect(radios.at(1).attributes('disabled')).toBe(el.disabled ? 'disabled' : undefined)
 
-				expect(radios.at(1).attributes('name')).toBe(el.name)
-				expect(radios.at(1).attributes('value')).toBe(el.disabled ? '' : "0")
-				expect(radios.at(1).attributes('disabled')).toBe(el.disabled ? 'disabled' : undefined)
+        expect(radios.at(2).attributes('name')).toBe(el.name)
+        expect(radios.at(2).attributes('value')).toBe(el.disabled ? '' : "-1")
+        expect(radios.at(2).attributes('disabled')).toBe(el.disabled ? 'disabled' : undefined)
+      })
+    })
 
-				expect(radios.at(2).attributes('name')).toBe(el.name)
-				expect(radios.at(2).attributes('value')).toBe(el.disabled ? '' : "-1")
-				expect(radios.at(2).attributes('disabled')).toBe(el.disabled ? 'disabled' : undefined)
-			})
-		})
+    it('emits change events', () => {
+      ELEMENTS.forEach((_el, index) => {
+        let radios = wrapper.findAll(`li:nth-child(${index + 1}) input[type="radio"]`)
+        radios.at(0).trigger('change')
+        radios.at(1).trigger('change')
+        radios.at(2).trigger('change')
+      })
 
-		it('propagates change events', () => {
+      expect(wrapper.emitted().change.length).toBe(2 * 3)
+    })
+  })
 
-			let elements = wrapper.findAll('li')
+  describe('in boolean mode', () => {
 
-			ELEMENTS.forEach((el, index) => {
-				let element = elements.at(index)
+    beforeEach(() => {
+      wrapper = mountRanker(true)
+    })
 
-				let radios = element.findAll('input[type="radio"]')
-				radios.at(0).trigger('change')
-				radios.at(1).trigger('change')
-				radios.at(2).trigger('change')
-			})
+    it('renders the right number of elements', () => {
+      let elements = wrapper.findAll('li')
+      expect(elements.length).toBe(ELEMENTS.length)
+    })
 
-			expect(wrapper.emitted().change.length).toBe(2 * 3)
-		})
-	})
+    it('renders the right elements in the right order', () => {
+      ELEMENTS_BOOLEAN.forEach((el, index) => {
+        expect(wrapper.find(`li:nth-child(${index + 1}) h6`).text()).toBe(el.name)
 
-	describe('in boolean mode', () => {
+        let toggle = wrapper.findAll(`li:nth-child(${index + 1}) input[type="checkbox"]`)
+        expect(toggle.length).toBe(1)
+        expect(toggle.at(0).attributes('disabled')).toBe(el.disabled ? 'disabled' : undefined)
+      })
+    })
 
-		beforeEach(() => {
-			wrapper = mountRanker(true)
-		})
+    it('emits change events', () => {
 
-		it('renders the right number of elements', () => {
-			let elements = wrapper.findAll('li')
-			expect(elements.length).toBe(ELEMENTS.length)
-		})
+      ELEMENTS_BOOLEAN.forEach((el, index) => {
 
-		it('renders the right elements in the right order', () => {
-			let elements = wrapper.findAll('li')
+        let toggle = wrapper.find(`li:nth-child(${index + 1}) input[type="checkbox"]`)
+        toggle.trigger('change')
+      })
 
-			ELEMENTS_BOOLEAN.forEach((el, index) => {
-				let element = elements.at(index)
+      expect(wrapper.emitted().change.length).toBe(2)
+    })
 
-				expect(element.find('h6').text()).toBe(el.name)
+    it('emits change events when clicking on the list item', () => {
+      ELEMENTS_BOOLEAN.forEach((el, index) => {
 
-				let toggle = element.findAll('input[type="checkbox"]')
-				expect(toggle.length).toBe(1)
-				expect(toggle.at(0).attributes('disabled')).toBe(el.disabled ? 'disabled' : undefined)
-			})
-		})
+        let listItem = wrapper.find(`li:nth-child(${index + 1})`)
+        listItem.trigger('click')
+      })
 
-		it('propagates change events', () => {
-
-			let elements = wrapper.findAll('li')
-
-			ELEMENTS_BOOLEAN.forEach((el, index) => {
-				let element = elements.at(index)
-
-				let toggle = element.findAll('input[type="checkbox"]')
-				toggle.at(0).trigger('change')
-			})
-
-			expect(wrapper.emitted().change.length).toBe(2)
-		})
-	})
+      expect(wrapper.emitted().change.length).toBe(2)
+    })
+  })
 })
