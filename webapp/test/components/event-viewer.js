@@ -24,7 +24,8 @@ function mountEventViewer(restRequest, propsData) {
       $tc: i18nMock.t,
       $i18n: i18nMock,
       $router: routerSpy,
-      $scrollTo: () => null
+      $scrollTo: () => null,
+      $screens: () => 2
     },
     propsData,
     localVue,
