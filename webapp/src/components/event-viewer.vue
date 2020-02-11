@@ -298,7 +298,6 @@
   import restMixin from '../mixins/rest'
   import dateDetails from './date-details'
   import {scrollToTopMixin, whatsAppHelpersMixin} from '../mixins/utils'
-  import popoverRow from 'v-calendar/lib/components/popover-row.umd.min'
 
   const SCHEDULE_DATES_LIMIT = null;
   const EVENT_RELOAD_INTERVAL_MSEC = 15000;
@@ -312,8 +311,7 @@
       whatsAppHelpersMixin
     ],
     components: {
-      dateDetails,
-      popoverRow
+      dateDetails
     },
     props: {
       eventId: {
