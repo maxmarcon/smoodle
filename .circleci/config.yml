@@ -61,7 +61,7 @@ jobs:
       - restore_yarn_cache
       - run:
           command: |
-            yarn install
+            yarn install --frozen-lockfile
       - save_yarn_cache
 
   backend_unit_tests:
