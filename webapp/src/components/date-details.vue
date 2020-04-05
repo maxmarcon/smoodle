@@ -5,7 +5,7 @@
       static=true
       ok-only
     )
-      template(v-slot:modal-header)
+      template(v-slot:modal-header="")
         .d-flex
           b
             i.icon.fas.fa-thumbs-up.text-success(v-if="positive")

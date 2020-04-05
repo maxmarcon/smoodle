@@ -106,6 +106,14 @@ let restRequest
 
 describe('eventEditor', () => {
 
+  beforeEach(() => {
+    restRequest = jest.fn().mockResolvedValue({
+      data: {
+        data: EVENT_DATA
+      }
+    })
+  })
+
   describe('without an eventId', () => {
 
     describe('at the first step after loading', () => {
@@ -320,17 +328,10 @@ describe('eventEditor', () => {
     describe('when successfully creating an event', () => {
 
       beforeEach(async () => {
-        restRequest = jest.fn().mockResolvedValueOnce({
-          data: {
-            data: EVENT_DATA
-          }
-        })
-
         wrapper = mountEventEditor(restRequest, {
           forceStep: 3
         })
         wrapper.find('button span[name="save-event-button"]').trigger("click")
-
       })
 
       it('renders one alert', () => {
@@ -398,18 +399,10 @@ describe('eventEditor', () => {
     describe('when loading an existing event', () => {
 
       beforeEach(async () => {
-        restRequest = jest.fn().mockResolvedValueOnce({
-          data: {
-            data: EVENT_DATA
-          }
-        })
-
         wrapper = mountEventEditor(restRequest, {
           eventId: EVENT_ID,
           secret: EVENT_SECRET
         })
-
-
       })
 
       it('renders the event header', () => {
@@ -490,11 +483,6 @@ describe('eventEditor', () => {
     describe('when trying to load an event without using the secret', () => {
 
       beforeEach(() => {
-        restRequest = jest.fn().mockResolvedValueOnce({
-          data: {
-            data: EVENT_DATA
-          }
-        })
 
         wrapper = mountEventEditor(restRequest, {
           eventId: EVENT_ID
@@ -513,7 +501,7 @@ describe('eventEditor', () => {
     describe('when trying to load an non-existent event', () => {
 
       beforeEach(async () => {
-        restRequest = jest.fn().mockResolvedValueOnce({
+        restRequest = jest.fn().mockRejectedValue({
           response: {
             status: 404
           }
@@ -523,8 +511,6 @@ describe('eventEditor', () => {
           eventId: EVENT_ID,
           secret: EVENT_SECRET
         })
-
-
       })
 
       it('does not render the main card', () => {
@@ -622,7 +608,6 @@ describe('eventEditor', () => {
       // Try again after a new version becomes available
       xit('the event-updated-modal has a button that takes the user back to the event', async () => {
         wrapper.find('#event-updated-modal button.btn-primary').trigger('click')
-
 
         expect(routerSpy.push).toHaveBeenCalledWith({
           name: 'event',

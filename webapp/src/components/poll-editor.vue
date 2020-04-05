@@ -103,11 +103,11 @@
             .form-group.row
               .col.text-center.text-justify
                 i18n.small.text-muted(path="poll_editor.date_ranker_helper" tag="p")
-                  template(v-slot:good)
+                  template(v-slot:good="")
                     i.fas.fa-thumbs-up.text-success
-                  template(v-slot:bad)
+                  template(v-slot:bad="")
                     i.fas.fa-thumbs-down.text-danger
-                  template(v-slot:indifferent)
+                  template(v-slot:indifferent="")
                     i.fas.fa-circle.text-warning
 
             .form-group.row.justify-content-center.justify-content-md-between.justify-content-lg-center

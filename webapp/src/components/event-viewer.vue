@@ -152,23 +152,23 @@
             div(v-else-if="loaded")
               .alert.alert-info(v-if="eventScheduleParticipantsCount")
                 i18n(:path="isOrganizer ? 'event_viewer.event_open_organizer' : 'event_viewer.event_open_public_participants'" v-if="eventPublicParticipants || isOrganizer")
-                  template(v-slot:calendar_icon)
+                  template(v-slot:calendar_icon="")
                     i.fas.fa-calendar-check.fa-lg
-                  template(v-slot:participants)
+                  template(v-slot:participants="")
                     a(href="#" v-b-modal.participants-list-modal="")
                       | {{ $tc('event_viewer.nof_participants', eventScheduleParticipantsCount, {participants: eventScheduleParticipantsCount}) }}
 
                 i18n(path="event_viewer.event_open" v-else)
-                  template(v-slot:calendar_icon)
+                  template(v-slot:calendar_icon="")
                     i.fas.fa-calendar-check.fa-lg
-                  template(v-slot:answers)
+                  template(v-slot:answers="")
                     span {{ $tc('event_viewer.answers', eventScheduleParticipantsCount, {count: eventScheduleParticipantsCount}) }}
               div.alert.alert-primary(v-else)
                 i18n(path="event_viewer.no_participants_organizer" v-if="isOrganizer")
-                  template(v-slot:icon)
+                  template(v-slot:icon="")
                     i.fas.fa-thermometer-empty.fa-lg
                 i18n(path="event_viewer.no_participants" v-else)
-                  template(v-slot:icon)
+                  template(v-slot:icon="")
                     i.fas.fa-trophy.fa-lg
               .row.justify-content-center
                 .col-md-3.order-md-last.text-justify(v-if="eventScheduleParticipantsCount")
@@ -177,22 +177,22 @@
                       :path="isOrganizer ? 'event_viewer.date_selection_help_organizer' : 'event_viewer.date_selection_help'"
                       tag="p"
                     )
-                      template(v-slot:best)
+                      template(v-slot:best="")
                         span.text-success {{ $t('event_viewer.best') }}
-                      template(v-slot:worst)
+                      template(v-slot:worst="")
                         span.text-danger {{ $t('event_viewer.worst') }}
-                      template(v-slot:green)
+                      template(v-slot:green="")
                         span.text-success {{ $t('event_viewer.green') }}
-                      template(v-slot:red)
+                      template(v-slot:red="")
                         span.text-danger {{ $t('event_viewer.red') }}
-                      template(v-slot:blue_underlined)
+                      template(v-slot:blue_underlined="")
                         span.text-primary {{ $t('event_viewer.blue_underlined') }}
 
                 .col-md-9.text-center
                   .form-group
                     b-carousel(ref="calendarCarousel" :interval="0" no-touch)
                       b-carousel-slide
-                        template(v-slot:img)
+                        template(v-slot:img="")
                           v-calendar(
                             nav-visibility="hidden"
                             :attributes="scheduleCalendarAttributes"
@@ -206,7 +206,7 @@
                             template(v-slot:day-popover="{attributes: [attr]}")
                               span {{ textForDate(attr.customData, 2) }}
                       b-carousel-slide
-                        template(v-slot:img)
+                        template(v-slot:img="")
                           date-details(
                             v-if="dayDetailsCalendarAttribute"
                             :isOrganizer="isOrganizer"
@@ -237,7 +237,7 @@
                     :locale="$i18n.locale"
                     :is-expanded="true"
                   )
-                    template(v-slot:day-popover)
+                    template(v-slot:day-popover="")
                       span {{ eventScheduledTime }}
 
           div(v-else-if="eventCanceled")

@@ -150,7 +150,11 @@ describe('pollEditor', () => {
   describe('with an eventId', () => {
 
     it('loads the event', () => {
-      restRequest = jest.fn().mockResolvedValue(true)
+      restRequest = jest.fn().mockResolvedValue({
+        data: {
+          data: EVENT_DATA
+        }
+      })
       wrapper = mountPollEditor(restRequest, {
         eventId: EVENT_ID
       })
@@ -160,7 +164,7 @@ describe('pollEditor', () => {
     describe('when loading a non-open event', () => {
 
       beforeEach(async () => {
-        restRequest = jest.fn().mockResolvedValue(
+        restRequest = jest.fn().mockResolvedValueOnce(
           {
             data: {
               data: CANCELED_EVENT_DATA
@@ -174,20 +178,20 @@ describe('pollEditor', () => {
       })
 
       it('shows an error modal', () => {
-        expect(wrapper.find('#event-error-modal').isVisible()).toBeTrue();
+        expect(wrapper.find('#event-error-modal').isVisible()).toBeTruthy();
       })
     })
 
     describe('if loading is successful, at step 1', () => {
 
       beforeEach(async () => {
-        restRequest = jest.fn().mockResolvedValue(
+        restRequest = jest.fn().mockResolvedValueOnce(
           {
             data: {
               data: EVENT_DATA
             }
           }
-        ).mockRejectedValue(
+        ).mockRejectedValueOnce(
           {
             response: {
               status: 422,
@@ -197,7 +201,7 @@ describe('pollEditor', () => {
                 }
               }
             }
-          }).mockResolvedValue({
+          }).mockResolvedValueOnce({
           data: {
             data: POLL_DATA
           }
@@ -262,7 +266,6 @@ describe('pollEditor', () => {
 
         beforeEach(async () => {
           wrapper.find('input#pollParticipant').trigger('blur')
-          await wait()
         })
 
         it('triggers local validation', () => {
@@ -274,7 +277,6 @@ describe('pollEditor', () => {
 
         beforeEach(async () => {
           wrapper.find('button span[name="forward-button"]').trigger('click')
-          return wait()
         })
 
         errorElements[0].forEach(selector => {
@@ -289,13 +291,10 @@ describe('pollEditor', () => {
         beforeEach(async () => {
           // clicked once to get the error response
           wrapper.find('button span[name="forward-button"]').trigger('click')
-
-          await wait()
         })
 
         beforeEach(async () => {
           wrapper.find('button span[name="forward-button"]').trigger('click')
-          await wait()
         })
 
         errorElements[1].forEach(selector => {
@@ -309,12 +308,12 @@ describe('pollEditor', () => {
     describe('if loading is successful, at step 2', () => {
 
       beforeEach(async () => {
-        restRequest = jest.fn().mockResolvedValue(
+        restRequest = jest.fn().mockResolvedValueOnce(
           {
             data: {
               data: EVENT_DATA
             }
-          }).mockRejectedValue(
+          }).mockRejectedValueOnce(
           {
             response: {
               status: 422,
@@ -327,7 +326,7 @@ describe('pollEditor', () => {
                 }
               }
             }
-          }).mockResolvedValue({
+          }).mockResolvedValueOnce({
           data: {
             data: POLL_DATA
           }
@@ -385,7 +384,6 @@ describe('pollEditor', () => {
 
         beforeEach(async () => {
           wrapper.find('button span[name="save-poll-button"]').trigger('click')
-          await wait()
         })
 
         errorElements[1].forEach(selector => {
@@ -400,12 +398,10 @@ describe('pollEditor', () => {
         beforeEach(async () => {
           // clicked once to get error response
           wrapper.find('button span[name="save-poll-button"]').trigger('click')
-          await wait()
         })
 
         beforeEach(async () => {
           wrapper.find('button span[name="save-poll-button"]').trigger('click')
-          await wait()
         })
 
         errorElements[1].forEach(selector => {
@@ -415,7 +411,7 @@ describe('pollEditor', () => {
         })
 
         it('shows the modal to go back to the event', () => {
-          expect(wrapper.find('#poll-saved-modal').isVisible()).toBeTrue()
+          expect(wrapper.find('#poll-saved-modal').isVisible()).toBeTruthy()
         })
       })
     })
@@ -443,7 +439,11 @@ describe('pollEditor', () => {
   describe('with a pollId', () => {
 
     it('loads the poll', () => {
-      let restRequest = jest.fn().mockResolvedValue(true)
+      restRequest = jest.fn().mockResolvedValue({
+        data: {
+          data: POLL_DATA
+        }
+      })
       wrapper = mountPollEditor(restRequest, {
         pollId: POLL_ID
       })
@@ -466,19 +466,19 @@ describe('pollEditor', () => {
       })
 
       it('shows an error modal', () => {
-        expect(wrapper.find('#event-error-modal').isVisible()).toBeTrue()
+        expect(wrapper.find('#event-error-modal').isVisible()).toBeTruthy()
       })
     })
 
     describe('if loading is successful', () => {
 
       beforeEach(async () => {
-        restRequest = jest.fn().mockResolvedValue(
+        restRequest = jest.fn().mockResolvedValueOnce(
           {
             data: {
               data: POLL_DATA
             }
-          }).mockResolvedValue({
+          }).mockRejectedValueOnce({
           response: {
             status: 422,
             data: {
@@ -487,7 +487,7 @@ describe('pollEditor', () => {
               }
             }
           }
-        }).mockResolvedValue({
+        }).mockResolvedValueOnce({
           data: {
             data: POLL_DATA
           }
@@ -594,7 +594,6 @@ describe('pollEditor', () => {
 
         beforeEach(async () => {
           wrapper.find('input#pollParticipant').trigger('blur')
-          await wait()
         })
 
         it('triggers local validation', () => {
@@ -607,12 +606,11 @@ describe('pollEditor', () => {
 
         beforeEach(async () => {
           wrapper.find('button span[name="save-poll-button"]').trigger('click')
-          await wait()
         })
 
         it('renders errors', () => {
           expect(wrapper.vm.eventError).toBe(NO_LONGER_OPEN)
-          expect(wrapper.find('#poll-saved-modal').isVisible()).toBeFalse()
+          expect(wrapper.find('#poll-saved-modal').isVisible()).toBeFalsy()
         })
       })
 
@@ -620,12 +618,10 @@ describe('pollEditor', () => {
 
         beforeEach(async () => {
           wrapper.find('button span[name="save-poll-button"]').trigger('click')
-          await wait()
         })
 
         beforeEach(async () => {
           wrapper.find('button span[name="save-poll-button"]').trigger('click')
-          await wait()
         })
 
         it('there should be no errors', () => {
@@ -633,7 +629,7 @@ describe('pollEditor', () => {
         })
 
         it('shows the modal to go back to the event', () => {
-          expect(wrapper.find('#poll-saved-modal').isVisible()).toBeTrue();
+          expect(wrapper.find('#poll-saved-modal').isVisible()).toBeTruthy();
         })
       })
 
@@ -641,11 +637,10 @@ describe('pollEditor', () => {
 
         beforeEach(async () => {
           wrapper.find('button[name="delete-poll-button"]').trigger('click')
-          await wait()
         })
 
         it('shows the confirmation modal', () => {
-          expect(wrapper.find('#poll-delete-modal').isVisible()).toBeTrue();
+          expect(wrapper.find('#poll-delete-modal').isVisible()).toBeTruthy();
         })
 
         // All buttons in the modal appear as disabled. Could be a bug in bootstrap-vue (2.2.2)
@@ -654,7 +649,6 @@ describe('pollEditor', () => {
 
           beforeEach(async () => {
             wrapper.find('#poll-delete-modal button.btn-danger').trigger('click');
-            await wait()
           })
 
           it('deletes the poll', () => {

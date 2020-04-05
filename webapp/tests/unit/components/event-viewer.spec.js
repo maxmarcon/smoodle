@@ -300,7 +300,6 @@ describe('eventViewer', () => {
 
           beforeEach(async () => {
             wrapper.find(EDIT_POLL_BUTTON).trigger("click")
-            await wait()
           })
 
           it('opens modal', () => {
@@ -313,12 +312,10 @@ describe('eventViewer', () => {
 
             beforeEach(async () => {
               wrapper.find('input#pollParticipant').setValue(POLL_PARTICIPANT)
-              await wait();
             })
 
             beforeEach(async () => {
               wrapper.find('#update-answer-modal button.btn.btn-primary').trigger('click')
-              await wait()
             })
 
             it('takes user to editor for the poll', () => {
@@ -400,7 +397,7 @@ describe('eventViewer', () => {
         })
 
         it('does render calendar', () => {
-          expect(wrapper.find('v-calendar-stub').exists()).toBeTrue()
+          expect(wrapper.find('v-calendar-stub').exists()).toBeTruthy()
         })
       })
     })
@@ -458,7 +455,7 @@ describe('eventViewer', () => {
       })
 
       it('does not render calendar', () => {
-        expect(wrapper.find('v-calendar').exists()).toBeFalse()
+        expect(wrapper.find('v-calendar').exists()).toBeFalsy()
       })
 
       buttonSelectors.all.forEach(selector => {
@@ -629,7 +626,6 @@ describe('eventViewer', () => {
 
           beforeEach(async () => {
             wrapper.vm.$bvModal.show('schedule-event-modal')
-            await wait()
           })
 
           it('opens modal', () => {
@@ -642,7 +638,6 @@ describe('eventViewer', () => {
 
             beforeEach(async () => {
               wrapper.find('#schedule-event-modal button.btn-primary').trigger('click')
-              await wait()
             })
 
             it('only closes the modal', () => {
@@ -657,13 +652,11 @@ describe('eventViewer', () => {
 
             beforeEach(async () => {
               wrapper.vm.selectedDate = wrapper.vm.scheduleCalendarAttributes[0].dates
-              await wait()
             })
 
             beforeEach(async () => {
               wrapper.find('#schedule-event-modal textarea#scheduleOrganizerMessage').setValue(ORGANIZER_MESSAGE)
               wrapper.find('#schedule-event-modal button.btn-primary').trigger('click')
-              await wait()
             })
 
             it('schedules the event', () => {
@@ -692,7 +685,6 @@ describe('eventViewer', () => {
 
             wrapper.find(CANCEL_EVENT_BUTTON).trigger('click')
 
-            await wait()
           })
 
           it('opens modal', () => {
@@ -708,7 +700,6 @@ describe('eventViewer', () => {
               wrapper.find('#cancel-event-modal textarea#cancelOrganizerMessage').setValue(ORGANIZER_MESSAGE)
               wrapper.find('#cancel-event-modal button.btn-primary').trigger('click')
 
-              await wait()
             })
 
             it('cancels the event', () => {
@@ -797,7 +788,7 @@ describe('eventViewer', () => {
         })
 
         it('renders calendar', () => {
-          expect(wrapper.find('v-calendar-stub').exists()).toBeTrue()
+          expect(wrapper.find('v-calendar-stub').exists()).toBeTruthy()
         })
       })
     })
@@ -877,7 +868,6 @@ describe('eventViewer', () => {
 
           wrapper.find(OPEN_EVENT_BUTTON).trigger('click')
 
-          await wait()
         })
 
         it('reopens the event', () => {
