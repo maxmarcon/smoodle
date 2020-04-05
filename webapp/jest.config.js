@@ -1,4 +1,3 @@
 module.exports = {
-  preset: '@vue/cli-plugin-unit-jest',
-  reporters: ["default", "jest-junit"]
+  preset: '@vue/cli-plugin-unit-jest'
 }
