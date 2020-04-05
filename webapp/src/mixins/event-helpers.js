@@ -4,10 +4,10 @@ export default {
   methods: {
     weekdayEnabled(date) {
       const enabledWeekdays = this.eventWeekdays.filter(({
-                                                         value
-                                                       }) => value).map(({
-                                                                           day
-                                                                         }) => (day + 1) % 7) // from 0=Mon...6=Sun to dateFns's 0=Sun...6=Sat
+                                                           value
+                                                         }) => value).map(({
+                                                                             day
+                                                                           }) => (day + 1) % 7) // from 0=Mon...6=Sun to dateFns's 0=Sun...6=Sat
 
       return enabledWeekdays.indexOf(dateFns.getDay(date)) > -1
     },
@@ -57,8 +57,8 @@ export default {
     negativeParticipantsText(date_entry, maxVisible = Infinity) {
       if (date_entry.negative_participants && maxVisible > 0) {
         return this.$i18n.tc('event_viewer.negative_participants_list_date',
-            date_entry.negative_participants.length,
-            {participants: this.nameList(date_entry.negative_participants, maxVisible)});
+          date_entry.negative_participants.length,
+          {participants: this.nameList(date_entry.negative_participants, maxVisible)});
       } else {
         return this.$i18n.tc('event_viewer.negative_participants_for_date', -date_entry.negative_rank);
       }
@@ -66,7 +66,7 @@ export default {
     positiveParticipantsText(date_entry, maxVisible = Infinity) {
       if (date_entry.positive_participants && date_entry.positive_rank > 0 && maxVisible > 0) {
         return this.$i18n.tc('event_viewer.positive_participants_list_date', date_entry.positive_participants.length,
-            {participants: this.nameList(date_entry.positive_participants, maxVisible)});
+          {participants: this.nameList(date_entry.positive_participants, maxVisible)});
       } else {
         return this.$i18n.tc('event_viewer.positive_participants_for_date', date_entry.positive_rank);
       }

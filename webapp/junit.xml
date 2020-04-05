@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="132" failures="0" time="12.206">
+  <testsuite name="ranker" errors="0" failures="0" skipped="0" timestamp="2020-04-05T19:13:47" time="1.616" tests="7">
+    <testcase classname="ranker in non-boolean mode renders the right number of elements" name="ranker in non-boolean mode renders the right number of elements" time="0.085">
+    </testcase>
+    <testcase classname="ranker in non-boolean mode renders the right elements in the right order" name="ranker in non-boolean mode renders the right elements in the right order" time="0.069">
+    </testcase>
+    <testcase classname="ranker in non-boolean mode emits change events" name="ranker in non-boolean mode emits change events" time="0.032">
+    </testcase>
+    <testcase classname="ranker in boolean mode renders the right number of elements" name="ranker in boolean mode renders the right number of elements" time="0.016">
+    </testcase>
+    <testcase classname="ranker in boolean mode renders the right elements in the right order" name="ranker in boolean mode renders the right elements in the right order" time="0.033">
+    </testcase>
+    <testcase classname="ranker in boolean mode emits change events" name="ranker in boolean mode emits change events" time="0.01">
+    </testcase>
+    <testcase classname="ranker in boolean mode emits change events when clicking on the list item" name="ranker in boolean mode emits change events when clicking on the list item" time="0.039">
+    </testcase>
+  </testsuite>
+  <testsuite name="eventHeader" errors="0" failures="0" skipped="0" timestamp="2020-04-05T19:13:47" time="1.937" tests="9">
+    <testcase classname="eventHeader open event renders the event name" name="eventHeader open event renders the event name" time="0.051">
+    </testcase>
+    <testcase classname="eventHeader open event renders the organizer name" name="eventHeader open event renders the organizer name" time="0.004">
+    </testcase>
+    <testcase classname="eventHeader open event renders the event dates" name="eventHeader open event renders the event dates" time="0.008">
+    </testcase>
+    <testcase classname="eventHeader scheduled event renders the event name" name="eventHeader scheduled event renders the event name" time="0.002">
+    </testcase>
+    <testcase classname="eventHeader scheduled event renders the organizer name" name="eventHeader scheduled event renders the organizer name" time="0.002">
+    </testcase>
+    <testcase classname="eventHeader scheduled event renders the event dates" name="eventHeader scheduled event renders the event dates" time="0.002">
+    </testcase>
+    <testcase classname="eventHeader canceled event renders the event name" name="eventHeader canceled event renders the event name" time="0.003">
+    </testcase>
+    <testcase classname="eventHeader canceled event renders the organizer name" name="eventHeader canceled event renders the organizer name" time="0.003">
+    </testcase>
+    <testcase classname="eventHeader canceled event renders the event dates" name="eventHeader canceled event renders the event dates" time="0.003">
+    </testcase>
+  </testsuite>
+  <testsuite name="progressHeader" errors="0" failures="0" skipped="0" timestamp="2020-04-05T19:13:49" time="0.6" tests="12">
+    <testcase classname="progressHeader when hideLabel = false renders the label" name="progressHeader when hideLabel = false renders the label" time="0.019">
+    </testcase>
+    <testcase classname="progressHeader when hideLabel = false renders the progress bar" name="progressHeader when hideLabel = false renders the progress bar" time="0.004">
+    </testcase>
+    <testcase classname="progressHeader when hideLabel = false correclty computes displayStep" name="progressHeader when hideLabel = false correclty computes displayStep" time="0.01">
+    </testcase>
+    <testcase classname="progressHeader when hideLabel = false correclty computes displayMaxStep" name="progressHeader when hideLabel = false correclty computes displayMaxStep" time="0.003">
+    </testcase>
+    <testcase classname="progressHeader when hideLabel = true does not render the label" name="progressHeader when hideLabel = true does not render the label" time="0.016">
+    </testcase>
+    <testcase classname="progressHeader when hideLabel = true renders the progress bar" name="progressHeader when hideLabel = true renders the progress bar" time="0.003">
+    </testcase>
+    <testcase classname="progressHeader when hideLabel = true correclty computes displayStep" name="progressHeader when hideLabel = true correclty computes displayStep" time="0.003">
+    </testcase>
+    <testcase classname="progressHeader when hideLabel = true correclty computes displayMaxStep" name="progressHeader when hideLabel = true correclty computes displayMaxStep" time="0.004">
+    </testcase>
+    <testcase classname="progressHeader when minStep = maxStep does not render the label" name="progressHeader when minStep = maxStep does not render the label" time="0.018">
+    </testcase>
+    <testcase classname="progressHeader when minStep = maxStep does not render the progress bar" name="progressHeader when minStep = maxStep does not render the progress bar" time="0.002">
+    </testcase>
+    <testcase classname="progressHeader when minStep = maxStep correclty computes displayStep" name="progressHeader when minStep = maxStep correclty computes displayStep" time="0.001">
+    </testcase>
+    <testcase classname="progressHeader when minStep = maxStep correclty computes displayMaxStep" name="progressHeader when minStep = maxStep correclty computes displayMaxStep" time="0.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="app" errors="0" failures="0" skipped="0" timestamp="2020-04-05T19:13:49" time="1.008" tests="6">
+    <testcase classname="app renders a link to the home route" name="app renders a link to the home route" time="0.177">
+    </testcase>
+    <testcase classname="app renders a link to the new_event route" name="app renders a link to the new_event route" time="0.042">
+    </testcase>
+    <testcase classname="app can change the locale to en" name="app can change the locale to en" time="0.057">
+    </testcase>
+    <testcase classname="app can change the locale to de" name="app can change the locale to de" time="0.064">
+    </testcase>
+    <testcase classname="app can change the locale to it" name="app can change the locale to it" time="0.075">
+    </testcase>
+    <testcase classname="app can retrieve the locale" name="app can retrieve the locale" time="0.033">
+    </testcase>
+  </testsuite>
+  <testsuite name="messageBar" errors="0" failures="0" skipped="0" timestamp="2020-04-05T19:13:50" time="0.465" tests="2">
+    <testcase classname="messageBar without countdown shows a permanent dismissable message" name="messageBar without countdown shows a permanent dismissable message" time="0.007">
+    </testcase>
+    <testcase classname="messageBar with countdown shows a message with countdown" name="messageBar with countdown shows a message with countdown" time="0.015">
+    </testcase>
+  </testsuite>
+  <testsuite name="errorPage" errors="0" failures="0" skipped="0" timestamp="2020-04-05T19:13:50" time="0.475" tests="2">
+    <testcase classname="errorPage displays the error message" name="errorPage displays the error message" time="0.057">
+    </testcase>
+    <testcase classname="errorPage displays a link to the home route" name="errorPage displays a link to the home route" time="0.004">
+    </testcase>
+  </testsuite>
+  <testsuite name="RestMixin" errors="0" failures="0" skipped="0" timestamp="2020-04-05T19:13:50" time="0.488" tests="24">
+    <testcase classname="RestMixin has an API version" name="RestMixin has an API version" time="0.02">
+    </testcase>
+    <testcase classname="RestMixin initially there is no ongoing request" name="RestMixin initially there is no ongoing request" time="0.002">
+    </testcase>
+    <testcase classname="RestMixin when executing a request calls axios with the right parameters" name="RestMixin when executing a request calls axios with the right parameters" time="0.003">
+    </testcase>
+    <testcase classname="RestMixin when executing a request returns a promise" name="RestMixin when executing a request returns a promise" time="0.001">
+    </testcase>
+    <testcase classname="RestMixin when executing a request marks the request as ongoing" name="RestMixin when executing a request marks the request as ongoing" time="0.002">
+    </testcase>
+    <testcase classname="RestMixin when executing a request shows the loading overlay after 100 msec" name="RestMixin when executing a request shows the loading overlay after 100 msec" time="0.014">
+    </testcase>
+    <testcase classname="RestMixin when executing a request after the request completes the returned promise resolves to the response" name="RestMixin when executing a request after the request completes the returned promise resolves to the response" time="0.002">
+    </testcase>
+    <testcase classname="RestMixin when executing a request after the request completes marks the request as not ongoing" name="RestMixin when executing a request after the request completes marks the request as not ongoing" time="0.002">
+    </testcase>
+    <testcase classname="RestMixin when executing a request after the request completes cancels the loading overlay" name="RestMixin when executing a request after the request completes cancels the loading overlay" time="0.001">
+    </testcase>
+    <testcase classname="RestMixin for background requests does not mark the request as ongoing" name="RestMixin for background requests does not mark the request as ongoing" time="0.002">
+    </testcase>
+    <testcase classname="RestMixin for background requests does not show the loading overlay after 100 msec" name="RestMixin for background requests does not show the loading overlay after 100 msec" time="0.001">
+    </testcase>
+    <testcase classname="RestMixin for background requests after the request completes the request is still not marked as ongoing" name="RestMixin for background requests after the request completes the request is still not marked as ongoing" time="0.002">
+    </testcase>
+    <testcase classname="RestMixin for background requests after the request completes does not cancel the loading overlay" name="RestMixin for background requests after the request completes does not cancel the loading overlay" time="0.002">
+    </testcase>
+    <testcase classname="RestMixin without VueLoading does not show the loading overlay after 100 msec" name="RestMixin without VueLoading does not show the loading overlay after 100 msec" time="0.002">
+    </testcase>
+    <testcase classname="RestMixin without VueLoading after the request completes does not cancel the loading overlay" name="RestMixin without VueLoading after the request completes does not cancel the loading overlay" time="0.011">
+    </testcase>
+    <testcase classname="RestMixin when a request fails without a response displays the network error message" name="RestMixin when a request fails without a response displays the network error message" time="0.001">
+    </testcase>
+    <testcase classname="RestMixin when a request fails without a response marks the request as not ongoing after the promise resolves" name="RestMixin when a request fails without a response marks the request as not ongoing after the promise resolves" time="0.002">
+    </testcase>
+    <testcase classname="RestMixin when a request fails without a response rethrows the error" name="RestMixin when a request fails without a response rethrows the error" time="0.001">
+    </testcase>
+    <testcase classname="RestMixin when a request fails without a response and a request displays a generic error message" name="RestMixin when a request fails without a response and a request displays a generic error message" time="0.002">
+    </testcase>
+    <testcase classname="RestMixin when a request fails without a response and a request marks the request as not ongoing after the promise resolves" name="RestMixin when a request fails without a response and a request marks the request as not ongoing after the promise resolves" time="0.001">
+    </testcase>
+    <testcase classname="RestMixin when a request fails without a response and a request rethrows the error" name="RestMixin when a request fails without a response and a request rethrows the error" time="0.002">
+    </testcase>
+    <testcase classname="RestMixin with error handling disabled when a request fails without a response does not display the network error message" name="RestMixin with error handling disabled when a request fails without a response does not display the network error message" time="0.012">
+    </testcase>
+    <testcase classname="RestMixin with error handling disabled when a request fails without a response marks the request as not ongoing after the promise resolves" name="RestMixin with error handling disabled when a request fails without a response marks the request as not ongoing after the promise resolves" time="0.002">
+    </testcase>
+    <testcase classname="RestMixin with error handling disabled when a request fails without a response rethrows the error" name="RestMixin with error handling disabled when a request fails without a response rethrows the error" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="Home" errors="0" failures="0" skipped="0" timestamp="2020-04-05T19:13:51" time="0.415" tests="1">
+    <testcase classname="Home renders a link to the new_event route" name="Home renders a link to the new_event route" time="0">
+    </testcase>
+  </testsuite>
+  <testsuite name="eventEditor" errors="0" failures="0" skipped="1" timestamp="2020-04-05T19:13:47" time="10.539" tests="69">
+    <testcase classname="eventEditor without an eventId at the first step after loading renders the event header" name="eventEditor without an eventId at the first step after loading renders the event header" time="0.215">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the first step after loading renders the main card" name="eventEditor without an eventId at the first step after loading renders the main card" time="0.092">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the first step after loading renders the progress header" name="eventEditor without an eventId at the first step after loading renders the progress header" time="0.044">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the first step after loading renders the card body" name="eventEditor without an eventId at the first step after loading renders the card body" time="0.067">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the first step after loading renders one alert" name="eventEditor without an eventId at the first step after loading renders one alert" time="0.053">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the first step after loading renders input element input#eventOrganizer" name="eventEditor without an eventId at the first step after loading renders input element input#eventOrganizer" time="0.11">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the first step after loading renders input element input#eventOrganizerEmail" name="eventEditor without an eventId at the first step after loading renders input element input#eventOrganizerEmail" time="0.044">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the first step after loading renders input element input#eventOrganizerEmailConfirmation" name="eventEditor without an eventId at the first step after loading renders input element input#eventOrganizerEmailConfirmation" time="0.042">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the first step after loading renders the right buttons" name="eventEditor without an eventId at the first step after loading renders the right buttons" time="0.094">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the second step renders the event header" name="eventEditor without an eventId at the second step renders the event header" time="0.073">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the second step renders the main card" name="eventEditor without an eventId at the second step renders the main card" time="0.075">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the second step renders the progress header" name="eventEditor without an eventId at the second step renders the progress header" time="0.083">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the second step renders the card body" name="eventEditor without an eventId at the second step renders the card body" time="0.064">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the second step renders one alert" name="eventEditor without an eventId at the second step renders one alert" time="0.047">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the second step renders input element input#eventName" name="eventEditor without an eventId at the second step renders input element input#eventName" time="0.058">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the second step renders input element textarea#eventDesc" name="eventEditor without an eventId at the second step renders input element textarea#eventDesc" time="0.04">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the second step renders input element div#publicParticipants[p-checkbox]" name="eventEditor without an eventId at the second step renders input element div#publicParticipants[p-checkbox]" time="0.08">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the second step renders the right buttons" name="eventEditor without an eventId at the second step renders the right buttons" time="0.074">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the third step renders the event header" name="eventEditor without an eventId at the third step renders the event header" time="0.051">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the third step renders the main card" name="eventEditor without an eventId at the third step renders the main card" time="0.03">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the third step renders the progress header" name="eventEditor without an eventId at the third step renders the progress header" time="0.061">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the third step renders the card body" name="eventEditor without an eventId at the third step renders the card body" time="0.037">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the third step renders one alert" name="eventEditor without an eventId at the third step renders one alert" time="0.304">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the third step renders input element v-date-picker-stub#eventPossibleDates" name="eventEditor without an eventId at the third step renders input element v-date-picker-stub#eventPossibleDates" time="0.154">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the third step renders input element ranker-stub#eventWeekdays" name="eventEditor without an eventId at the third step renders input element ranker-stub#eventWeekdays" time="0.153">
+    </testcase>
+    <testcase classname="eventEditor without an eventId at the third step renders the right buttons" name="eventEditor without an eventId at the third step renders the right buttons" time="0.044">
+    </testcase>
+    <testcase classname="eventEditor without an eventId when blurring input triggers local validation" name="eventEditor without an eventId when blurring input triggers local validation" time="0.341">
+    </testcase>
+    <testcase classname="eventEditor without an eventId when saving the event with errors renders error in .invalid-feedback[name=&quot;event-organizer-error&quot;]" name="eventEditor without an eventId when saving the event with errors renders error in .invalid-feedback[name=&quot;event-organizer-error&quot;]" time="0.201">
+    </testcase>
+    <testcase classname="eventEditor without an eventId when saving the event with errors renders error in .invalid-feedback[name=&quot;event-organizer-email-error&quot;]" name="eventEditor without an eventId when saving the event with errors renders error in .invalid-feedback[name=&quot;event-organizer-email-error&quot;]" time="0.104">
+    </testcase>
+    <testcase classname="eventEditor without an eventId when saving the event with errors renders error in .invalid-feedback[name=&quot;event-organizer-email-confirmation-error&quot;]" name="eventEditor without an eventId when saving the event with errors renders error in .invalid-feedback[name=&quot;event-organizer-email-confirmation-error&quot;]" time="0.186">
+    </testcase>
+    <testcase classname="eventEditor without an eventId when successfully creating an event renders one alert" name="eventEditor without an eventId when successfully creating an event renders one alert" time="0.347">
+    </testcase>
+    <testcase classname="eventEditor without an eventId when successfully creating an event renders the event header" name="eventEditor without an eventId when successfully creating an event renders the event header" time="0.243">
+    </testcase>
+    <testcase classname="eventEditor without an eventId when successfully creating an event renders the main card" name="eventEditor without an eventId when successfully creating an event renders the main card" time="0.159">
+    </testcase>
+    <testcase classname="eventEditor without an eventId when successfully creating an event does not render the card body" name="eventEditor without an eventId when successfully creating an event does not render the card body" time="0.602">
+    </testcase>
+    <testcase classname="eventEditor without an eventId when successfully creating an event does not render input element input#eventOrganizer" name="eventEditor without an eventId when successfully creating an event does not render input element input#eventOrganizer" time="0.501">
+    </testcase>
+    <testcase classname="eventEditor without an eventId when successfully creating an event does not render input element input#eventOrganizerEmail" name="eventEditor without an eventId when successfully creating an event does not render input element input#eventOrganizerEmail" time="0.316">
+    </testcase>
+    <testcase classname="eventEditor without an eventId when successfully creating an event does not render input element input#eventOrganizerEmailConfirmation" name="eventEditor without an eventId when successfully creating an event does not render input element input#eventOrganizerEmailConfirmation" time="0.266">
+    </testcase>
+    <testcase classname="eventEditor without an eventId when successfully creating an event does not render input element input#eventName" name="eventEditor without an eventId when successfully creating an event does not render input element input#eventName" time="0.097">
+    </testcase>
+    <testcase classname="eventEditor without an eventId when successfully creating an event does not render input element textarea#eventDesc" name="eventEditor without an eventId when successfully creating an event does not render input element textarea#eventDesc" time="0.152">
+    </testcase>
+    <testcase classname="eventEditor without an eventId when successfully creating an event does not render input element div#publicParticipants[p-checkbox]" name="eventEditor without an eventId when successfully creating an event does not render input element div#publicParticipants[p-checkbox]" time="0.118">
+    </testcase>
+    <testcase classname="eventEditor without an eventId when successfully creating an event does not render input element v-date-picker-stub#eventPossibleDates" name="eventEditor without an eventId when successfully creating an event does not render input element v-date-picker-stub#eventPossibleDates" time="0.091">
+    </testcase>
+    <testcase classname="eventEditor without an eventId when successfully creating an event does not render input element ranker-stub#eventWeekdays" name="eventEditor without an eventId when successfully creating an event does not render input element ranker-stub#eventWeekdays" time="0.101">
+    </testcase>
+    <testcase classname="eventEditor without an eventId when successfully creating an event renders the share link input field" name="eventEditor without an eventId when successfully creating an event renders the share link input field" time="0.185">
+    </testcase>
+    <testcase classname="eventEditor without an eventId when successfully creating an event renders the share button" name="eventEditor without an eventId when successfully creating an event renders the share button" time="0.122">
+    </testcase>
+    <testcase classname="eventEditor without an eventId when successfully creating an event renders the share via Whatsapp button" name="eventEditor without an eventId when successfully creating an event renders the share via Whatsapp button" time="0.1">
+    </testcase>
+    <testcase classname="eventEditor without an eventId when successfully creating an event renders only the manage event button" name="eventEditor without an eventId when successfully creating an event renders only the manage event button" time="0.133">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when loading an existing event renders the event header" name="eventEditor with an eventId when loading an existing event renders the event header" time="0.11">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when loading an existing event renders the main card" name="eventEditor with an eventId when loading an existing event renders the main card" time="0.055">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when loading an existing event renders the card body" name="eventEditor with an eventId when loading an existing event renders the card body" time="0.089">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when loading an existing event renders one alert" name="eventEditor with an eventId when loading an existing event renders one alert" time="0.048">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when loading an existing event does not render input element input#eventOrganizer" name="eventEditor with an eventId when loading an existing event does not render input element input#eventOrganizer" time="0.042">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when loading an existing event does not render input element input#eventOrganizerEmail" name="eventEditor with an eventId when loading an existing event does not render input element input#eventOrganizerEmail" time="0.076">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when loading an existing event does not render input element input#eventOrganizerEmailConfirmation" name="eventEditor with an eventId when loading an existing event does not render input element input#eventOrganizerEmailConfirmation" time="0.052">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when loading an existing event renders input element input#eventName" name="eventEditor with an eventId when loading an existing event renders input element input#eventName" time="0.127">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when loading an existing event renders input element textarea#eventDesc" name="eventEditor with an eventId when loading an existing event renders input element textarea#eventDesc" time="0.134">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when loading an existing event renders input element div#publicParticipants[p-checkbox]" name="eventEditor with an eventId when loading an existing event renders input element div#publicParticipants[p-checkbox]" time="0.076">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when loading an existing event user can go back to the event" name="eventEditor with an eventId when loading an existing event user can go back to the event" time="0.126">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when loading an existing event renders the right buttons" name="eventEditor with an eventId when loading an existing event renders the right buttons" time="0.056">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when loading an existing event when blurring input triggers local validation" name="eventEditor with an eventId when loading an existing event when blurring input triggers local validation" time="0.087">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when trying to load an event without using the secret does not render the main card" name="eventEditor with an eventId when trying to load an event without using the secret does not render the main card" time="0.032">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when trying to load an event without using the secret renders an error page" name="eventEditor with an eventId when trying to load an event without using the secret renders an error page" time="0.037">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when trying to load an non-existent event does not render the main card" name="eventEditor with an eventId when trying to load an non-existent event does not render the main card" time="0.04">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when trying to load an non-existent event renders an error page" name="eventEditor with an eventId when trying to load an non-existent event renders an error page" time="0.032">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when saving an existing event with errors renders error in .invalid-feedback[name=&quot;event-name-error&quot;]" name="eventEditor with an eventId when saving an existing event with errors renders error in .invalid-feedback[name=&quot;event-name-error&quot;]" time="0.126">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when saving an existing event with errors renders error in .invalid-feedback[name=&quot;event-desc-error&quot;]" name="eventEditor with an eventId when saving an existing event with errors renders error in .invalid-feedback[name=&quot;event-desc-error&quot;]" time="0.124">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when saving an existing event no error in .small.text-danger[name=&quot;event-possible-dates-error&quot;]" name="eventEditor with an eventId when saving an existing event no error in .small.text-danger[name=&quot;event-possible-dates-error&quot;]" time="0.063">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when saving an existing event no error in .small.text-danger[name=&quot;event-weekdays-error&quot;]" name="eventEditor with an eventId when saving an existing event no error in .small.text-danger[name=&quot;event-weekdays-error&quot;]" time="0.06">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when saving an existing event opens the eventu-updated-modal modal" name="eventEditor with an eventId when saving an existing event opens the eventu-updated-modal modal" time="0.056">
+    </testcase>
+    <testcase classname="eventEditor with an eventId when saving an existing event the event-updated-modal has a button that takes the user back to the event" name="eventEditor with an eventId when saving an existing event the event-updated-modal has a button that takes the user back to the event" time="0">
+      <skipped/>
+    </testcase>
+  </testsuite>
+</testsuites>

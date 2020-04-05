@@ -1,4 +1,4 @@
-import RestMixin from '../../src/mixins/rest'
+import RestMixin from '@/mixins/rest'
 import {shallowMount} from '@vue/test-utils'
 
 const dummyComponent = {
@@ -13,13 +13,18 @@ let wrapper, requestResult, rethrownError, axiosError;
 describe('RestMixin', () => {
 
   beforeEach(() => {
-    jasmine.clock().install();
+    jest.useFakeTimers()
 
-    axiosStub = jasmine.createSpyObj('axios', ['request']);
-    showInErrorBarStub = jasmine.createSpy('showInErrorBar');
-    loadingStub = jasmine.createSpyObj('$loading', ['show']);
-    loaderStub = jasmine.createSpyObj('loader', ['hide'])
-    loadingStub.show.and.returnValue(loaderStub)
+    axiosStub = {
+      request: jest.fn()
+    }
+    showInErrorBarStub = jest.fn();
+    loaderStub = {
+      hide: jest.fn()
+    }
+    loadingStub = {
+      show: jest.fn().mockReturnValue(loaderStub)
+    }
 
     wrapper = shallowMount(dummyComponent, {
       mocks: {
@@ -35,7 +40,7 @@ describe('RestMixin', () => {
   });
 
   afterEach(() => {
-    jasmine.clock().uninstall();
+    jest.useRealTimers()
   })
 
   it('has an API version', () => {
@@ -43,13 +48,15 @@ describe('RestMixin', () => {
   });
 
   it('initially there is no ongoing request', () => {
-    expect(wrapper.vm.requestOngoing).toBeFalse()
+    expect(wrapper.vm.requestOngoing).toBeFalsy()
   });
 
   describe('when executing a request', () => {
 
     beforeEach(() => {
-      axiosStub.request.and.returnValue(Promise.resolve("RESPONSE"))
+      axiosStub.request.mockReturnValue(
+        new Promise((resolve) => setTimeout(() => resolve("RESPONSE"), 105))
+      )
 
       requestResult = wrapper.vm.restRequest('api/endpoint', {
         method: 'post',
@@ -60,7 +67,7 @@ describe('RestMixin', () => {
     })
 
     it('calls axios with the right parameters', () => {
-      expect(axiosStub.request).toHaveBeenCalledWith(jasmine.objectContaining({
+      expect(axiosStub.request).toHaveBeenCalledWith(expect.objectContaining({
         url: '/v1/api/endpoint',
         method: 'post',
         params: {
@@ -72,30 +79,34 @@ describe('RestMixin', () => {
       }))
     });
 
-    it('returns a promise that resolves to the response', async () => {
-      expect(requestResult).toEqual(jasmine.any(Promise));
-      const response = await requestResult;
-      expect(response).toEqual("RESPONSE")
+    it('returns a promise', () => {
+      expect(requestResult).toEqual(expect.any(Promise));
     });
 
     it('marks the request as ongoing', () => {
-      expect(wrapper.vm.requestOngoing).toBeTrue();
+      expect(wrapper.vm.requestOngoing).toBeTruthy();
     });
 
     it('shows the loading overlay after 100 msec', () => {
-      jasmine.clock().tick(105)
+      jest.advanceTimersByTime(100)
       expect(loadingStub.show).toHaveBeenCalled()
     });
 
     describe('after the request completes', () => {
 
-      it('marks the request as not ongoing after the promise resolves', async () => {
+      beforeEach(() => jest.advanceTimersByTime(105))
+
+      it('the returned promise resolves to the response', async () => {
+        const response = await requestResult
+        expect(response).toEqual("RESPONSE")
+      })
+
+      it('marks the request as not ongoing', async () => {
         await requestResult;
-        expect(wrapper.vm.requestOngoing).toBeFalse();
+        expect(wrapper.vm.requestOngoing).toBeFalsy();
       })
 
       it('cancels the loading overlay', async () => {
-        jasmine.clock().tick(105)
         await requestResult
         expect(loaderStub.hide).toHaveBeenCalled()
       });
@@ -105,7 +116,9 @@ describe('RestMixin', () => {
   describe('for background requests', () => {
 
     beforeEach(() => {
-      axiosStub.request.and.returnValue(Promise.resolve("RESPONSE"))
+      axiosStub.request.mockReturnValue(
+        new Promise((resolve) => setTimeout(() => resolve("RESPONSE"), 105))
+      )
 
       requestResult = wrapper.vm.restRequest('api/endpoint', {
         method: 'post',
@@ -117,23 +130,24 @@ describe('RestMixin', () => {
     })
 
     it('does not mark the request as ongoing', () => {
-      expect(wrapper.vm.requestOngoing).toBeFalse();
+      expect(wrapper.vm.requestOngoing).toBeFalsy();
     });
 
     it('does not show the loading overlay after 100 msec', () => {
-      jasmine.clock().tick(105)
+      jest.advanceTimersByTime(100)
       expect(loadingStub.show).not.toHaveBeenCalled()
     });
 
     describe('after the request completes', () => {
 
-      it('the request is still not marked as ongoing after the promise resolves', async () => {
+      beforeEach(() => jest.advanceTimersByTime(105))
+
+      it('the request is still not marked as ongoing', async () => {
         await requestResult;
-        expect(wrapper.vm.requestOngoing).toBeFalse();
+        expect(wrapper.vm.requestOngoing).toBeFalsy();
       })
 
       it('does not cancel the loading overlay', async () => {
-        jasmine.clock().tick(105)
         await requestResult
         expect(loaderStub.hide).not.toHaveBeenCalled()
       });
@@ -154,7 +168,9 @@ describe('RestMixin', () => {
         }
       });
 
-      axiosStub.request.and.returnValue(Promise.resolve("RESPONSE"))
+      axiosStub.request.mockReturnValue(
+        new Promise((resolve) => setTimeout(() => resolve("RESPONSE"), 105))
+      )
 
       requestResult = wrapper.vm.restRequest('api/endpoint', {
         method: 'post',
@@ -165,14 +181,15 @@ describe('RestMixin', () => {
     })
 
     it('does not show the loading overlay after 100 msec', () => {
-      jasmine.clock().tick(105)
+      jest.advanceTimersByTime(100)
       expect(loadingStub.show).not.toHaveBeenCalled()
     });
 
     describe('after the request completes', () => {
 
+      beforeEach(() => jest.advanceTimersByTime(105))
+
       it('does not cancel the loading overlay', async () => {
-        jasmine.clock().tick(105)
         await requestResult
         expect(loaderStub.hide).not.toHaveBeenCalled()
       });
@@ -183,7 +200,7 @@ describe('RestMixin', () => {
 
     beforeEach(async () => {
       axiosError = {error: "ERROR", request: {}};
-      axiosStub.request.and.returnValue(Promise.reject(axiosError))
+      axiosStub.request.mockRejectedValue(axiosError)
 
       requestResult = wrapper.vm.restRequest('api/endpoint', {
         method: 'post',
@@ -199,12 +216,12 @@ describe('RestMixin', () => {
       }
     })
 
-    it('displays the network error message', async () => {
+    it('displays the network error message', () => {
       expect(wrapper.vm.showInErrorBar).toHaveBeenCalledWith('errors.network');
     });
 
-    it('marks the request as not ongoing after the promise resolves', async () => {
-      expect(wrapper.vm.requestOngoing).toBeFalse();
+    it('marks the request as not ongoing after the promise resolves', () => {
+      expect(wrapper.vm.requestOngoing).toBeFalsy();
     })
 
     it('rethrows the error', () => {
@@ -216,7 +233,7 @@ describe('RestMixin', () => {
 
     beforeEach(async () => {
       axiosError = {error: "ERROR"};
-      axiosStub.request.and.returnValue(Promise.reject(axiosError))
+      axiosStub.request.mockRejectedValue(axiosError)
 
       requestResult = wrapper.vm.restRequest('api/endpoint', {
         method: 'post',
@@ -232,12 +249,12 @@ describe('RestMixin', () => {
       }
     })
 
-    it('displays a generic error message', async () => {
+    it('displays a generic error message', () => {
       expect(wrapper.vm.showInErrorBar).toHaveBeenCalledWith('errors.generic');
     });
 
-    it('marks the request as not ongoing after the promise resolves', async () => {
-      expect(wrapper.vm.requestOngoing).toBeFalse();
+    it('marks the request as not ongoing after the promise resolves', () => {
+      expect(wrapper.vm.requestOngoing).toBeFalsy();
     })
 
     it('rethrows the error', () => {
@@ -251,7 +268,7 @@ describe('RestMixin', () => {
 
       beforeEach(async () => {
         axiosError = {error: "ERROR", request: {}};
-        axiosStub.request.and.returnValue(Promise.reject(axiosError))
+        axiosStub.request.mockRejectedValue(axiosError)
 
         requestResult = wrapper.vm.restRequest('api/endpoint', {
           method: 'post',
@@ -268,12 +285,12 @@ describe('RestMixin', () => {
         }
       })
 
-      it('does not display the network error message', async () => {
+      it('does not display the network error message', () => {
         expect(wrapper.vm.showInErrorBar).not.toHaveBeenCalled();
       });
 
-      it('marks the request as not ongoing after the promise resolves', async () => {
-        expect(wrapper.vm.requestOngoing).toBeFalse();
+      it('marks the request as not ongoing after the promise resolves', () => {
+        expect(wrapper.vm.requestOngoing).toBeFalsy();
       })
 
       it('rethrows the error', () => {

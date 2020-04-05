@@ -5,9 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "test": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "test": "karma start",
-    "test-once": "karma start --single-run --reporters dots,junit",
     "i18n:report": "vue-cli-service i18n:report --src './src/**/*.?(js|vue)' --locales './src/locales/**/*.json'"
   },
   "dependencies": {
@@ -35,18 +34,14 @@
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.1.2",
     "@vue/cli-plugin-eslint": "^4.1.2",
+    "@vue/cli-plugin-unit-jest": "^4.2.3",
     "@vue/cli-service": "^4.1.2",
-    "@vue/test-utils": "^1.0.0-beta.31",
+    "@vue/test-utils": "1.0.0-beta.31",
     "babel-eslint": "^10.0.1",
+    "babel-jest": "^25.2.4",
     "eslint": "^6.8.0",
     "eslint-plugin-vue": "^6.1.2",
-    "jasmine-core": "^3.5.0",
-    "karma": "^4.3.0",
-    "karma-chrome-launcher": "^3.1.0",
-    "karma-jasmine": "^3.1.0",
-    "karma-jasmine-html-reporter": "^1.4.2",
-    "karma-junit-reporter": "^2.0.1",
-    "karma-webpack": "^4.0.2",
+    "jest-junit": "^10.0.0",
     "vue-cli-plugin-bootstrap": "^1.0.0-alpha.1",
     "vue-cli-plugin-i18n": "^0.6.0",
     "vue-template-compiler": "^2.6.10"
@@ -69,7 +64,18 @@
     },
     "parserOptions": {
       "parser": "babel-eslint"
-    }
+    },
+    "overrides": [
+      {
+        "files": [
+          "**/__tests__/*.{j,t}s?(x)",
+          "**/tests/unit/**/*.spec.{j,t}s?(x)"
+        ],
+        "env": {
+          "jest": true
+        }
+      }
+    ]
   },
   "postcss": {
     "plugins": {
