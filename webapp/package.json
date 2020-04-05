@@ -7,7 +7,7 @@
     "build": "vue-cli-service build",
     "test": "vue-cli-service test:unit",
     "test-watch": "vue-cli-service test:unit --watch",
-    "test-once": "JEST_JUNIT_OUTPUT_DIR=test-results vue-cli-service test:unit --reporters=default --reporters=jest-junit",
+    "test-once": "JEST_JUNIT_OUTPUT_DIR=test-results/jest vue-cli-service test:unit --reporters=default --reporters=jest-junit",
     "lint": "vue-cli-service lint",
     "i18n:report": "vue-cli-service i18n:report --src './src/**/*.?(js|vue)' --locales './src/locales/**/*.json'"
   },
