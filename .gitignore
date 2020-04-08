@@ -27,4 +27,12 @@ npm-debug.log
 # variables.
 /config/*.secret.exs
 
-/*.iml
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.iml
