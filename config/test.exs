@@ -15,8 +15,8 @@ config :logger, level: :warn
 # Configure your database
 config :smoodle,
        Smoodle.Repo,
-       username: "homestead",
-       password: "secret",
+       username: "postgres",
+       password: "postgres",
        database: "smoodle_test",
        hostname: "localhost",
        pool: Ecto.Adapters.SQL.Sandbox
