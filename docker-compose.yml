@@ -4,6 +4,9 @@ services:
     image: smoodle
     build:
       context: ./
+      args:
+        node_version: 13.7.0
+        elixir_version: 1.10.0
     ports:
       - "4000:4000"
     environment:

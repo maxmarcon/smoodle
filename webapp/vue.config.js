@@ -6,6 +6,5 @@ module.exports = {
       localeDir: 'locales',
       enableInSFC: false
     }
-  },
-  outputDir: '../priv/static'
+  }
 }
