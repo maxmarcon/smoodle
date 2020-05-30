@@ -53,6 +53,7 @@ defmodule Smoodle.Mixfile do
       {:distillery, "~> 2.0"},
       {:jason, "~> 1.1"},
       {:cors_plug, "~> 1.5"},
+      {:ecto, "~> 3.0", override: true},
       {:junit_formatter, "~> 3.0", only: [:test]},
       {:faker, "~> 0.13", only: [:test, :dev]}
     ]
