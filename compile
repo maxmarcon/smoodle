@@ -1,4 +1,4 @@
 cd ${phoenix_dir}/webapp
 yarn install
 yarn build
-cp -R dist/* ${phoenix_dir}/priv/static
+cp -R dist ${phoenix_dir}/priv/static
