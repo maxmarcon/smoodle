@@ -8,7 +8,7 @@ services:
         node_version: 13.7.0
         elixir_version: 1.10.0
     ports:
-      - "4000:4000"
+      - "4001:4000"
     environment:
       DATABASE_URL: postgresql://docker:secret@db:5432/docker
       PORT: 4000
@@ -19,7 +19,7 @@ services:
       POSTGRES_PASSWORD: secret
       POSTGRES_USER: docker
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - "data:/var/lib/postgresql/data"
 volumes:

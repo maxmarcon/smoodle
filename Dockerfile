@@ -23,9 +23,9 @@ RUN mix local.hex --force
 RUN mix local.rebar --force
 RUN mix deps.get
 
-RUN mix distillery.release --env=prod
+RUN mix release
 
 RUN chmod ug+x docker_entrypoint_wrapper.sh
 
 ENTRYPOINT ["./docker_entrypoint_wrapper.sh", "_build/docker/rel/smoodle/bin/smoodle"]
-CMD ["foreground"]
+CMD ["start"]
