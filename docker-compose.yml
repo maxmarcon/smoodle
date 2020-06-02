@@ -10,14 +10,14 @@ services:
     ports:
       - "4001:4000"
     environment:
-      DATABASE_URL: postgresql://docker:secret@db:5432/docker
+      DATABASE_URL: postgresql://smoodle:secret@db:5432/smoodle
       PORT: 4000
       HOST_NAME: localhost
   db:
     image: postgres
     environment:
       POSTGRES_PASSWORD: secret
-      POSTGRES_USER: docker
+      POSTGRES_USER: smoodle
     ports:
       - "5433:5432"
     volumes:

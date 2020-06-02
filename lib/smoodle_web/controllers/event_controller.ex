@@ -11,7 +11,7 @@ defmodule SmoodleWeb.EventController do
   action_fallback(SmoodleWeb.FallbackController)
 
   def index(conn, _params) do
-    if Enum.member?([:test, :dev, :docker], Application.get_env(:smoodle, :env)) do
+    if Enum.member?([:test, :dev], Application.get_env(:smoodle, :env)) do
       events = Repo.preload(Scheduler.list_events(), :possible_dates)
       render(conn, :index, events: events)
     else

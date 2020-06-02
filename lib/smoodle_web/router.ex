@@ -23,7 +23,7 @@ defmodule SmoodleWeb.Router do
     resources("/polls", PollController, only: [:update, :delete, :show])
   end
 
-  if Application.get_env(:smoodle, :env) in [:dev, :docker] do
+  if Application.get_env(:smoodle, Smoodle.Mailer)[:adapter] == Bamboo.LocalAdapter do
     forward("/sent_emails", Bamboo.SentEmailViewerPlug)
   end
 

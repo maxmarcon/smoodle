@@ -14,7 +14,7 @@ RUN apt-get update -y && \
   wait-for-it \
   gawk
 
-ENV MIX_ENV=docker REPLACE_OS_VARS=true
+ENV MIX_ENV=docker
 COPY . /app
 WORKDIR /app
 COPY --from=0 /app/webapp/dist/ ./priv/static
