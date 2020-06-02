@@ -31,8 +31,8 @@ Elixir/Phoenix in the backend, Vue.js in the frontend.
 
 ### With docker in "almost production" mode
 
-By far the easiest way, this will run a distillery release similar to the one used in production with optimized
-frontend assets. Just run:
+By far the easiest way, this will run a release similar to the one used in production with optimized
+frontend assets. Just type:
 
 ```docker-compose up```
 
