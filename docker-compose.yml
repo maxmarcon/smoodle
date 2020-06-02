@@ -11,8 +11,10 @@ services:
       - "4001:4000"
     environment:
       DATABASE_URL: postgresql://smoodle:secret@db:5432/smoodle
-      PORT: 4000
+      SCHEME: http
       HOST_NAME: localhost
+      PORT: 4000
+      LOCAL_EMAILS: "true"
   db:
     image: postgres
     environment:
