@@ -1,7 +1,7 @@
 import Config
 
 config :smoodle, SmoodleWeb.Endpoint,
-  http: [port: System.get_env("PORT")],
+  http: [port: 4000],
   url: [
     host: System.get_env("HOST_NAME"),
     scheme: System.get_env("SCHEME", "https"),

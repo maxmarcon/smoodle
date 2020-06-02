@@ -13,7 +13,7 @@ services:
       DATABASE_URL: postgresql://smoodle:secret@db:5432/smoodle
       SCHEME: http
       HOST_NAME: localhost
-      PORT: 4000
+      PORT: 4001
       LOCAL_EMAILS: "true"
   db:
     image: postgres
