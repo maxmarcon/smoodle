@@ -372,7 +372,7 @@ describe('eventEditor', () => {
       })
 
       it('renders the share via Whatsapp button', () => {
-        expect(wrapper.find(`a[href="https://wa.me/?text=http%3A%2F%2Flocalhost%3A4000%2Fevents%2F${EVENT_ID}"]`).exists()).toBeTruthy()
+        expect(wrapper.find(`a[href="whatsapp://send?text=http%3A%2F%2Flocalhost%3A4000%2Fevents%2F${EVENT_ID}"]`).exists()).toBeTruthy()
       })
 
       it('renders only the manage event button', () => {

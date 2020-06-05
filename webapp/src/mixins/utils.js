@@ -10,6 +10,6 @@ export const scrollToTopMixin = {
 
 export const whatsAppHelpersMixin = {
   methods: {
-    whatsAppMessageURL: (link) => `https://wa.me/?text=${encodeURIComponent(link)}`
+    whatsAppMessageURL: (text) => `whatsapp://send?text=${encodeURIComponent(text)}`
   }
 };
