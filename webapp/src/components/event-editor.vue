@@ -27,7 +27,6 @@
                 input#shareLink.form-control(:value="eventShareLink" readonly)
                 .input-group-append
                   a.btn.bdn-sm.btn-outline-secondary(
-                    target="_blank"
                     :href="whatsAppMessageURL(eventShareLink)"
                   )
                     span.fab.fa-lg.fa-whatsapp
