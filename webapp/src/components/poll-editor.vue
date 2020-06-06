@@ -260,9 +260,10 @@
           this.assignPollData({}, this.eventWeekdays)
           this.checkEventValid()
           this.loadedSuccessfully = true
-        } finally {
-          this.loaded = true
+        } catch {
+          this.loaded = false
         }
+        this.loaded = true
       } else {
         try {
           const response = await this.restRequest(['polls', this.pollId].join('/'))

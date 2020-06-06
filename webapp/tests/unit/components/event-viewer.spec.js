@@ -237,7 +237,7 @@ describe('eventViewer', () => {
                 }
               })
             }
-            return Promise.reject()
+
           })
 
           wrapper = mountEventViewer(restRequest, {
@@ -347,7 +347,7 @@ describe('eventViewer', () => {
                 }
               })
             }
-            return Promise.reject()
+            // //return Promise.reject()
           })
 
           wrapper = mountEventViewer(restRequest, {
@@ -419,7 +419,7 @@ describe('eventViewer', () => {
               }
             })
           }
-          return Promise.reject()
+          //return Promise.reject()
         })
 
         wrapper = mountEventViewer(restRequest, {
@@ -482,7 +482,7 @@ describe('eventViewer', () => {
               }
             })
           }
-          return Promise.reject()
+          //return Promise.reject()
         })
 
         wrapper = mountEventViewer(restRequest, {
@@ -551,7 +551,7 @@ describe('eventViewer', () => {
                 }
               })
             }
-            return Promise.reject()
+            //return Promise.reject()
           })
 
           wrapper = mountEventViewer(restRequest, {
@@ -735,7 +735,7 @@ describe('eventViewer', () => {
                 }
               })
             }
-            return Promise.reject()
+            //return Promise.reject()
           })
 
           wrapper = mountEventViewer(restRequest, {
@@ -810,7 +810,7 @@ describe('eventViewer', () => {
               }
             })
           }
-          return Promise.reject()
+          //return Promise.reject()
         })
 
         wrapper = mountEventViewer(restRequest, {
@@ -904,7 +904,7 @@ describe('eventViewer', () => {
               }
             })
           }
-          return Promise.reject()
+          //return Promise.reject()
         })
 
         wrapper = mountEventViewer(restRequest, {

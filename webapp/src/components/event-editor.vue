@@ -342,6 +342,8 @@
             this.loadedSuccessfully = true
             this.minStep = 2
             this.step = this.forceStep || this.minStep
+          } catch {
+            this.loaded = false
           } finally {
             this.loaded = true
           }

@@ -484,10 +484,12 @@
           this.eventScheduleParticipants = scheduleResult.data.data.participants;
           this.eventScheduleParticipantsCount = scheduleResult.data.data.participants_count;
           this.loadedSuccessfully = true;
-        } finally {
-          this.loaded = true
+        } catch {
+          this.loaded = false
           this.loading = false
         }
+        this.loaded = true
+        this.loading = false
       },
       classForDate(date_entry, minNegativeRank, maxPositiveRank) {
         const relativeRank = (date_entry.negative_rank < 0 ?
