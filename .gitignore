@@ -3,6 +3,7 @@
 /db
 /deps
 /*.ez
+/rel
 .*.env
 .elixir_ls
 # Generated on crash by the VM
