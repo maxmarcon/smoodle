@@ -44,7 +44,7 @@
     "too_many_requests_error": "You have created too many events for {email}. Take a short break..."
   },
   "poll_editor": {
-    "welcome": "Here you can update your availability for ths event. Your participant name is: \u201C{participant}\u201E",
+    "welcome": "Here you can update your availability for this event. Your participant name is: \u201C{participant}\u201E",
     "welcome_new_participant": "Here you can enter your availability for this event.",
     "title": "My availability for \u201C{eventName}\u201E",
     "participant_group": "Who are you?",
