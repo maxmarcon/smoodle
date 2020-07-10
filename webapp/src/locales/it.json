@@ -67,7 +67,9 @@
     "date_ranker_help_modal_content": "Prima scegli se le date vanno bene {good} o non vanno bene {bad} per questo evento. Poi aggungile, come giorni singoli oppure come periodo. Per rimuoverle, seleziona {trash} e clicca sulle date.",
     "weekday_ranker_help_modal_title": "Preferenze per i giorni della settimana",
     "weekday_ranker_help_modal_content": "Com'è la tua settimana tipica? Per esempio, magari vai ogni Mercoledì a fare sport e vuoi perciò marcare questo giorno con {bad}. Il Venerdì però in genere potrebbe andare bene e lo potresti marcare con {good}. I rimanenti giorni sono semplicemente ok, e puoi lasciarli con {ok}.",
-    "event_invalid": "L'evento è invalido o già fissato"
+    "event_invalid": "L'evento è invalido o già fissato",
+    "participant_name_already_exists": "Un partecipante con il nome \u201C{participant}\u201E esiste già. Vuoi aggiornare la sua disponibilità?"
+
   },
   "event_viewer": {
     "organizer": "Organizzatore:",
@@ -207,5 +209,7 @@
     "prev": "Indietro",
     "show_all": "Mostra tutti"
   },
-  "trimmed_list": "{list} e {others} altri"
+  "trimmed_list": "{list} e {others} altri",
+  "y": "Sì",
+  "n": "No"
 }

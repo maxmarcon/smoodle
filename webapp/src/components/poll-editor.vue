@@ -252,8 +252,19 @@
         }
       }
     },
-    async created() {
-      if (this.eventId) {
+    created() {
+      this.loadEvent()
+      this.loadPoll()
+    },
+    watch: {
+      eventId: 'loadEvent',
+      pollId: 'loadPoll'
+    },
+    methods: {
+      async loadEvent() {
+        if (!this.eventId) {
+          return
+        }
         try {
           const response = await this.restRequest(['events', this.eventId].join('/'))
           this.assignEventData(response.data.data)
@@ -264,7 +275,11 @@
           this.loaded = false
         }
         this.loaded = true
-      } else {
+      },
+      async loadPoll() {
+        if (!this.pollId) {
+          return
+        }
         try {
           const response = await this.restRequest(['polls', this.pollId].join('/'))
           this.assignEventData(response.data.data.event)
@@ -277,9 +292,7 @@
         } finally {
           this.loaded = true
         }
-      }
-    },
-    methods: {
+      },
       checkEventValid() {
         if (!this.eventOpen || this.emptyDomain) {
           this.eventError = this.$i18n.t('poll_editor.event_invalid')
@@ -342,8 +355,42 @@
         });
       },
       async nextStep() {
+        if (this.step === 1 && this.pollParticipant) {
+          const pollId = await this.findPollByParticipant(this.pollParticipant)
+          if (pollId) {
+            if (await this.$bvModal.msgBoxConfirm(
+              this.$t('poll_editor.participant_name_already_exists', {participant: this.pollParticipant}),
+              {
+                okTitle: this.$t('y'),
+                cancelTitle: this.$t('n')
+              })
+            ) {
+              this.$router.push({
+                name: 'edit_poll',
+                params: {
+                  pollId: pollId
+                }
+              });
+            }
+            return
+          }
+        }
         await this.savePoll(this.step < this.maxStep)
         this.step = Math.min(this.step + 1, this.maxStep, this.firstStepWithErrors || this.maxStep)
+      },
+      async findPollByParticipant(pollParticipant) {
+        try {
+          const result = await this.restRequest(['events', this.eventId, 'polls'].join('/'), {
+            params: {
+              participant: pollParticipant
+            }
+          })
+          return result.data.data.id
+        } catch (error) {
+          if (!error.response || error.response.status !== 404) {
+            throw error;
+          }
+        }
       },
       prevStep() {
         if (this.step > this.minStep) {

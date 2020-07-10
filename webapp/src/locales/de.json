@@ -68,7 +68,8 @@
     "date_ranker_help_modal_content": "Zuerst wähle aus, ob die Daten passend {good} oder unpassend {bad} sind für dieses Event. Dann füg die Daten hinzu, entweder einzeln oder als Zeitspanne. Um Daten zu entfernen, wähl {trash} aus, dann Daten anklicken.",
     "weekday_ranker_help_modal_title": "Auswahl für die Wochentage",
     "weekday_ranker_help_modal_content": "Wie sieht deine typische Woche aus? Zum Beispiel, gehst du vielleicht mittwochs ins Fittnessstudio und möchtest deswegen diesen Wochentag als {bad} markieren. Ein Freitag könnte aber ein guter Tag sein für das Event und du kannst ihn mit {good} markieren. Die restlichen Tage sind vielleicht nur ok, und du kannst sie als {ok} lassen.",
-    "event_invalid": "Das Event ist ungültig oder schon festgelet"
+    "event_invalid": "Das Event ist ungültig oder schon festgelet",
+    "participant_name_already_exists": "Es gibt schon eine(n) TeilnehmerIn mit dem Namen \u201C{participant}\u201E. Möchtest du seine/ihre Verfügbarkeit aktualisieren?"
   },
   "event_viewer": {
     "organizer": "Organisator:",
@@ -208,5 +209,7 @@
     "prev": "Zurück",
     "show_all": "Alle zeigen"
   },
-  "trimmed_list": "{list} und {others} andere"
+  "trimmed_list": "{list} und {others} andere",
+  "y": "Ja",
+  "n": "Nein"
 }
