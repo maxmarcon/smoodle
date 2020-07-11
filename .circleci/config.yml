@@ -13,8 +13,7 @@ commands:
   save_mix_cache:
     steps:
       # Reason: mix deps.get sometimes modifies mix.lock
-      - checkout:
-          path: mix.lock
+      - checkout
       - save_cache:
           key: mix-deps-{{ checksum "mix.lock" }}
           paths:
