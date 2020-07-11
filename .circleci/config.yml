@@ -65,6 +65,10 @@ jobs:
           command: |
             yarn install --frozen-lockfile
       - save_yarn_cache
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project
 
   backend_unit_tests:
     docker:
