@@ -12,7 +12,7 @@ commands:
 
   save_mix_cache:
     steps:
-      # Reason: mix deps.get sometimes modifies mix.lock
+      # Reason: mix deps.get sometimes modifies mix.lock and no option to suppress this behavior (7/11/2020)
       - checkout
       - save_cache:
           key: mix-deps-{{ checksum "mix.lock" }}
