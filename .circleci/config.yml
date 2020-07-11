@@ -91,7 +91,6 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
-      - restore_yarn_cache
       - run:
           command: |
             yarn lint
