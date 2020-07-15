@@ -13,7 +13,7 @@ function mountEventViewer(restRequest, propsData) {
   // needed for the modals to correctly render their buttons in the tests.
   // omitting this stub with result in disabled, unclickable buttons
   const transitionStub = () => ({
-    render: function (_h) {
+    render: function () {
       return this.$options._renderChildren
     }
   })
