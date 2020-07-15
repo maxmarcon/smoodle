@@ -1,21 +1,18 @@
 import eventEditor from '@/components/event-editor.vue'
-import BootstrapVue from 'bootstrap-vue'
+import {AlertPlugin, CardPlugin} from 'bootstrap-vue'
 import PrettyCheckbox from 'pretty-checkbox-vue'
 import VueClipboard from 'vue-clipboard2'
 import messageBar from '@/components/message-bar.vue'
 import i18nMock from '../test-utils/i18n-mock'
 import {createLocalVue, mount, RouterLinkStub} from '@vue/test-utils'
 
-const routerSpy = {
-  push: jest.fn()
-}
-
 const CANT_BE_BLANK = 'can\'t be blank'
 
 function mountEventEditor(restRequest, propsData) {
 
   const localVue = createLocalVue();
-  localVue.use(BootstrapVue);
+  localVue.use(CardPlugin);
+  localVue.use(AlertPlugin);
   localVue.use(VueClipboard);
   localVue.use(PrettyCheckbox);
 
@@ -30,8 +27,13 @@ function mountEventEditor(restRequest, propsData) {
       $tc: i18nMock.t,
       $i18n: i18nMock,
       $scrollTo: () => null,
-      $router: routerSpy,
-      $screens: () => 2
+      $router: {
+        push: jest.fn()
+      },
+      $screens: () => 2,
+      $bvModal: {
+        msgBoxOk: jest.fn()
+      }
     },
     stubs: {
       'progress-header': true,
@@ -153,10 +155,8 @@ describe('eventEditor', () => {
         expect(wrapper.findAll('.alert').length).toBe(1)
       })
 
-      inputElements[0].forEach(selector => {
-        it(`renders input element ${selector}`, () => {
-          expect(wrapper.find(selector).exists()).toBeTruthy()
-        })
+      test.each(inputElements[0])('renders input element %s', selector => {
+        expect(wrapper.find(selector).exists()).toBeTruthy()
       })
 
       it('renders the right buttons', () => {
@@ -207,10 +207,8 @@ describe('eventEditor', () => {
         expect(wrapper.findAll('.alert').length).toBe(1)
       })
 
-      inputElements[1].forEach(selector => {
-        it(`renders input element ${selector}`, () => {
-          expect(wrapper.find(selector).exists()).toBeTruthy()
-        })
+      test.each(inputElements[1])('renders input element %s', selector => {
+        expect(wrapper.find(selector).exists()).toBeTruthy()
       })
 
       it('renders the right buttons', () => {
@@ -261,10 +259,8 @@ describe('eventEditor', () => {
         expect(wrapper.findAll('.alert').length).toBe(1)
       })
 
-      inputElements[2].forEach(selector => {
-        it(`renders input element ${selector}`, () => {
-          expect(wrapper.find(selector).exists()).toBeTruthy()
-        })
+      test.each(inputElements[2])('renders input element %s', selector => {
+        expect(wrapper.find(selector).exists()).toBeTruthy()
       })
 
       it('renders the right buttons', () => {
@@ -318,10 +314,8 @@ describe('eventEditor', () => {
       })
 
       // back to first step
-      errorElements[0].forEach(selector => {
-        it(`renders error in ${selector}`, () => {
-          expect(wrapper.find(selector).text()).toBe(CANT_BE_BLANK)
-        })
+      test.each(errorElements[0])('renders error in %s', selector => {
+        expect(wrapper.find(selector).text()).toBe(CANT_BE_BLANK)
       })
     })
 
@@ -357,10 +351,8 @@ describe('eventEditor', () => {
         expect(wrapper.find('div.card[name="main-card"] div.card-body').exists()).toBeFalsy();
       })
 
-      inputElements.flat().forEach(selector => {
-        it(`does not render input element ${selector}`, () => {
-          expect(wrapper.find(selector).exists()).toBeFalsy()
-        })
+      test.each(inputElements.flat())('does not render input element %s', selector => {
+        expect(wrapper.find(selector).exists()).toBeFalsy()
       })
 
       it('renders the share link input field', () => {
@@ -428,24 +420,19 @@ describe('eventEditor', () => {
         expect(wrapper.findAll('.alert').length).toBe(1)
       })
 
-      inputElements[0]
-        .forEach(selector => {
-          it(`does not render input element ${selector}`, () => {
-            expect(wrapper.find(selector).exists()).toBeFalsy()
-          })
-        })
+      test.each(inputElements[0])('`does not render input element %s', selector => {
+        expect(wrapper.find(selector).exists()).toBeFalsy()
+      })
 
-      inputElements[1].forEach(selector => {
-        it(`renders input element ${selector}`, () => {
-          expect(wrapper.find(selector).exists()).toBeTruthy()
-        })
+      test.each(inputElements[1])('renders input element %s', selector => {
+        expect(wrapper.find(selector).exists()).toBeTruthy()
       })
 
       it('user can go back to the event', () => {
 
         wrapper.find('button[name="cancel-button"]').trigger("click")
 
-        expect(routerSpy.push).toHaveBeenCalledWith({
+        expect(wrapper.vm.$router.push).toHaveBeenCalledWith({
           name: 'event',
           params: {
             eventId: EVENT_ID,
@@ -559,10 +546,8 @@ describe('eventEditor', () => {
         wrapper.find('button span[name="save-event-button"]').trigger("click")
       })
 
-      errorElements[1].forEach(selector => {
-        it(`renders error in ${selector}`, () => {
-          expect(wrapper.find(selector).text()).toBe(CANT_BE_BLANK)
-        })
+      test.each(errorElements[1])('renders error in %s', selector => {
+        expect(wrapper.find(selector).text()).toBe(CANT_BE_BLANK)
       })
     })
 
@@ -594,22 +579,16 @@ describe('eventEditor', () => {
 
       })
 
-      errorElements[2].forEach(selector => {
-        it(`no error in ${selector}`, () => {
-          expect(wrapper.find(selector).text()).toBeFalsy()
-        })
+      test.each(errorElements[2])('no error in %s', selector => {
+        expect(wrapper.find(selector).text()).toBeFalsy()
       })
 
-      it('opens the eventu-updated-modal modal', () => {
-        expect(wrapper.find('#event-updated-modal').isVisible()).toBeTruthy()
+      it('opens a notification modal', () => {
+        expect(wrapper.vm.$bvModal.msgBoxOk).toHaveBeenCalledWith('event_editor.event_updated', expect.anything())
       })
 
-      // All buttons in the modal appear as disabled. Could be a bug in bootstrap-vue (2.2.2)
-      // Try again after a new version becomes available
-      xit('the event-updated-modal has a button that takes the user back to the event', async () => {
-        wrapper.find('#event-updated-modal button.btn-primary').trigger('click')
-
-        expect(routerSpy.push).toHaveBeenCalledWith({
+      it('takes the user back to the event', async () => {
+        expect(wrapper.vm.$router.push).toHaveBeenCalledWith({
           name: 'event',
           params: {
             eventId: EVENT_ID,

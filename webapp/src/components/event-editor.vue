@@ -1,12 +1,6 @@
 <template lang="pug">
   div
     message-bar(ref="errorBar" variant="danger")
-    b-modal#clipboard-modal(static=true hide-header ok-only)
-      p {{ $t('event_editor.link_copied') }}
-    b-modal#event-created-modal(static=true hide-header ok-only)
-      p {{ $t('event_editor.event_created_short') }}
-    b-modal#event-updated-modal(static=true hide-header ok-only :ok-title="$t('event_editor.back_to_event')" @ok="backToEvent")
-      p {{ $t('event_editor.event_updated') }}
     .card(v-if="!eventId || loadedSuccessfully || eventCreated" name="main-card")
       .card-header
         event-header#event-header(
@@ -512,7 +506,9 @@
         // console.log("dateSelection = " + this.dateSelection)
       },
       clipboard() {
-        this.$bvModal.show('clipboard-modal')
+        this.$bvModal.msgBoxOk(
+          this.$t('event_editor.link_copied')
+        )
       },
       async saveEvent(dry_run = false) {
         let dataForRequest = this.eventDataForRequest
@@ -539,13 +535,16 @@
           if (result.status !== 204) {
             // not just validating...
             if (this.eventId) {
-              this.$bvModal.show('event-updated-modal')
+              await this.$bvModal.msgBoxOk(this.$t('event_editor.event_updated'), {
+                okTitle: this.$t('event_editor.back_to_event')
+              })
+              this.backToEvent()
             } else {
               this.eventCreated = true
               this.createdEventId = result.data.data.id
               this.createdEventSecret = result.data.data.secret
               this.assignEventData(result.data.data)
-              this.$bvModal.show('event-created-modal')
+              this.$bvModal.msgBoxOk(this.$t('event_editor.event_created_short'))
             }
           }
         } catch (error) {

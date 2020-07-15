@@ -254,8 +254,6 @@
       },
       async showEventError() {
         await this.$bvModal.msgBoxOk(this.eventError, {
-          hideHeader: true,
-          okOnly: true,
           noCloseOnEsc: true,
           noCloseOnBackdrop: true,
           okTitle: this.$t('poll_editor.back_to_event')
@@ -322,7 +320,6 @@
             await this.$bvModal.msgBoxOk(this.$t('poll_editor.poll_deleted'),
               {
                 title: this.$t('poll_editor.delete_poll'),
-                okOnly: true,
                 okTitle: this.$t('poll_editor.back_to_event'),
               });
             this.backToEvent()
@@ -332,7 +329,6 @@
             this.$t('poll_editor.poll_delete_error'),
             {
               title: this.$t('errors.error'),
-              okOnly: true
             }
           );
         }
