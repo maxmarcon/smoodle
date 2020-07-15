@@ -20,9 +20,6 @@
         )
         .invalid-feedback {{ pollParticipantError }}
 
-    b-modal#clipboard-modal(staic=true hide-header ok-only)
-      p {{ $t('event_editor.link_copied') }}
-
     b-modal#cancel-event-modal(
       static=true
       :title="$t('event_viewer.cancel_event')"
@@ -35,41 +32,6 @@
       .form-group
         label(for=cancelOrganizerMessage) {{ $t('event_viewer.organizer_message') }}
         textarea#cancelOrganizerMessage.form-control(v-model.trim="organizerMessage")
-
-    b-modal#event-canceled-modal(
-      static=true
-      :title="$t('event_viewer.cancel_event')"
-      ok-only
-    )
-      p {{ $t('event_viewer.event_canceled_ok') }}
-
-    b-modal#event-cancel-error-modal(
-      static=true
-      :title="$t('errors.error')"
-      ok-only
-    )
-      p {{ $t('event_viewer.cancel_event_error') }}
-
-    b-modal#event-opened-modal(
-      static=true
-      :title="$t('event_viewer.open_event')"
-      ok-only
-    )
-      p {{ $t('event_viewer.event_opened_ok') }}
-
-    b-modal#event-open-error-modal(
-      static=true
-      :title="$t('errors.error')"
-      ok-only
-    )
-      p {{ $t('event_viewer.open_event_error') }}
-
-    b-modal#participants-list-modal(
-      static=true
-      :title="$t('event_viewer.current_participants')"
-      ok-only
-    )
-      p {{ nameList(eventScheduleParticipants) }}
 
     b-modal#schedule-event-modal(
       static=true
@@ -93,21 +55,6 @@
         .form-group
           label(for=scheduleOrganizerMessage) {{ $t('event_viewer.organizer_message') }}
           textarea#scheduleOrganizerMessage.form-control(v-model.trim="organizerMessage")
-
-
-    b-modal#scheduled-event-modal(
-      satic=true
-      :title="$t('event_viewer.schedule_event')"
-      ok-only
-    )
-      p {{ $t('event_viewer.event_scheduled_organizer', {datetime: eventScheduledDateTime, time_distance: eventScheduledDateTimeRelative}) }}
-
-    b-modal#schedule-rvent-rrror-modal(
-      static=true
-      :title="$t('errors.error')"
-      ok-only
-    )
-      p {{ $t('event_viewer.schedule_event_error') }}
 
     .card(v-if="loadedSuccessfully")
       .card-header(:class="eventBackgroundClass")
@@ -154,7 +101,7 @@
                   template(v-slot:calendar_icon="")
                     i.fas.fa-calendar-check.fa-lg
                   template(v-slot:participants="")
-                    a(href="#" v-b-modal.participants-list-modal="")
+                    a(href="#" @click="showParticipantList($event)")
                       | {{ $tc('event_viewer.nof_participants', eventScheduleParticipantsCount, {participants: eventScheduleParticipantsCount}) }}
 
                 i18n(path="event_viewer.event_open" v-else)
@@ -502,7 +449,7 @@
         return `${opacityClass} ${colorClass}`
       },
       clipboard() {
-        this.$bvModal.show('clipboard-modal');
+        this.$bvModal.msgBoxOk(this.$t('event_editor.link_copied'));
       },
       async loadPoll(bvEvt) {
         bvEvt.preventDefault();
@@ -543,9 +490,13 @@
             }
           })
           this.assignEventData(result.data.data);
-          this.$bvModal.show('event-opened-modal');
+          this.$bvModal.msgBoxOk(this.$t('event_viewer.event_opened_ok'), {
+            title: this.$t('event_viewer.open_event')
+          });
         } catch (error) {
-          this.$bvModal.show('event-open-error-modal');
+          this.$bvModal.show(this.$t('event_viewer.open_event_error'), {
+            title: this.$t('errors.error')
+          });
           throw error;
         }
       },
@@ -562,10 +513,13 @@
             }
           })
           this.assignEventData(result.data.data);
-          this.$bvModal.show('event-canceled-modal');
+          this.$bvModal.msgBoxOk(this.$t('event_viewer.event_canceled_ok'), {
+            title: this.$t('event_viewer.cancel_event')
+          });
         } catch (error) {
-          this.$bvModal.show('event-cancel-error-modal');
-          throw error;
+          this.$bvModal.msgBoxOk(this.$t('event_viewer.cancel_event_error'), {
+        title: this.$t('errors.error')
+        });
         }
       },
       openScheduleEventModal(date) {
@@ -599,11 +553,21 @@
             }
           });
           this.assignEventData(result.data.data);
-          this.$bvModal.show('scheduled-event-modal');
+          this.$bvModal.msgBoxOk(this.$t('event_viewer.event_scheduled_organizer', {datetime: this.eventScheduledDateTime, time_distance: this.eventScheduledDateTimeRelative}), {
+            title: this.$t('event_viewer.schedule_event')
+          });
         } catch (error) {
-          this.$bvModal.show('schedule-event-error-modal');
+          this.$bvModal.msgBoxOk(this.$t('event_viewer.schedule_event_error'), {
+            title: this.$t('errors.error')
+          });
           throw error;
         }
+      },
+      showParticipantList($event) {
+        $event.preventDefault()
+        this.$bvModal.msgBoxOk(this.nameList(this.eventScheduleParticipants), {
+          title: this.$t('event_viewer.current_participants')
+        })
       }
     }
   }

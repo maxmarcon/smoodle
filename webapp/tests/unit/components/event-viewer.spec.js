@@ -4,10 +4,6 @@ import VueClipboard from 'vue-clipboard2'
 import i18nMock from '../test-utils/i18n-mock'
 import {createLocalVue, mount} from '@vue/test-utils'
 
-const routerSpy = {
-  push: jest.fn()
-}
-
 function mountEventViewer(restRequest, propsData) {
 
   const localVue = createLocalVue();
@@ -24,7 +20,9 @@ function mountEventViewer(restRequest, propsData) {
       $t: i18nMock.t,
       $tc: i18nMock.t,
       $i18n: i18nMock,
-      $router: routerSpy,
+      $router: {
+        push: jest.fn()
+      },
       $scrollTo: () => null,
       $screens: () => 2
     },
@@ -260,16 +258,13 @@ describe('eventViewer', () => {
           expect(wrapper.find('div.card').exists()).toBeTruthy();
         })
 
-        buttonSelectors.all.forEach(selector => {
-          if (buttonSelectors.guest.openWithParticipants.indexOf(selector) > -1) {
-            it(`renders ${selector}`, () => {
-              expect(wrapper.find(selector).exists()).toBeTruthy()
-            })
-          } else {
-            it(`does not render ${selector}`, () => {
-              expect(wrapper.find(selector).exists()).toBeFalsy()
-            })
-          }
+        test.each(buttonSelectors.guest.openWithParticipants)('renders %s', (selector) => {
+          expect(wrapper.find(selector).exists()).toBeTruthy()
+        })
+
+        test.each(buttonSelectors.all
+          .filter(selector => buttonSelectors.guest.openWithParticipants.indexOf(selector) === -1))('does not render %s', (selector) => {
+          expect(wrapper.find(selector).exists()).toBeFalsy()
         })
 
         it('renders event intro', () => {
@@ -319,7 +314,7 @@ describe('eventViewer', () => {
             })
 
             it('takes user to editor for the poll', () => {
-              expect(routerSpy.push).toHaveBeenCalledWith({
+              expect(wrapper.vm.$router.push).toHaveBeenCalledWith({
                 name: 'edit_poll',
                 params: {
                   pollId: POLL_ID
@@ -376,16 +371,13 @@ describe('eventViewer', () => {
           expect(wrapper.find('div.card').exists()).toBeTruthy();
         })
 
-        buttonSelectors.all.forEach(selector => {
-          if (buttonSelectors.guest.open.indexOf(selector) > -1) {
-            it(`renders ${selector}`, () => {
-              expect(wrapper.find(selector).exists()).toBeTruthy()
-            })
-          } else {
-            it(`does not render ${selector}`, () => {
-              expect(wrapper.find(selector).exists()).toBeFalsy()
-            })
-          }
+        test.each(buttonSelectors.guest.open)('renders %s', (selector) => {
+          expect(wrapper.find(selector).exists()).toBeTruthy()
+        })
+
+        test.each(buttonSelectors.all
+          .filter(selector => buttonSelectors.guest.open.indexOf(selector) === -1))('does not render %s', (selector) => {
+          expect(wrapper.find(selector).exists()).toBeFalsy()
         })
 
         it('renders event intro', () => {
@@ -458,10 +450,8 @@ describe('eventViewer', () => {
         expect(wrapper.find('v-calendar').exists()).toBeFalsy()
       })
 
-      buttonSelectors.all.forEach(selector => {
-        it(`does not render ${selector}`, () => {
-          expect(wrapper.find(selector).exists()).toBeFalsy()
-        })
+      test.each(buttonSelectors.all)('does not render %s', selector => {
+        expect(wrapper.find(selector).exists()).toBeFalsy()
       })
     })
 
@@ -521,10 +511,8 @@ describe('eventViewer', () => {
         expect(wrapper.find('v-calendar-stub').exists()).toBeTruthy()
       })
 
-      buttonSelectors.all.forEach(selector => {
-        it(`does not render ${selector}`, () => {
-          expect(wrapper.find(selector).exists()).toBeFalsy()
-        })
+      test.each(buttonSelectors.all)('does not render %s', selector => {
+        expect(wrapper.find(selector).exists()).toBeFalsy()
       })
     })
   })
@@ -586,16 +574,13 @@ describe('eventViewer', () => {
           })
         })
 
-        buttonSelectors.all.forEach(selector => {
-          if (buttonSelectors.organizer.openWithParticipants.indexOf(selector) > -1) {
-            it(`renders ${selector}`, () => {
-              expect(wrapper.find(selector).exists()).toBeTruthy()
-            })
-          } else {
-            it(`does not render ${selector}`, () => {
-              expect(wrapper.find(selector).exists()).toBeFalsy()
-            })
-          }
+        test.each(buttonSelectors.organizer.openWithParticipants)('renders %s', (selector) => {
+          expect(wrapper.find(selector).exists()).toBeTruthy()
+        })
+
+        test.each(buttonSelectors.all
+          .filter(selector => buttonSelectors.organizer.openWithParticipants.indexOf(selector) === -1))('does not render %s', (selector) => {
+          expect(wrapper.find(selector).exists()).toBeFalsy()
         })
 
         it('renders event intro', () => {
@@ -763,16 +748,13 @@ describe('eventViewer', () => {
           expect(wrapper.find('div.card').exists()).toBeTruthy();
         })
 
-        buttonSelectors.all.forEach(selector => {
-          if (buttonSelectors.organizer.open.indexOf(selector) > -1) {
-            it(`renders ${selector}`, () => {
-              expect(wrapper.find(selector).exists()).toBeTruthy()
-            })
-          } else {
-            it(`does not render ${selector}`, () => {
-              expect(wrapper.find(selector).exists()).toBeFalsy()
-            })
-          }
+        test.each(buttonSelectors.organizer.open)('renders %s', (selector) => {
+          expect(wrapper.find(selector).exists()).toBeTruthy()
+        })
+
+        test.each(buttonSelectors.all
+          .filter(selector => buttonSelectors.organizer.open.indexOf(selector) === -1))('does not render %s', (selector) => {
+          expect(wrapper.find(selector).exists()).toBeFalsy()
         })
 
         it('renders event intro', () => {
@@ -850,16 +832,13 @@ describe('eventViewer', () => {
         expect(wrapper.find('v-date-picker-stub').exists()).toBeFalsy()
       })
 
-      buttonSelectors.all.forEach(selector => {
-        if (buttonSelectors.organizer.closed.indexOf(selector) > -1) {
-          it(`renders ${selector}`, () => {
-            expect(wrapper.find(selector).exists()).toBeTruthy()
-          })
-        } else {
-          it(`does not render ${selector}`, () => {
-            expect(wrapper.find(selector).exists()).toBeFalsy()
-          })
-        }
+      test.each(buttonSelectors.organizer.closed)('renders %s', (selector) => {
+        expect(wrapper.find(selector).exists()).toBeTruthy()
+      })
+
+      test.each(buttonSelectors.all
+        .filter(selector => buttonSelectors.organizer.closed.indexOf(selector) === -1))('does not render %s', (selector) => {
+        expect(wrapper.find(selector).exists()).toBeFalsy()
       })
 
       describe('when clicking on reopen event', () => {
@@ -944,16 +923,13 @@ describe('eventViewer', () => {
         expect(wrapper.find('v-date-picker-stub').exists()).toBeFalsy()
       })
 
-      buttonSelectors.all.forEach(selector => {
-        if (buttonSelectors.organizer.closed.indexOf(selector) > -1) {
-          it(`renders ${selector}`, () => {
-            expect(wrapper.find(selector).exists()).toBeTruthy()
-          })
-        } else {
-          it(`does not render ${selector}`, () => {
-            expect(wrapper.find(selector).exists()).toBeFalsy()
-          })
-        }
+      test.each(buttonSelectors.organizer.closed)('renders %s', (selector) => {
+        expect(wrapper.find(selector).exists()).toBeTruthy()
+      })
+
+      test.each(buttonSelectors.all
+        .filter(selector => buttonSelectors.organizer.closed.indexOf(selector) === -1))('does not render %s', (selector) => {
+        expect(wrapper.find(selector).exists()).toBeFalsy()
       })
     })
   })
