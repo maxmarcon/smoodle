@@ -2,7 +2,7 @@ import pollEditor from '@/components/poll-editor.vue'
 import messageBar from '@/components/message-bar.vue'
 import i18nMock from '../test-utils/i18n-mock'
 import {createLocalVue, mount} from '@vue/test-utils'
-import BootstrapVue from 'bootstrap-vue'
+import {AlertPlugin, CardPlugin} from 'bootstrap-vue'
 
 const CANT_BE_BLANK = "can't be blank"
 const NO_LONGER_OPEN = "no longer open"
@@ -100,15 +100,21 @@ const errorElements = [
   ['.small.text-danger[name="poll-date-ranks-error"]', '.small.text-danger[name="poll-weekday-rank-error"]']
 ]
 
-const routerSpy = {
-  push: jest.fn()
-}
-const newDateSpy = jest.fn()
-
 function mountPollEditor(restRequest, propsData) {
 
   const localVue = createLocalVue()
-  localVue.use(BootstrapVue)
+  localVue.use(CardPlugin)
+  localVue.use(AlertPlugin)
+
+  const routerSpy = {
+    push: jest.fn()
+  }
+  const newDateSpy = jest.fn()
+
+  const bvModalSpy = {
+    msgBoxOk: jest.fn().mockResolvedValue(true),
+    msgBoxConfirm: jest.fn().mockResolvedValue(true)
+  }
 
   return mount(pollEditor, {
     mixins: [{
@@ -125,7 +131,8 @@ function mountPollEditor(restRequest, propsData) {
       $i18n: i18nMock,
       $scrollTo: () => null,
       $router: routerSpy,
-      $screens: () => 2
+      $screens: () => 2,
+      $bvModal: bvModalSpy
     },
     stubs: {
       'progress-header': true,
@@ -178,7 +185,7 @@ describe('pollEditor', () => {
       })
 
       it('shows an error modal', () => {
-        expect(wrapper.find('#event-error-modal').isVisible()).toBeTruthy();
+        expect(wrapper.vm.$bvModal.msgBoxOk).toHaveBeenCalledWith('poll_editor.event_invalid', expect.anything())
       })
     })
 
@@ -191,21 +198,7 @@ describe('pollEditor', () => {
               data: EVENT_DATA
             }
           }
-        ).mockRejectedValueOnce(
-          {
-            response: {
-              status: 422,
-              data: {
-                errors: {
-                  "participant": [CANT_BE_BLANK]
-                }
-              }
-            }
-          }).mockResolvedValueOnce({
-          data: {
-            data: POLL_DATA
-          }
-        })
+        )
 
         wrapper = mountPollEditor(restRequest, {
           eventId: EVENT_ID
@@ -234,10 +227,8 @@ describe('pollEditor', () => {
         expect(eventHeader.attributes('eventtimewindow')).toBeDefined()
       })
 
-      inputElements[0].forEach(selector => {
-        it(`renders input element ${selector}`, () => {
-          expect(wrapper.find(selector).exists()).toBeTruthy()
-        })
+      test.each(inputElements[0])('renders input element ${selector}', (selector) => {
+        expect(wrapper.find(selector).exists()).toBeTruthy()
       })
 
       it('renders one alert', () => {
@@ -254,7 +245,7 @@ describe('pollEditor', () => {
 
       it('user can go back to event', () => {
         wrapper.find('button[name="back-to-event-button"]').trigger('click')
-        expect(routerSpy.push).toHaveBeenCalledWith({
+        expect(wrapper.vm.$router.push).toHaveBeenCalledWith({
           name: 'event',
           params: {
             eventId: EVENT_ID
@@ -276,31 +267,63 @@ describe('pollEditor', () => {
       describe('when clicking on the forward button with errors', () => {
 
         beforeEach(async () => {
+          restRequest = jest.fn().mockResolvedValueOnce(
+            {
+              status: 200,
+              data: {
+                data: EVENT_DATA
+              }
+            }
+          ).mockRejectedValueOnce(
+            {
+              response: {
+                status: 422,
+                data: {
+                  errors: {
+                    "participant": [CANT_BE_BLANK]
+                  }
+                }
+              }
+            })
+
+          wrapper = mountPollEditor(restRequest, {
+            eventId: EVENT_ID
+          })
+        })
+
+        beforeEach(async () => {
           wrapper.find('button span[name="forward-button"]').trigger('click')
         })
 
-        errorElements[0].forEach(selector => {
-          it(`renders error in ${selector}`, () => {
-            expect(wrapper.find(selector).text()).toBe(CANT_BE_BLANK)
-          })
+        test.each(errorElements[0])('renders error in %s', (selector) => {
+          expect(wrapper.find(selector).text()).toBe(CANT_BE_BLANK)
         })
       })
 
       describe('when clicking on the forward button without errors', () => {
 
         beforeEach(async () => {
-          // clicked once to get the error response
-          wrapper.find('button span[name="forward-button"]').trigger('click')
+          restRequest = jest.fn().mockResolvedValueOnce(
+            {
+              data: {
+                data: EVENT_DATA
+              }
+            }
+          ).mockResolvedValueOnce({
+            status: 204
+          })
+
+          wrapper = mountPollEditor(restRequest, {
+            eventId: EVENT_ID
+          })
         })
 
         beforeEach(async () => {
           wrapper.find('button span[name="forward-button"]').trigger('click')
         })
 
-        errorElements[1].forEach(selector => {
-          it(`does not render error in ${selector}`, () => {
-            expect(wrapper.find(selector).text()).toBeFalsy()
-          })
+        test.each(errorElements[1])('does not render error in %s', (selector) => {
+          expect(wrapper.find(selector).text()).toBeFalsy()
         })
       })
     })
@@ -332,7 +355,6 @@ describe('pollEditor', () => {
           }
         })
 
-
         wrapper = mountPollEditor(restRequest, {
           eventId: EVENT_ID,
           forceStep: 2
@@ -362,10 +384,8 @@ describe('pollEditor', () => {
         expect(eventHeader.attributes('eventtimewindow')).toBeDefined()
       })
 
-      inputElements[1].forEach(selector => {
-        it(`renders input element ${selector}`, () => {
-          expect(wrapper.find(selector).exists()).toBeTruthy()
-        })
+      test.each(inputElements[1])('renders input element %selector', (selector) => {
+        expect(wrapper.find(selector).exists()).toBeTruthy()
       })
 
       it('renders one alert', () => {
@@ -386,10 +406,9 @@ describe('pollEditor', () => {
           wrapper.find('button span[name="save-poll-button"]').trigger('click')
         })
 
-        errorElements[1].forEach(selector => {
-          it(`renders error in ${selector}`, () => {
-            expect(wrapper.find(selector).text()).toBe(CANT_BE_BLANK)
-          })
+
+        test.each(errorElements[1])('renders error in %s', selector => {
+          expect(wrapper.find(selector).text()).toBe(CANT_BE_BLANK)
         })
       })
 
@@ -404,14 +423,12 @@ describe('pollEditor', () => {
           wrapper.find('button span[name="save-poll-button"]').trigger('click')
         })
 
-        errorElements[1].forEach(selector => {
-          it(`does not render error in ${selector}`, () => {
-            expect(wrapper.find(selector).text()).toBeFalsy()
-          })
+        test.each(errorElements[1])('does not render error in %s', (selector) => {
+          expect(wrapper.find(selector).text()).toBeFalsy()
         })
 
         it('shows the modal to go back to the event', () => {
-          expect(wrapper.find('#poll-saved-modal').isVisible()).toBeTruthy()
+          expect(wrapper.vm.$bvModal.msgBoxOk).toHaveBeenCalledWith('poll_editor.poll_saved', expect.anything())
         })
       })
     })
@@ -466,7 +483,7 @@ describe('pollEditor', () => {
       })
 
       it('shows an error modal', () => {
-        expect(wrapper.find('#event-error-modal').isVisible()).toBeTruthy()
+        expect(wrapper.vm.$bvModal.msgBoxOk).toHaveBeenCalledWith('poll_editor.event_invalid', expect.anything())
       })
     })
 
@@ -508,7 +525,6 @@ describe('pollEditor', () => {
         expect(wrapper.find('progress-header-stub').attributes('minstep')).toEqual('2')
         expect(wrapper.find('progress-header-stub').attributes('maxstep')).toEqual('2')
       })
-
 
       it('renders the event header', () => {
         let eventHeader = wrapper.find('event-header-stub')
@@ -582,7 +598,7 @@ describe('pollEditor', () => {
 
       it('user can go back to event', () => {
         wrapper.find('button[name="back-to-event-button"]').trigger('click')
-        expect(routerSpy.push).toHaveBeenCalledWith({
+        expect(wrapper.vm.$router.push).toHaveBeenCalledWith({
           name: 'event',
           params: {
             eventId: EVENT_ID
@@ -610,7 +626,7 @@ describe('pollEditor', () => {
 
         it('renders errors', () => {
           expect(wrapper.vm.eventError).toBe(NO_LONGER_OPEN)
-          expect(wrapper.find('#poll-saved-modal').isVisible()).toBeFalsy()
+          expect(wrapper.vm.$bvModal.msgBoxOk).toHaveBeenCalledWith('no longer open', expect.anything())
         })
       })
 
@@ -629,7 +645,7 @@ describe('pollEditor', () => {
         })
 
         it('shows the modal to go back to the event', () => {
-          expect(wrapper.find('#poll-saved-modal').isVisible()).toBeTruthy();
+          expect(wrapper.vm.$bvModal.msgBoxOk).toHaveBeenCalledWith('poll_editor.poll_saved', expect.anything())
         })
       })
 
@@ -640,21 +656,12 @@ describe('pollEditor', () => {
         })
 
         it('shows the confirmation modal', () => {
-          expect(wrapper.find('#poll-delete-modal').isVisible()).toBeTruthy();
+          expect(wrapper.vm.$bvModal.msgBoxConfirm).toHaveBeenCalledWith('poll_editor.really_delete', expect.anything())
         })
 
-        // All buttons in the modal appear as disabled. Could be a bug in bootstrap-vue (2.2.2)
-        // Try again after a new version becomes available
-        xdescribe('when the user clicks delete', () => {
-
-          beforeEach(async () => {
-            wrapper.find('#poll-delete-modal button.btn-danger').trigger('click');
-          })
-
-          it('deletes the poll', () => {
-            expect(restRequest).toHaveBeenCalledWith(`polls/${POLL_ID}`, {
-              method: 'delete'
-            })
+        it('deletes the poll', () => {
+          expect(restRequest).toHaveBeenCalledWith(`polls/${POLL_ID}`, {
+            method: 'delete'
           })
         })
       })

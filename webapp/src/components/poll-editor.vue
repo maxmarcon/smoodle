@@ -1,52 +1,6 @@
 <template lang="pug">
   div
     message-bar(ref="errorBar" variant="danger")
-    b-modal#poll-saved-modal(
-      static=true
-      hide-header
-      ok-only
-      :ok-title="$t('poll_editor.back_to_event')"
-      @hidden="backToEvent"
-    )
-      p {{ $t('poll_editor.poll_saved') }}
-
-    b-modal#poll-delete-modal(
-      static=true
-      :title="$t('poll_editor.delete_poll')"
-      @ok="deletePoll"
-      :ok-title="$t('poll_editor.delete_poll')"
-      :cancel-title="$t('actions.cancel')"
-      :ok-disabled="requestOngoing"
-      ok-variant="danger"
-    )
-      p {{ $t('poll_editor.really_delete') }}
-
-    b-modal#poll-deleted-modal(
-      static=true
-      :title="$t('poll_editor.delete_poll')"
-      ok-only
-      :ok-title="$t('poll_editor.back_to_event')"
-      @hidden="backToEvent"
-    )
-      p {{ $t('poll_editor.poll_deleted') }}
-
-    b-modal#poll-delete-error-modal(
-      static=true
-      :title="$t('errors.error')"
-      ok-only
-    )
-      p {{ $t('poll_editor.poll_delete_error') }}
-
-    b-modal#event-error-modal(
-      static=true
-      hide-header
-      :ok-title="$t('poll_editor.back_to_event')"
-      ok-only
-      no-close-on-esc
-      no-close-on-backdrop
-      @ok="backToEvent"
-    )
-      p {{ eventError }}
 
     .card(v-if="loadedSuccessfully" name="main-card")
       .card-header(:class="eventBackgroundClass")
@@ -164,7 +118,7 @@
                 i.fas.fa-save
                 | &nbsp; {{ $t('poll_editor.save_poll') }}
           .col-12.col-sm-2.mt-1(v-if="pollId && eventOpen && !emptyDomain")
-            button.btn.btn-block.btn-danger(name="delete-poll-button" v-b-modal.poll-delete-modal="" :disabled="requestOngoing")
+            button.btn.btn-block.btn-danger(name="delete-poll-button" :disabled="requestOngoing" @click="deletePoll")
               i.fas.fa-trash-alt
               | &nbsp; {{ $t('poll_editor.delete_poll') }}
           .col-12.col-sm-2.order-sm-first.mt-1(v-if="step == minStep")
@@ -257,7 +211,6 @@
       this.loadPoll()
     },
     watch: {
-      eventId: 'loadEvent',
       pollId: 'loadPoll'
     },
     methods: {
@@ -296,8 +249,18 @@
       checkEventValid() {
         if (!this.eventOpen || this.emptyDomain) {
           this.eventError = this.$i18n.t('poll_editor.event_invalid')
-          this.$bvModal.show('event-error-modal')
+          this.showEventError()
         }
+      },
+      async showEventError() {
+        await this.$bvModal.msgBoxOk(this.eventError, {
+          hideHeader: true,
+          okOnly: true,
+          noCloseOnEsc: true,
+          noCloseOnBackdrop: true,
+          okTitle: this.$t('poll_editor.back_to_event')
+        })
+        this.backToEvent()
       },
       clearDateSelection() {
         // done in the next update cycle otherwise ineffective
@@ -319,7 +282,13 @@
           this.scrollToTop()
 
           if (result.status !== 204) {
-            this.$bvModal.show('poll-saved-modal');
+            await this.$bvModal.msgBoxOk(
+              this.$t('poll_editor.poll_saved'),
+              {
+                okTitle: this.$t('poll_editor.back_to_event')
+              }
+            );
+            this.backToEvent();
           }
         } catch (error) {
           if (error.response && error.response.status === 422) {
@@ -328,7 +297,7 @@
               this.showErrorCodeInErrorBar(error.response.status)
             } else if (this.eventError) {
               this.scrollToTop()
-              this.$bvModal.show('event-error-modal');
+              this.showEventError()
             }
           } else {
             throw error;
@@ -337,13 +306,35 @@
       },
       async deletePoll() {
         try {
-          await this.restRequest(['polls', this.pollId].join('/'), {
-            method: 'delete'
-          })
-          this.$bvModal.show('poll-deleted-modal');
+          if (await this.$bvModal.msgBoxConfirm(
+            this.$t('poll_editor.really_delete'),
+            {
+              title: this.$t('poll_editor.delete_poll'),
+              okTitle: this.$t('poll_editor.delete_poll'),
+              cancelTitle: this.$t('actions.cancel'),
+              okDisabled: this.requestOngoing,
+              okVariant: "danger"
+            }
+          )) {
+            await this.restRequest(['polls', this.pollId].join('/'), {
+              method: 'delete'
+            })
+            await this.$bvModal.msgBoxOk(this.$t('poll_editor.poll_deleted'),
+              {
+                title: this.$t('poll_editor.delete_poll'),
+                okOnly: true,
+                okTitle: this.$t('poll_editor.back_to_event'),
+              });
+            this.backToEvent()
+          }
         } catch (error) {
-          this.$bvModal.show('poll-delete-error-modal');
-          throw error;
+          this.$bvModal.msgBoxOk(
+            this.$t('poll_editor.poll_delete_error'),
+            {
+              title: this.$t('errors.error'),
+              okOnly: true
+            }
+          );
         }
       },
       backToEvent() {
