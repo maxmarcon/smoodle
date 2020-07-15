@@ -2,7 +2,6 @@
   b-card(no-body :border-variant="borderVariant")
     b-modal#name-list-modal(
       v-if="participantsList"
-      static=true
       ok-only
     )
       template(v-slot:modal-header="")

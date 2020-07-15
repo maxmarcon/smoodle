@@ -10,6 +10,14 @@ function mountEventViewer(restRequest, propsData) {
   localVue.use(BootstrapVue);
   localVue.use(VueClipboard)
 
+  // needed for the modals to correctly render their buttons in the tests.
+  // omitting this stub with result in disabled, unclickable buttons
+  const transitionStub = () => ({
+    render: function (_h) {
+      return this.$options._renderChildren
+    }
+  })
+
   const config = {
     mixins: [{
       methods: {
@@ -28,9 +36,16 @@ function mountEventViewer(restRequest, propsData) {
     },
     propsData,
     localVue,
-    stubs: ['message-bar', 'event-header', 'v-calendar',
-      'router-link', 'i18n', 'date-picker', 'error-page'
-    ]
+    stubs: {
+      'message-bar': true,
+      'event-header': true,
+      'v-calendar': true,
+      'router-link': true,
+      'i18n': true,
+      'date-picker': true,
+      'error-page': true,
+      transition: transitionStub()
+    }
   }
 
   return mount(eventViewer, config)
@@ -301,15 +316,13 @@ describe('eventViewer', () => {
             expect(wrapper.find('#update-answer-modal').isVisible()).toBeTruthy()
           })
 
-          // All buttons in the modal appear as disabled. Could be a bug in bootstrap-vue (2.2.2)
-          // Try again after a new version becomes available
-          xdescribe('clicking on the load button', () => {
+          describe('clicking on the load button', () => {
 
-            beforeEach(async () => {
+            beforeEach(() => {
               wrapper.find('input#pollParticipant').setValue(POLL_PARTICIPANT)
             })
 
-            beforeEach(async () => {
+            beforeEach( () => {
               wrapper.find('#update-answer-modal button.btn.btn-primary').trigger('click')
             })
 
@@ -609,7 +622,7 @@ describe('eventViewer', () => {
 
         describe('when the schedule-event-modal is open', () => {
 
-          beforeEach(async () => {
+          beforeEach(() => {
             wrapper.vm.$bvModal.show('schedule-event-modal')
           })
 
@@ -617,11 +630,9 @@ describe('eventViewer', () => {
             expect(wrapper.find('#schedule-event-modal').isVisible()).toBeTruthy()
           })
 
-          // All buttons in the modal appear as disabled. Could be a bug in bootstrap-vue (2.2.2)
-          // Try again after a new version becomes available
-          xdescribe('clicking on the primary button in the modal without a selected date', () => {
+          describe('clicking on the primary button in the modal without a selected date', () => {
 
-            beforeEach(async () => {
+            beforeEach(() => {
               wrapper.find('#schedule-event-modal button.btn-primary').trigger('click')
             })
 
@@ -631,15 +642,13 @@ describe('eventViewer', () => {
             })
           })
 
-          // All buttons in the modal appear as disabled. Could be a bug in bootstrap-vue (2.2.2)
-          // Try again after a new version becomes available
-          xdescribe('clicking on the primary button in the modal with a selected date', () => {
+          describe('clicking on the primary button in the modal with a selected date', () => {
 
-            beforeEach(async () => {
+            beforeEach(() => {
               wrapper.vm.selectedDate = wrapper.vm.scheduleCalendarAttributes[0].dates
             })
 
-            beforeEach(async () => {
+            beforeEach(() => {
               wrapper.find('#schedule-event-modal textarea#scheduleOrganizerMessage').setValue(ORGANIZER_MESSAGE)
               wrapper.find('#schedule-event-modal button.btn-primary').trigger('click')
             })
@@ -649,16 +658,21 @@ describe('eventViewer', () => {
               // must use regex and not exact time match because the value sent by the browser
               // depends on the time zone
               const TIME_REGEX = /2018-09-(29|30)T\d{2}:\d{2}:\d{2}\.\d{3}Z/
-
-              let scheduleCallbackArgs = restRequest.calls.mostRecent().args
-              expect(scheduleCallbackArgs[0]).toEqual('events/bf6747d5-7b32-4bde-8e2d-c055d9bb02d3')
-              expect(scheduleCallbackArgs[1].method).toEqual('patch')
-              expect(scheduleCallbackArgs[1].data.event.state).toEqual('SCHEDULED')
-              expect(scheduleCallbackArgs[1].data.event.secret).toEqual(EVENT_SECRET)
-              expect(scheduleCallbackArgs[1].data.event.scheduled_from).toMatch(TIME_REGEX)
-              expect(scheduleCallbackArgs[1].data.event.scheduled_to).toMatch(TIME_REGEX)
-              expect(scheduleCallbackArgs[1].data.event.organizer_message).toEqual(ORGANIZER_MESSAGE)
-
+              expect(restRequest).toHaveBeenCalledWith(
+                'events/bf6747d5-7b32-4bde-8e2d-c055d9bb02d3',
+                expect.objectContaining({
+                  method: 'patch',
+                  data: {
+                    event: {
+                      state: 'SCHEDULED',
+                      secret: EVENT_SECRET,
+                      scheduled_from: expect.stringMatching(TIME_REGEX),
+                      scheduled_to: expect.stringMatching(TIME_REGEX),
+                      organizer_message: ORGANIZER_MESSAGE
+                    }
+                  }
+                })
+              )
               expect(wrapper.find('#schedule-event-modal').isVisible()).toBeFalsy()
             })
           })
@@ -666,25 +680,19 @@ describe('eventViewer', () => {
 
         describe('clicking on cancel event', () => {
 
-          beforeEach(async () => {
-
+          beforeEach( () => {
             wrapper.find(CANCEL_EVENT_BUTTON).trigger('click')
-
           })
 
           it('opens modal', () => {
             expect(wrapper.find('#cancel-event-modal').isVisible()).toBeTruthy()
           })
 
-          // All buttons in the modal appear as disabled. Could be a bug in bootstrap-vue (2.2.2)
-          // Try again after a new version becomes available
-          xdescribe('clicking on primary button within the modal', () => {
+          describe('clicking on primary button within the modal', () => {
 
-            beforeEach(async () => {
-
+            beforeEach(() => {
               wrapper.find('#cancel-event-modal textarea#cancelOrganizerMessage').setValue(ORGANIZER_MESSAGE)
               wrapper.find('#cancel-event-modal button.btn-primary').trigger('click')
-
             })
 
             it('cancels the event', () => {
