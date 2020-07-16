@@ -13,7 +13,7 @@ function mountEventViewer(restRequest, propsData) {
   // needed for the modals to correctly render their buttons in the tests.
   // omitting this stub with result in disabled, unclickable buttons
   const transitionStub = () => ({
-    render: function () {
+    render() {
       return this.$options._renderChildren
     }
   })
@@ -226,7 +226,7 @@ describe('eventViewer', () => {
 
       describe('with participants', () => {
 
-        beforeEach(async () => {
+        beforeEach(() => {
 
           restRequest = jest.fn((path, config) => {
             if (path === `events/${EVENT_ID}`) {
@@ -308,7 +308,7 @@ describe('eventViewer', () => {
 
         describe('clicking on update availability', () => {
 
-          beforeEach(async () => {
+          beforeEach(() => {
             wrapper.find(EDIT_POLL_BUTTON).trigger("click")
           })
 
@@ -322,7 +322,7 @@ describe('eventViewer', () => {
               wrapper.find('input#pollParticipant').setValue(POLL_PARTICIPANT)
             })
 
-            beforeEach( () => {
+            beforeEach(() => {
               wrapper.find('#update-answer-modal button.btn.btn-primary').trigger('click')
             })
 
@@ -340,7 +340,7 @@ describe('eventViewer', () => {
 
       describe("without participants", () => {
 
-        beforeEach(async () => {
+        beforeEach(() => {
           restRequest = jest.fn(path => {
             if (path === `events/${EVENT_ID}`) {
               return Promise.resolve({
@@ -409,7 +409,7 @@ describe('eventViewer', () => {
 
     describe('canceled event', () => {
 
-      beforeEach(async () => {
+      beforeEach(() => {
         restRequest = jest.fn(path => {
           if (path === `events/${EVENT_ID}`) {
             return Promise.resolve({
@@ -470,7 +470,7 @@ describe('eventViewer', () => {
 
     describe('scheduled event', () => {
 
-      beforeEach(async () => {
+      beforeEach(() => {
         restRequest = jest.fn(path => {
           if (path === `events/${EVENT_ID}`) {
             return Promise.resolve({
@@ -536,7 +536,7 @@ describe('eventViewer', () => {
 
       describe("with participants", () => {
 
-        beforeEach(async () => {
+        beforeEach(() => {
 
           restRequest = jest.fn(path => {
             if (path === `events/${EVENT_ID}`) {
@@ -680,7 +680,7 @@ describe('eventViewer', () => {
 
         describe('clicking on cancel event', () => {
 
-          beforeEach( () => {
+          beforeEach(() => {
             wrapper.find(CANCEL_EVENT_BUTTON).trigger('click')
           })
 
@@ -713,7 +713,7 @@ describe('eventViewer', () => {
 
       describe("without participants", () => {
 
-        beforeEach(async () => {
+        beforeEach(() => {
           restRequest = jest.fn(path => {
             if (path === `events/${EVENT_ID}`) {
               return Promise.resolve({
@@ -785,7 +785,7 @@ describe('eventViewer', () => {
 
     describe('canceled event', () => {
 
-      beforeEach(async () => {
+      beforeEach(() => {
         restRequest = jest.fn(path => {
           if (path === `events/${EVENT_ID}`) {
             return Promise.resolve({
@@ -851,7 +851,7 @@ describe('eventViewer', () => {
 
       describe('when clicking on reopen event', () => {
 
-        beforeEach(async () => {
+        beforeEach(() => {
 
           wrapper.find(OPEN_EVENT_BUTTON).trigger('click')
 
@@ -876,7 +876,7 @@ describe('eventViewer', () => {
 
     describe('scheduled event', () => {
 
-      beforeEach(async () => {
+      beforeEach(() => {
         restRequest = jest.fn(path => {
           if (path === `events/${EVENT_ID}`) {
             return Promise.resolve({

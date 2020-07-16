@@ -170,7 +170,7 @@ describe('pollEditor', () => {
 
     describe('when loading a non-open event', () => {
 
-      beforeEach(async () => {
+      beforeEach(() => {
         restRequest = jest.fn().mockResolvedValueOnce(
           {
             data: {
@@ -191,7 +191,7 @@ describe('pollEditor', () => {
 
     describe('if loading is successful, at step 1', () => {
 
-      beforeEach(async () => {
+      beforeEach(() => {
         restRequest = jest.fn().mockResolvedValueOnce(
           {
             data: {
@@ -255,7 +255,7 @@ describe('pollEditor', () => {
 
       describe('when blurring input', () => {
 
-        beforeEach(async () => {
+        beforeEach(() => {
           wrapper.find('input#pollParticipant').trigger('blur')
         })
 
@@ -266,7 +266,7 @@ describe('pollEditor', () => {
 
       describe('when clicking on the forward button with errors', () => {
 
-        beforeEach(async () => {
+        beforeEach(() => {
           restRequest = jest.fn().mockResolvedValueOnce(
             {
               status: 200,
@@ -291,7 +291,7 @@ describe('pollEditor', () => {
           })
         })
 
-        beforeEach(async () => {
+        beforeEach(() => {
           wrapper.find('button span[name="forward-button"]').trigger('click')
         })
 
@@ -302,7 +302,7 @@ describe('pollEditor', () => {
 
       describe('when clicking on the forward button without errors', () => {
 
-        beforeEach(async () => {
+        beforeEach(() => {
           restRequest = jest.fn().mockResolvedValueOnce(
             {
               data: {
@@ -319,7 +319,7 @@ describe('pollEditor', () => {
         })
 
         beforeEach(async () => {
-          wrapper.find('button span[name="forward-button"]').trigger('click')
+          await wrapper.find('button span[name="forward-button"]').trigger('click')
         })
 
         test.each(errorElements[1])('does not render error in %s', (selector) => {
@@ -330,7 +330,7 @@ describe('pollEditor', () => {
 
     describe('if loading is successful, at step 2', () => {
 
-      beforeEach(async () => {
+      beforeEach(() => {
         restRequest = jest.fn().mockResolvedValueOnce(
           {
             data: {
@@ -402,7 +402,7 @@ describe('pollEditor', () => {
 
       describe('when saving the poll with errors', () => {
 
-        beforeEach(async () => {
+        beforeEach(() => {
           wrapper.find('button span[name="save-poll-button"]').trigger('click')
         })
 
@@ -414,12 +414,12 @@ describe('pollEditor', () => {
 
       describe('when saving the poll without errors', () => {
 
-        beforeEach(async () => {
+        beforeEach(() => {
           // clicked once to get error response
           wrapper.find('button span[name="save-poll-button"]').trigger('click')
         })
 
-        beforeEach(async () => {
+        beforeEach(() => {
           wrapper.find('button span[name="save-poll-button"]').trigger('click')
         })
 
@@ -435,7 +435,7 @@ describe('pollEditor', () => {
 
     describe('if loading fails', () => {
 
-      beforeEach(async () => {
+      beforeEach(() => {
         restRequest = jest.fn().mockRejectedValue(null)
         wrapper = mountPollEditor(restRequest, {
           eventId: EVENT_ID
@@ -469,7 +469,7 @@ describe('pollEditor', () => {
 
     describe('when loading a poll for a non-open event', () => {
 
-      beforeEach(async () => {
+      beforeEach(() => {
         restRequest = jest.fn().mockResolvedValue(
           {
             data: {
@@ -489,7 +489,7 @@ describe('pollEditor', () => {
 
     describe('if loading is successful', () => {
 
-      beforeEach(async () => {
+      beforeEach(() => {
         restRequest = jest.fn().mockResolvedValueOnce(
           {
             data: {
@@ -608,7 +608,7 @@ describe('pollEditor', () => {
 
       xdescribe('when blurring input', () => {
 
-        beforeEach(async () => {
+        beforeEach(() => {
           wrapper.find('input#pollParticipant').trigger('blur')
         })
 
@@ -620,7 +620,7 @@ describe('pollEditor', () => {
 
       describe('when saving the poll with errors', () => {
 
-        beforeEach(async () => {
+        beforeEach(() => {
           wrapper.find('button span[name="save-poll-button"]').trigger('click')
         })
 
@@ -632,11 +632,11 @@ describe('pollEditor', () => {
 
       describe('when saving the poll successfully', () => {
 
-        beforeEach(async () => {
+        beforeEach(() => {
           wrapper.find('button span[name="save-poll-button"]').trigger('click')
         })
 
-        beforeEach(async () => {
+        beforeEach(() => {
           wrapper.find('button span[name="save-poll-button"]').trigger('click')
         })
 
@@ -651,7 +651,7 @@ describe('pollEditor', () => {
 
       describe('when deleting the poll', () => {
 
-        beforeEach(async () => {
+        beforeEach(() => {
           wrapper.find('button[name="delete-poll-button"]').trigger('click')
         })
 

@@ -274,7 +274,7 @@ describe('eventEditor', () => {
 
     describe('when blurring input', () => {
 
-      beforeEach(async () => {
+      beforeEach(() => {
         wrapper = mountEventEditor(restRequest, {})
         wrapper.find('input#eventOrganizer').trigger('blur')
 
@@ -321,7 +321,7 @@ describe('eventEditor', () => {
 
     describe('when successfully creating an event', () => {
 
-      beforeEach(async () => {
+      beforeEach(() => {
         wrapper = mountEventEditor(restRequest, {
           forceStep: 3
         })
@@ -390,7 +390,7 @@ describe('eventEditor', () => {
 
     describe('when loading an existing event', () => {
 
-      beforeEach(async () => {
+      beforeEach(() => {
         wrapper = mountEventEditor(restRequest, {
           eventId: EVENT_ID,
           secret: EVENT_SECRET
@@ -455,7 +455,7 @@ describe('eventEditor', () => {
 
       describe('when blurring input', () => {
 
-        beforeEach(async () => {
+        beforeEach(() => {
           wrapper.vm.eventName = '';
           wrapper.find('input#eventName').trigger('blur')
 
@@ -487,7 +487,7 @@ describe('eventEditor', () => {
 
     describe('when trying to load an non-existent event', () => {
 
-      beforeEach(async () => {
+      beforeEach(() => {
         restRequest = jest.fn().mockRejectedValue({
           response: {
             status: 404
@@ -511,7 +511,7 @@ describe('eventEditor', () => {
 
     describe('when saving an existing event with errors', () => {
 
-      beforeEach(async () => {
+      beforeEach(() => {
 
         restRequest = jest.fn().mockResolvedValueOnce(
           {
@@ -543,7 +543,7 @@ describe('eventEditor', () => {
       })
 
       beforeEach(async () => {
-        wrapper.find('button span[name="save-event-button"]').trigger("click")
+        await wrapper.find('button span[name="save-event-button"]').trigger("click")
       })
 
       test.each(errorElements[1])('renders error in %s', selector => {
@@ -553,7 +553,7 @@ describe('eventEditor', () => {
 
     describe('when saving an existing event', () => {
 
-      beforeEach(async () => {
+      beforeEach(() => {
         restRequest = jest.fn().mockResolvedValueOnce({
           data: {
             data: EVENT_DATA
@@ -574,7 +574,7 @@ describe('eventEditor', () => {
 
       })
 
-      beforeEach(async () => {
+      beforeEach(() => {
         wrapper.find('button span[name="save-event-button"]').trigger('click')
 
       })
@@ -587,7 +587,7 @@ describe('eventEditor', () => {
         expect(wrapper.vm.$bvModal.msgBoxOk).toHaveBeenCalledWith('event_editor.event_updated', expect.anything())
       })
 
-      it('takes the user back to the event', async () => {
+      it('takes the user back to the event', () => {
         expect(wrapper.vm.$router.push).toHaveBeenCalledWith({
           name: 'event',
           params: {
