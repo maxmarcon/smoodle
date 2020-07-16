@@ -17,7 +17,7 @@
         .alert.alert-danger(v-if="emptyDomain")
           i.fas.fa-exclamation-triangle
           | &nbsp; {{ $t('event_viewer.empty_domain') }}
-        div(v-else)
+        div(v-else @keyup.enter="nextStep")
           progress-header.mb-1(
             :step="step"
             :maxStep="maxStep"
