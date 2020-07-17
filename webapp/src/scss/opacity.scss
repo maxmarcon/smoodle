@@ -1,4 +1,4 @@
-@for $opacity from 2 through 20 {
+@for $opacity from 0 through 20 {
   .smoodle-opacity-#{$opacity*5} {
     opacity: #{$opacity*5 / 100}
   }

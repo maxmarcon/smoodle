@@ -439,12 +439,13 @@
         this.loading = false
       },
       classForDate(date_entry, minNegativeRank, maxPositiveRank) {
+        const minOpacity = 20
         const relativeRank = (date_entry.negative_rank < 0 ?
           date_entry.negative_rank / minNegativeRank :
           date_entry.positive_rank / maxPositiveRank);
-        const relativeRankBetween20and100 = (relativeRank * 80) + 20
+        const opacityForRank = (relativeRank * (100 - minOpacity)) + minOpacity
 
-        const opacityClass = `smoodle-opacity-${Math.floor(relativeRankBetween20and100 / 5) * 5}`
+        const opacityClass = `smoodle-opacity-${Math.floor(opacityForRank / 5) * 5}`
         const colorClass = (date_entry.negative_rank < 0 ? 'bg-danger' : 'bg-success')
         return `${opacityClass} ${colorClass}`
       },
