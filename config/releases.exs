@@ -1,23 +1,14 @@
 import Config
 
 config :smoodle, SmoodleWeb.Endpoint,
-  http: [port: 4000],
   url: [
     host: System.get_env("HOST_NAME"),
     scheme: System.get_env("SCHEME", "https"),
     port: System.get_env("PORT", "443")
   ],
-  cache_static_manifest: "priv/static/cache_manifest.json",
-  secret_key_base: System.get_env("SECRET_KEY_BASE}"),
-  server: true
+  secret_key_base: System.get_env("SECRET_KEY_BASE}")
 
-# Do not print debug messages in production
-config :logger, level: :info
-
-config :smoodle, Smoodle.Repo,
-  url: System.get_env("DATABASE_URL"),
-  ssl: false,
-  pool_size: 2
+config :smoodle, Smoodle.Repo, url: System.get_env("DATABASE_URL")
 
 if System.get_env("LOCAL_EMAILS") do
   config :smoodle, Smoodle.Mailer, adapter: Bamboo.LocalAdapter
