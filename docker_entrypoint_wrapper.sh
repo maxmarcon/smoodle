@@ -3,6 +3,10 @@
 # before launching the application
 DB_TIMEOUT=${DB_TIMEOUT:-45}
 
+RELEASE_SCRIPT=$1
+
+export DATABASE_URL
+
 # Why this assignment here? Because ENV SECRET_KEY_BASE=$(mix phx.gen.secret) does not work
 # (the output of a command can't be used to set an environment variable)
 export SECRET_KEY_BASE=$(mix phx.gen.secret)
@@ -14,7 +18,8 @@ if [ -z $DB_ENDPOINT ]; then
 fi
 
 if (wait-for-it $DB_ENDPOINT -t $DB_TIMEOUT); then
-	mix ecto.migrate
+  $RELEASE_SCRIPT eval 'Application.ensure_all_started(:smoodle); \
+  Ecto.Migrator.run(Smoodle.Repo, :up, all: true)'
 	exec $*
 else
 	echo "Error: database at: [$DB_ENDPOINT] not ready after waiting for $DB_TIMEOUT seconds" >&2
