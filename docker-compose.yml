@@ -14,7 +14,6 @@ services:
       SCHEME: http
       HOST_NAME: localhost
       PORT: 4001
-      LOCAL_EMAILS: "true"
   db:
     image: postgres
     environment:
