@@ -9,8 +9,7 @@
     "test-watch": "vue-cli-service test:unit --watch",
     "test-once": "JEST_JUNIT_OUTPUT_DIR=test-results/jest vue-cli-service test:unit --reporters=default --reporters=jest-junit",
     "lint": "vue-cli-service lint",
-    "i18n:report": "vue-cli-service i18n:report --src './src/**/*.?(js|vue)' --locales './src/locales/**/*.json'",
-    "update-version": "yarn version --no-git-tag-version"
+    "i18n:report": "vue-cli-service i18n:report --src './src/**/*.?(js|vue)' --locales './src/locales/**/*.json'"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.11.2",
