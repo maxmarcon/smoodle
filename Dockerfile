@@ -14,7 +14,7 @@ RUN apt-get update -y && \
   wait-for-it \
   gawk
 
-ENV MIX_ENV=prod
+ENV MIX_ENV=docker
 COPY . /app
 WORKDIR /app
 COPY --from=0 /app/webapp/dist/ ./priv/static
@@ -27,5 +27,5 @@ RUN mix release
 
 RUN chmod ug+x docker_entrypoint_wrapper.sh
 
-ENTRYPOINT ["./docker_entrypoint_wrapper.sh", "_build/prod/rel/smoodle/bin/smoodle"]
+ENTRYPOINT ["./docker_entrypoint_wrapper.sh", "_build/docker/rel/smoodle/bin/smoodle"]
 CMD ["start"]

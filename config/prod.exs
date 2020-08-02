@@ -11,3 +11,5 @@ config :logger, level: :info
 config :smoodle, Smoodle.Repo,
   ssl: false,
   pool_size: 2
+
+config :smoodle, Smoodle.Mailer, adapter: Bamboo.MailjetAdapter
