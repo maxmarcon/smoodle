@@ -1,3 +1,20 @@
+<!--ts-->
+   * [Smoodle](#smoodle)
+      * [Where can I try it out?](#where-can-i-try-it-out)
+      * [How is this different from Doodle?](#how-is-this-different-from-doodle)
+      * [What technology does it use?](#what-technology-does-it-use)
+      * [How to run the application locally](#how-to-run-the-application-locally)
+         * [With docker in "almost production" mode](#with-docker-in-almost-production-mode)
+         * [Dev mode with mix](#dev-mode-with-mix)
+         * [Emails in local mode](#emails-in-local-mode)
+      * [Running tests](#running-tests)
+         * [Running the back end tests](#running-the-back-end-tests)
+         * [Running the front end tests](#running-the-front-end-tests)
+
+<!-- Added by: max, at: Fri Aug 28 10:12:38 CEST 2020 -->
+
+<!--te-->
+
 # Smoodle
 
 Smoodle (the web application has been released under the name *Let's meet*, but throughout the codebase
