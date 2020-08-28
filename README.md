@@ -1,4 +1,7 @@
-[![maxmarcon](https://circleci.com/gh/maxmarcon/smoodle.svg?style=shield)](https://app.circleci.com/pipelines/github/maxmarcon/stockcast)
+
+<a href="https://app.circleci.com/pipelines/github/maxmarcon/stockcast">
+    <img src="https://circleci.com/gh/maxmarcon/smoodle.svg?style=shield" alt-tex="CircleCI"></img>
+</a>
 
 <!--ts-->
    * [About](#about)
