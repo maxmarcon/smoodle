@@ -1,3 +1,5 @@
+[![mmarcon](https://circleci.com/gh/mmarcon/smoodle.svg?style=shield)](https://app.circleci.com/pipelines/github/maxmarcon/stockcast)
+
 <!--ts-->
    * [About](#about)
    * [Where can I try it out?](#where-can-i-try-it-out)
