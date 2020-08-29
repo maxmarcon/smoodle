@@ -1,4 +1,4 @@
-[![Build status](https://circleci.com/gh/maxmarcon/smoodle.svg?style=shield)](https://app.circleci.com/pipelines/github/maxmarcon/stockcast)
+[![Build status](https://circleci.com/gh/maxmarcon/smoodle.svg?style=shield)](https://app.circleci.com/pipelines/github/maxmarcon/smoodle)
 [![Latest](https://img.shields.io/github/v/tag/maxmarcon/smoodle.svg)](https://go.lets-meet.app)
 
 <!--ts-->
