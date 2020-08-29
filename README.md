@@ -1,4 +1,4 @@
-[![maxmarcon](https://circleci.com/gh/maxmarcon/smoodle.svg?style=shield)](https://app.circleci.com/pipelines/github/maxmarcon/stockcast)
+[![CircleCI](https://circleci.com/gh/maxmarcon/smoodle.svg?style=shield)](https://app.circleci.com/pipelines/github/maxmarcon/stockcast)
 
 <!--ts-->
    * [About](#about)
