@@ -420,9 +420,11 @@ defmodule Smoodle.SchedulerTest do
     end
 
     test "create_poll/3 with weekday ranks", %{event: event} do
-      update = Map.delete(@poll_valid_attrs_2, :date_ranks)
-      assert {:ok, poll = %Poll{}} = Scheduler.create_poll(event, update)
-      assert update == poll
+      poll_attrs = Map.delete(@poll_valid_attrs_2, :date_ranks)
+      assert {:ok, poll = %Poll{}} = Scheduler.create_poll(event, poll_attrs)
+
+      assert poll_attrs.preferences.weekday_ranks ==
+               Enum.map(poll.preferences.weekday_ranks, &Map.from_struct/1)
     end
 
     test "create_poll/3 poll with date ranks", %{event: event} do

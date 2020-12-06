@@ -108,12 +108,12 @@ defmodule Smoodle.Scheduler.Utils do
   end
 
   @doc """
-  iex> cs = Ecto.Changeset.change({%{weekdays: [%{day: 1}]}, %{weekdays: List}}, %{weekdays: [%{day: 0}, %{day: 1}]})
+  iex> cs = Ecto.Changeset.change({%{weekdays: [%{day: 1}]}, %{weekdays: {:array, :map}}}, %{weekdays: [%{day: 0}, %{day: 1}]})
   iex> cs = Smoodle.Scheduler.Utils.validate_no_weekday_duplicates(cs)
   iex> cs.errors
   []
 
-  iex> cs = Ecto.Changeset.change({%{weekdays: [%{day: 1}]}, %{weekdays: List}}, %{weekdays: [%{day: 0}, %{day: 0}]})
+  iex> cs = Ecto.Changeset.change({%{weekdays: [%{day: 1}]}, %{weekdays: {:array, :map}}}, %{weekdays: [%{day: 0}, %{day: 0}]})
   iex> cs = Smoodle.Scheduler.Utils.validate_no_weekday_duplicates(cs)
   iex> cs.errors
   [weekdays: {"you can only list a weekday once", [validation: :weekday_listed_twice]}]
@@ -143,33 +143,33 @@ defmodule Smoodle.Scheduler.Utils do
 
   ### Examples:
 
-  iex> cs = Ecto.Changeset.change({%{dates: []}, %{dates: List}}, %{dates: [%{date_from: ~D[2018-10-01], date_to: ~D[2018-10-14]}]})
+  iex> cs = Ecto.Changeset.change({%{dates: []}, %{dates: {:array, :map}}}, %{dates: [%{date_from: ~D[2018-10-01], date_to: ~D[2018-10-14]}]})
   iex> cs = Smoodle.Scheduler.Utils.validate_no_overlapping_dates(cs, :dates)
   iex> cs.errors
   []
 
-  iex> cs = Ecto.Changeset.change({%{dates: [%{date_from: ~D[2018-10-01], date_to: ~D[2018-10-05]}, %{date_from: ~D[2018-10-03], date_to: ~D[2018-10-06]}]}, %{dates: List}}, %{})
+  iex> cs = Ecto.Changeset.change({%{dates: [%{date_from: ~D[2018-10-01], date_to: ~D[2018-10-05]}, %{date_from: ~D[2018-10-03], date_to: ~D[2018-10-06]}]}, %{dates: {:array, :map}}}, %{})
   iex> cs = Smoodle.Scheduler.Utils.validate_no_overlapping_dates(cs, :dates)
   iex> cs.errors
   [dates: {"dates cannot overlap", [validation: :overlapping_dates]}]
 
 
-  iex> cs = Ecto.Changeset.change({%{dates: [%{date_from: ~D[2018-10-01], date_to: ~D[2018-10-05]}]}, %{dates: List}}, %{})
+  iex> cs = Ecto.Changeset.change({%{dates: [%{date_from: ~D[2018-10-01], date_to: ~D[2018-10-05]}]}, %{dates: {:array, :map}}}, %{})
   iex> cs = Smoodle.Scheduler.Utils.validate_no_overlapping_dates(cs, :dates)
   iex> cs.errors
   []
 
-  iex> cs = Ecto.Changeset.change({%{dates: []}, %{dates: List}}, %{dates: [%{date_from: ~D[2018-10-01], date_to: ~D[2018-10-14]}, %{date_from: ~D[2018-10-01], date_to: ~D[2018-10-01]}]})
+  iex> cs = Ecto.Changeset.change({%{dates: []}, %{dates: {:array, :map}}}, %{dates: [%{date_from: ~D[2018-10-01], date_to: ~D[2018-10-14]}, %{date_from: ~D[2018-10-01], date_to: ~D[2018-10-01]}]})
   iex> cs = Smoodle.Scheduler.Utils.validate_no_overlapping_dates(cs, :dates)
   iex> cs.errors
   [dates: {"dates cannot overlap", [validation: :overlapping_dates]}]
 
-  iex> cs = Ecto.Changeset.change({%{dates: []}, %{dates: List}}, %{})
+  iex> cs = Ecto.Changeset.change({%{dates: []}, %{dates: {:array, :map}}}, %{})
   iex> cs = Smoodle.Scheduler.Utils.validate_no_overlapping_dates(cs, :dates)
   iex> cs.errors
   []
 
-  iex> cs = Ecto.Changeset.change({%{dates: []}, %{dates: List}}, %{dates: [%{date_from: ~D[2018-10-01], date_to: ~D[2018-10-01]}]})
+  iex> cs = Ecto.Changeset.change({%{dates: []}, %{dates: {:array, :map}}}, %{dates: [%{date_from: ~D[2018-10-01], date_to: ~D[2018-10-01]}]})
   iex> cs = Smoodle.Scheduler.Utils.validate_no_overlapping_dates(cs, :dates)
   iex> cs.errors
   []
