@@ -194,7 +194,7 @@ defmodule Smoodle.SchedulerTest do
                  Map.merge(@event_update_attrs, %{secret: "sneaky_token"})
                )
 
-      assert event.secret == old_token
+      assert updated_event.secret == old_token
     end
 
     test "update_event/2 with valid data cannot update the id", %{event: event} do
@@ -203,7 +203,7 @@ defmodule Smoodle.SchedulerTest do
       assert {:ok, updated_event} =
                Scheduler.update_event(event, Map.merge(@event_update_attrs, %{id: "sneaky_id"}))
 
-      assert event.id == old_id
+      assert updated_event.id == old_id
     end
 
     test "update_event/2 with valid data invalidates the cache best_schedule", %{event: event} do
@@ -211,7 +211,7 @@ defmodule Smoodle.SchedulerTest do
 
       assert {:ok, updated_event} = Scheduler.update_event(event, @event_update_attrs)
 
-      assert {:ok, false} == Cachex.exists?(Scheduler.schedule_cache(), event.id)
+      assert {:ok, false} == Cachex.exists?(Scheduler.schedule_cache(), updated_event.id)
     end
 
     test "update_event/2 with invalid data returns error changeset", context do
@@ -387,7 +387,7 @@ defmodule Smoodle.SchedulerTest do
     test "create_poll/3 invalidates the cached best_schedule", %{event: event} do
       {:ok, true} = Cachex.put(Scheduler.schedule_cache(), event.id, "XXX")
 
-      assert {:ok, poll = %Poll{}} = Scheduler.create_poll(event, @poll_valid_attrs_1)
+      assert {:ok, %Poll{}} = Scheduler.create_poll(event, @poll_valid_attrs_1)
 
       assert {:ok, false} == Cachex.exists?(Scheduler.schedule_cache(), event.id)
     end
@@ -422,7 +422,7 @@ defmodule Smoodle.SchedulerTest do
     test "create_poll/3 with weekday ranks", %{event: event} do
       update = Map.delete(@poll_valid_attrs_2, :date_ranks)
       assert {:ok, poll = %Poll{}} = Scheduler.create_poll(event, update)
-      assert update = poll
+      assert update == poll
     end
 
     test "create_poll/3 poll with date ranks", %{event: event} do
@@ -479,7 +479,7 @@ defmodule Smoodle.SchedulerTest do
     test "update_poll/3 invalidates the cached best_schedule", %{poll: poll, event: event} do
       {:ok, true} = Cachex.put(Scheduler.schedule_cache(), event.id, "XXX")
 
-      assert {:ok, updated_poll = %Poll{}} = Scheduler.update_poll(poll, %{participant: "Mike"})
+      assert {:ok, %Poll{}} = Scheduler.update_poll(poll, %{participant: "Mike"})
 
       assert {:ok, false} == Cachex.exists?(Scheduler.schedule_cache(), event.id)
     end

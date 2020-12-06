@@ -5,7 +5,7 @@ defmodule Smoodle.Mixfile do
     [
       app: :smoodle,
       version: "1.8.7",
-      elixir: "~> 1.10",
+      elixir: "~> 1.11",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
@@ -34,8 +34,8 @@ defmodule Smoodle.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.4.0"},
-      {:phoenix_pubsub, "~> 1.0"},
+      {:phoenix, "~> 1.5"},
+      {:phoenix_pubsub, "~> 2.0"},
       {:ecto_sql, "~> 3.0"},
       {:postgrex, "~> 0.11"},
       {:phoenix_html, "~> 2.10"},
@@ -50,7 +50,7 @@ defmodule Smoodle.Mixfile do
       {:bamboo_mailjet, "~> 0.1.0"},
       {:cachex, "~> 3.0"},
       {:jason, "~> 1.1"},
-      {:cors_plug, "~> 1.5"},
+      {:cors_plug, "~> 2.0"},
       {:ecto, "~> 3.0", override: true},
       {:version_tasks, "~> 0.11.4"},
       {:junit_formatter, "~> 3.0", only: [:test]},
