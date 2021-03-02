@@ -2,7 +2,7 @@ defmodule SmoodleWeb.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "room:*", SmoodleWeb.RoomChannel
+  channel("event:*", SmoodleWeb.RoomChannel)
 
   ## Transports
   transport(:websocket, Phoenix.Transports.WebSocket)

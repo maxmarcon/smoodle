@@ -7,6 +7,7 @@ defmodule Smoodle.Scheduler do
   alias Smoodle.Repo
 
   alias Smoodle.Scheduler.Event
+  alias Phoenix.PubSub
 
   @schedule_cache :schedule
   @default_ttl_sec 3600
@@ -87,10 +88,17 @@ defmodule Smoodle.Scheduler do
   def update_event(%Event{} = event, attrs, _opts) do
     Cachex.del(schedule_cache(), event.id)
 
-    event
-    |> Repo.preload(:possible_dates)
-    |> Event.changeset(attrs)
-    |> Repo.update()
+    changeset =
+      event
+      |> Repo.preload(:possible_dates)
+      |> Event.changeset(attrs)
+
+    with {:ok, event} <- Repo.update(changeset),
+         :ok <- PubSub.broadcast(:smoodle, "event:#{event.id}", "updated") do
+      {:ok, event}
+    else
+      error -> error
+    end
   end
 
   @doc """

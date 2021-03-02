@@ -19,7 +19,8 @@ defmodule Smoodle.Application do
       %{
         id: ScheduleCache,
         start: {Cachex, :start_link, [:schedule, []]}
-      }
+      },
+      {Phoenix.PubSub, name: :smoodle}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
