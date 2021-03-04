@@ -23,7 +23,8 @@ config :smoodle,
          view: SmoodleWeb.ErrorView,
          accepts: ~w(html json),
          layout: {SmoodleWeb.LayoutView, "error.html"}
-       ]
+       ],
+       pubsub_server: :smoodle_pubsub
 
 config :smoodle,
        SmoodleWeb.Plugs.Locale,

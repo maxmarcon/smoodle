@@ -244,7 +244,9 @@
   import restMixin from '../mixins/rest'
   import dateDetails from './date-details'
   import {scrollToTopMixin, whatsAppHelpersMixin} from '../mixins/utils'
-
+  import {Socket} from 'phoenix'
+  
+  
   const SCHEDULE_DATES_LIMIT = null;
   const EVENT_RELOAD_INTERVAL_MSEC = 15000;
 
@@ -267,6 +269,7 @@
       secret: String
     },
     data: () => ({
+      socket: null,
       eventScheduleDates: [],
       eventScheduleParticipantsCount: 0,
       eventScheduleParticipants: [],
@@ -394,6 +397,20 @@
         }
       },
       async loadEvent() {
+        if (!this.socket) {
+          this.socket = new Socket("ws://localhost:4000/socket")
+          this.socket.connect()
+          this.socket.onError( () => console.log("there was an error with the connection!") )
+          this.socket.onClose( () => console.log("the connection dropped") )
+          console.log(`connection state: ${this.socket.connectionState()}`)
+          let channel = this.socket.channel(`event:${this.eventId}`)
+          channel.join()
+            .receive("ok", ({messages}) => console.log("catching up", messages) )
+            .receive("error", ({reason}) => console.log("failed join", reason) )
+            .receive("timeout", () => console.log("Networking issue. Still waiting..."))
+
+          channel.on("new_msg", msg => console.log("Got message", msg))
+        }        
         if (this.loading) {
           return
         }
