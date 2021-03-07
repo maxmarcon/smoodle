@@ -4,8 +4,7 @@ defmodule SmoodleWeb.EventView do
 
   def render("index.json", %{events: events}) do
     %{
-      data:
-        render_many(Enum.map(events, &%{&1 | secret: nil, email: nil}), EventView, "event.json")
+      data: render_many(events, EventView, "event.json")
     }
   end
 

@@ -7,7 +7,6 @@ defmodule Smoodle.Scheduler do
   alias Smoodle.Repo
 
   alias Smoodle.Scheduler.Event
-  alias Phoenix.PubSub
 
   @schedule_cache :schedule
   @default_ttl_sec 3600
@@ -17,6 +16,11 @@ defmodule Smoodle.Scheduler do
   def schedule_cache, do: @schedule_cache
 
   def ttl, do: 1_000 * (get_in(get_config(), [:cache, :ttl]) || @default_ttl_sec)
+
+  def local_pubsub() do
+    Application.get_env(:smoodle, SmoodleWeb.Endpoint)[:pubsub_server] ||
+      raise "You need to configure a pubsub server"
+  end
 
   @doc """
   Returns the list of events.
@@ -86,15 +90,21 @@ defmodule Smoodle.Scheduler do
   end
 
   def update_event(%Event{} = event, attrs, _opts) do
-    Cachex.del(schedule_cache(), event.id)
-
     changeset =
       event
       |> Repo.preload(:possible_dates)
       |> Event.changeset(attrs)
 
     with {:ok, event} <- Repo.update(changeset),
-         :ok <- PubSub.broadcast(:smoodle, "event:#{event.id}", "updated") do
+         {:ok, true} <- Cachex.del(schedule_cache(), event.id),
+         :ok <-
+           SmoodleWeb.Endpoint.broadcast("event:#{event.id}", "event_updated", %{
+             event: Map.from_struct(event) |> Map.drop([:__meta__, :polls])
+           }),
+         :ok <-
+           SmoodleWeb.Endpoint.broadcast("event:#{event.id}", "schedule_updated", %{
+             schedule: get_best_schedule(event, is_owner: true)
+           }) do
       {:ok, event}
     else
       error -> error
@@ -223,6 +233,11 @@ defmodule Smoodle.Scheduler do
   end
 
   defp maybe_remove_participants(schedule, true) do
+    schedule
+    |> remove_participants
+  end
+
+  def remove_participants(schedule) do
     schedule
     |> Map.update!(:participants, fn _ -> [] end)
     |> Map.update!(
