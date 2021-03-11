@@ -227,7 +227,7 @@ defmodule SmoodleWeb.PollControllerTest do
       check_poll(data, Map.take(poll, [:id, :participant, :event_id]))
     end
 
-    test "fetching a poll via its id does not leak event owner token", %{
+    test "fetching a poll via its id does not leak the event secret, mail and links", %{
       conn: conn,
       polls: [poll | _]
     } do
@@ -236,6 +236,9 @@ defmodule SmoodleWeb.PollControllerTest do
       assert data["id"] == poll.id
       assert data["event"]
       refute data["event"]["secret"]
+      refute data["event"]["email"]
+      refute data["event"]["share_link"]
+      refute data["event"]["owner_link"]
     end
   end
 

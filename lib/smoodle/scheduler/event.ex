@@ -23,9 +23,7 @@ defmodule Smoodle.Scheduler.Event do
   @secret_len 8
   @valid_states ~W(OPEN SCHEDULED CANCELED)
 
-  # Can't use "@derive Jason.Encoder" here becuase the field "secret" and "email"
-  # must be encoded only sometimes, requiring conversion to a Map in event_view.ex
-
+  @derive {Jason.Encoder, except: [:__meta__, :polls]}
   schema "events" do
     field(:name, :string)
     field(:organizer, :string)
@@ -37,6 +35,8 @@ defmodule Smoodle.Scheduler.Event do
     field(:email, :string)
     field(:state, :string, default: "OPEN")
     field(:public_participants, :boolean, default: false)
+    field(:owner_link, :string, virtual: true)
+    field(:share_link, :string, virtual: true)
 
     has_many(:polls, Poll)
 
@@ -162,6 +162,10 @@ defmodule Smoodle.Scheduler.Event do
       Map.get(weekdays_ranks, Date.day_of_week(date), 0) < 0 && rank <= 0
     end)
     |> Enum.map(fn %{date: date} -> date end)
+  end
+
+  def obfuscate(%Event{} = event) do
+    %{event | secret: nil, email: nil}
   end
 
   defp clear_organizer_message(changeset) do

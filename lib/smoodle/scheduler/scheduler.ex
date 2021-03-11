@@ -98,13 +98,14 @@ defmodule Smoodle.Scheduler do
     with {:ok, event} <- Repo.update(changeset),
          {:ok, true} <- Cachex.del(schedule_cache(), event.id),
          :ok <-
-           SmoodleWeb.Endpoint.broadcast("event:#{event.id}", "event_updated", %{
-             event: Map.from_struct(event) |> Map.drop([:__meta__, :polls])
-           }),
-         :ok <-
-           SmoodleWeb.Endpoint.broadcast("event:#{event.id}", "schedule_updated", %{
-             schedule: get_best_schedule(event, is_owner: true)
-           }) do
+           SmoodleWeb.Endpoint.broadcast(
+             "event:#{event.id}",
+             "event_update",
+             %{
+               event: event,
+               schedule: get_best_schedule(event, is_owner: true)
+             }
+           ) do
       {:ok, event}
     else
       error -> error
@@ -199,12 +200,27 @@ defmodule Smoodle.Scheduler do
   end
 
   def update_poll(%Poll{} = poll, attrs, _opts) do
-    Cachex.del(schedule_cache(), poll.event_id)
+    changeset =
+      poll
+      |> Repo.preload([[event: :possible_dates], :date_ranks])
+      |> Poll.changeset(attrs)
 
-    poll
-    |> Repo.preload([[event: :possible_dates], :date_ranks])
-    |> Poll.changeset(attrs)
-    |> Repo.update()
+    with {:ok, poll} <- Repo.update(changeset),
+         {:ok, true} <- Cachex.del(schedule_cache(), poll.event_id),
+         :ok <-
+           SmoodleWeb.Endpoint.broadcast(
+             "event:#{poll.event_id}",
+             "schedule_update",
+             %{
+               public_participants: poll.event.public_participants,
+               poll: poll,
+               schedule: get_best_schedule(poll.event, is_owner: true)
+             }
+           ) do
+      {:ok, poll}
+    else
+      error -> error
+    end
   end
 
   @doc """
@@ -225,19 +241,19 @@ defmodule Smoodle.Scheduler do
       {:ok, schedule} ->
         schedule
     end
-    |> maybe_remove_participants(!opts[:is_owner] && !event.public_participants)
+    |> maybe_obfuscate_schedule(!opts[:is_owner] && !event.public_participants)
   end
 
-  defp maybe_remove_participants(schedule, false) do
+  def maybe_obfuscate_schedule(schedule, false) do
     schedule
   end
 
-  defp maybe_remove_participants(schedule, true) do
+  def maybe_obfuscate_schedule(schedule, true) do
     schedule
     |> remove_participants
   end
 
-  def remove_participants(schedule) do
+  defp remove_participants(schedule) do
     schedule
     |> Map.update!(:participants, fn _ -> [] end)
     |> Map.update!(

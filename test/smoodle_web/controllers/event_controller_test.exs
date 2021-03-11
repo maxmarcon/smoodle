@@ -131,8 +131,6 @@ defmodule SmoodleWeb.EventControllerTest do
         event_list,
         fn data ->
           check_event(data)
-          refute Map.has_key?(data, "secret")
-          refute Map.has_key?(data, "email")
         end
       )
     end
@@ -154,6 +152,11 @@ defmodule SmoodleWeb.EventControllerTest do
       conn = get(conn, event_path(conn, :show, event.id, %{secret: event.secret}))
       data_response = json_response(conn, 200)["data"]
 
+      assert data_response["secret"]
+      assert data_response["email"]
+      assert data_response["share_link"]
+      assert data_response["owner_link"]
+
       check_event(data_response, Map.take(event, [:id, :email, :secret]))
     end
 
@@ -161,8 +164,10 @@ defmodule SmoodleWeb.EventControllerTest do
       conn = get(conn, event_path(conn, :show, event.id))
       data_response = json_response(conn, 200)["data"]
 
-      refute Map.has_key?(data_response, "secret")
-      refute Map.has_key?(data_response, "email")
+      refute data_response["secret"]
+      refute data_response["email"]
+      refute data_response["share_link"]
+      refute data_response["owner_link"]
 
       check_event(data_response, Map.take(event, [:id]))
     end

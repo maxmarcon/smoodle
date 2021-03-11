@@ -20,6 +20,7 @@ defmodule Smoodle.Scheduler.Poll do
 
   @primary_key {:id, :binary_id, autogenerate: true}
 
+  @derive {Jason.Encoder, except: [:__meta__]}
   schema "polls" do
     field(:participant, :string)
     has_many(:date_ranks, DateRank, on_replace: :delete)

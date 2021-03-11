@@ -6,6 +6,10 @@ defmodule Smoodle.SchedulerTest do
   alias Smoodle.Scheduler.DateRank
 
   import Ecto.Query
+  
+  # TODO:
+  # - poll creation!!!!
+  # - event deletion?
 
   @event_valid_attrs_1 %{
     name: "Party",
@@ -119,7 +123,9 @@ defmodule Smoodle.SchedulerTest do
       assert Repo.preload(fetched_event, :possible_dates) == event
     end
 
-    test "get_event!/2 returns the event with given id and secret", %{events: [event | _]} do
+    test "get_event!/2 returns the event with given id, secret, mail and links", %{
+      events: [event | _]
+    } do
       fetched_event = Scheduler.get_event!(event.id, event.secret)
       assert Repo.preload(fetched_event, :possible_dates) == event
     end
@@ -205,15 +211,7 @@ defmodule Smoodle.SchedulerTest do
 
       assert updated_event.id == old_id
     end
-
-    test "update_event/2 with valid data invalidates the cache best_schedule", %{event: event} do
-      {:ok, true} = Cachex.put(Scheduler.schedule_cache(), event.id, "XXX")
-
-      assert {:ok, updated_event} = Scheduler.update_event(event, @event_update_attrs)
-
-      assert {:ok, false} == Cachex.exists?(Scheduler.schedule_cache(), updated_event.id)
-    end
-
+    
     test "update_event/2 with invalid data returns error changeset", context do
       event = context[:event]
       assert {:error, %Ecto.Changeset{}} = Scheduler.update_event(event, @event_invalid_attrs)
@@ -477,15 +475,7 @@ defmodule Smoodle.SchedulerTest do
       assert {:ok, updated_poll = %Poll{}} = Scheduler.update_poll(poll, %{participant: "Mike"})
       assert %{participant: "Mike"} = updated_poll
     end
-
-    test "update_poll/3 invalidates the cached best_schedule", %{poll: poll, event: event} do
-      {:ok, true} = Cachex.put(Scheduler.schedule_cache(), event.id, "XXX")
-
-      assert {:ok, %Poll{}} = Scheduler.update_poll(poll, %{participant: "Mike"})
-
-      assert {:ok, false} == Cachex.exists?(Scheduler.schedule_cache(), event.id)
-    end
-
+    
     test "update_poll/3 with invalid data for dry run does not update the poll and returns invalid changeset",
          %{poll: poll} do
       assert {:error, changeset} = Scheduler.update_poll(poll, %{participant: 1}, dry_run: true)

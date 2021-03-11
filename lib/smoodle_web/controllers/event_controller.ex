@@ -30,7 +30,7 @@ defmodule SmoodleWeb.EventController do
                   {:ok, _} <-
                     Email.new_event_email(event)
                     |> Mailer.deliver_with_rate_limit(event.email) do
-               event
+               %{event | owner_link: owner_link(event), share_link: share_link(event)}
              else
                {:error, :rate_limit_exceeded} -> Repo.rollback(:too_many_requests)
                {:error, error} -> Repo.rollback(error)
@@ -47,7 +47,10 @@ defmodule SmoodleWeb.EventController do
 
   def show(conn, %{"id" => id, "secret" => secret}) do
     event = Repo.preload(Scheduler.get_event!(id, secret), :possible_dates)
-    render(conn, :show, event: event)
+
+    render(conn, :show,
+      event: %{event | owner_link: owner_link(event), share_link: share_link(event)}
+    )
   end
 
   def show(conn, %{"id" => id}) do
@@ -56,11 +59,7 @@ defmodule SmoodleWeb.EventController do
     render(
       conn,
       :show,
-      event: %{
-        event
-        | secret: nil,
-          email: nil
-      }
+      event: Event.obfuscate(event)
     )
   end
 
@@ -134,5 +133,13 @@ defmodule SmoodleWeb.EventController do
       end
 
     [limit: limit]
+  end
+
+  def owner_link(event) do
+    page_url(SmoodleWeb.Endpoint, :event, event.id, s: event.secret)
+  end
+
+  def share_link(event) do
+    page_url(SmoodleWeb.Endpoint, :event, event.id)
   end
 end

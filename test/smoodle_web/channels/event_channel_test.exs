@@ -2,6 +2,7 @@ defmodule SmoodleWeb.EventChannelTest do
   use SmoodleWeb.ChannelCase
   alias SmoodleWeb.UserSocket
   alias Smoodle.Scheduler
+  alias Smoodle.Repo
 
   @event_attrs %{
     name: "Party",
@@ -51,9 +52,9 @@ defmodule SmoodleWeb.EventChannelTest do
   setup do
     socket = socket(UserSocket, "socket", %{})
     {:ok, event} = Scheduler.create_event(@event_attrs)
-    {:ok, _} = Scheduler.create_poll(event, @poll_attrs)
+    {:ok, poll} = Scheduler.create_poll(event, @poll_attrs)
 
-    [socket: socket, event: event]
+    [socket: socket, event: event, poll: poll]
   end
 
   test "should be able to join a channel", %{socket: socket, event: event} do
@@ -69,42 +70,114 @@ defmodule SmoodleWeb.EventChannelTest do
     assert {:error, %{reason: "Invalid event id"}} == subscribe_and_join(socket, "event:12")
   end
 
-  describe "after having joined a channel as non-owner" do
+  describe "after joining a channel for a public participants event as non-owner" do
     setup %{socket: socket, event: event} do
-      assert {:ok, _, _} = subscribe_and_join(socket, "event:#{event.id}")
+      {:ok, event} = Scheduler.update_event(event, %{public_participants: true})
 
-      :ok
+      {:ok, reply, _} = subscribe_and_join(socket, "event:#{event.id}")
+
+      [reply: reply, event: event]
     end
 
-    test "should receive updates on the event", %{event: event} do
-      {:ok, _} = Scheduler.update_event(event, %{name: "Grill"})
+    test "the socket should reply with obfuscated event and unobfuscated schedule", %{
+      reply: reply,
+      event: event
+    } do
+      event = obfuscate_event(event)
 
-      assert_push("event_updated", %{event: %{name: "Grill"}})
+      assert %{
+               event: ^event,
+               schedule: %{dates: _, participants: ["Betty Davies"], participants_count: 1}
+             } = reply
     end
 
-    test "should receive masked updates on the event's schedule", %{event: event} do
-      {:ok, _} = Scheduler.update_event(event, %{name: "Grill"})
+    test "should receive event_update events", %{event: event} do
+      {:ok, event} = Scheduler.update_event(event, %{name: "Grill"})
 
-      assert_push("schedule_updated", %{
+      event = obfuscate_event(event)
+
+      assert_push("event_update", %{
+        event: ^event,
+        schedule: %{dates: _, participants: ["Betty Davies"], participants_count: 1}
+      })
+    end
+
+    test "should receive schedule_update events", %{poll: poll} do
+      {:ok, _} = Scheduler.update_poll(Repo.reload(poll), %{participant: "Batman"})
+
+      assert_push("schedule_update", %{
+        schedule: %{dates: _, participants: ["Batman"], participants_count: 1}
+      })
+    end
+  end
+
+  describe "after joining a channel for a private-participants event as non-owner" do
+    setup %{socket: socket, event: event} do
+      {:ok, reply, _} = subscribe_and_join(socket, "event:#{event.id}")
+
+      [reply: reply]
+    end
+
+    test "the socket should reply with obfuscated event and schedule", %{
+      reply: reply,
+      event: event
+    } do
+      event = obfuscate_event(event)
+
+      assert %{event: ^event, schedule: %{dates: _, participants: [], participants_count: 1}} =
+               reply
+    end
+
+    test "should receive event_update events", %{event: event} do
+      {:ok, event} = Scheduler.update_event(event, %{name: "Grill"})
+
+      event = obfuscate_event(event)
+      assert_push("event_update", %{event: ^event})
+    end
+
+    test "should receive schedule_update events", %{poll: poll} do
+      {:ok, _} = Scheduler.update_poll(poll, %{participant: "Batman"})
+
+      assert_push("schedule_update", %{
         schedule: %{dates: _, participants: [], participants_count: 1}
       })
     end
   end
 
-  describe "after having joined a channel as event owner" do
+  describe "after joining a channel as event owner" do
     setup %{socket: socket, event: event} do
-      assert {:ok, _, _} =
+      assert {:ok, reply, _} =
                subscribe_and_join(socket, "event:#{event.id}", %{secret: event.secret})
 
-      :ok
+      [reply: reply]
     end
 
-    test "should receive unmasked updates on the event's schedule", %{event: event} do
+    test "the socket should reply with unobfuscated event and schedule", %{
+      reply: reply,
+      event: event
+    } do
+      assert %{
+               event: ^event,
+               schedule: %{dates: _, participants: ["Betty Davies"], participants_count: 1}
+             } = reply
+    end
+
+    test "should receive event_update events", %{event: event} do
       {:ok, _} = Scheduler.update_event(event, %{name: "Grill"})
 
-      assert_push("schedule_updated", %{
-        schedule: %{dates: _, participants: [_], participants_count: 1}
+      assert_push("event_update", %{event: %{name: "Grill"}})
+    end
+
+    test "should receive schedule_update events", %{poll: poll} do
+      {:ok, _} = Scheduler.update_poll(poll, %{participant: "Batman"})
+
+      assert_push("schedule_update", %{
+        schedule: %{dates: _, participants: ["Batman"], participants_count: 1}
       })
     end
+  end
+
+  defp obfuscate_event(event) do
+    %{event | email: nil, secret: nil}
   end
 end

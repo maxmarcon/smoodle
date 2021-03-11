@@ -1,7 +1,6 @@
 defmodule SmoodleWeb.PollView do
   use SmoodleWeb, :view
   alias SmoodleWeb.PollView
-  alias SmoodleWeb.EventView
 
   def render("index.json", %{polls: polls}) do
     %{data: render_many(polls, PollView, "poll.json")}
@@ -12,21 +11,14 @@ defmodule SmoodleWeb.PollView do
   end
 
   def render("poll.json", %{poll: poll}) do
-    poll
-    |> Map.from_struct()
-    |> Map.drop([:__meta__])
-    |> drop_or_render_event
+    maybe_nullify_event(poll)
   end
 
-  defp drop_or_render_event(poll) do
-    if Ecto.assoc_loaded?(poll.event) do
-      Map.update!(
-        poll,
-        :event,
-        &render_one(%{&1 | secret: nil, email: nil}, EventView, "event.json")
-      )
+  defp maybe_nullify_event(poll) do
+    if !Ecto.assoc_loaded?(poll.event) do
+      %{poll | event: nil}
     else
-      Map.delete(poll, :event)
+      poll
     end
   end
 end
