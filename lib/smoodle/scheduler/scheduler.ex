@@ -261,11 +261,12 @@ defmodule Smoodle.Scheduler do
   def get_best_schedule(%Event{} = event, opts \\ []) do
     case Cachex.get(schedule_cache(), event.id) do
       {:ok, nil} ->
-        compute_and_cache_best_schedule(event, opts)
+        compute_and_cache_best_schedule(event)
 
       {:ok, schedule} ->
         schedule
     end
+    |> shorten_ranking(opts[:limit])
     |> maybe_obfuscate_schedule(!opts[:is_owner] && !event.public_participants)
   end
 
@@ -289,16 +290,16 @@ defmodule Smoodle.Scheduler do
     )
   end
 
-  defp compute_and_cache_best_schedule(%Event{} = event, opts) do
+  defp compute_and_cache_best_schedule(%Event{} = event) do
     schedule_cache()
-    |> Cachex.put(event.id, compute_best_schedule(event, opts), ttl: ttl())
+    |> Cachex.put(event.id, compute_best_schedule(event), ttl: ttl())
 
     {:ok, cached_schedule} = Cachex.get(schedule_cache(), event.id)
 
     cached_schedule
   end
 
-  defp compute_best_schedule(%Event{} = event, opts) do
+  defp compute_best_schedule(%Event{} = event) do
     event = Repo.preload(event, :possible_dates)
 
     polls =
@@ -307,18 +308,17 @@ defmodule Smoodle.Scheduler do
       |> Enum.map(&transform_poll_for_ranking/1)
 
     %{
-      dates: date_ranking(Event.domain(event), polls, opts[:limit]),
+      dates: date_ranking(Event.domain(event), polls),
       participants: polls |> Enum.map(& &1.participant) |> Enum.sort(),
       participants_count: Enum.count(polls)
     }
   end
 
-  defp date_ranking(date_domain, polls, limit) do
+  defp date_ranking(date_domain, polls) do
     if Enum.any?(polls) do
       date_domain
       |> Enum.map(fn date -> Enum.reduce(polls, initial_date_rank(date), &accumulate_poll/2) end)
       |> Enum.sort(&compare_date_ranks/2)
-      |> shorten_ranking(limit)
     else
       []
     end
@@ -351,11 +351,11 @@ defmodule Smoodle.Scheduler do
     }
   end
 
-  defp shorten_ranking(ranking, limit) do
+  defp shorten_ranking(schedule, limit) do
     if limit do
-      Enum.take(ranking, limit)
+      %{schedule | dates: Enum.take(schedule.dates, limit)}
     else
-      ranking
+      schedule
     end
   end
 

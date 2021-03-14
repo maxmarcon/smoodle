@@ -669,6 +669,12 @@ defmodule Smoodle.SchedulerTest do
     test "get_best_schedule returns a shortened list when a limit is passed", %{event: event} do
       best_schedule = Scheduler.get_best_schedule(event, limit: 1)
       assert Enum.count(best_schedule.dates) == 1
+
+      Cachex.del(Scheduler.schedule_cache(), event.id)
+      Scheduler.get_best_schedule(event)
+
+      cached_best_schedule = Scheduler.get_best_schedule(event, limit: 1)
+      assert Enum.count(cached_best_schedule.dates) == 1
     end
 
     test "the result of get_best_schedule is cached", %{event: event} do
