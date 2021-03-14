@@ -117,7 +117,17 @@ defmodule Smoodle.Scheduler do
 
   """
   def delete_event(%Event{} = event) do
-    Repo.delete(event)
+    with {:ok, event} <- Repo.delete(event),
+         :ok <-
+           SmoodleWeb.Endpoint.broadcast(
+             "event:#{event.id}",
+             "event_delete",
+             %{}
+           ) do
+      {:ok, event}
+    else
+      error -> error
+    end
   end
 
   alias Smoodle.Scheduler.Poll
@@ -174,10 +184,17 @@ defmodule Smoodle.Scheduler do
   def create_poll(%Event{} = event, attrs, _opts) do
     Cachex.del(schedule_cache(), event.id)
 
-    Ecto.build_assoc(event, :polls)
-    |> Repo.preload(event: :possible_dates)
-    |> Poll.changeset(attrs)
-    |> Repo.insert()
+    changeset =
+      Ecto.build_assoc(event, :polls)
+      |> Repo.preload(event: :possible_dates)
+      |> Poll.changeset(attrs)
+
+    with {:ok, poll} <- Repo.insert(changeset),
+         :ok <- broadcast_schedule_update(event) do
+      {:ok, poll}
+    else
+      error -> error
+    end
   end
 
   @doc """
@@ -207,20 +224,22 @@ defmodule Smoodle.Scheduler do
 
     with {:ok, poll} <- Repo.update(changeset),
          {:ok, true} <- Cachex.del(schedule_cache(), poll.event_id),
-         :ok <-
-           SmoodleWeb.Endpoint.broadcast(
-             "event:#{poll.event_id}",
-             "schedule_update",
-             %{
-               public_participants: poll.event.public_participants,
-               poll: poll,
-               schedule: get_best_schedule(poll.event, is_owner: true)
-             }
-           ) do
+         :ok <- broadcast_schedule_update(poll.event) do
       {:ok, poll}
     else
       error -> error
     end
+  end
+
+  defp broadcast_schedule_update(%Event{} = event) do
+    SmoodleWeb.Endpoint.broadcast(
+      "event:#{event.id}",
+      "schedule_update",
+      %{
+        public_participants: event.public_participants,
+        schedule: get_best_schedule(event, is_owner: true)
+      }
+    )
   end
 
   @doc """
@@ -228,9 +247,15 @@ defmodule Smoodle.Scheduler do
 
   """
   def delete_poll(%Poll{} = poll) do
-    Cachex.del(schedule_cache(), poll.event_id)
+    poll = Repo.preload(poll, :event)
 
-    Repo.delete(poll)
+    with {:ok, poll} <- Repo.delete(poll),
+         {:ok, true} <- Cachex.del(schedule_cache(), poll.event_id),
+         :ok <- broadcast_schedule_update(poll.event) do
+      {:ok, poll}
+    else
+      error -> error
+    end
   end
 
   def get_best_schedule(%Event{} = event, opts \\ []) do
@@ -283,7 +308,7 @@ defmodule Smoodle.Scheduler do
 
     %{
       dates: date_ranking(Event.domain(event), polls, opts[:limit]),
-      participants: Enum.map(polls, &Map.get(&1, :participant)),
+      participants: polls |> Enum.map(& &1.participant) |> Enum.sort(),
       participants_count: Enum.count(polls)
     }
   end

@@ -64,7 +64,10 @@ defmodule SmoodleWeb.EventChannel do
     if socket.assigns[:is_owner] do
       push(socket, channel_event, payload)
     else
-      push(socket, channel_event, %{event: Event.obfuscate(event), schedule: schedule})
+      push(socket, channel_event, %{
+        event: Event.obfuscate(event),
+        schedule: Scheduler.maybe_obfuscate_schedule(schedule, !event.public_participants)
+      })
     end
 
     {:noreply, socket}
