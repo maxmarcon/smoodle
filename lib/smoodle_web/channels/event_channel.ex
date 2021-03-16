@@ -3,6 +3,7 @@ defmodule SmoodleWeb.EventChannel do
   alias Smoodle.Repo
   alias Smoodle.Scheduler.Event
   alias Smoodle.Scheduler
+  alias SmoodleWeb.EventController
 
   def join("event:" <> event_id, %{"secret" => secret}, socket) do
     try do
@@ -13,7 +14,7 @@ defmodule SmoodleWeb.EventChannel do
         _ ->
           {:ok,
            %{
-             event: Repo.preload(event, :possible_dates),
+             event: Repo.preload(event, :possible_dates) |> EventController.add_links(),
              schedule: Scheduler.get_best_schedule(event, is_owner: true)
            }, assign(socket, :is_owner, true)}
       end
@@ -62,7 +63,7 @@ defmodule SmoodleWeb.EventChannel do
         socket
       ) do
     if socket.assigns[:is_owner] do
-      push(socket, channel_event, payload)
+      push(socket, channel_event, %{payload | event: EventController.add_links(event)})
     else
       push(socket, channel_event, %{
         event: Event.obfuscate(event),

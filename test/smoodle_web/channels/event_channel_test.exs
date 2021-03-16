@@ -3,6 +3,7 @@ defmodule SmoodleWeb.EventChannelTest do
   alias SmoodleWeb.UserSocket
   alias Smoodle.Scheduler
   alias Smoodle.Repo
+  alias SmoodleWeb.EventController
 
   @event_attrs %{
     name: "Party",
@@ -125,7 +126,7 @@ defmodule SmoodleWeb.EventChannelTest do
 
           event =
             if @owner do
-              event
+              EventController.add_links(event)
             else
               obfuscate_event(event)
             end
@@ -152,7 +153,7 @@ defmodule SmoodleWeb.EventChannelTest do
 
           event =
             if @owner do
-              event
+              EventController.add_links(event)
             else
               obfuscate_event(event)
             end

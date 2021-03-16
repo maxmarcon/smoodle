@@ -39,7 +39,7 @@
     "dates_placeholder": "Scegli un periodo",
     "back_to_event": "Ritorna all'evento",
     "update_event": "Modifica l'evento",
-    "event_updated": "I dettagli dell'evento sono stati modificati.",
+    "event_updated": "L'evento è stato aggiornato",
     "too_many_requests_error": "Hai creato troppi eventi per {email}. Prenditi una breve pausa..."
   },
   "poll_editor": {

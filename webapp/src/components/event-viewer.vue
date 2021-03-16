@@ -1,6 +1,7 @@
 <template lang="pug">
   div
     message-bar(ref="errorBar" variant="danger")
+    message-bar(ref="updateBar" :seconds="10")
     b-modal#update-answer-modal(
       static=true
       :title="$t('event_viewer.update.title')"
@@ -238,355 +239,347 @@
     )
 </template>
 <script>
-  import * as dateFns from 'date-fns'
-  import eventHelpersMixin from '../mixins/event-helpers'
-  import eventDataMixin from '../mixins/event-data'
-  import restMixin from '../mixins/rest'
-  import dateDetails from './date-details'
-  import {scrollToTopMixin, whatsAppHelpersMixin} from '../mixins/utils'
-  import {Socket} from 'phoenix'
-  
-  
-  const SCHEDULE_DATES_LIMIT = null;
-  const EVENT_RELOAD_INTERVAL_MSEC = 15000;
+import * as dateFns from 'date-fns'
+import eventHelpersMixin from '../mixins/event-helpers'
+import eventDataMixin from '../mixins/event-data'
+import restMixin from '../mixins/rest'
+import dateDetails from './date-details'
+import {scrollToTopMixin, whatsAppHelpersMixin} from '../mixins/utils'
+import {Socket} from 'phoenix'
 
-  export default {
-    mixins: [
-      restMixin,
-      eventHelpersMixin,
-      eventDataMixin,
-      scrollToTopMixin,
-      whatsAppHelpersMixin
-    ],
-    components: {
-      dateDetails
-    },
-    props: {
-      eventId: {
-        type: String,
-        required: true
-      },
-      secret: String
-    },
-    data: () => ({
-      socket: null,
-      eventScheduleDates: [],
-      eventScheduleParticipantsCount: 0,
-      eventScheduleParticipants: [],
-      pollParticipant: null,
-      pollParticipantError: null,
-      loaded: false,
-      loadedSuccessfully: false,
-      loading: false,
-      requestOngoing: false,
-      selectedDate: null,
-      selectedTime: "19:30",
-      timePickerOptions: {
-        format: 'HH:mm',
-        inline: true,
-        icons: {
-          up: "fas fa-sort-up fa-2x",
-          down: "fas fa-sort-down fa-2x"
-        }
-      },
-      reloadIntervalId: null,
-      dayDetailsCalendarAttribute: null,
-      organizerMessage: null
-    }),
-    created() {
-      this.loadEvent()
-      this.reloadIntervalId = setInterval(() => this.loadEvent(), EVENT_RELOAD_INTERVAL_MSEC)
-    },
-    beforeDestroy() {
-      clearInterval(this.reloadIntervalId)
-    },
-    computed: {
-      isOrganizer() {
-        return !!this.secret;
-      },
-      calendarColumns() {
-        return this.$screens({
-          default: 1,
-          lg: this.differentMonths ? 2 : 1
-        })
-      },
-      scheduleCalendarAttributes() {
-        if (!this.eventScheduleParticipantsCount) {
-          return [
-            {
-              dates: {
-                start: this.minDate,
-                end: this.maxDate
-              },
-              highlight: {
-                color: 'green'
-              }
-            }
-          ]
-        }
 
-        const scheduleDates = this.eventScheduleDates.length;
-        let minNegativeRank;
-        let maxPositiveRank;
-        if (scheduleDates > 0) {
-          minNegativeRank = this.eventScheduleDates[scheduleDates - 1].negative_rank;
-          maxPositiveRank = this.eventScheduleDates[0].positive_rank;
-        }
-        const limit = (SCHEDULE_DATES_LIMIT !== null ? SCHEDULE_DATES_LIMIT : this.eventScheduleDates.length);
-        let is_top_rank = ({
-                             negative_rank,
-                             positive_rank
-                           }) => {
-          if (this.eventScheduleDates.length > 0) {
-            const {
-              negative_rank: top_negative_rank,
-              positive_rank: top_positive_rank
-            } = this.eventScheduleDates[0]
-            if (top_negative_rank < 0) {
-              return top_negative_rank === negative_rank
-            } else {
-              return negative_rank === 0 && top_positive_rank === positive_rank
+const SCHEDULE_DATES_LIMIT = null;
+
+export default {
+  mixins: [
+    restMixin,
+    eventHelpersMixin,
+    eventDataMixin,
+    scrollToTopMixin,
+    whatsAppHelpersMixin
+  ],
+  components: {
+    dateDetails
+  },
+  props: {
+    eventId: {
+      type: String,
+      required: true
+    },
+    secret: String
+  },
+  data: () => ({
+    socket: null,
+    eventScheduleDates: [],
+    eventScheduleParticipantsCount: 0,
+    eventScheduleParticipants: [],
+    pollParticipant: null,
+    pollParticipantError: null,
+    loaded: false,
+    loadedSuccessfully: false,
+    requestOngoing: false,
+    selectedDate: null,
+    selectedTime: "19:30",
+    timePickerOptions: {
+      format: 'HH:mm',
+      inline: true,
+      icons: {
+        up: "fas fa-sort-up fa-2x",
+        down: "fas fa-sort-down fa-2x"
+      }
+    },
+    dayDetailsCalendarAttribute: null,
+    organizerMessage: null
+  }),
+  created() {
+    this.initSocket()
+  },
+  beforeDestroy() {
+    this.closeSocket()
+  },
+  computed: {
+    isOrganizer() {
+      return !!this.secret;
+    },
+    calendarColumns() {
+      return this.$screens({
+        default: 1,
+        lg: this.differentMonths ? 2 : 1
+      })
+    },
+    scheduleCalendarAttributes() {
+      if (!this.eventScheduleParticipantsCount) {
+        return [
+          {
+            dates: {
+              start: this.minDate,
+              end: this.maxDate
+            },
+            highlight: {
+              color: 'green'
             }
+          }
+        ]
+      }
+
+      const scheduleDates = this.eventScheduleDates.length;
+      let minNegativeRank;
+      let maxPositiveRank;
+      if (scheduleDates > 0) {
+        minNegativeRank = this.eventScheduleDates[scheduleDates - 1].negative_rank;
+        maxPositiveRank = this.eventScheduleDates[0].positive_rank;
+      }
+      const limit = (SCHEDULE_DATES_LIMIT !== null ? SCHEDULE_DATES_LIMIT : this.eventScheduleDates.length);
+      let is_top_rank = ({
+                           negative_rank,
+                           positive_rank
+                         }) => {
+        if (this.eventScheduleDates.length > 0) {
+          const {
+            negative_rank: top_negative_rank,
+            positive_rank: top_positive_rank
+          } = this.eventScheduleDates[0]
+          if (top_negative_rank < 0) {
+            return top_negative_rank === negative_rank
           } else {
-            return false
+            return negative_rank === 0 && top_positive_rank === positive_rank
           }
+        } else {
+          return false
         }
-        return this.eventScheduleDates.slice(0, limit).map((date_entry) => ({
-          dates: date_entry.date,
-          highlight: {
-            class: this.classForDate(date_entry, minNegativeRank, maxPositiveRank)
-          },
-          bar: (is_top_rank(date_entry) ? {
-            color: 'blue'
-          } : false),
-          popover: {
-            visibility: "hover"
-          },
-          customData: Object.assign(date_entry, {
-            optimal: is_top_rank(date_entry)
-          })
-        }));
-      },
-      scheduledEventCalendarAttributes() {
-        return [{
-          dates: this.eventScheduledFrom,
-          highlight: {
-            class: 'bg-primary'
-          },
-          popover: {
-            visibility: 'hover'
-          }
-        }]
-      },
-      selectedDateFormatted() {
-        return dateFns.format(this.selectedDate, this.$i18n.t('date_format_long'), {
-          locale: this.$i18n.t('date_fns_locale')
-        });
-      },
-      selectedDateNegativeRank() {
-        return (this.eventScheduleDates.find(({
-                                                date
-                                              }) => dateFns.isEqual(date, this.selectedDate)) || {}).negative_rank
+      }
+      return this.eventScheduleDates.slice(0, limit).map((date_entry) => ({
+        dates: date_entry.date,
+        highlight: {
+          class: this.classForDate(date_entry, minNegativeRank, maxPositiveRank)
+        },
+        bar: (is_top_rank(date_entry) ? {
+          color: 'blue'
+        } : false),
+        popover: {
+          visibility: "hover"
+        },
+        customData: Object.assign(date_entry, {
+          optimal: is_top_rank(date_entry)
+        })
+      }));
+    },
+    scheduledEventCalendarAttributes() {
+      return [{
+        dates: this.eventScheduledFrom,
+        highlight: {
+          class: 'bg-primary'
+        },
+        popover: {
+          visibility: 'hover'
+        }
+      }]
+    },
+    selectedDateFormatted() {
+      return dateFns.format(this.selectedDate, this.$i18n.t('date_format_long'), {
+        locale: this.$i18n.t('date_fns_locale')
+      });
+    },
+    selectedDateNegativeRank() {
+      return (this.eventScheduleDates.find(({
+                                              date
+                                            }) => dateFns.isEqual(date, this.selectedDate)) || {}).negative_rank
+    }
+  },
+  methods: {
+    dayclicked(day) {
+      if (this.isInDomain(day.date) && this.eventScheduleParticipantsCount) {
+        this.dayDetailsCalendarAttribute = day.attributes[0]
+        this.$refs.calendarCarousel.next()
       }
     },
-    methods: {
-      dayclicked(day) {
-        if (this.isInDomain(day.date) && this.eventScheduleParticipantsCount) {
-          this.dayDetailsCalendarAttribute = day.attributes[0]
-          this.$refs.calendarCarousel.next()
-        }
-      },
-      async loadEvent() {
-        if (!this.socket) {
-          this.socket = new Socket("ws://localhost:4000/socket")
-          this.socket.connect()
-          this.socket.onError( () => console.log("there was an error with the connection!") )
-          this.socket.onClose( () => console.log("the connection dropped") )
-          console.log(`connection state: ${this.socket.connectionState()}`)
-          let channel = this.socket.channel(`event:${this.eventId}`)
-          channel.join()
-            .receive("ok", ({messages}) => console.log("catching up", messages) )
-            .receive("error", ({reason}) => console.log("failed join", reason) )
-            .receive("timeout", () => console.log("Networking issue. Still waiting..."))
+    initSocket() {
+      this.socket = new Socket(`${process.env.VUE_APP_SOCKETBASE}/socket`)
+      this.socket.connect()
+      this.socket.onOpen(() => {
+        const channel = this.socket.channel(`event:${this.eventId}`, this.secret ? {secret: this.secret} : {})
+        const loader = this.$loading.show()
+        channel.join()
+          .receive("ok", ({event, schedule}) => {
+            this.assignEventData(event);
+            this.updateSchedule(schedule)
+            this.loadedSuccessfully = this.loaded = true;
+            loader.hide()
+          })
+          .receive("error", () => {
+            loader.hide()
+            this.loaded = true
+          })
 
-          channel.on("new_msg", msg => console.log("Got message", msg))
-        }        
-        if (this.loading) {
-          return
-        }
+        channel.on('event_update', ({event, schedule}) => {
+          this.assignEventData(event)
+          this.updateSchedule(schedule)
+          this.$refs.updateBar.show(this.$t('event_editor.event_updated'))
+        })
+        channel.on('schedule_update', ({schedule}) => {
+          this.updateSchedule(schedule)
+          this.$refs.updateBar.show(this.$t('event_editor.event_updated'))
+        })
+        channel.on('event_delete', () => {
+          this.loadedSuccessfully = false
+        })
+      })
+    },
+    closeSocket() {
+      this.socket.disconnect()
+    },
+    updateSchedule({dates, participants, participants_count}) {
+      this.eventScheduleDates = dates.map(({
+                                             date,
+                                             positive_rank,
+                                             positive_participants,
+                                             negative_rank,
+                                             negative_participants
+                                           }) => ({
+        date: dateFns.parseISO(date),
+        positive_rank,
+        positive_participants,
+        negative_rank,
+        negative_participants
+      }));
+      this.eventScheduleParticipants = participants;
+      this.eventScheduleParticipantsCount = participants_count;
+    },
+    classForDate(date_entry, minNegativeRank, maxPositiveRank) {
+      const minOpacity = 20
+      const relativeRank = (date_entry.negative_rank < 0 ?
+        date_entry.negative_rank / minNegativeRank :
+        date_entry.positive_rank / maxPositiveRank);
+      const opacityForRank = (relativeRank * (100 - minOpacity)) + minOpacity
+
+      const opacityClass = `smoodle-opacity-${Math.floor(opacityForRank / 5) * 5}`
+      const colorClass = (date_entry.negative_rank < 0 ? 'bg-danger' : 'bg-success')
+      return `${opacityClass} ${colorClass}`
+    },
+    clipboard() {
+      this.$bvModal.msgBoxOk(this.$t('event_editor.link_copied'));
+    },
+    async loadPoll(bvEvt) {
+      bvEvt.preventDefault();
+      if (this.pollParticipant) {
         try {
-          this.loading = true;
-          const [eventResult, scheduleResult] = await Promise.all([
-            this.restRequest(['events', this.eventId].join('/'), {
-              params: {
-                secret: this.secret,
-              },
-              background: this.loadedSuccessfully
-            }),
-            this.restRequest(['events', this.eventId, 'schedule'].join('/'), {
-              params: {
-                limit: SCHEDULE_DATES_LIMIT,
-                secret: this.secret
-              },
-              background: this.loadedSuccessfully
-            })
-          ])
-          this.assignEventData(eventResult.data.data);
-          this.eventScheduleDates = scheduleResult.data.data.dates.map(({
-                                                                          date,
-                                                                          positive_rank,
-                                                                          positive_participants,
-                                                                          negative_rank,
-                                                                          negative_participants
-                                                                        }) => ({
-            date: dateFns.parseISO(date),
-            positive_rank,
-            positive_participants,
-            negative_rank,
-            negative_participants
-          }));
-          this.eventScheduleParticipants = scheduleResult.data.data.participants;
-          this.eventScheduleParticipantsCount = scheduleResult.data.data.participants_count;
-          this.loadedSuccessfully = true;
-        } catch {
-          this.loaded = false
-          this.loading = false
-        }
-        this.loaded = true
-        this.loading = false
-      },
-      classForDate(date_entry, minNegativeRank, maxPositiveRank) {
-        const minOpacity = 20
-        const relativeRank = (date_entry.negative_rank < 0 ?
-          date_entry.negative_rank / minNegativeRank :
-          date_entry.positive_rank / maxPositiveRank);
-        const opacityForRank = (relativeRank * (100 - minOpacity)) + minOpacity
-
-        const opacityClass = `smoodle-opacity-${Math.floor(opacityForRank / 5) * 5}`
-        const colorClass = (date_entry.negative_rank < 0 ? 'bg-danger' : 'bg-success')
-        return `${opacityClass} ${colorClass}`
-      },
-      clipboard() {
-        this.$bvModal.msgBoxOk(this.$t('event_editor.link_copied'));
-      },
-      async loadPoll(bvEvt) {
-        bvEvt.preventDefault();
-        if (this.pollParticipant) {
-          try {
-            const result = await this.restRequest(['events', this.eventId, 'polls'].join('/'), {
-              params: {
-                participant: this.pollParticipant
-              }
-            })
-            this.pollParticipantError = null
-            this.$router.push({
-              name: 'edit_poll',
-              params: {
-                pollId: result.data.data.id
-              }
-            });
-          } catch (error) {
-            if (error.response && error.response.status === 404) {
-              this.pollParticipantError = this.$i18n.t('event_viewer.update.poll_not_found');
-            } else {
-              throw error;
+          const result = await this.restRequest(['events', this.eventId, 'polls'].join('/'), {
+            params: {
+              participant: this.pollParticipant
             }
+          })
+          this.pollParticipantError = null
+          this.$router.push({
+            name: 'edit_poll',
+            params: {
+              pollId: result.data.data.id
+            }
+          });
+        } catch (error) {
+          if (error.response && error.response.status === 404) {
+            this.pollParticipantError = this.$i18n.t('event_viewer.update.poll_not_found');
+          } else {
+            throw error;
           }
         }
-      },
-      async openEvent() {
-        try {
-          const result = await this.restRequest(['events', this.eventId].join('/'), {
-            method: 'patch',
-            data: {
-              event: {
-                state: "OPEN",
-                secret: this.secret,
-                scheduled_from: null,
-                scheduled_to: null
-              }
-            }
-          })
-          this.assignEventData(result.data.data);
-          this.$bvModal.msgBoxOk(this.$t('event_viewer.event_opened_ok'), {
-            title: this.$t('event_viewer.open_event')
-          });
-        } catch (error) {
-          this.$bvModal.show(this.$t('event_viewer.open_event_error'), {
-            title: this.$t('errors.error')
-          });
-          throw error;
-        }
-      },
-      async cancelEvent() {
-        try {
-          const result = await this.restRequest(['events', this.eventId].join('/'), {
-            method: 'patch',
-            data: {
-              event: {
-                state: "CANCELED",
-                secret: this.secret,
-                organizer_message: this.organizerMessage
-              }
-            }
-          })
-          this.assignEventData(result.data.data);
-          this.$bvModal.msgBoxOk(this.$t('event_viewer.event_canceled_ok'), {
-            title: this.$t('event_viewer.cancel_event')
-          });
-        } catch (error) {
-          this.$bvModal.msgBoxOk(this.$t('event_viewer.cancel_event_error'), {
-        title: this.$t('errors.error')
-        });
-        }
-      },
-      openScheduleEventModal(date) {
-        this.selectedDate = date;
-        this.$bvModal.show('schedule-event-modal');
-      },
-      async scheduleEvent() {
-        if (!this.selectedDate) {
-          return;
-        }
-
-        this.dayDetailsCalendarAttribute = null;
-
-        const [hours, minutes] = this.selectedTime.split(':');
-        this.selectedDate = dateFns.setHours(
-          dateFns.setMinutes(this.selectedDate, Number(minutes)),
-          Number(hours)
-        );
-
-        try {
-          const result = await this.restRequest(['events', this.eventId].join('/'), {
-            method: 'patch',
-            data: {
-              event: {
-                state: 'SCHEDULED',
-                secret: this.secret,
-                scheduled_from: this.selectedDate.toISOString(),
-                scheduled_to: this.selectedDate.toISOString(),
-                organizer_message: this.organizerMessage
-              }
-            }
-          });
-          this.assignEventData(result.data.data);
-          this.$bvModal.msgBoxOk(this.$t('event_viewer.event_scheduled_organizer', {datetime: this.eventScheduledDateTime, time_distance: this.eventScheduledDateTimeRelative}), {
-            title: this.$t('event_viewer.schedule_event')
-          });
-        } catch (error) {
-          this.$bvModal.msgBoxOk(this.$t('event_viewer.schedule_event_error'), {
-            title: this.$t('errors.error')
-          });
-          throw error;
-        }
-      },
-      showParticipantList($event) {
-        $event.preventDefault()
-        this.$bvModal.msgBoxOk(this.nameList(this.eventScheduleParticipants), {
-          title: this.$t('event_viewer.current_participants')
-        })
       }
+    },
+    async openEvent() {
+      try {
+        const result = await this.restRequest(['events', this.eventId].join('/'), {
+          method: 'patch',
+          data: {
+            event: {
+              state: "OPEN",
+              secret: this.secret,
+              scheduled_from: null,
+              scheduled_to: null
+            }
+          }
+        })
+        this.assignEventData(result.data.data);
+        this.$bvModal.msgBoxOk(this.$t('event_viewer.event_opened_ok'), {
+          title: this.$t('event_viewer.open_event')
+        });
+      } catch (error) {
+        this.$bvModal.show(this.$t('event_viewer.open_event_error'), {
+          title: this.$t('errors.error')
+        });
+        throw error;
+      }
+    },
+    async cancelEvent() {
+      try {
+        const result = await this.restRequest(['events', this.eventId].join('/'), {
+          method: 'patch',
+          data: {
+            event: {
+              state: "CANCELED",
+              secret: this.secret,
+              organizer_message: this.organizerMessage
+            }
+          }
+        })
+        this.assignEventData(result.data.data);
+        this.$bvModal.msgBoxOk(this.$t('event_viewer.event_canceled_ok'), {
+          title: this.$t('event_viewer.cancel_event')
+        });
+      } catch (error) {
+        this.$bvModal.msgBoxOk(this.$t('event_viewer.cancel_event_error'), {
+          title: this.$t('errors.error')
+        });
+      }
+    },
+    openScheduleEventModal(date) {
+      this.selectedDate = date;
+      this.$bvModal.show('schedule-event-modal');
+    },
+    async scheduleEvent() {
+      if (!this.selectedDate) {
+        return;
+      }
+
+      this.dayDetailsCalendarAttribute = null;
+
+      const [hours, minutes] = this.selectedTime.split(':');
+      this.selectedDate = dateFns.setHours(
+        dateFns.setMinutes(this.selectedDate, Number(minutes)),
+        Number(hours)
+      );
+
+      try {
+        const result = await this.restRequest(['events', this.eventId].join('/'), {
+          method: 'patch',
+          data: {
+            event: {
+              state: 'SCHEDULED',
+              secret: this.secret,
+              scheduled_from: this.selectedDate.toISOString(),
+              scheduled_to: this.selectedDate.toISOString(),
+              organizer_message: this.organizerMessage
+            }
+          }
+        });
+        this.assignEventData(result.data.data);
+        this.$bvModal.msgBoxOk(this.$t('event_viewer.event_scheduled_organizer', {
+          datetime: this.eventScheduledDateTime,
+          time_distance: this.eventScheduledDateTimeRelative
+        }), {
+          title: this.$t('event_viewer.schedule_event')
+        });
+      } catch (error) {
+        this.$bvModal.msgBoxOk(this.$t('event_viewer.schedule_event_error'), {
+          title: this.$t('errors.error')
+        });
+        throw error;
+      }
+    },
+    showParticipantList($event) {
+      $event.preventDefault()
+      this.$bvModal.msgBoxOk(this.nameList(this.eventScheduleParticipants), {
+        title: this.$t('event_viewer.current_participants')
+      })
     }
   }
+}
 </script>

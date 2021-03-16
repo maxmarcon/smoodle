@@ -40,7 +40,7 @@
     "dates_placeholder": "Zeitraum auswählen",
     "back_to_event": "Zurück zum Event",
     "update_event": "Event aktualisieren",
-    "event_updated": "Die Details des Events wurden aktualisiert",
+    "event_updated": "Das Event wurde aktualisiert",
     "too_many_requests_error": "Du hast zu viele Events für {email} angelegt. Gönne dir eine kurze Pause..."
   },
   "poll_editor": {

@@ -27,10 +27,11 @@ defmodule SmoodleWeb.EventController do
     with {:ok, event} <-
            Repo.transaction(fn ->
              with {:ok, %Event{} = event} <- Scheduler.create_event(event_params),
+                  event <- add_links(event),
                   {:ok, _} <-
                     Email.new_event_email(event)
                     |> Mailer.deliver_with_rate_limit(event.email) do
-               %{event | owner_link: owner_link(event), share_link: share_link(event)}
+               event
              else
                {:error, :rate_limit_exceeded} -> Repo.rollback(:too_many_requests)
                {:error, error} -> Repo.rollback(error)
@@ -48,9 +49,7 @@ defmodule SmoodleWeb.EventController do
   def show(conn, %{"id" => id, "secret" => secret}) do
     event = Repo.preload(Scheduler.get_event!(id, secret), :possible_dates)
 
-    render(conn, :show,
-      event: %{event | owner_link: owner_link(event), share_link: share_link(event)}
-    )
+    render(conn, :show, event: add_links(event))
   end
 
   def show(conn, %{"id" => id}) do
@@ -124,6 +123,10 @@ defmodule SmoodleWeb.EventController do
     )
   end
 
+  def add_links(event) do
+    %{event | owner_link: owner_link(event), share_link: share_link(event)}
+  end
+
   defp schedule_parse_params(params) do
     limit =
       with {number, _} <- Integer.parse(params["limit"] || "") do
@@ -135,11 +138,12 @@ defmodule SmoodleWeb.EventController do
     [limit: limit]
   end
 
-  def owner_link(event) do
-    page_url(SmoodleWeb.Endpoint, :event, event.id, s: event.secret)
+  defp owner_link(%Event{secret: secret, id: id})
+       when is_binary(secret) and byte_size(secret) > 0 do
+    page_url(SmoodleWeb.Endpoint, :event, id, s: secret)
   end
 
-  def share_link(event) do
-    page_url(SmoodleWeb.Endpoint, :event, event.id)
+  defp share_link(%Event{id: id}) do
+    page_url(SmoodleWeb.Endpoint, :event, id)
   end
 end
