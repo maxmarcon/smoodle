@@ -276,6 +276,7 @@ export default {
     pollParticipant: null,
     pollParticipantError: null,
     loaded: false,
+    loader: null,
     loadedSuccessfully: false,
     requestOngoing: false,
     selectedDate: null,
@@ -398,16 +399,16 @@ export default {
       this.socket.connect()
       this.socket.onOpen(() => {
         const channel = this.socket.channel(`event:${this.eventId}`, this.secret ? {secret: this.secret} : {})
-        const loader = this.$loading.show()
+        this.loader = this.$loading.show()
         channel.join()
           .receive("ok", ({event, schedule}) => {
+            this.loader.hide()
             this.assignEventData(event);
             this.updateSchedule(schedule)
             this.loadedSuccessfully = this.loaded = true;
-            loader.hide()
           })
           .receive("error", () => {
-            loader.hide()
+            this.loader.hide()
             this.loaded = true
           })
 
