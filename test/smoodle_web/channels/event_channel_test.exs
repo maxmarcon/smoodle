@@ -4,6 +4,7 @@ defmodule SmoodleWeb.EventChannelTest do
   alias Smoodle.Scheduler
   alias Smoodle.Repo
   alias SmoodleWeb.EventController
+  alias SmoodleWeb.EventView
 
   @event_attrs %{
     name: "Party",
@@ -55,6 +56,13 @@ defmodule SmoodleWeb.EventChannelTest do
     }
   ]
 
+  @event_update_attrs %{
+    scheduled_from: ~U[2117-04-05 21:10:00Z],
+    scheduled_to: ~U[2117-04-05 22:10:00Z],
+    state: "SCHEDULED",
+    public_participants: true
+  }
+
   @participant_names for e <- @poll_attrs_list, do: e.participant
 
   setup do
@@ -99,7 +107,7 @@ defmodule SmoodleWeb.EventChannelTest do
           {:ok, event} =
             Scheduler.update_event(event, %{public_participants: @public_participants})
 
-          {:ok, join_reply, _} =
+          {:ok, join_reply, socket} =
             subscribe_and_join(
               socket,
               "event:#{event.id}",
@@ -110,7 +118,7 @@ defmodule SmoodleWeb.EventChannelTest do
               end
             )
 
-          [join_reply: join_reply, event: event]
+          [join_reply: join_reply, event: event, socket: socket]
         end
 
         test "the socket should reply with event and schedule", %{
@@ -126,7 +134,7 @@ defmodule SmoodleWeb.EventChannelTest do
 
           event =
             if @owner do
-              EventController.add_links(event)
+              EventView.add_links(event)
             else
               obfuscate_event(event)
             end
@@ -153,7 +161,7 @@ defmodule SmoodleWeb.EventChannelTest do
 
           event =
             if @owner do
-              EventController.add_links(event)
+              EventView.add_links(event)
             else
               obfuscate_event(event)
             end
@@ -246,6 +254,34 @@ defmodule SmoodleWeb.EventChannelTest do
               }
             }
           )
+        end
+
+        test "the socket #{
+               if owner do
+                 "should"
+               else
+                 "should not"
+               end
+             } be able to update the event",
+             %{socket: socket, event: event} do
+          ref = push(socket, "update_event", %{event: @event_update_attrs})
+
+          if @owner do
+            assert_reply(ref, :ok, %{event: @event_update_attrs})
+          else
+            assert_reply(ref, :error, %{reason: "Forbidden"})
+            refute_push("event_update", _)
+          end
+        end
+
+        if owner do
+          test "the socket should receive changeset errors if the event update does not pass validation",
+               %{socket: socket, event: event} do
+            ref = push(socket, "update_event", %{event: Map.put(@event_update_attrs, :name, nil)})
+
+            assert_reply(ref, :error, %{reason: "Invalid", errors: %{name: _}})
+            refute_push("event_update", _)
+          end
         end
       end
     end

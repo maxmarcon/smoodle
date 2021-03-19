@@ -164,10 +164,6 @@ defmodule Smoodle.Scheduler.Event do
     |> Enum.map(fn %{date: date} -> date end)
   end
 
-  def obfuscate(%Event{} = event) do
-    %{event | secret: nil, email: nil}
-  end
-
   defp clear_organizer_message(changeset) do
     {_, state} = fetch_field(changeset, :state)
 
