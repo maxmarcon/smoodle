@@ -7,31 +7,18 @@ defmodule SmoodleWeb.EventChannel do
   alias SmoodleWeb.ChangesetView
   alias Phoenix.Socket
 
-  def join("event:" <> event_id, %{"secret" => secret}, socket) do
-    try do
-      case event = Repo.get_by(Event, id: event_id, secret: secret) do
-        nil ->
-          {:error, %{reason: :not_found}}
+  def join("event:" <> event_id, message, socket) do
+    secret = message["secret"]
 
-        _ ->
-          {
-            :ok,
-            %{
-              event:
-                EventView.render("event.json", %{event: Repo.preload(event, :possible_dates)}),
-              schedule: Scheduler.get_best_schedule(event, is_owner: true)
-            },
-            assign(socket, is_owner: true)
-          }
+    clauses =
+      if secret do
+        [secret: secret, id: event_id]
+      else
+        [id: event_id]
       end
-    rescue
-      Ecto.Query.CastError -> {:error, %{reason: :invalid_id}}
-    end
-  end
 
-  def join("event:" <> event_id, _message, socket) do
     try do
-      case event = Repo.get(Event, event_id) do
+      case event = Repo.get_by(Event, clauses) do
         nil ->
           {:error, %{reason: :not_found}}
 
@@ -42,11 +29,11 @@ defmodule SmoodleWeb.EventChannel do
               event:
                 EventView.render("event.json", %{
                   event: Repo.preload(event, :possible_dates),
-                  obfuscate: true
+                  obfuscate: !secret
                 }),
-              schedule: Scheduler.get_best_schedule(event)
+              schedule: Scheduler.get_best_schedule(event, is_owner: !!secret)
             },
-            socket
+            assign(socket, is_owner: !!secret)
           }
       end
     rescue

@@ -3,7 +3,6 @@ defmodule SmoodleWeb.EventChannelTest do
   alias SmoodleWeb.UserSocket
   alias Smoodle.Scheduler
   alias Smoodle.Repo
-  alias SmoodleWeb.EventController
   alias SmoodleWeb.EventView
 
   @event_attrs %{
