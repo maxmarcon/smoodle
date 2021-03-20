@@ -11,7 +11,7 @@ defmodule SmoodleWeb.EventChannel do
     try do
       case event = Repo.get_by(Event, id: event_id, secret: secret) do
         nil ->
-          {:error, %{reason: "Event not found"}}
+          {:error, %{reason: :not_found}}
 
         _ ->
           {
@@ -25,7 +25,7 @@ defmodule SmoodleWeb.EventChannel do
           }
       end
     rescue
-      Ecto.Query.CastError -> {:error, %{reason: "Invalid event id"}}
+      Ecto.Query.CastError -> {:error, %{reason: :invalid_id}}
     end
   end
 
@@ -33,7 +33,7 @@ defmodule SmoodleWeb.EventChannel do
     try do
       case event = Repo.get(Event, event_id) do
         nil ->
-          {:error, %{reason: "Event not found"}}
+          {:error, %{reason: :not_found}}
 
         _ ->
           {
@@ -50,7 +50,7 @@ defmodule SmoodleWeb.EventChannel do
           }
       end
     rescue
-      Ecto.Query.CastError -> {:error, %{reason: "Invalid event id"}}
+      Ecto.Query.CastError -> {:error, %{reason: :invalid_id}}
     end
   end
 
@@ -61,35 +61,33 @@ defmodule SmoodleWeb.EventChannel do
         %{schedule: schedule, public_participants: public_participants},
         socket
       ) do
-    if socket.assigns[:is_owner] || public_participants do
-      push(socket, channel_event, %{schedule: schedule})
-    else
-      push(socket, channel_event, %{schedule: Scheduler.maybe_obfuscate_schedule(schedule, true)})
-    end
+    do_obfuscate = !socket.assigns[:is_owner] && !public_participants
+
+    push(socket, channel_event, %{
+      schedule: Scheduler.maybe_obfuscate_schedule(schedule, do_obfuscate)
+    })
 
     {:noreply, socket}
   end
 
   def handle_out(
         "event_update" = channel_event,
-        %{event: event, schedule: schedule} = payload,
+        %{event: event, schedule: schedule},
         socket
       ) do
-    if socket.assigns[:is_owner] do
-      push(socket, channel_event, %{
-        payload
-        | event: EventView.render("event.json", %{event: event})
-      })
-    else
-      push(
-        socket,
-        channel_event,
-        %{
-          event: EventView.render("event.json", %{event: event, obfuscate: true}),
-          schedule: Scheduler.maybe_obfuscate_schedule(schedule, !event.public_participants)
-        }
-      )
-    end
+    push(
+      socket,
+      channel_event,
+      %{
+        event:
+          EventView.render("event.json", %{event: event, obfuscate: !socket.assigns[:is_owner]}),
+        schedule:
+          Scheduler.maybe_obfuscate_schedule(
+            schedule,
+            !event.public_participants && !socket.assigns[:is_owner]
+          )
+      }
+    )
 
     {:noreply, socket}
   end
@@ -108,14 +106,14 @@ defmodule SmoodleWeb.EventChannel do
 
         {:error, changeset} ->
           {:reply,
-           {:error, %{reason: "Invalid", errors: ChangesetView.translate_errors(changeset)}},
+           {:error, %{reason: :invalid, errors: ChangesetView.translate_errors(changeset)}},
            socket}
 
         err ->
           {:reply, {:error, %{reason: err}}, socket}
       end
     else
-      {:reply, {:error, %{reason: "Forbidden"}}, socket}
+      {:reply, {:error, %{reason: :forbidden}}, socket}
     end
   end
 end

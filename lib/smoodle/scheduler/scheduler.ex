@@ -98,7 +98,8 @@ defmodule Smoodle.Scheduler do
     with {:ok, event} <- Repo.update(changeset),
          {:ok, true} <- Cachex.del(schedule_cache(), event.id),
          :ok <-
-           SmoodleWeb.Endpoint.broadcast(
+           SmoodleWeb.Endpoint.broadcast_from(
+             self(),
              "event:#{event.id}",
              "event_update",
              %{

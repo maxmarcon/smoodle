@@ -86,12 +86,12 @@ defmodule SmoodleWeb.EventChannelTest do
   end
 
   test "should reject join for nonexistent event", %{socket: socket} do
-    assert {:error, %{reason: "Event not found"}} ==
+    assert {:error, %{reason: :not_found}} ==
              subscribe_and_join(socket, "event:86211ba1-1f94-4a4f-b8bf-5e6eb4941eed")
   end
 
   test "should reject join for nonexistent event with invalid UUID", %{socket: socket} do
-    assert {:error, %{reason: "Invalid event id"}} == subscribe_and_join(socket, "event:12")
+    assert {:error, %{reason: :invalid_id}} == subscribe_and_join(socket, "event:12")
   end
 
   for {owner, user_type} <- [{true, "owner"}, {false, "non-owner"}] do
@@ -268,9 +268,11 @@ defmodule SmoodleWeb.EventChannelTest do
 
           if @owner do
             assert_reply(ref, :ok, %{event: @event_update_attrs})
-          else
-            assert_reply(ref, :error, %{reason: "Forbidden"})
+            assert_broadcast("event_update", _)
             refute_push("event_update", _)
+          else
+            assert_reply(ref, :error, %{reason: :forbidden})
+            refute_broadcast("event_update", _)
           end
         end
 
@@ -279,8 +281,8 @@ defmodule SmoodleWeb.EventChannelTest do
                %{socket: socket, event: event} do
             ref = push(socket, "update_event", %{event: Map.put(@event_update_attrs, :name, nil)})
 
-            assert_reply(ref, :error, %{reason: "Invalid", errors: %{name: _}})
-            refute_push("event_update", _)
+            assert_reply(ref, :error, %{reason: :invalid, errors: %{name: [_]}})
+            refute_broadcast("event_update", _)
           end
         end
       end
