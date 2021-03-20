@@ -73,7 +73,7 @@ defmodule SmoodleWeb.EventChannelTest do
         @poll_attrs_list,
         fn attrs ->
           {:ok, poll} = Scheduler.create_poll(event, attrs)
-          poll
+          Repo.reload(poll) |> Repo.preload(:date_ranks)
         end
       )
 
@@ -262,7 +262,7 @@ defmodule SmoodleWeb.EventChannelTest do
                  "should not"
                end
              } be able to update the event",
-             %{socket: socket, event: event} do
+             %{socket: socket} do
           ref = push(socket, "update_event", %{event: @event_update_attrs})
 
           if @owner do
@@ -277,12 +277,29 @@ defmodule SmoodleWeb.EventChannelTest do
 
         if owner do
           test "the socket should receive changeset errors if the event update does not pass validation",
-               %{socket: socket, event: event} do
+               %{socket: socket} do
             ref = push(socket, "update_event", %{event: Map.put(@event_update_attrs, :name, nil)})
 
             assert_reply(ref, :error, %{reason: :invalid, errors: %{name: [_]}})
             refute_broadcast("event_update", _)
           end
+        end
+
+        test "the socket should be able to retrieve a poll by participant", %{
+          socket: socket,
+          polls: [poll | _]
+        } do
+          ref = push(socket, "get_poll", %{participant: poll.participant})
+
+          assert_reply(ref, :ok, %{poll: ^poll})
+        end
+
+        test "the socket should receive an error when tryint to retrieve a nonexistent poll", %{
+          socket: socket
+        } do
+          ref = push(socket, "get_poll", %{participant: "FOO"})
+
+          assert_reply(ref, :error, %{reason: :not_found})
         end
       end
     end

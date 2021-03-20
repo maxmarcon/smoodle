@@ -1,7 +1,7 @@
 defmodule SmoodleWeb.EventChannel do
   use Phoenix.Channel
   alias Smoodle.Repo
-  alias Smoodle.Scheduler.Event
+  alias Smoodle.Scheduler.{Event, Poll}
   alias Smoodle.Scheduler
   alias SmoodleWeb.EventView
   alias SmoodleWeb.ChangesetView
@@ -18,7 +18,7 @@ defmodule SmoodleWeb.EventChannel do
       end
 
     try do
-      case event = Repo.get_by(Event, clauses) do
+      case event = Repo.get_by(Event, clauses) |> Repo.preload(:possible_dates) do
         nil ->
           {:error, %{reason: :not_found}}
 
@@ -27,10 +27,13 @@ defmodule SmoodleWeb.EventChannel do
             :ok,
             %{
               event:
-                EventView.render("event.json", %{
-                  event: Repo.preload(event, :possible_dates),
-                  obfuscate: !secret
-                }),
+                EventView.render(
+                  "event.json",
+                  %{
+                    event: event,
+                    obfuscate: !secret
+                  }
+                ),
               schedule: Scheduler.get_best_schedule(event, is_owner: !!secret)
             },
             assign(socket, is_owner: !!secret)
@@ -50,9 +53,13 @@ defmodule SmoodleWeb.EventChannel do
       ) do
     do_obfuscate = !socket.assigns[:is_owner] && !public_participants
 
-    push(socket, channel_event, %{
-      schedule: Scheduler.maybe_obfuscate_schedule(schedule, do_obfuscate)
-    })
+    push(
+      socket,
+      channel_event,
+      %{
+        schedule: Scheduler.maybe_obfuscate_schedule(schedule, do_obfuscate)
+      }
+    )
 
     {:noreply, socket}
   end
@@ -92,15 +99,33 @@ defmodule SmoodleWeb.EventChannel do
           {:reply, {:ok, %{event: EventView.render("event.json", %{event: event})}}, socket}
 
         {:error, changeset} ->
-          {:reply,
-           {:error, %{reason: :invalid, errors: ChangesetView.translate_errors(changeset)}},
-           socket}
+          {
+            :reply,
+            {:error, %{reason: :invalid, errors: ChangesetView.translate_errors(changeset)}},
+            socket
+          }
 
         err ->
           {:reply, {:error, %{reason: err}}, socket}
       end
     else
       {:reply, {:error, %{reason: :forbidden}}, socket}
+    end
+  end
+
+  def handle_in(
+        "get_poll",
+        %{"participant" => participant},
+        socket = %Socket{topic: "event:" <> event_id}
+      ) do
+    poll =
+      Repo.get_by(Poll, event_id: event_id, participant: participant)
+      |> Repo.preload(:date_ranks)
+
+    if poll do
+      {:reply, {:ok, %{poll: poll}}, socket}
+    else
+      {:reply, {:error, %{reason: :not_found}}, socket}
     end
   end
 end
