@@ -3,8 +3,7 @@ defmodule SmoodleWeb.EventChannel do
   alias Smoodle.Repo
   alias Smoodle.Scheduler.{Event, Poll}
   alias Smoodle.Scheduler
-  alias SmoodleWeb.EventView
-  alias SmoodleWeb.ChangesetView
+  alias SmoodleWeb.{EventView, PollView, ChangesetView}
   alias Phoenix.Socket
 
   def join("event:" <> event_id, message, socket) do
@@ -115,15 +114,22 @@ defmodule SmoodleWeb.EventChannel do
 
   def handle_in(
         "get_poll",
-        %{"participant" => participant},
+        message,
         socket = %Socket{topic: "event:" <> event_id}
       ) do
+    clause =
+      Map.take(message, ["participant", "id"])
+      |> Map.to_list()
+      |> Enum.map(fn {key, val} -> {String.to_atom(key), val} end)
+      |> Keyword.merge(event_id: event_id)
+
     poll =
-      Repo.get_by(Poll, event_id: event_id, participant: participant)
+      Repo.get_by(Poll, clause)
       |> Repo.preload(:date_ranks)
+      |> Repo.preload(event: :possible_dates)
 
     if poll do
-      {:reply, {:ok, %{poll: poll}}, socket}
+      {:reply, {:ok, %{poll: PollView.render("poll.json", %{poll: poll})}}, socket}
     else
       {:reply, {:error, %{reason: :not_found}}, socket}
     end

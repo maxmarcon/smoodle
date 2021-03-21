@@ -1,6 +1,7 @@
 defmodule SmoodleWeb.PollView do
   use SmoodleWeb, :view
   alias SmoodleWeb.PollView
+  alias SmoodleWeb.EventView
 
   def render("index.json", %{polls: polls}) do
     %{data: render_many(polls, PollView, "poll.json")}
@@ -11,14 +12,10 @@ defmodule SmoodleWeb.PollView do
   end
 
   def render("poll.json", %{poll: poll}) do
-    maybe_nullify_event(poll)
-  end
-
-  defp maybe_nullify_event(poll) do
     if !Ecto.assoc_loaded?(poll.event) do
       %{poll | event: nil}
     else
-      poll
+      %{poll | event: EventView.render("event.json", %{event: poll.event, obfuscate: true})}
     end
   end
 end

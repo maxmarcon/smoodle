@@ -3,6 +3,10 @@ defmodule SmoodleWeb.EventView do
   alias SmoodleWeb.EventView
   alias Smoodle.Scheduler.Event
 
+  def render("schedule.json", %{schedule: schedule}) do
+    %{data: schedule}
+  end
+
   def render("index.json", %{events: events}) do
     %{
       data: render_many(events, EventView, "event.json")
@@ -34,9 +38,5 @@ defmodule SmoodleWeb.EventView do
 
   defp share_link(%Event{id: id}) do
     page_url(SmoodleWeb.Endpoint, :event, id)
-  end
-
-  def render("schedule.json", %{schedule: schedule}) do
-    %{data: schedule}
   end
 end

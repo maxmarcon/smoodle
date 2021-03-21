@@ -2,6 +2,7 @@ defmodule SmoodleWeb.EventChannelTest do
   use SmoodleWeb.ChannelCase
   alias SmoodleWeb.UserSocket
   alias Smoodle.Scheduler
+  alias Smoodle.Scheduler.{Event, Poll}
   alias Smoodle.Repo
   alias SmoodleWeb.EventView
 
@@ -73,7 +74,7 @@ defmodule SmoodleWeb.EventChannelTest do
         @poll_attrs_list,
         fn attrs ->
           {:ok, poll} = Scheduler.create_poll(event, attrs)
-          Repo.reload(poll) |> Repo.preload(:date_ranks)
+          Repo.reload(poll)
         end
       )
 
@@ -291,13 +292,37 @@ defmodule SmoodleWeb.EventChannelTest do
         } do
           ref = push(socket, "get_poll", %{participant: poll.participant})
 
+          poll = Repo.preload(poll, date_ranks: [], event: [:possible_dates]) |> obfuscate_poll
+
           assert_reply(ref, :ok, %{poll: ^poll})
         end
 
-        test "the socket should receive an error when tryint to retrieve a nonexistent poll", %{
-          socket: socket
+        test "the socket should be able to retrieve a poll by id", %{
+          socket: socket,
+          polls: [poll | _]
         } do
+          ref = push(socket, "get_poll", %{id: poll.id})
+
+          poll = Repo.preload(poll, date_ranks: [], event: [:possible_dates]) |> obfuscate_poll
+
+          assert_reply(ref, :ok, %{poll: ^poll})
+        end
+
+        test "the socket should receive an error when trying to retrieve a nonexistent poll by participant",
+             %{
+               socket: socket
+             } do
           ref = push(socket, "get_poll", %{participant: "FOO"})
+
+          assert_reply(ref, :error, %{reason: :not_found})
+        end
+
+        test "the socket should receive an error when trying to retrieve a nonexistent poll by id",
+             %{
+               socket: socket,
+               event: event
+             } do
+          ref = push(socket, "get_poll", %{id: event.id})
 
           assert_reply(ref, :error, %{reason: :not_found})
         end
@@ -305,7 +330,11 @@ defmodule SmoodleWeb.EventChannelTest do
     end
   end
 
-  defp obfuscate_event(event) do
-    %{event | email: nil, secret: nil}
+  defp obfuscate_event(event = %Event{}) do
+    %{event | email: nil, secret: nil, share_link: nil, owner_link: nil}
+  end
+
+  defp obfuscate_poll(poll = %Poll{event: event}) do
+    %{poll | event: obfuscate_event(event)}
   end
 end

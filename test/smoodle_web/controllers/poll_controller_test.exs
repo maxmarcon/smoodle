@@ -165,6 +165,13 @@ defmodule SmoodleWeb.PollControllerTest do
     refute Map.has_key?(poll, "__meta__")
     refute Map.has_key?(poll, "__struct__")
 
+    if Map.has_key?(poll, "event") do
+      refute poll["event"]["secret"]
+      refute poll["event"]["email"]
+      refute poll["event"]["owner_link"]
+      refute poll["event"]["share_link"]
+    end
+
     unless is_nil(poll["preferences"]) do
       assert is_map(poll["preferences"])
     end
@@ -226,20 +233,6 @@ defmodule SmoodleWeb.PollControllerTest do
 
       check_poll(data, Map.take(poll, [:id, :participant, :event_id]))
     end
-
-    test "fetching a poll via its id does not leak the event secret, mail and links", %{
-      conn: conn,
-      polls: [poll | _]
-    } do
-      conn = get(conn, poll_path(conn, :show, poll.id))
-      data = json_response(conn, 200)["data"]
-      assert data["id"] == poll.id
-      assert data["event"]
-      refute data["event"]["secret"]
-      refute data["event"]["email"]
-      refute data["event"]["share_link"]
-      refute data["event"]["owner_link"]
-    end
   end
 
   describe "create" do
@@ -256,7 +249,7 @@ defmodule SmoodleWeb.PollControllerTest do
       check_poll(data, Map.take(@poll_update_attrs_1, [:participant]))
     end
 
-    test "attemp to create a poll with invalid parameters renders errors", %{
+    test "attempt to create a poll with invalid parameters renders errors", %{
       conn: conn,
       event: event
     } do
