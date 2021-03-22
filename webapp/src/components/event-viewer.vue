@@ -1,7 +1,7 @@
 <template lang="pug">
   div
     message-bar(ref="errorBar" variant="danger")
-    message-bar(ref="updateBar" :seconds="10")
+    message-bar(ref="updateBar")
     b-modal#update-answer-modal(
       static=true
       :title="$t('event_viewer.update.title')"
@@ -242,7 +242,6 @@
 import * as dateFns from 'date-fns'
 import eventHelpersMixin from '../mixins/event-helpers'
 import eventDataMixin from '../mixins/event-data'
-import restMixin from '../mixins/rest'
 import dateDetails from './date-details'
 import {scrollToTopMixin, whatsAppHelpersMixin} from '../mixins/utils'
 import {Socket} from 'phoenix'
@@ -252,7 +251,6 @@ const SCHEDULE_DATES_LIMIT = null;
 
 export default {
   mixins: [
-    restMixin,
     eventHelpersMixin,
     eventDataMixin,
     scrollToTopMixin,
@@ -270,6 +268,7 @@ export default {
   },
   data: () => ({
     socket: null,
+    channel: null,
     eventScheduleDates: [],
     eventScheduleParticipantsCount: 0,
     eventScheduleParticipants: [],
@@ -398,9 +397,9 @@ export default {
       this.socket = new Socket(`${process.env.VUE_APP_SOCKETBASE}/socket`)
       this.socket.connect()
       this.socket.onOpen(() => {
-        const channel = this.socket.channel(`event:${this.eventId}`, this.secret ? {secret: this.secret} : {})
+        this.channel = this.socket.channel(`event:${this.eventId}`, this.secret ? {secret: this.secret} : {})
         this.loader = this.$loading.show()
-        channel.join()
+        this.channel.join()
           .receive("ok", ({event, schedule}) => {
             this.loader.hide()
             this.assignEventData(event);
@@ -412,16 +411,16 @@ export default {
             this.loaded = true
           })
 
-        channel.on('event_update', ({event, schedule}) => {
+        this.channel.on('event_update', ({event, schedule}) => {
           this.assignEventData(event)
           this.updateSchedule(schedule)
           this.$refs.updateBar.show(this.$t('event_editor.event_updated'))
         })
-        channel.on('schedule_update', ({schedule}) => {
+        this.channel.on('schedule_update', ({schedule}) => {
           this.updateSchedule(schedule)
           this.$refs.updateBar.show(this.$t('event_editor.event_updated'))
         })
-        channel.on('event_delete', () => {
+        this.channel.on('event_delete', () => {
           this.loadedSuccessfully = false
         })
       })
@@ -462,80 +461,66 @@ export default {
     },
     async loadPoll(bvEvt) {
       bvEvt.preventDefault();
+
       if (this.pollParticipant) {
-        try {
-          const result = await this.restRequest(['events', this.eventId, 'polls'].join('/'), {
-            params: {
-              participant: this.pollParticipant
-            }
-          })
+        this.channel.push("get_poll", {
+          participant: this.pollParticipant
+        }).receive("ok", ({poll: {id: poll_id}}) => {
           this.pollParticipantError = null
           this.$router.push({
             name: 'edit_poll',
             params: {
-              pollId: result.data.data.id
+              pollId: poll_id
             }
           });
-        } catch (error) {
-          if (error.response && error.response.status === 404) {
+        }).receive("error", ({reason}) => {
+          if (reason === "not_found") {
             this.pollParticipantError = this.$i18n.t('event_viewer.update.poll_not_found');
-          } else {
-            throw error;
-          }
-        }
-      }
-    },
-    async openEvent() {
-      try {
-        const result = await this.restRequest(['events', this.eventId].join('/'), {
-          method: 'patch',
-          data: {
-            event: {
-              state: "OPEN",
-              secret: this.secret,
-              scheduled_from: null,
-              scheduled_to: null
-            }
           }
         })
-        this.assignEventData(result.data.data);
-        this.$bvModal.msgBoxOk(this.$t('event_viewer.event_opened_ok'), {
-          title: this.$t('event_viewer.open_event')
-        });
-      } catch (error) {
+      }
+    },
+    openEvent() {
+      this.channel.push("update_event", {
+        event: {
+          state: "OPEN",
+          scheduled_from: null,
+          scheduled_to: null
+        }
+      }).receive("ok", ({event}) => {
+          this.assignEventData(event);
+          this.$bvModal.msgBoxOk(this.$t('event_viewer.event_opened_ok'), {
+            title: this.$t('event_viewer.open_event')
+          });
+        }
+      ).receive("error", () => {
         this.$bvModal.show(this.$t('event_viewer.open_event_error'), {
           title: this.$t('errors.error')
         });
-        throw error;
-      }
+      })
     },
-    async cancelEvent() {
-      try {
-        const result = await this.restRequest(['events', this.eventId].join('/'), {
-          method: 'patch',
-          data: {
-            event: {
-              state: "CANCELED",
-              secret: this.secret,
-              organizer_message: this.organizerMessage
-            }
-          }
-        })
-        this.assignEventData(result.data.data);
+    cancelEvent() {
+      this.channel.push("update_event", {
+        event: {
+          state: "CANCELED",
+          organizer_message: this.organizerMessage
+        }
+      }).receive("ok", ({event}) => {
+        this.assignEventData(event);
         this.$bvModal.msgBoxOk(this.$t('event_viewer.event_canceled_ok'), {
           title: this.$t('event_viewer.cancel_event')
         });
-      } catch (error) {
+      }).receive("error", () => {
         this.$bvModal.msgBoxOk(this.$t('event_viewer.cancel_event_error'), {
           title: this.$t('errors.error')
         });
-      }
+      })
     },
     openScheduleEventModal(date) {
       this.selectedDate = date;
       this.$bvModal.show('schedule-event-modal');
     },
-    async scheduleEvent() {
+    scheduleEvent() {
       if (!this.selectedDate) {
         return;
       }
@@ -548,32 +533,26 @@ export default {
         Number(hours)
       );
 
-      try {
-        const result = await this.restRequest(['events', this.eventId].join('/'), {
-          method: 'patch',
-          data: {
-            event: {
-              state: 'SCHEDULED',
-              secret: this.secret,
-              scheduled_from: this.selectedDate.toISOString(),
-              scheduled_to: this.selectedDate.toISOString(),
-              organizer_message: this.organizerMessage
-            }
-          }
-        });
-        this.assignEventData(result.data.data);
+      this.channel.push("update_event", {
+        event: {
+          state: 'SCHEDULED',
+          scheduled_from: this.selectedDate.toISOString(),
+          scheduled_to: this.selectedDate.toISOString(),
+          organizer_message: this.organizerMessage
+        }
+      }).receive("ok", ({event}) => {
+        this.assignEventData(event);
         this.$bvModal.msgBoxOk(this.$t('event_viewer.event_scheduled_organizer', {
           datetime: this.eventScheduledDateTime,
           time_distance: this.eventScheduledDateTimeRelative
         }), {
           title: this.$t('event_viewer.schedule_event')
         });
-      } catch (error) {
+      }).receive("error", () => {
         this.$bvModal.msgBoxOk(this.$t('event_viewer.schedule_event_error'), {
           title: this.$t('errors.error')
         });
-        throw error;
-      }
+      })
     },
     showParticipantList($event) {
       $event.preventDefault()
