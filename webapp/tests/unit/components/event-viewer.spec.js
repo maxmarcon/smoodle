@@ -3,8 +3,9 @@ import BootstrapVue from 'bootstrap-vue'
 import VueClipboard from 'vue-clipboard2'
 import i18nMock from '../test-utils/i18n-mock'
 import {createLocalVue, mount} from '@vue/test-utils'
+import {pushMock, setJoinResponse, setPushResponse} from "phoenix";
 
-function mountEventViewer(restRequest, propsData) {
+function mountEventViewer(propsData) {
 
   const localVue = createLocalVue();
   localVue.use(BootstrapVue);
@@ -18,12 +19,14 @@ function mountEventViewer(restRequest, propsData) {
     }
   })
 
+  const loaderStub = {
+    hide: jest.fn()
+  }
+  const loadingStub = {
+    show: jest.fn().mockReturnValue(loaderStub)
+  }
+
   const config = {
-    mixins: [{
-      methods: {
-        restRequest
-      }
-    }],
     mocks: {
       $t: i18nMock.t,
       $tc: i18nMock.t,
@@ -31,6 +34,7 @@ function mountEventViewer(restRequest, propsData) {
       $router: {
         push: jest.fn()
       },
+      $loading: loadingStub,
       $scrollTo: () => null,
       $screens: () => 2
     },
@@ -196,17 +200,15 @@ function makeSchedule(withParticipants = false, withSecret = false) {
 }
 
 let wrapper
-let restRequest
 
 describe('eventViewer', () => {
 
   describe('when loading fails', () => {
 
-    beforeEach(async () => {
+    beforeEach(() => {
+      setJoinResponse("error")
 
-      restRequest = jest.fn().mockRejectedValue(null)
-
-      wrapper = mountEventViewer(restRequest, {
+      wrapper = mountEventViewer({
         eventId: EVENT_ID
       })
     })
@@ -228,32 +230,16 @@ describe('eventViewer', () => {
 
         beforeEach(() => {
 
-          restRequest = jest.fn((path, config) => {
-            if (path === `events/${EVENT_ID}`) {
-              return Promise.resolve({
-                data: {
-                  data: makeEvent()
-                }
-              })
-            } else if (path === `events/${EVENT_ID}/schedule`) {
-              return Promise.resolve({
-                data: {
-                  data: makeSchedule(true)
-                }
-              })
-            } else if (path === `events/${EVENT_ID}/polls` && config.params.participant === POLL_PARTICIPANT) {
-              return Promise.resolve({
-                data: {
-                  data: {
-                    id: POLL_ID
-                  }
-                }
-              })
-            }
-
+          setJoinResponse("ok", {
+            event: makeEvent(),
+            schedule: makeSchedule(true)
           })
 
-          wrapper = mountEventViewer(restRequest, {
+          setPushResponse("ok", {
+            poll: {id: POLL_ID}
+          })
+
+          wrapper = mountEventViewer({
             eventId: EVENT_ID
           })
         })
@@ -341,28 +327,16 @@ describe('eventViewer', () => {
       describe("without participants", () => {
 
         beforeEach(() => {
-          restRequest = jest.fn(path => {
-            if (path === `events/${EVENT_ID}`) {
-              return Promise.resolve({
-                data: {
-                  data: makeEvent()
-                }
-              })
-            } else if (path === `events/${EVENT_ID}/schedule`) {
-              return Promise.resolve({
-                data: {
-                  data: makeSchedule(false)
-                }
-              })
-            }
-            // //return Promise.reject()
+
+          setJoinResponse("ok", {
+            event: makeEvent(),
+            schedule: makeSchedule(false)
           })
 
-          wrapper = mountEventViewer(restRequest, {
+          wrapper = mountEventViewer({
             eventId: EVENT_ID
           })
 
-          // await new Promise(resolve => setTimeout(resolve, 0))
         })
 
         it('renders event header', () => {
@@ -409,25 +383,15 @@ describe('eventViewer', () => {
 
     describe('canceled event', () => {
 
+
       beforeEach(() => {
-        restRequest = jest.fn(path => {
-          if (path === `events/${EVENT_ID}`) {
-            return Promise.resolve({
-              data: {
-                data: makeEvent('CANCELED')
-              }
-            })
-          } else if (path === `events/${EVENT_ID}/schedule`) {
-            return Promise.resolve({
-              data: {
-                data: makeSchedule(false)
-              }
-            })
-          }
-          //return Promise.reject()
+        setJoinResponse("ok", {
+          event: makeEvent('CANCELED'),
+          schedule: makeSchedule(false)
         })
 
-        wrapper = mountEventViewer(restRequest, {
+
+        wrapper = mountEventViewer({
           eventId: EVENT_ID
         })
       })
@@ -471,24 +435,12 @@ describe('eventViewer', () => {
     describe('scheduled event', () => {
 
       beforeEach(() => {
-        restRequest = jest.fn(path => {
-          if (path === `events/${EVENT_ID}`) {
-            return Promise.resolve({
-              data: {
-                data: makeEvent('SCHEDULED')
-              }
-            })
-          } else if (path === `events/${EVENT_ID}/schedule`) {
-            return Promise.resolve({
-              data: {
-                data: makeSchedule(false)
-              }
-            })
-          }
-          //return Promise.reject()
+        setJoinResponse("ok", {
+          event: makeEvent('SCHEDULED'),
+          schedule: makeSchedule(false)
         })
 
-        wrapper = mountEventViewer(restRequest, {
+        wrapper = mountEventViewer({
           eventId: EVENT_ID
         })
       })
@@ -537,25 +489,16 @@ describe('eventViewer', () => {
       describe("with participants", () => {
 
         beforeEach(() => {
-
-          restRequest = jest.fn(path => {
-            if (path === `events/${EVENT_ID}`) {
-              return Promise.resolve({
-                data: {
-                  data: makeEvent("OPEN", true)
-                }
-              })
-            } else if (path === `events/${EVENT_ID}/schedule`) {
-              return Promise.resolve({
-                data: {
-                  data: makeSchedule(true, true)
-                }
-              })
-            }
-            //return Promise.reject()
+          setJoinResponse('ok', {
+            event: makeEvent("OPEN", true),
+            schedule: makeSchedule(true, true)
           })
 
-          wrapper = mountEventViewer(restRequest, {
+          setPushResponse('ok', {
+            event: {}
+          })
+
+          wrapper = mountEventViewer({
             eventId: EVENT_ID,
             secret: EVENT_SECRET
           })
@@ -637,7 +580,6 @@ describe('eventViewer', () => {
             })
 
             it('only closes the modal', () => {
-              expect(restRequest).toHaveBeenCalledTimes(2)
               expect(wrapper.find('#schedule-event-modal').isVisible()).toBeFalsy()
             })
           })
@@ -654,24 +596,20 @@ describe('eventViewer', () => {
             })
 
             it('schedules the event', () => {
-              expect(restRequest).toHaveBeenCalledTimes(3)
               // must use regex and not exact time match because the value sent by the browser
               // depends on the time zone
               const TIME_REGEX = /2018-09-(29|30)T\d{2}:\d{2}:\d{2}\.\d{3}Z/
-              expect(restRequest).toHaveBeenCalledWith(
-                'events/bf6747d5-7b32-4bde-8e2d-c055d9bb02d3',
+              expect(pushMock).toHaveBeenCalledWith(
+                'update_event',
                 expect.objectContaining({
-                  method: 'patch',
-                  data: {
                     event: {
                       state: 'SCHEDULED',
-                      secret: EVENT_SECRET,
                       scheduled_from: expect.stringMatching(TIME_REGEX),
                       scheduled_to: expect.stringMatching(TIME_REGEX),
                       organizer_message: ORGANIZER_MESSAGE
                     }
                   }
-                })
+                )
               )
               expect(wrapper.find('#schedule-event-modal').isVisible()).toBeFalsy()
             })
@@ -696,14 +634,10 @@ describe('eventViewer', () => {
             })
 
             it('cancels the event', () => {
-              expect(restRequest).toHaveBeenCalledWith(`events/${EVENT_ID}`, {
-                method: 'patch',
-                data: {
-                  event: {
-                    state: 'CANCELED',
-                    secret: EVENT_SECRET,
-                    organizer_message: ORGANIZER_MESSAGE
-                  }
+              expect(pushMock).toHaveBeenCalledWith('update_event', {
+                event: {
+                  state: 'CANCELED',
+                  organizer_message: ORGANIZER_MESSAGE
                 }
               })
             })
@@ -714,24 +648,13 @@ describe('eventViewer', () => {
       describe("without participants", () => {
 
         beforeEach(() => {
-          restRequest = jest.fn(path => {
-            if (path === `events/${EVENT_ID}`) {
-              return Promise.resolve({
-                data: {
-                  data: makeEvent('OPEN', true)
-                }
-              })
-            } else if (path === `events/${EVENT_ID}/schedule`) {
-              return Promise.resolve({
-                data: {
-                  data: makeSchedule(false, true)
-                }
-              })
-            }
-            //return Promise.reject()
+
+          setJoinResponse('ok', {
+            event: makeEvent('OPEN', true),
+            schedule: makeSchedule(false, true)
           })
 
-          wrapper = mountEventViewer(restRequest, {
+          wrapper = mountEventViewer({
             eventId: EVENT_ID,
             secret: EVENT_SECRET
           })
@@ -786,24 +709,13 @@ describe('eventViewer', () => {
     describe('canceled event', () => {
 
       beforeEach(() => {
-        restRequest = jest.fn(path => {
-          if (path === `events/${EVENT_ID}`) {
-            return Promise.resolve({
-              data: {
-                data: makeEvent('CANCELED', true)
-              }
-            })
-          } else if (path === `events/${EVENT_ID}/schedule`) {
-            return Promise.resolve({
-              data: {
-                data: makeSchedule(false, true)
-              }
-            })
-          }
-          //return Promise.reject()
+
+        setJoinResponse('ok', {
+          event: makeEvent('CANCELED', true),
+          schedule: makeSchedule(false, true)
         })
 
-        wrapper = mountEventViewer(restRequest, {
+        wrapper = mountEventViewer({
           eventId: EVENT_ID,
           secret: EVENT_SECRET
         })
@@ -859,15 +771,11 @@ describe('eventViewer', () => {
 
         it('reopens the event', () => {
 
-          expect(restRequest).toHaveBeenCalledWith(`events/${EVENT_ID}`, {
-            method: 'patch',
-            data: {
-              event: {
-                state: "OPEN",
-                secret: EVENT_SECRET,
-                scheduled_from: null,
-                scheduled_to: null
-              }
+          expect(pushMock).toHaveBeenCalledWith('update_event', {
+            event: {
+              state: "OPEN",
+              scheduled_from: null,
+              scheduled_to: null
             }
           })
         })
@@ -877,24 +785,12 @@ describe('eventViewer', () => {
     describe('scheduled event', () => {
 
       beforeEach(() => {
-        restRequest = jest.fn(path => {
-          if (path === `events/${EVENT_ID}`) {
-            return Promise.resolve({
-              data: {
-                data: makeEvent('SCHEDULED', true)
-              }
-            })
-          } else if (path === `events/${EVENT_ID}/schedule`) {
-            return Promise.resolve({
-              data: {
-                data: makeSchedule(false, true)
-              }
-            })
-          }
-          //return Promise.reject()
+        setJoinResponse('ok', {
+          event: makeEvent('SCHEDULED', true),
+          schedule: makeSchedule(false, true)
         })
 
-        wrapper = mountEventViewer(restRequest, {
+        wrapper = mountEventViewer({
           eventId: EVENT_ID,
           secret: EVENT_SECRET
         })

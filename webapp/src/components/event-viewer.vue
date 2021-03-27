@@ -267,6 +267,7 @@ export default {
     secret: String
   },
   data: () => ({
+    socket: null,
     channel: null,
     eventScheduleDates: [],
     eventScheduleParticipantsCount: 0,
@@ -294,7 +295,7 @@ export default {
     this.initSocket()
   },
   beforeDestroy() {
-    this.leaveChannel()
+    this.closeSocket()
   },
   computed: {
     isOrganizer() {
@@ -393,13 +394,12 @@ export default {
       }
     },
     initSocket() {
-      const socket = new Socket(`${process.env.VUE_APP_SOCKETBASE}/socket`)
-      socket.connect()
-      this.channel = socket.channel(`event:${this.eventId}`, this.secret ? {secret: this.secret} : {})
+      this.socket = new Socket(`${process.env.VUE_APP_SOCKETBASE}/socket`)
+      this.socket.connect()
+      this.channel = this.socket.channel(`event:${this.eventId}`, this.secret ? {secret: this.secret} : {})
       this.loader = this.$loading.show()
       this.channel.join()
         .receive("ok", ({event, schedule}) => {
-
           this.loader.hide()
           this.assignEventData(event);
           this.updateSchedule(schedule)
@@ -409,7 +409,7 @@ export default {
           this.loader.hide()
           this.loaded = true
         })
-      
+
       this.channel.on('event_update', ({event, schedule}) => {
         this.assignEventData(event)
         this.updateSchedule(schedule)
@@ -423,8 +423,8 @@ export default {
         this.loadedSuccessfully = false
       })
     },
-    leaveChannel() {
-      this.channel.leave()
+    closeSocket() {
+      this.socket.disconnect()
     },
     updateSchedule({dates, participants, participants_count}) {
       this.eventScheduleDates = dates.map(({
