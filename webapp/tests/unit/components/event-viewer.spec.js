@@ -3,8 +3,15 @@ import BootstrapVue from 'bootstrap-vue'
 import VueClipboard from 'vue-clipboard2'
 import i18nMock from '../test-utils/i18n-mock'
 import {createLocalVue, mount} from '@vue/test-utils'
-import {pushMock, resetMocks, setJoinResponse, setPushResponse} from "phoenix";
-import {channelMock} from "../../../__mocks__/phoenix";
+import {
+  channelMock,
+  pushMock,
+  resetMocks,
+  sendEvent,
+  setJoinResponse,
+  setPushResponse
+} from "../../../__mocks__/phoenix";
+import MessageBar from '@/components/message-bar.vue'
 
 function mountEventViewer(propsData) {
 
@@ -42,7 +49,7 @@ function mountEventViewer(propsData) {
     propsData,
     localVue,
     stubs: {
-      'message-bar': true,
+      MessageBar,
       'event-header': true,
       'v-calendar': true,
       'router-link': true,
@@ -297,6 +304,72 @@ describe('eventViewer', () => {
             expect(typeof (attr.customData.negative_rank)).toEqual("number")
 
           });
+        })
+
+        describe('when sending an event update', () => {
+
+          beforeEach(() => {
+
+            jest.useFakeTimers()
+
+            sendEvent('event_update', {
+              event: Object.assign({}, EVENT_DATA, {name: "Grill"}),
+              schedule: Object.assign({}, SCHEDULE_DATA, {dates: SCHEDULE_DATA.dates.slice(0, 1)})
+            })
+
+            wrapper = mountEventViewer({
+              eventId: EVENT_ID
+            })
+
+            jest.runAllTimers()
+          })
+
+          it('updates event and schedule', () => {
+            expect(wrapper.vm.eventName).toEqual('Grill')
+            expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(1)
+          })
+        })
+
+        describe('when sending a schedule update', () => {
+
+          beforeEach(() => {
+
+            jest.useFakeTimers()
+
+            sendEvent('schedule_update', {
+              schedule: Object.assign({}, SCHEDULE_DATA, {dates: SCHEDULE_DATA.dates.slice(0, 1)})
+            })
+
+            wrapper = mountEventViewer({
+              eventId: EVENT_ID
+            })
+
+            jest.runAllTimers()
+          })
+
+          it('updates the schedule', () => {
+            expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(1)
+          })
+        })
+
+        describe('when sending an event delete', () => {
+
+          beforeEach(() => {
+
+            jest.useFakeTimers()
+
+            sendEvent('event_delete')
+
+            wrapper = mountEventViewer({
+              eventId: EVENT_ID
+            })
+
+            jest.runAllTimers()
+          })
+
+          it('hides the event', () => {
+            expect(wrapper.find('div.card').exists()).toBeFalsy();
+          })
         })
 
         describe('clicking on update availability', () => {

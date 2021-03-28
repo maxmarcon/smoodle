@@ -1,9 +1,11 @@
 export const joinMock = jest.fn()
 export const pushMock = jest.fn()
 export const onMock = jest.fn()
-export const channelMock = jest.fn() 
+export const channelMock = jest.fn()
 
-export const Socket = jest.fn().mockImplementation(() => ({
+const DEFAULT_EVENT_DELAY = 10
+
+export const Socket = jest.fn(() => ({
   connect: jest.fn(),
   channel: channelMock
 }))
@@ -23,7 +25,7 @@ export const resetMocks = () => {
   joinMock.mockClear()
   pushMock.mockReturnValue(pushReturnValue)
   pushMock.mockClear()
-  onMock.mockClear()
+  onMock.mockReset()
 }
 
 const setResponse = (mock, status, reply) => {
@@ -40,5 +42,11 @@ const setResponse = (mock, status, reply) => {
 export const setJoinResponse = (status, reply) => setResponse(joinMock, status, reply)
 
 export const setPushResponse = (status, reply) => setResponse(pushMock, status, reply)
+
+export const sendEvent = (event, payload, delay = DEFAULT_EVENT_DELAY) => onMock.mockImplementation((_event, callback) => {
+  if (_event === event) {
+    setTimeout(() => callback(payload), delay)
+  }
+})
 
 resetMocks()
