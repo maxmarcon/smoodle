@@ -21,7 +21,6 @@ import '@fortawesome/fontawesome-free/scss/solid.scss';
 import '@fortawesome/fontawesome-free/scss/brands.scss';
 import '@fortawesome/fontawesome-free/scss/fontawesome.scss';
 import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css';
-import 'vue-loading-overlay/dist/vue-loading.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import 'pretty-checkbox/src/pretty-checkbox.scss';
 import './scss/app.scss';
@@ -50,7 +49,9 @@ Vue.use(PrettyCheckbox)
 Vue.use(VueScrollTo)
 Vue.use(datePicker)
 Vue.use(VueClipboard)
-Vue.use(VueNativeNotification)
+Vue.use(VueNativeNotification, {
+  requestOnNotify: true
+})
 
 Vue.component('message-bar', MessageBar);
 Vue.component('event-header', EventHeader);

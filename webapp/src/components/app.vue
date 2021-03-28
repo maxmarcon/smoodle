@@ -56,9 +56,6 @@
             getLocale() {
                 return this.$i18n.locale;
             }
-        },
-        mounted() {
-          this.$notification.requestPermission()
         }
     }
 </script>

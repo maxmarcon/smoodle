@@ -44,7 +44,10 @@ function mountEventViewer(propsData) {
       },
       $loading: loadingStub,
       $scrollTo: () => null,
-      $screens: () => 2
+      $screens: () => 2,
+      $notification: {
+        show: jest.fn()
+      }
     },
     propsData,
     localVue,
