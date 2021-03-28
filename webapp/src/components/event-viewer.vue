@@ -413,11 +413,11 @@ export default {
       this.channel.on('event_update', ({event, schedule}) => {
         this.assignEventData(event)
         this.updateSchedule(schedule)
-        this.$refs.updateBar.show(this.$t('event_editor.event_updated'))
+        this.$refs.updateBar.show(this.$t('event_editor.event_updated'), true)
       })
       this.channel.on('schedule_update', ({schedule}) => {
         this.updateSchedule(schedule)
-        this.$refs.updateBar.show(this.$t('event_editor.event_updated'))
+        this.$refs.updateBar.show(this.$t('event_editor.event_updated'), true)
       })
       this.channel.on('event_delete', () => {
         this.loadedSuccessfully = false

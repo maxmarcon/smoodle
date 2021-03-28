@@ -29,9 +29,12 @@
             countDownChanged(dismissCountDown) {
                 this.dismissCountDown = dismissCountDown;
             },
-            show(errorMsg) {
-                this.errorMsg = errorMsg;
+            show(msg, showNativeNotification = false) {
+                this.errorMsg = msg;
                 this.dismissCountDown = (this.seconds > 0 ? this.seconds : true);
+                if (showNativeNotification) {
+                  this.$notification.show(this.$i18n.t('app_name'), {icon: '/favicon.ico', body: msg}, {})
+                }
             }
         }
     }

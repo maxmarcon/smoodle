@@ -15,53 +15,115 @@ let alert
 
 describe('messageBar', () => {
 
-    describe('without countdown', () => {
+  describe('without countdown', () => {
 
-        beforeEach(async () => {
+    beforeEach(() => {
 
-            wrapper = shallowMount(messageBar, {
-                localVue,
-                propsData: {
-                    seconds: 0,
-                    variant: VARIANT
-                }
-            })
+      wrapper = shallowMount(messageBar, {
+        localVue,
+        propsData: {
+          seconds: 0,
+          variant: VARIANT
+        },
+        mocks: {
+          $notification: {
+            show: jest.fn()
+          },
+          $i18n: {
+            t: () => "Let's meet"
+          }
+        }
+      })
 
-            wrapper.vm.show(MESSAGE)
-        })
-
-        it('shows a permanent dismissable message', () => {
-            alert = wrapper.find('b-alert-stub')
-
-            expect(alert.attributes('show')).toBe('true')
-            expect(alert.attributes('dismissible')).toBeTruthy()
-            expect(alert.attributes('variant')).toBe(VARIANT)
-            expect(alert.text()).toBe(MESSAGE)
-        })
+      wrapper.vm.show(MESSAGE)
     })
 
-    describe('with countdown', () => {
+    it('shows a permanent dismissable message', () => {
+      alert = wrapper.find('b-alert-stub')
 
-        beforeEach(async () => {
-
-            wrapper = shallowMount(messageBar, {
-                localVue,
-                propsData: {
-                    seconds: SECONDS,
-                    variant: VARIANT
-                }
-            })
-
-            wrapper.vm.show(MESSAGE)
-        })
-
-        it('shows a message with countdown', () => {
-            alert = wrapper.find('b-alert-stub')
-
-            expect(alert.attributes('show')).toEqual(SECONDS.toString())
-            expect(alert.attributes('dismissible')).toBeFalsy()
-            expect(alert.attributes('variant')).toBe(VARIANT)
-            expect(alert.text()).toBe(MESSAGE)
-        })
+      expect(alert.attributes('show')).toBe('true')
+      expect(alert.attributes('dismissible')).toBeTruthy()
+      expect(alert.attributes('variant')).toBe(VARIANT)
+      expect(alert.text()).toBe(MESSAGE)
     })
+
+    it('does not show native notifications', () => {
+      expect(wrapper.vm.$notification.show).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('with countdown', () => {
+
+    beforeEach(() => {
+
+      wrapper = shallowMount(messageBar, {
+        localVue,
+        propsData: {
+          seconds: SECONDS,
+          variant: VARIANT
+        },
+        mocks: {
+          $notification: {
+            show: jest.fn()
+          },
+          $i18n: {
+            t: () => "Let's meet"
+          }
+        }
+      })
+
+      wrapper.vm.show(MESSAGE)
+    })
+
+    it('shows a message with countdown', () => {
+      alert = wrapper.find('b-alert-stub')
+
+      expect(alert.attributes('show')).toEqual(SECONDS.toString())
+      expect(alert.attributes('dismissible')).toBeFalsy()
+      expect(alert.attributes('variant')).toBe(VARIANT)
+      expect(alert.text()).toBe(MESSAGE)
+    })
+
+    it('does not show native notifications', () => {
+      expect(wrapper.vm.$notification.show).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('when requesting native notifications', () => {
+    beforeEach(() => {
+
+      wrapper = shallowMount(messageBar, {
+        localVue,
+        propsData: {
+          seconds: 0,
+          variant: VARIANT
+        },
+        mocks: {
+          $notification: {
+            show: jest.fn()
+          },
+          $i18n: {
+            t: () => "Let's meet"
+          }
+        }
+      })
+
+      wrapper.vm.show(MESSAGE, true)
+    })
+
+    it('shows a message', () => {
+      alert = wrapper.find('b-alert-stub')
+
+      expect(alert.attributes('show')).toBe('true')
+      expect(alert.attributes('dismissible')).toBeTruthy()
+      expect(alert.attributes('variant')).toBe(VARIANT)
+      expect(alert.text()).toBe(MESSAGE)
+    })
+
+    it('shows native notifications', () => {
+      expect(wrapper.vm.$notification.show).toHaveBeenCalledWith("Let's meet", {
+        icon: '/favicon.ico', body: MESSAGE
+      }, {})
+    })
+  })
 })
