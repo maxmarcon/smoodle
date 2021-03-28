@@ -3,7 +3,8 @@ import BootstrapVue from 'bootstrap-vue'
 import VueClipboard from 'vue-clipboard2'
 import i18nMock from '../test-utils/i18n-mock'
 import {createLocalVue, mount} from '@vue/test-utils'
-import {pushMock, setJoinResponse, setPushResponse} from "phoenix";
+import {pushMock, resetMocks, setJoinResponse, setPushResponse} from "phoenix";
+import {channelMock} from "../../../__mocks__/phoenix";
 
 function mountEventViewer(propsData) {
 
@@ -203,6 +204,8 @@ let wrapper
 
 describe('eventViewer', () => {
 
+  beforeEach(resetMocks)
+
   describe('when loading fails', () => {
 
     beforeEach(() => {
@@ -242,6 +245,10 @@ describe('eventViewer', () => {
           wrapper = mountEventViewer({
             eventId: EVENT_ID
           })
+        })
+
+        it('joins channel without secret', () => {
+          expect(channelMock).toHaveBeenCalledWith(`event:${EVENT_ID}`, {})
         })
 
         it('renders event header', () => {
@@ -339,6 +346,10 @@ describe('eventViewer', () => {
 
         })
 
+        it('joins channel without secret', () => {
+          expect(channelMock).toHaveBeenCalledWith(`event:${EVENT_ID}`, {})
+        })
+
         it('renders event header', () => {
           let eventHeader = wrapper.find('event-header-stub')
           expect(eventHeader.exists).toBeTruthy();
@@ -396,6 +407,10 @@ describe('eventViewer', () => {
         })
       })
 
+      it('joins channel without secret', () => {
+        expect(channelMock).toHaveBeenCalledWith(`event:${EVENT_ID}`, {})
+      })
+
       it('renders event header', () => {
         let eventHeader = wrapper.find('event-header-stub')
         expect(eventHeader.exists).toBeTruthy();
@@ -443,6 +458,10 @@ describe('eventViewer', () => {
         wrapper = mountEventViewer({
           eventId: EVENT_ID
         })
+      })
+
+      it('joins channel without secret', () => {
+        expect(channelMock).toHaveBeenCalledWith(`event:${EVENT_ID}`, {})
       })
 
       it('renders event header', () => {
@@ -494,14 +513,14 @@ describe('eventViewer', () => {
             schedule: makeSchedule(true, true)
           })
 
-          setPushResponse('ok', {
-            event: {}
-          })
-
           wrapper = mountEventViewer({
             eventId: EVENT_ID,
             secret: EVENT_SECRET
           })
+        })
+
+        it('joins channel with secret', () => {
+          expect(channelMock).toHaveBeenCalledWith(`event:${EVENT_ID}`, {secret: EVENT_SECRET})
         })
 
         it('renders event header', () => {
@@ -580,6 +599,7 @@ describe('eventViewer', () => {
             })
 
             it('only closes the modal', () => {
+              expect(pushMock).not.toHaveBeenCalled()
               expect(wrapper.find('#schedule-event-modal').isVisible()).toBeFalsy()
             })
           })
@@ -660,6 +680,10 @@ describe('eventViewer', () => {
           })
         })
 
+        it('joins channel with secret', () => {
+          expect(channelMock).toHaveBeenCalledWith(`event:${EVENT_ID}`, {secret: EVENT_SECRET})
+        })
+
         it('renders event header', () => {
           let eventHeader = wrapper.find('event-header-stub')
           expect(eventHeader.exists).toBeTruthy();
@@ -719,6 +743,10 @@ describe('eventViewer', () => {
           eventId: EVENT_ID,
           secret: EVENT_SECRET
         })
+      })
+
+      it('joins channel with secret', () => {
+        expect(channelMock).toHaveBeenCalledWith(`event:${EVENT_ID}`, {secret: EVENT_SECRET})
       })
 
       it('renders event header', () => {
@@ -794,6 +822,10 @@ describe('eventViewer', () => {
           eventId: EVENT_ID,
           secret: EVENT_SECRET
         })
+      })
+
+      it('joins channel with secret', () => {
+        expect(channelMock).toHaveBeenCalledWith(`event:${EVENT_ID}`, {secret: EVENT_SECRET})
       })
 
       it('renders event header', () => {
