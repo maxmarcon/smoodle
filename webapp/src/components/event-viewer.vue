@@ -394,7 +394,7 @@ export default {
       }
     },
     initSocket() {
-      this.socket = new Socket(`${process.env.VUE_APP_SOCKETBASE}/socket`)
+      this.socket = new Socket([process.env.VUE_APP_SOCKETBASE, 'socket'].join('/'))
       this.socket.connect()
       this.channel = this.socket.channel(`event:${this.eventId}`, this.secret ? {secret: this.secret} : {})
       this.loader = this.$loading.show()
