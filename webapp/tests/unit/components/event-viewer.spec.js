@@ -5,6 +5,7 @@ import i18nMock from '../test-utils/i18n-mock'
 import {createLocalVue, mount} from '@vue/test-utils'
 import {
   channelMock,
+  leaveMock,
   pushMock,
   resetMocks,
   sendEvent,
@@ -331,6 +332,10 @@ describe('eventViewer', () => {
             expect(wrapper.vm.eventName).toEqual('Grill')
             expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(1)
           })
+
+          it('notifies user', () => {
+            expect(wrapper.vm.$notification.show).toHaveBeenCalled()
+          })
         })
 
         describe('when sending a schedule update', () => {
@@ -353,6 +358,10 @@ describe('eventViewer', () => {
           it('updates the schedule', () => {
             expect(wrapper.vm.scheduleCalendarAttributes.length).toBe(1)
           })
+
+          it('notifies user', () => {
+            expect(wrapper.vm.$notification.show).toHaveBeenCalled()
+          })
         })
 
         describe('when sending an event delete', () => {
@@ -372,6 +381,14 @@ describe('eventViewer', () => {
 
           it('hides the event', () => {
             expect(wrapper.find('div.card').exists()).toBeFalsy();
+          })
+
+          it('does not notify user', () => {
+            expect(wrapper.vm.$notification.show).not.toHaveBeenCalled()
+          })
+
+          it('leaves the channel', () => {
+            expect(leaveMock).toHaveBeenCalled()
           })
         })
 

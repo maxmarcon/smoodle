@@ -421,6 +421,7 @@ export default {
       })
       this.channel.on('event_delete', () => {
         this.loadedSuccessfully = false
+        this.channel.leave()
       })
     },
     closeSocket() {

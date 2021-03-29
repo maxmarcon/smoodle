@@ -2,6 +2,7 @@ export const joinMock = jest.fn()
 export const pushMock = jest.fn()
 export const onMock = jest.fn()
 export const channelMock = jest.fn()
+export const leaveMock = jest.fn()
 
 const DEFAULT_EVENT_DELAY = 10
 
@@ -18,7 +19,8 @@ export const resetMocks = () => {
   channelMock.mockReturnValue({
     join: joinMock,
     on: onMock,
-    push: pushMock
+    push: pushMock,
+    leave: leaveMock
   })
   channelMock.mockClear()
   joinMock.mockReturnValue(pushReturnValue)
