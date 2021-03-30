@@ -28,6 +28,7 @@ export const resetMocks = () => {
   pushMock.mockReturnValue(pushReturnValue)
   pushMock.mockClear()
   onMock.mockReset()
+  leaveMock.mockReset()
 }
 
 const setResponse = (mock, status, reply) => {

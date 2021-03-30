@@ -2,6 +2,7 @@
   "navbar": {
     "language": "Lingua"
   },
+  "enable_notifications": "Attiva le notifiche",
   "step": "Passo {step} di {total}",
   "event_editor": {
     "title": "Nuovo evento",

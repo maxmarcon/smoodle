@@ -14,7 +14,11 @@ import {
 } from "../../../__mocks__/phoenix";
 import MessageBar from '@/components/message-bar.vue'
 
+
 function mountEventViewer(propsData) {
+
+  global.Notification = jest.fn(() => {
+  })
 
   const localVue = createLocalVue();
   localVue.use(BootstrapVue);
@@ -45,10 +49,7 @@ function mountEventViewer(propsData) {
       },
       $loading: loadingStub,
       $scrollTo: () => null,
-      $screens: () => 2,
-      $notification: {
-        show: jest.fn()
-      }
+      $screens: () => 2
     },
     propsData,
     localVue,
@@ -334,7 +335,7 @@ describe('eventViewer', () => {
           })
 
           it('notifies user', () => {
-            expect(wrapper.vm.$notification.show).toHaveBeenCalled()
+            expect(global.Notification).toHaveBeenCalled()
           })
         })
 
@@ -360,7 +361,7 @@ describe('eventViewer', () => {
           })
 
           it('notifies user', () => {
-            expect(wrapper.vm.$notification.show).toHaveBeenCalled()
+            expect(global.Notification).toHaveBeenCalled()
           })
         })
 
@@ -384,7 +385,7 @@ describe('eventViewer', () => {
           })
 
           it('does not notify user', () => {
-            expect(wrapper.vm.$notification.show).not.toHaveBeenCalled()
+            expect(global.Notification).not.toHaveBeenCalled()
           })
 
           it('leaves the channel', () => {

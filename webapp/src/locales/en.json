@@ -3,6 +3,7 @@
   "navbar": {
     "language": "Language"
   },
+  "enable_notifications": "Enable notifications", 
   "step": "Step {step} of {total}",
   "event_editor": {
     "title": "New event",

@@ -13,8 +13,13 @@ const SECONDS = 10
 let wrapper
 let alert
 
+
 describe('messageBar', () => {
 
+  beforeEach(() => {
+    global.Notification = jest.fn(() => {})
+  })
+  
   describe('without countdown', () => {
 
     beforeEach(() => {
@@ -48,7 +53,7 @@ describe('messageBar', () => {
     })
 
     it('does not show native notifications', () => {
-      expect(wrapper.vm.$notification.show).not.toHaveBeenCalled()
+      expect(global.Notification).not.toHaveBeenCalled()
     })
   })
 
@@ -85,7 +90,7 @@ describe('messageBar', () => {
     })
 
     it('does not show native notifications', () => {
-      expect(wrapper.vm.$notification.show).not.toHaveBeenCalled()
+      expect(global.Notification).not.toHaveBeenCalled()
     })
   })
 
@@ -121,9 +126,9 @@ describe('messageBar', () => {
     })
 
     it('shows native notifications', () => {
-      expect(wrapper.vm.$notification.show).toHaveBeenCalledWith("Let's meet", {
+      expect(global.Notification).toHaveBeenCalledWith("Let's meet", {
         icon: '/favicon.ico', body: MESSAGE
-      }, {})
+      })
     })
   })
 })

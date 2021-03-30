@@ -40,7 +40,15 @@
             )
               span.flag-icon.flag-icon-it
               | &nbsp; IT
-
+    
+    .d-flex.justify-content-center
+      b-button#enable-notifications(
+        pill
+        v-if="displayNotificationButton"
+        @click="requestNotificationPermission"
+        variant="outline-secondary"
+        size="sm"
+      ) {{ $t('enable_notifications') }}
     div
       router-view
 
@@ -49,12 +57,25 @@
 </template>
 <script>
     export default {
+        data: () => ({
+          displayNotificationButton: false
+        }),
+        created() {
+          this.updateNotificationState(Notification?.permission)          
+        },
         methods: {
             setLocale(locale) {
                 this.$i18n.locale = locale;
             },
             getLocale() {
                 return this.$i18n.locale;
+            },
+            updateNotificationState(permission) {
+              this.displayNotificationButton = permission === 'default'
+            },
+            async requestNotificationPermission() {
+              const permission = await Notification.requestPermission()
+              this.updateNotificationState(permission)
             }
         }
     }
