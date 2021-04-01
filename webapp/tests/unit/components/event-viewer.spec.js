@@ -3,6 +3,7 @@ import BootstrapVue from 'bootstrap-vue'
 import VueClipboard from 'vue-clipboard2'
 import i18nMock from '../test-utils/i18n-mock'
 import {createLocalVue, mount} from '@vue/test-utils'
+import Vue from 'vue'
 import {
   channelMock,
   leaveMock,
@@ -12,13 +13,10 @@ import {
   setJoinResponse,
   setPushResponse
 } from "../../../__mocks__/phoenix";
-import MessageBar from '@/components/message-bar.vue'
 
 
 function mountEventViewer(propsData) {
 
-  global.Notification = jest.fn(() => {
-  })
 
   const localVue = createLocalVue();
   localVue.use(BootstrapVue);
@@ -38,6 +36,13 @@ function mountEventViewer(propsData) {
   const loadingStub = {
     show: jest.fn().mockReturnValue(loaderStub)
   }
+
+  const MessageBar = Vue.component('foo', {
+    template: "<div></div>",
+    methods: {
+      show: jest.fn()
+    }
+  })
 
   const config = {
     mocks: {
@@ -64,8 +69,9 @@ function mountEventViewer(propsData) {
       transition: transitionStub()
     }
   }
-
-  return mount(eventViewer, config)
+  const wrapper = mount(eventViewer, config)
+  jest.spyOn(wrapper.vm.$refs.updateBar, 'show')
+  return wrapper
 }
 
 const EVENT_ID = "bf6747d5-7b32-4bde-8e2d-c055d9bb02d3"
@@ -335,7 +341,7 @@ describe('eventViewer', () => {
           })
 
           it('notifies user', () => {
-            expect(global.Notification).toHaveBeenCalled()
+            expect(wrapper.vm.$refs.updateBar.show).toHaveBeenCalledWith(expect.any(String), true)
           })
         })
 
@@ -361,7 +367,7 @@ describe('eventViewer', () => {
           })
 
           it('notifies user', () => {
-            expect(global.Notification).toHaveBeenCalled()
+            expect(wrapper.vm.$refs.updateBar.show).toHaveBeenCalledWith(expect.any(String), true)
           })
         })
 
@@ -385,7 +391,7 @@ describe('eventViewer', () => {
           })
 
           it('does not notify user', () => {
-            expect(global.Notification).not.toHaveBeenCalled()
+            expect(wrapper.vm.$refs.updateBar.show).not.toHaveBeenCalled()
           })
 
           it('leaves the channel', () => {
