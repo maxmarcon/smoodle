@@ -13,33 +13,32 @@ const SECONDS = 10
 let wrapper
 let alert
 
+function mountComponent(propsData = {
+  seconds: 0,
+  variant: VARIANT
+}) {
+  return shallowMount(messageBar, {
+    localVue,
+    propsData,
+    mocks: {
+      $i18n: {
+        t: () => "Let's meet"
+      }
+    }
+  })
+}
 
 describe('messageBar', () => {
 
   beforeEach(() => {
-    global.Notification = jest.fn(() => {})
+    global.Notification = jest.fn()
   })
-  
+
   describe('without countdown', () => {
 
     beforeEach(() => {
 
-      wrapper = shallowMount(messageBar, {
-        localVue,
-        propsData: {
-          seconds: 0,
-          variant: VARIANT
-        },
-        mocks: {
-          $notification: {
-            show: jest.fn()
-          },
-          $i18n: {
-            t: () => "Let's meet"
-          }
-        }
-      })
-
+      wrapper = mountComponent()
       wrapper.vm.show(MESSAGE)
     })
 
@@ -51,32 +50,16 @@ describe('messageBar', () => {
       expect(alert.attributes('variant')).toBe(VARIANT)
       expect(alert.text()).toBe(MESSAGE)
     })
-
-    it('does not show native notifications', () => {
-      expect(global.Notification).not.toHaveBeenCalled()
-    })
   })
 
   describe('with countdown', () => {
 
     beforeEach(() => {
 
-      wrapper = shallowMount(messageBar, {
-        localVue,
-        propsData: {
-          seconds: SECONDS,
-          variant: VARIANT
-        },
-        mocks: {
-          $notification: {
-            show: jest.fn()
-          },
-          $i18n: {
-            t: () => "Let's meet"
-          }
-        }
+      wrapper = mountComponent({
+        seconds: SECONDS,
+        variant: VARIANT
       })
-
       wrapper.vm.show(MESSAGE)
     })
 
@@ -97,22 +80,7 @@ describe('messageBar', () => {
   describe('when requesting native notifications', () => {
     beforeEach(() => {
 
-      wrapper = shallowMount(messageBar, {
-        localVue,
-        propsData: {
-          seconds: 0,
-          variant: VARIANT
-        },
-        mocks: {
-          $notification: {
-            show: jest.fn()
-          },
-          $i18n: {
-            t: () => "Let's meet"
-          }
-        }
-      })
-
+      wrapper = mountComponent()
       wrapper.vm.show(MESSAGE, true)
     })
 
@@ -129,6 +97,24 @@ describe('messageBar', () => {
       expect(global.Notification).toHaveBeenCalledWith("Let's meet", {
         icon: '/favicon.ico', body: MESSAGE
       })
+    })
+  })
+
+  describe('when requesting native notifications with no Notification feature available', () => {
+    beforeEach(() => {
+
+      global.Notification = undefined
+      wrapper = mountComponent()
+      wrapper.vm.show(MESSAGE, true)
+    })
+
+    it('shows a message', () => {
+      alert = wrapper.find('b-alert-stub')
+
+      expect(alert.attributes('show')).toBe('true')
+      expect(alert.attributes('dismissible')).toBeTruthy()
+      expect(alert.attributes('variant')).toBe(VARIANT)
+      expect(alert.text()).toBe(MESSAGE)
     })
   })
 })

@@ -32,7 +32,7 @@
             show(msg, showNativeNotification) {
                 this.errorMsg = msg;
                 this.dismissCountDown = (this.seconds > 0 ? this.seconds : true);
-                if (showNativeNotification) {
+                if (Notification && showNativeNotification) {
                   new Notification(this.$i18n.t('app_name'), {icon: '/favicon.ico', body: msg})
                 }
             }
