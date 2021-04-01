@@ -42,7 +42,7 @@
               | &nbsp; IT
     
     .d-flex.justify-content-center
-      b-button#enable-notifications(
+      b-button#enable-notifications.my-1(
         pill
         v-if="displayNotificationButton"
         @click="requestNotificationPermission"
