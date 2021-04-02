@@ -3,7 +3,6 @@ import BootstrapVue from 'bootstrap-vue'
 import VueClipboard from 'vue-clipboard2'
 import i18nMock from '../test-utils/i18n-mock'
 import {createLocalVue, mount} from '@vue/test-utils'
-import Vue from 'vue'
 import {
   channelMock,
   leaveMock,
@@ -37,12 +36,12 @@ function mountEventViewer(propsData) {
     show: jest.fn().mockReturnValue(loaderStub)
   }
 
-  const MessageBar = Vue.component('foo', {
+  const MessageBar = {
     template: "<div></div>",
     methods: {
       show: jest.fn()
     }
-  })
+  }
 
   const config = {
     mocks: {
