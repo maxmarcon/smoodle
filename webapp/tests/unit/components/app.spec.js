@@ -1,5 +1,5 @@
 import app from '@/components/app'
-import BootstrapVue from 'bootstrap-vue'
+import {NavbarPlugin} from 'bootstrap-vue'
 import VueRouter from 'vue-router'
 
 import {createLocalVue, mount} from '@vue/test-utils'
@@ -19,14 +19,17 @@ let wrapper;
 
 function mountComponent() {
   const localVue = createLocalVue();
-  localVue.use(BootstrapVue);
+  localVue.use(NavbarPlugin);
   localVue.use(VueRouter);
 
   wrapper = mount(app, {
     mocks: {
-      $t: () => "",
+      $t: (text) => text,
       $i18n: {
         locale: 'default'
+      },
+      $bvModal: {
+        msgBoxOk: jest.fn()
       }
     },
     localVue,
@@ -74,8 +77,8 @@ describe('app', () => {
 
   describe('if notifications are not available', () => {
 
-    it('does not show the enable notification button', () => {
-      expect(wrapper.find('button#enable-notifications').exists()).toBe(false)
+    it('does not show the notification modal', () => {
+      expect(wrapper.vm.$bvModal.msgBoxOk).not.toHaveBeenCalled()
     })
   })
 
@@ -86,8 +89,8 @@ describe('app', () => {
       mountComponent()
     })
 
-    it('does not show the enable notification button', () => {
-      expect(wrapper.find('button#enable-notifications').exists()).toBe(false)
+    it('does not show the notification modal', () => {
+      expect(wrapper.vm.$bvModal.msgBoxOk).not.toHaveBeenCalled()
     })
   })
 
@@ -98,8 +101,8 @@ describe('app', () => {
       mountComponent()
     })
 
-    it('does not show the enable notification button', () => {
-      expect(wrapper.find('button#enable-notifications').exists()).toBe(false)
+    it('does not show the enable notification modal', () => {
+      expect(wrapper.vm.$bvModal.msgBoxOk).not.toHaveBeenCalled()
     })
   })
 
@@ -107,43 +110,18 @@ describe('app', () => {
 
     beforeEach(() => {
       global.Notification = {
-        permission: 'default'
+        permission: 'default',
+        requestPermission: jest.fn()
       }
       mountComponent()
     })
 
-    it('does show the enable notification button', () => {
-      expect(wrapper.find('button#enable-notifications').exists()).toBe(true)
+    it('does show the notification modal', () => {
+      expect(wrapper.vm.$bvModal.msgBoxOk).toHaveBeenCalledWith("notification_prompt")
     })
 
-    describe('if the user enables notifications', () => {
-      beforeEach(() => {
-        global.Notification = {
-          permission: 'default',
-          requestPermission: jest.fn().mockResolvedValue("granted")
-        }
-        mountComponent()
-        wrapper.find('button#enable-notifications').trigger('click')
-      })
-
-      it('hides the button', () => {
-        expect(wrapper.find('button#enable-notifications').exists()).toBe(false)
-      })
-    })
-
-    describe('if the user denies notifications', () => {
-      beforeEach(() => {
-        global.Notification = {
-          permission: 'default',
-          requestPermission: jest.fn().mockResolvedValue("denied")
-        }
-        mountComponent()
-        wrapper.find('button#enable-notifications').trigger('click')
-      })
-
-      it('hides the button', () => {
-        expect(wrapper.find('button#enable-notifications').exists()).toBe(false)
-      })
+    it('does request permission for notifications', () => {
+      expect(global.Notification.requestPermission).toHaveBeenCalled()
     })
   })
 });

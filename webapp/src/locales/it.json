@@ -2,7 +2,7 @@
   "navbar": {
     "language": "Lingua"
   },
-  "enable_notifications": "Attiva le notifiche",
+  "notification_prompt": "Per favore attiva (consigliato) o blocca le notifiche desktop.",
   "step": "Passo {step} di {total}",
   "event_editor": {
     "title": "Nuovo evento",

@@ -3,7 +3,7 @@
   "navbar": {
     "language": "Sprache"
   },
-  "enable_notifications": "Meldungen aktivieren",
+  "notification_prompt": "Bitte Desktop-Meldungen erlauben (empfohlen) oder blockieren.",
   "step": "Schritt {step} von {total}",
   "event_editor": {
     "title": "Neues Event",

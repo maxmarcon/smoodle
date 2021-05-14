@@ -3,7 +3,7 @@
   "navbar": {
     "language": "Language"
   },
-  "enable_notifications": "Enable notifications", 
+  "notification_prompt": "Please allow (recommended) or block desktop notifications.", 
   "step": "Step {step} of {total}",
   "event_editor": {
     "title": "New event",
