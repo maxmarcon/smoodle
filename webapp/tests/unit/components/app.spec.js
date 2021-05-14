@@ -117,7 +117,10 @@ describe('app', () => {
     })
 
     it('does show the notification modal', () => {
-      expect(wrapper.vm.$bvModal.msgBoxOk).toHaveBeenCalledWith("notification_prompt")
+      expect(wrapper.vm.$bvModal.msgBoxOk).toHaveBeenCalledWith("notification_prompt", {
+        noCloseOnBackdrop: true,
+        noCloseOnEsc: true
+      })
     })
 
     it('does request permission for notifications', () => {
