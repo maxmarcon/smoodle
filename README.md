@@ -2,7 +2,6 @@
 
 <!--ts-->
    * [About](#about)
-   * [Where can I try it out?](#where-can-i-try-it-out)
    * [How is this different from Doodle?](#how-is-this-different-from-doodle)
    * [What technology does it use?](#what-technology-does-it-use)
    * [How to run the application locally](#how-to-run-the-application-locally)
