@@ -1,5 +1,4 @@
 [![Build status](https://circleci.com/gh/maxmarcon/smoodle.svg?style=shield)](https://app.circleci.com/pipelines/github/maxmarcon/smoodle)
-[![Latest](https://img.shields.io/github/v/tag/maxmarcon/smoodle.svg)](https://go.lets-meet.app)
 
 <!--ts-->
    * [About](#about)
@@ -31,10 +30,6 @@ dates or weekdays do not work for them or which ones they prefer.
 
 The app does not require the creation of any account. The only thing required is the email address of the
 event organizer to send them a secret link used to organize the event.
-
-# Where can I try it out?
-
-[Here](https://go.lets-meet.app) 👈
 
 # How is this different from Doodle?
 
